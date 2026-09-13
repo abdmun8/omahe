@@ -1,5 +1,7 @@
 <script lang="ts">
 	import ProjectCard from '$lib/components/project-card.svelte';
+	import { SITE } from '$lib/config';
+	import { amankanJsonLd } from '$lib/jsonld';
 	import { withRef } from '$lib/ref';
 	import { formatAngka } from '$lib/utils';
 	import type { PageData } from './$types';
@@ -7,6 +9,31 @@
 	let { data }: { data: PageData } = $props();
 
 	const totalUnit = $derived(data.developer.proyek.reduce((sum, p) => sum + p.unitTersedia, 0));
+
+	// Cermin breadcrumb visual di atas — WAJIB lewat amankanJsonLd() karena
+	// nama developer datang dari input admin yang tidak disanitasi di backend
+	// (src/lib/jsonld.ts). Tanpa `?ref=`, sama seperti JSON-LD lain: URL di
+	// sini kanonik untuk mesin pencari, bukan atribusi mitra.
+	const jsonLdBreadcrumbAman = $derived(
+		amankanJsonLd({
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{
+					'@type': 'ListItem',
+					position: 1,
+					name: 'Direktori Pengembang',
+					item: `${SITE.url}/developer`
+				},
+				{
+					'@type': 'ListItem',
+					position: 2,
+					name: data.developer.nama,
+					item: `${SITE.url}/developer/${data.developer.slug}`
+				}
+			]
+		})
+	);
 </script>
 
 <svelte:head>
@@ -16,6 +43,10 @@
 		content={data.developer.deskripsi ??
 			`${data.developer.nama} memasarkan ${data.developer.jumlahProyek} proyek perumahan di Omahe.`}
 	/>
+	<!-- Tag <script> utuh lewat {@html} — Svelte 5 menolak <script> non-JS di
+	     level komponen (`script_duplicate`); isinya tetap JSON yang sudah
+	     di-escape (src/lib/jsonld.ts). -->
+	{@html `<script type="application/ld+json">${jsonLdBreadcrumbAman}</script>`}
 </svelte:head>
 
 <div class="border-line bg-surface border-b">

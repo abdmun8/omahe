@@ -2,10 +2,31 @@
 	import '../app.css';
 	import { page } from '$app/state';
 	import { SITE } from '$lib/config';
+	import { amankanJsonLd } from '$lib/jsonld';
+	import { normalisasiNomor } from '$lib/utils';
 	import SiteFooter from '$lib/components/site-footer.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 
 	let { children } = $props();
+
+	// Identitas situs untuk mesin pencari. Wajib lewat amankanJsonLd() sebelum
+	// {@html} — satu jalur escape untuk SEMUA JSON-LD, supaya saat nanti ada
+	// JSON-LD lain yang membawa teks admin, tidak ada yang lupa (src/lib/jsonld.ts).
+	const jsonLdOrgAman = amankanJsonLd({
+		'@context': 'https://schema.org',
+		'@type': 'Organization',
+		name: SITE.nama,
+		slogan: SITE.tagline,
+		description: SITE.deskripsi,
+		url: SITE.url,
+		logo: `${SITE.url}/omahe-logo.jpeg`,
+		contactPoint: {
+			'@type': 'ContactPoint',
+			contactType: 'customer service',
+			telephone: `+${normalisasiNomor(SITE.telepon)}`,
+			email: SITE.email
+		}
+	});
 </script>
 
 <svelte:head>
@@ -14,6 +35,13 @@
 	<meta property="og:type" content="website" />
 	<meta property="og:locale" content="id_ID" />
 	<link rel="canonical" href={`${SITE.url}${page.url.pathname}`} />
+	<!--
+		JSON-LD Organization. Tag <script>-nya ikut disuntik lewat {@html}
+		karena Svelte 5 menganggap <script> apa pun jenisnya di level komponen
+		sebagai script komponen (error `script_duplicate`) — isinya TETAP
+		JSON yang sudah di-escape (`amankanJsonLd`, src/lib/jsonld.ts).
+	-->
+	{@html `<script type="application/ld+json">${jsonLdOrgAman}</script>`}
 </svelte:head>
 
 <div class="flex min-h-dvh flex-col">

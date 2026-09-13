@@ -5,6 +5,8 @@
 	import Badge from '$lib/components/ui/badge.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
+	import { SITE } from '$lib/config';
+	import { amankanJsonLd } from '$lib/jsonld';
 	import { ajukanUrl, withRef } from '$lib/ref';
 	import { formatAngka, formatRentangHarga, formatRupiah, formatRupiahPenuh } from '$lib/utils';
 	import type { PageData } from './$types';
@@ -23,6 +25,57 @@
 	);
 	const totalUnit = $derived(data.tipeUnit.reduce((sum, u) => sum + u.unitTersedia, 0));
 	const fotoUtama = $derived(p.photos.find((f) => f.url !== null)?.url ?? null);
+
+	const urlHalaman = $derived(`${SITE.url}/perumahan/${p.slug}`);
+
+	// JSON-LD listing — WAJIB lewat amankanJsonLd(): nama/deskripsi datang
+	// dari input admin yang tidak disanitasi di backend; teks penutup tag
+	// script di tengah nilai bisa memutus tag script JSON-LD saat dirender
+	// (src/lib/jsonld.ts).
+	const jsonLdListingAman = $derived(
+		amankanJsonLd({
+			'@context': 'https://schema.org',
+			'@type': 'RealEstateListing',
+			name: p.nama,
+			url: urlHalaman,
+			...(p.deskripsi ? { description: p.deskripsi } : {}),
+			...(fotoUtama ? { image: fotoUtama } : {}),
+			...(p.regionNama ? { address: p.regionNama } : {}),
+			...(hargaMulai !== null
+				? {
+						offers: {
+							'@type': 'AggregateOffer',
+							priceCurrency: 'IDR',
+							lowPrice: hargaMulai,
+							offerCount: totalUnit,
+							url: `${urlHalaman}#tipe-unit`,
+							...(p.developer
+								? {
+										seller: {
+											'@type': 'Organization',
+											name: p.developer.nama,
+											url: `${SITE.url}/developer/${p.developer.slug}`
+										}
+									}
+								: {})
+						}
+					}
+				: {})
+		})
+	);
+
+	// Cermin breadcrumb visual di atas. URL-nya sengaja TANPA `?ref=` — itu
+	// passthrough atribusi mitra untuk pengunjung, bukan untuk mesin pencari.
+	const jsonLdBreadcrumbAman = $derived(
+		amankanJsonLd({
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Cari Rumah', item: `${SITE.url}/cari` },
+				{ '@type': 'ListItem', position: 2, name: p.nama, item: urlHalaman }
+			]
+		})
+	);
 </script>
 
 <svelte:head>
@@ -34,6 +87,11 @@
 	/>
 	<meta property="og:title" content={p.nama} />
 	{#if fotoUtama}<meta property="og:image" content={fotoUtama} />{/if}
+	<!-- Tag <script> utuh lewat {@html} — Svelte 5 menolak <script> non-JS di
+	     level komponen (`script_duplicate`); isinya tetap JSON yang sudah
+	     di-escape (src/lib/jsonld.ts). -->
+	{@html `<script type="application/ld+json">${jsonLdListingAman}</script>`}
+	{@html `<script type="application/ld+json">${jsonLdBreadcrumbAman}</script>`}
 </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-6">
