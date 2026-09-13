@@ -47,11 +47,21 @@ Mari diskusikan, mana yang lebih baik kita pakai? saya tidak prefer nextjs karen
 ## Rumah baru vs second
 - **Keputusan (2026-09-13)**: Rumah Second **dikeluarkan dari scope awal**. Backend `perumahan` sama sekali tidak punya model data untuk resale (semua alur booking/DP/KPR/komisi dibangun khusus unit baru dari developer) — rumah second butuh infrastruktur berbeda (akun penjual perorangan, listing, verifikasi, tanpa funnel booking developer yang ada). Didesain terpisah nanti kalau memang mau dikejar, bukan bagian dari MVP marketplace ini.
 
-## Theme color
-- Diturunkan dari `omahe-logo.jpeg`: hijau tua sebagai primary, gold sebagai accent. Diimplementasikan sebagai design tokens/CSS variables agar warna mudah diganti.
+## Theme color & Design System (2026-09-13)
+- **Warna** — disampling langsung dari pixel `omahe-logo.jpeg`:
+  - Primary (hijau): base `#0B3D28`, gelap `#062015`, terang `#1B5E3A`
+  - Accent (gold): base `#B8862F`, gelap `#8C6A21`, terang `#F0D9A0`
+  - Diimplementasikan sebagai CSS variables/design tokens agar mudah diganti (kebutuhan asli user-story).
+- **Component approach**: Tailwind CSS + shadcn-svelte (bits-ui headless, di-copy ke project bukan npm dependency berat) — kontrol penuh atas markup, mudah di-theme lewat CSS variables.
+- **Dark mode**: tidak perlu untuk sekarang — light-only (konsisten dengan referensi mybeyond/brighton/rumah123, semua light-only).
+- **Font**: heading — Plus Jakarta Sans (bold, modern, cocok angka harga besar); body — Inter (readable). Pairing umum fintech/property, gampang diganti kalau perlu.
 
 ## Scope B2C vs B2B (2026-09-13)
 - **Keputusan**: Omahe murni marketplace **konsumen (B2C)** — cari & lihat rumah untuk dibeli. Halaman rekrutmen developer/agen/mitra baru (jual sistem hadirapp, B2B) TETAP scope terpisah — sudah ada epic `SITE-01-landing-principal.md` (`todo`) di repo `perumahan` untuk itu, tidak digabung ke Omahe. Bisa disambung lewat link CTA dari Omahe ke sana nanti kalau perlu, bukan dibangun di dalam Omahe.
+
+## Domain & URL (2026-09-13)
+- Domain final: **`omahe.id`**. Deploy sekarang masih di Vercel (`abdmun8/omahe`, lihat catatan Stack) — domain custom disambungkan belakangan sebelum go-live, `LANDING-05` di repo `perumahan` pakai `omahe.id` sebagai referensi resmi (bukan placeholder lagi).
+- Pola URL detail developer: **`/developer/:slug`** (bukan `/perumahan/:slug` atau `/p/:slug` — dipilih supaya jelas beda makna dari `/p/:slug` milik app `perumahan`, dan eksplisit "developer" konsisten dengan istilah direktori).
 
 ## Site map (draf awal, 2026-09-13)
 | Route | Isi | Sumber data |

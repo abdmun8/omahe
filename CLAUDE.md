@@ -41,9 +41,11 @@ Murni B2C (bukan rekrutmen developer/mitra — itu tetap `SITE-01` di repo `peru
 - Data: fetch dari API admin via SvelteKit `load` functions (server-side)
 - Cache: pakai cache bawaan Vercel (edge cache/ISR per-route) dulu selama di Vercel, bukan Redis terpisah — evaluasi ulang kalau nanti pindah infra sendiri
 
-## Theme
+## Theme & Design System
 
-Warna diturunkan dari `docs/omahe-logo.jpeg`: hijau tua (primary) dan gold (accent). Implementasikan sebagai design tokens/CSS variables agar mudah diganti.
+- Warna (disampling dari `docs/omahe-logo.jpeg`): primary hijau `#0B3D28` (gelap `#062015`, terang `#1B5E3A`), accent gold `#B8862F` (gelap `#8C6A21`, terang `#F0D9A0`) — sebagai CSS variables agar mudah diganti.
+- Tailwind CSS + shadcn-svelte (bits-ui), light-only (tanpa dark mode).
+- Font: Plus Jakarta Sans (heading) + Inter (body).
 
 ## Keputusan Produk
 
