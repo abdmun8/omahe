@@ -5,11 +5,13 @@ Tagline: "Where your story begins".
 
 ## Status
 
-Tahap planning — belum ada kode. Lihat `docs/user-story.md` untuk brainstorm produk lengkap.
+Skeleton app SvelteKit sudah berdiri di `landing/` — seluruh route site map di bawah sudah dirender, lengkap dengan design token, passthrough `?ref=`, dan kalkulator KPR. Data masih dari fixture (`landing/src/lib/api/fixtures.ts`) karena `GET /public/units` dan `GET /public/developers` di repo `perumahan` belum ada; peralihan ke API asli diatur env, per-endpoint, tanpa mengubah komponen — lihat `landing/README.md`.
+
+Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dari repo `perumahan` (termasuk asumsi yang masih perlu dikonfirmasi): `docs/api-contract.md`.
 
 ## Arsitektur
 
-Landing/marketplace ini **terpisah** dari aplikasi admin yang sudah ada dan berjalan di repo `~/Code/Project/perumahan`:
+Landing/marketplace ini **terpisah** dari aplikasi admin yang sudah ada dan berjalan di repo `~/projects/perumahan`:
 
 - **Admin/backend (existing, repo `perumahan`)**: Hono + Bun + Postgres, frontend React. Ini aplikasi booking & referral **multi-tenant** — satu tenant = satu `perumahan` (proyek hunian). Sudah punya alur booking konsumen penuh, referral QR (perusahaan mitra), komisi 2 tingkat, dan **landing page publik per perumahan sendiri** (`/p/:slug`, section builder Hero/Gallery/Pricing/dll) + alur `/ajukan/:slug`. Sumber kebenaran domain: `docs/PRD.md` di repo tsb.
 - **`developer` (perusahaan pengembang) adalah entitas TERPISAH dari `perumahan`** (epic `DEVELOPER-01`, `todo`) — satu developer bisa menaungi banyak proyek `perumahan`. Jangan disamakan; `perumahan.developerId` nullable.

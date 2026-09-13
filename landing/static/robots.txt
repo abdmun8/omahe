@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Halaman hasil berfilter tidak perlu diindeks satu per satu — kanonnya
+# `/cari` polos (halaman berfilter sudah kirim noindex di <head> juga).
+Disallow: /cari?
+
+Sitemap: https://omahe.id/sitemap.xml
