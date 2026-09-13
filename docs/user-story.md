@@ -59,19 +59,28 @@ Mari diskusikan, mana yang lebih baik kita pakai? saya tidak prefer nextjs karen
 ## Scope B2C vs B2B (2026-09-13)
 - **Keputusan**: Omahe murni marketplace **konsumen (B2C)** — cari & lihat rumah untuk dibeli. Halaman rekrutmen developer/agen/mitra baru (jual sistem hadirapp, B2B) TETAP scope terpisah — sudah ada epic `SITE-01-landing-principal.md` (`todo`) di repo `perumahan` untuk itu, tidak digabung ke Omahe. Bisa disambung lewat link CTA dari Omahe ke sana nanti kalau perlu, bukan dibangun di dalam Omahe.
 
-## Domain & URL (2026-09-13)
+## Domain & URL (2026-09-13, direvisi setelah entitas developer ditambah)
 - Domain final: **`omahe.id`**. Deploy sekarang masih di Vercel (`abdmun8/omahe`, lihat catatan Stack) — domain custom disambungkan belakangan sebelum go-live, `LANDING-05` di repo `perumahan` pakai `omahe.id` sebagai referensi resmi (bukan placeholder lagi).
-- Pola URL detail developer: **`/developer/:slug`** (bukan `/perumahan/:slug` atau `/p/:slug` — dipilih supaya jelas beda makna dari `/p/:slug` milik app `perumahan`, dan eksplisit "developer" konsisten dengan istilah direktori).
+- **Revisi pola URL** (setelah keputusan entitas `developer` terpisah dari `perumahan`, lihat epic [`DEVELOPER-01`](../../perumahan/docs/epics/DEVELOPER-01-entitas-pengembang.md) di repo `perumahan`):
+  - `/developer` — direktori **perusahaan developer** (bukan proyek). Satu developer bisa menaungi banyak proyek `perumahan`.
+  - `/developer/:companySlug` — profil satu developer + daftar semua proyek perumahan miliknya.
+  - `/perumahan/:slug` — detail satu proyek perumahan (**dipindah dari `/developer/:slug` sebelumnya** — nama lama tabrakan makna dengan direktori developer di atas). Halaman ini yang di-render Omahe sendiri (hero, galeri, fasilitas, lokasi, testimoni, FAQ, daftar tipe unit), plus baris "Dikembangkan oleh [Nama Developer]" yang link ke `/developer/:companySlug`.
 
-## Site map (draf awal, 2026-09-13)
+## Site map (revisi 2026-09-13 — entitas developer terpisah dari perumahan)
 | Route | Isi | Sumber data |
 |---|---|---|
 | `/` | Homepage — hero search (lokasi/harga/tipe), project unggulan, value prop, link ke direktori & KPR | `GET /public/units` (highlight), statis |
-| `/cari` | Hasil pencarian, granularitas per-unit — filter lokasi/harga/tipe/developer, pagination | `GET /public/units` (`UNIT-04`) |
-| `/developer` | Direktori project/developer — kartu per perumahan (nama, foto, lokasi, jumlah tipe tersedia) | `GET /public/perumahan` (`UNIT-04`, ditambahkan setelah diskusi site map) |
-| `/developer/:slug` | Detail satu perumahan (Omahe-rendered) — hero, galeri, fasilitas, lokasi, testimoni, FAQ (reuse konten `sections` yang diisi admin perumahan lewat `LANDING-02`) + daftar semua tipe unit di project itu + CTA "Ajukan" → `/ajukan/:slug?ref=...` (passthrough `ref`, lihat `LANDING-05`) | `GET /public/perumahan/:slug` + `GET /public/units?perumahanSlug=` |
+| `/cari` | Hasil pencarian, granularitas per-unit — filter lokasi/harga/tipe/developer, pagination | `GET /public/units` (`UNIT-04`, field developer ditambah `DEVELOPER-01`) |
+| `/developer` | Direktori **perusahaan developer** — kartu per developer (logo, nama, jumlah proyek aktif, cakupan lokasi) | `GET /public/developers` (`DEVELOPER-01`, baru) |
+| `/developer/:companySlug` | Profil satu developer — deskripsi, daftar semua proyek perumahan miliknya (kartu, link ke `/perumahan/:slug`) | `GET /public/developers/:slug` (`DEVELOPER-01`, baru) |
+| `/perumahan/:slug` | Detail satu proyek perumahan (Omahe-rendered, dipindah dari `/developer/:slug`) — hero, galeri, fasilitas, lokasi, testimoni, FAQ (reuse konten `sections` dari `LANDING-02`) + daftar tipe unit + baris "Dikembangkan oleh" + CTA "Ajukan" → `/ajukan/:slug?ref=...` (passthrough `ref`, lihat `LANDING-05`) | `GET /public/perumahan/:slug` + `GET /public/units?perumahanSlug=` |
 | `/kpr` | Simulasi cicilan KPR — kalkulator mandiri client-side (flat/anuitas), tanpa backend | — |
 | `/tentang`, `/kontak` | Corporate info Omahe — statis | — |
 | `/privasi`, `/syarat-ketentuan` | Legal Omahe sendiri (beda dari `/legal/:kind` milik app `perumahan` yang khusus proses booking) | statis |
 
-Detail unit sebagai halaman tersendiri (`/unit/:id`) **ditunda** — cukup anchor/section di `/developer/:slug` untuk MVP, karena foto & deskripsi cuma ada di level perumahan (bukan per-unit), jadi halaman detail unit sendiri isinya akan tipis. Bisa dipecah nanti kalau ada kebutuhan deep-link dari hasil pencarian ke unit spesifik.
+Detail unit sebagai halaman tersendiri (`/unit/:id`) **ditunda** — cukup anchor/section di `/perumahan/:slug` untuk MVP, karena foto & deskripsi cuma ada di level perumahan (bukan per-unit), jadi halaman detail unit sendiri isinya akan tipis. Bisa dipecah nanti kalau ada kebutuhan deep-link dari hasil pencarian ke unit spesifik.
+
+## Developer sebagai entitas terpisah (2026-09-13)
+- **Keputusan**: "Developer" yang ditampilkan di card BUKAN sekadar nama perumahan itu sendiri — melainkan perusahaan induk yang bisa menaungi beberapa proyek perumahan sekaligus (mis. "PT Nusa Land Development" mengembangkan "Griya Asri Bogor" DAN "Villa Kenanga Residence"). Ini butuh entitas baru di backend `perumahan`, bukan cuma perubahan tampilan.
+- Detail lengkap: epic [`DEVELOPER-01`](../../perumahan/docs/epics/DEVELOPER-01-entitas-pengembang.md) di repo `perumahan` — tabel `developer` baru, `perumahan.developerId` (nullable), endpoint publik `GET /public/developers` + `/:slug`, dan perluasan response `UNIT-04` supaya card di Omahe bisa tampilkan + link ke nama developer.
+- Open question yang dicatat di epic: siapa yang mengelola relasi developer↔perumahan (draft: principal-only, mirip pola `AUTH-04`).
