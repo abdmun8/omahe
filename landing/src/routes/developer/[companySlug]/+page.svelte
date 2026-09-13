@@ -9,6 +9,10 @@
 	let { data }: { data: PageData } = $props();
 
 	const totalUnit = $derived(data.developer.proyek.reduce((sum, p) => sum + p.unitTersedia, 0));
+	const deskripsi = $derived(
+		data.developer.deskripsi ??
+			`${data.developer.nama} memasarkan ${data.developer.jumlahProyek} proyek perumahan di Omahe.`
+	);
 
 	// Cermin breadcrumb visual di atas — WAJIB lewat amankanJsonLd() karena
 	// nama developer datang dari input admin yang tidak disanitasi di backend
@@ -38,11 +42,10 @@
 
 <svelte:head>
 	<title>{data.developer.nama} — Proyek Perumahan · Omahe</title>
-	<meta
-		name="description"
-		content={data.developer.deskripsi ??
-			`${data.developer.nama} memasarkan ${data.developer.jumlahProyek} proyek perumahan di Omahe.`}
-	/>
+	<meta name="description" content={deskripsi} />
+	<meta property="og:title" content={`${data.developer.nama} — Proyek Perumahan`} />
+	<meta property="og:description" content={deskripsi} />
+	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 	<!-- Tag <script> utuh lewat {@html} — Svelte 5 menolak <script> non-JS di
 	     level komponen (`script_duplicate`); isinya tetap JSON yang sudah
 	     di-escape (src/lib/jsonld.ts). -->

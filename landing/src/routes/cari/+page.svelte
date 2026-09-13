@@ -4,6 +4,7 @@
 	import Pagination from '$lib/components/pagination.svelte';
 	import SearchForm from '$lib/components/search-form.svelte';
 	import UnitCard from '$lib/components/unit-card.svelte';
+	import { SITE } from '$lib/config';
 	import { formatAngka } from '$lib/utils';
 	import type { PageData } from './$types';
 
@@ -15,16 +16,17 @@
 	const judul = $derived(
 		lokasiAktif ? `Rumah Dijual di ${lokasiAktif}` : 'Rumah Dijual dari Pengembang'
 	);
+	const deskripsi = $derived(
+		`${formatAngka(data.hasil.meta.total)} tipe unit tersedia${lokasiAktif ? ` di ${lokasiAktif}` : ''}. Bandingkan harga, luas, dan pengembangnya di Omahe.`
+	);
 </script>
 
 <svelte:head>
 	<title>{judul} · Omahe</title>
-	<meta
-		name="description"
-		content="{formatAngka(data.hasil.meta.total)} tipe unit tersedia{lokasiAktif
-			? ` di ${lokasiAktif}`
-			: ''}. Bandingkan harga, luas, dan pengembangnya di Omahe."
-	/>
+	<meta name="description" content={deskripsi} />
+	<meta property="og:title" content={judul} />
+	<meta property="og:description" content={deskripsi} />
+	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 	<!-- Halaman hasil berfilter jangan bersaing dengan dirinya sendiri di indeks. -->
 	{#if data.hasil.meta.page > 1 || data.query.tipe}
 		<meta name="robots" content="noindex,follow" />

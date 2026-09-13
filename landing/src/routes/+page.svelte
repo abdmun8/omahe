@@ -15,6 +15,7 @@
 	<meta name="description" content={SITE.deskripsi} />
 	<meta property="og:title" content="Omahe — {SITE.tagline}" />
 	<meta property="og:description" content={SITE.deskripsi} />
+	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
 
 <!-- Hero + pencarian -->

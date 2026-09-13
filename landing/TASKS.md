@@ -13,10 +13,15 @@ Urutan boleh disusun ulang; jangan hapus item yang belum selesai.
       end-to-end dengan payload `</script><script>alert(1)</script>` di
       deskripsi fixture: tetap inert, tidak lolos sebagai tag. (2026-09-13,
       implementor pi/glm-5.3, review Claude)
-- [ ] **OpenGraph image di halaman tanpa foto** — `/`, `/cari`, `/developer`,
-      `/kpr` belum punya `og:image` (perumahan detail sudah, pakai foto
-      hero). Opsi murah: satu static og-image branded di `static/`, dipakai
-      sebagai fallback lewat `SITE` config.
+- [x] **OpenGraph metadata di halaman yang belum punya** — `/`, `/cari`,
+      `/developer`, `/developer/:companySlug`, `/kpr`, `/tentang`, `/kontak`
+      sekarang punya `og:title`/`og:description`/`og:image` (fallback
+      `${SITE.url}/omahe-logo.jpeg`, URL absolut). `/cari` &
+      `/developer/:companySlug` di-refactor jadi `const deskripsi = $derived(...)`
+      supaya `meta description` & `og:description` satu sumber, bukan dua
+      literal yang bisa drift. `/perumahan/:slug` (og:image kondisional dari
+      foto asli) & `/privasi`/`/syarat-ketentuan` tidak disentuh — diverifikasi.
+      (2026-09-13, implementor pi/glm-5.3, review Claude)
 - [ ] **Component test dasar** — pasang `@testing-library/svelte` + `jsdom`,
       tes render untuk `unit-card.svelte` (harga tampil benar, link developer
       hanya muncul kalau `developer` tidak null, tombol WA/Telepon selalu

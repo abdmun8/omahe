@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { amortisasi, DEFAULT_INPUT, hitungKpr, type InputKpr } from '$lib/kpr';
+	import { SITE } from '$lib/config';
 	import { formatAngka, formatRupiahPenuh } from '$lib/utils';
 	import Button from '$lib/components/ui/button.svelte';
 
@@ -19,6 +20,12 @@
 		name="description"
 		content="Hitung estimasi cicilan KPR bulanan dari harga rumah, uang muka, tenor, dan suku bunga — metode anuitas maupun flat."
 	/>
+	<meta property="og:title" content="Simulasi Cicilan KPR" />
+	<meta
+		property="og:description"
+		content="Hitung estimasi cicilan KPR bulanan dari harga rumah, uang muka, tenor, dan suku bunga — metode anuitas maupun flat."
+	/>
+	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8">

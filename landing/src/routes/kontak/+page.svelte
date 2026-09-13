@@ -7,6 +7,12 @@
 <svelte:head>
 	<title>Kontak · Omahe</title>
 	<meta name="description" content="Hubungi tim Omahe lewat WhatsApp, telepon, atau email." />
+	<meta property="og:title" content="Kontak · Omahe" />
+	<meta
+		property="og:description"
+		content="Hubungi tim Omahe lewat WhatsApp, telepon, atau email."
+	/>
+	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-10">

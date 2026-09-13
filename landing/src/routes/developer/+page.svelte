@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DeveloperCard from '$lib/components/developer-card.svelte';
+	import { SITE } from '$lib/config';
 	import { formatAngka } from '$lib/utils';
 	import type { PageData } from './$types';
 
@@ -12,6 +13,12 @@
 		name="description"
 		content="Daftar perusahaan pengembang perumahan di Omahe beserta proyek aktif dan cakupan lokasinya."
 	/>
+	<meta property="og:title" content="Direktori Pengembang Perumahan" />
+	<meta
+		property="og:description"
+		content="Daftar perusahaan pengembang perumahan di Omahe beserta proyek aktif dan cakupan lokasinya."
+	/>
+	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8">

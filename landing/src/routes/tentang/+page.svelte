@@ -9,6 +9,12 @@
 		name="description"
 		content="Omahe adalah portal properti yang menghubungkan pencari rumah dengan pengembang perumahan secara langsung."
 	/>
+	<meta property="og:title" content="Tentang Omahe" />
+	<meta
+		property="og:description"
+		content="Omahe adalah portal properti yang menghubungkan pencari rumah dengan pengembang perumahan secara langsung."
+	/>
+	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-10">
