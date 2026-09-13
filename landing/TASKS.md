@@ -22,10 +22,23 @@ Urutan boleh disusun ulang; jangan hapus item yang belum selesai.
       literal yang bisa drift. `/perumahan/:slug` (og:image kondisional dari
       foto asli) & `/privasi`/`/syarat-ketentuan` tidak disentuh — diverifikasi.
       (2026-09-13, implementor pi/glm-5.3, review Claude)
-- [ ] **Component test dasar** — pasang `@testing-library/svelte` + `jsdom`,
-      tes render untuk `unit-card.svelte` (harga tampil benar, link developer
-      hanya muncul kalau `developer` tidak null, tombol WA/Telepon selalu
-      ada) dan `contact-buttons.svelte` (href `wa.me`/`tel:` benar).
+- [x] **Component test dasar (1/2) — pasang toolchain + contact-buttons** —
+      `vitest` + `@testing-library/svelte` + `@testing-library/jest-dom` +
+      `jsdom` terpasang sebagai runner TERPISAH (`vitest.config.ts`,
+      `bun run test:component`). `bun test` tidak disentuh (script `test`
+      sama persis) dan tetap 23 pass — file tes baru otomatis ke-skip di
+      situ lewat `describe.skipIf(typeof document === 'undefined')` (bun
+      ikut menjemput file `*.test.ts` yang sama, jadi guard ini wajib).
+      `vitest.config.ts` pakai `resolve.conditions: ['browser']` (kalau
+      tidak, `svelte` resolve ke `index-server` dan `mount()` gagal). 4 tes
+      `contact-buttons.svelte` lulus. (2026-09-13, implementor pi/glm-5.3,
+      review Claude — diverifikasi independen: `bun test` 23 pass + 4 skip,
+      `bun run test:component` 4 pass, `check`/`build` tetap hijau)
+- [ ] **Component test dasar (2/2) — unit-card** — setelah (1/2) beres:
+      tes `unit-card.svelte` pakai toolchain yang sama (harga tampil benar,
+      link developer hanya muncul kalau `developer` tidak null, badge "unit
+      tersisa" hanya muncul kalau `unitTersedia <= 3`, tombol WA/Telepon
+      selalu ada).
 - [ ] **Aksesibilitas pass** — audit manual: kontras warna accent/primary di
       atas putih & di atas gelap, semua ikon dekoratif punya `aria-hidden`,
       urutan fokus hamburger menu & filter chip, `<details>` FAQ bisa

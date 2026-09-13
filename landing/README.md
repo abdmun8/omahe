@@ -18,13 +18,14 @@ Tanpa `OMAHE_API_BASE_URL`, seluruh data diambil dari
 `src/lib/api/fixtures.ts` — jadi repo ini bisa dikembangkan **sebelum** epic
 `UNIT-04` dan `DEVELOPER-01` di repo `perumahan` selesai.
 
-| Perintah         | Kegunaan                        |
-| ---------------- | ------------------------------- |
-| `bun run dev`    | dev server                      |
-| `bun run build`  | build produksi (adapter Vercel) |
-| `bun test`       | unit test (`src/lib/*.test.ts`) |
-| `bun run check`  | type-check Svelte + TS          |
-| `bun run format` | Prettier                        |
+| Perintah                 | Kegunaan                                                        |
+| ------------------------ | --------------------------------------------------------------- |
+| `bun run dev`            | dev server                                                      |
+| `bun run build`          | build produksi (adapter Vercel)                                 |
+| `bun test`               | unit test (`src/lib/*.test.ts`)                                 |
+| `bun run test:component` | component test (vitest + jsdom, `src/lib/components/*.test.ts`) |
+| `bun run check`          | type-check Svelte + TS                                          |
+| `bun run format`         | Prettier                                                        |
 
 ## Sumber data: tiga tahap
 
