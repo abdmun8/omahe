@@ -10,7 +10,7 @@
 
 	const variants = {
 		default: 'bg-primary/8 text-primary',
-		accent: 'bg-accent-light/50 text-accent-dark',
+		accent: 'bg-accent-light/25 text-accent-dark',
 		muted: 'bg-surface text-muted'
 	};
 </script>

@@ -48,10 +48,55 @@ Urutan boleh disusun ulang; jangan hapus item yang belum selesai.
       link yang justru mengandung hash (`hrefDetail`), supaya celah itu
       sekalian kebuktikan tertutup. (2026-09-13, implementor pi/glm-5.3,
       review + 1 revisi Claude)
-- [ ] **Aksesibilitas pass** — audit manual: kontras warna accent/primary di
-      atas putih & di atas gelap, semua ikon dekoratif punya `aria-hidden`,
-      urutan fokus hamburger menu & filter chip, `<details>` FAQ bisa
-      dioperasikan keyboard-only.
+- [x] **Aksesibilitas pass — kontras warna** — dihitung reviewer (formula
+      WCAG relative luminance, bukan tebakan) atas SEMUA pasangan
+      teks/latar yang benar-benar dipakai di kode. Hasil: 3 GAGAL, sisanya
+      (ink/muted/primary di atas putih & surface, teks putih di atas
+      primary, `accent-light/25` untuk callout box, dll) sudah lolos AA —
+      JANGAN diubah.
+
+      **Perbaikan wajib (3 titik, di `src/lib/components/ui/button.svelte`
+      dan `src/lib/components/ui/badge.svelte`):**
+      1. Button `whatsapp`: `bg-whatsapp text-white` = **1.98:1** (gagal
+         jauh, standar minimal teks normal 4.5:1). Ganti `text-white` →
+         `text-ink` → jadi 8.46:1. `hover:brightness-95` yang sudah ada
+         TETAP (ink di atas whatsapp-brightness-95 ≈ 7.67:1, masih lolos).
+      2. Button `accent`: `bg-accent text-white` = **3.24:1** (gagal untuk
+         teks normal, cuma cukup untuk UI besar). Ganti `text-white` →
+         `text-ink` → jadi 5.19:1. TAPI hover-nya (`hover:bg-accent-dark`)
+         kalau dibiarkan + `text-ink` jadi 3.36:1 (gagal lagi) — ganti
+         `hover:bg-accent-dark` → `hover:brightness-95` (pola yang sama
+         persis dengan variant `whatsapp` di atasnya) → ink di atas itu
+         ≈ 4.71:1, lolos.
+      3. Badge `accent`: `bg-accent-light/50 text-accent-dark` = **4.26:1**
+         (gagal tipis untuk teks kecil `text-xs`). Turunkan opacity `/50`
+         → `/25` → jadi ≈4.63:1.
+
+      Warna brand WhatsApp (`--wa-green`/`bg-whatsapp`) itu sendiri JANGAN
+      diubah (keputusan 2026-09-13 §Kontak langsung di card — cuma warna
+      TEKS di atasnya yang berubah, bukan latarnya).
+
+      **Verifikasi wajib**: setelah tiap perubahan, hitung ulang rasio
+      kontras (boleh pakai script Python/Node kecil dengan formula relative
+      luminance WCAG — searchable, atau tanya reviewer polanya) dan laporkan
+      angkanya, jangan cuma "kelihatan lebih gelap".
+
+      **Sudah dicek reviewer, TIDAK perlu diubah** (laporkan status
+      "sudah patuh" untuk masing-masing, jangan diam-diam dilewati):
+      semua ikon SVG dekoratif sudah `aria-hidden="true"` (langsung atau
+      lewat wrapper `photo-placeholder.svelte`); hamburger menu
+      (`site-header.svelte`) sudah punya `aria-expanded`/`aria-controls`/
+      `aria-label`; chip filter (`filter-chips.svelte`) sudah `<a>` asli
+      (focusable native); FAQ (`landing-sections.svelte`) sudah pakai
+      `<details>`/`<summary>` native (keyboard-operable bawaan browser).
+
+      **Hasil**: `button.svelte` whatsapp & accent → `text-ink` (8.46:1 &
+      5.19:1), hover accent → `hover:brightness-95` (4.71:1, `bg-accent-dark`
+      lama gagal 3.36:1 dikombinasi `text-ink`). `badge.svelte` accent →
+      `accent-light/25` (4.63:1). Implementor menghitung ulang independen
+      dengan skrip sendiri — angkanya cocok persis dengan hitungan reviewer
+      di atas. 4 poin "sudah patuh" dikonfirmasi ulang, tidak diubah.
+      (2026-09-13, implementor pi/glm-5.3, review Claude)
 - [ ] **Sitemap lebih lengkap** — tambahkan `lastmod` (dari data yang ada;
       kalau tidak ada timestamp, boleh tanggal deploy) dan halaman legal
       (`/tentang`, `/kontak`) ke `sitemap.xml`; sertakan `<lastmod>` sesuai

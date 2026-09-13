@@ -30,10 +30,10 @@
 
 	const variants: Record<Variant, string> = {
 		primary: 'bg-primary text-white hover:bg-primary-light',
-		accent: 'bg-accent text-white hover:bg-accent-dark',
+		accent: 'bg-accent text-ink hover:brightness-95',
 		outline: 'border border-primary/25 text-primary bg-white hover:bg-surface',
 		ghost: 'text-primary hover:bg-surface',
-		whatsapp: 'bg-whatsapp text-white hover:brightness-95'
+		whatsapp: 'bg-whatsapp text-ink hover:brightness-95'
 	};
 
 	const sizes: Record<Size, string> = {
