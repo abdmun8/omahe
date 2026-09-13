@@ -97,10 +97,26 @@ Urutan boleh disusun ulang; jangan hapus item yang belum selesai.
       dengan skrip sendiri — angkanya cocok persis dengan hitungan reviewer
       di atas. 4 poin "sudah patuh" dikonfirmasi ulang, tidak diubah.
       (2026-09-13, implementor pi/glm-5.3, review Claude)
-- [ ] **Sitemap lebih lengkap** — tambahkan `lastmod` (dari data yang ada;
-      kalau tidak ada timestamp, boleh tanggal deploy) dan halaman legal
-      (`/tentang`, `/kontak`) ke `sitemap.xml`; sertakan `<lastmod>` sesuai
-      spec sitemaps.org.
+- [x] **Sitemap: tambahkan `<lastmod>`** — dicek ulang reviewer:
+      `/tentang` & `/kontak` TERNYATA SUDAH ada di `STATIS` (deskripsi item
+      ini sempat salah asumsi, ditulis sebelum cek isi file — abaikan
+      klaim "belum ada halaman legal" di judul lama). Yang benar-benar
+      kurang cuma `<lastmod>`. Cek `src/lib/api/types.ts`: TIDAK ADA field
+      timestamp apa pun (`createdAt`/`updatedAt`) di `PerumahanDetail`,
+      `DeveloperSummary`, atau `UnitListing` — jadi tidak ada "data yang
+      ada" untuk dipakai per-halaman. Solusi jujur: SEMUA `<lastmod>` pakai
+      satu timestamp build-time yang sama (`new Date().toISOString()`
+      dipanggil sekali di handler, bukan per-URL — supaya nilainya
+      konsisten dalam satu response), format W3C Datetime sesuai spec
+      sitemaps.org (ISO 8601, `YYYY-MM-DDTHH:mm:ssZ` valid). `/privasi` &
+      `/syarat-ketentuan` (noindex) TETAP TIDAK masuk sitemap — jangan
+      ditambahkan, kontradiktif dengan noindex.
+
+      **Hasil**: diff 6 baris di `src/routes/sitemap.xml/+server.ts` —
+      `STATIS`/urutan/header tidak disentuh. Reviewer parse ulang XML
+      output pakai `xml.etree.ElementTree` (bukan `grep`): 15 URL, semua
+      punya `<lastmod>` valid, `/privasi`/`/syarat-ketentuan` tidak bocor.
+      (2026-09-13, implementor pi/glm-5.3, review Claude)
 - [ ] **404 unit-not-found di anchor `#tipe-unit`** — kalau proyek tidak
       punya `tipeUnit` sama sekali, halaman `/perumahan/:slug` sudah punya
       empty state; pastikan juga kartu di `/cari` yang link ke proyek yang
