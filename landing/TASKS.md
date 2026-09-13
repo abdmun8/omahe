@@ -117,11 +117,50 @@ Urutan boleh disusun ulang; jangan hapus item yang belum selesai.
       output pakai `xml.etree.ElementTree` (bukan `grep`): 15 URL, semua
       punya `<lastmod>` valid, `/privasi`/`/syarat-ketentuan` tidak bocor.
       (2026-09-13, implementor pi/glm-5.3, review Claude)
-- [ ] **404 unit-not-found di anchor `#tipe-unit`** — kalau proyek tidak
-      punya `tipeUnit` sama sekali, halaman `/perumahan/:slug` sudah punya
-      empty state; pastikan juga kartu di `/cari` yang link ke proyek yang
-      sudah tidak aktif (404 di backend) tidak bikin seluruh halaman crash —
-      cek penanganan error di `getPerumahan`.
+- [x] **Regression test: proyek nonaktif tidak bikin crash** — dicek ulang
+      reviewer dulu (sebelum dispatch, biar tidak membangun ulang yang
+      sudah ada):
+      - Empty state "Tidak ada unit yang tersedia" di `/perumahan/:slug`
+        SUDAH ADA sejak awal (`src/routes/perumahan/[slug]/+page.svelte`) —
+        JANGAN dibangun ulang.
+      - `getPerumahan()`/`apiGet()` (`src/lib/api/client.ts`) SUDAH benar
+        panggil `error(404, ...)` dari `@sveltejs/kit` untuk slug yang
+        tidak ada — diverifikasi manual reviewer: `curl /perumahan/tidak-ada`
+        sudah balas 404 lewat `+error.svelte` custom (bukan crash generik),
+        dan `error()` melempar objek `{ status: 404, body: { message } }`
+        (diverifikasi langsung lewat Node).
+
+      **Yang benar-benar belum ada**: regression test otomatis yang
+      MENGUNCI perilaku itu di level data layer (`src/lib/api/client.ts`),
+      supaya kalau nanti ada yang mengubah `apiGet`/`getPerumahan` secara
+      tidak sengaja dan menghilangkan `error(404,...)`-nya, `bun test`
+      langsung merah — bukan baru ketahuan pas production 500.
+
+      Buat `src/lib/api/client.test.ts` (`bun:test`, BUKAN vitest — ini
+      murni fungsi, tidak merender komponen, tidak butuh DOM):
+      1. `getPerumahan(fetchDummy, 'slug-tidak-ada')` → harus `throw` objek
+         dengan `.status === 404` (assert pakai
+         `expect(...).rejects.toMatchObject({ status: 404 })` atau
+         try/catch manual — cek dulu API `bun:test` yang benar untuk
+         async-throw sebelum menulis).
+      2. `getPerumahan(fetchDummy, 'griya-asri-bogor')` (slug valid di
+         fixture) → HARUS TIDAK throw, resolve normal.
+      3. `getUnits(fetchDummy, { perumahanSlug: 'slug-tidak-ada' })` → HARUS
+         TIDAK throw — resolve dengan `items: []` (ini bukti "/cari" sendiri
+         tidak pernah crash walau filter tidak match apa pun, beda dari
+         kasus #1 yang memang sengaja 404).
+      4. `fetchDummy` = fungsi yang `throw` kalau benar-benar dipanggil —
+         membuktikan di mode fixture (env kosong, default `bun:test`)
+         semua ini tidak pernah menyentuh network sama sekali.
+
+      **Hasil**: `src/lib/api/client.test.ts`, 4 test, `bun test` naik
+      23→27 pass (bukan cuma "lulus" — file baru benar-benar ke-run).
+      Reviewer mutation-test: hapus baris `error(404,...)` di
+      `getPerumahan` sementara → test #1 langsung merah persis seperti
+      dirancang, lalu dikembalikan (bukan tautologi yang selalu lolos).
+      (2026-09-13, implementor pi/glm-5.3, review Claude)
+
+      **Backlog ini sekarang kosong** — semua item tuntas.
 
 ## Aturan untuk implementor (pi/GLM)
 
