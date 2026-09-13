@@ -42,6 +42,10 @@ Detail: `docs/epics/DEVELOPER-01-entitas-pengembang.md` di repo `perumahan`.
 
 Murni B2C (bukan rekrutmen developer/mitra — itu tetap `SITE-01` di repo `perumahan`, terpisah): `/` (homepage+search), `/cari` (hasil per-unit), `/developer` (direktori PERUSAHAAN developer), `/developer/:companySlug` (profil developer + daftar proyeknya), `/perumahan/:slug` (detail satu proyek, Omahe-rendered, CTA ke `/ajukan/:slug?ref=...`), `/kpr` (kalkulator), `/tentang`, `/kontak`, `/privasi`, `/syarat-ketentuan`. Detail unit tersendiri (`/unit/:id`) ditunda — cukup anchor di `/perumahan/:slug`. Rincian: `docs/user-story.md` §Site map.
 
+Domain final: **`omahe.id`** (deploy sementara masih Vercel, lihat §Stack). Setiap card properti wajib ada tombol **WhatsApp + Telepon** (nomor kontaknya belum diputuskan sumbernya — perumahan/developer/marketing, lihat `docs/user-story.md` §Kontak langsung di card). Desain **mobile-first** wajib (pola: hamburger nav, filter jadi chip horizontal, sticky bottom CTA di halaman detail) — lihat `docs/user-story.md` §Mobile-first.
+
+**Mockup visual**: 10 artboard (desktop+mobile) sudah dibuat, published sebagai Claude Artifact privat: https://claude.ai/code/artifact/5d4fa421-0da2-4461-af7d-96be65191a33 (masih statis, data contoh — bukan clickable prototype). Detail: `docs/user-story.md` §Mockup visual.
+
 ## Stack (landing)
 
 - Framework: SvelteKit (SSR untuk SEO di halaman publik, prerender untuk halaman statis)

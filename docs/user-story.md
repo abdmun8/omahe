@@ -84,3 +84,15 @@ Detail unit sebagai halaman tersendiri (`/unit/:id`) **ditunda** — cukup ancho
 - **Keputusan**: "Developer" yang ditampilkan di card BUKAN sekadar nama perumahan itu sendiri — melainkan perusahaan induk yang bisa menaungi beberapa proyek perumahan sekaligus (mis. "PT Nusa Land Development" mengembangkan "Griya Asri Bogor" DAN "Villa Kenanga Residence"). Ini butuh entitas baru di backend `perumahan`, bukan cuma perubahan tampilan.
 - Detail lengkap: epic [`DEVELOPER-01`](../../perumahan/docs/epics/DEVELOPER-01-entitas-pengembang.md) di repo `perumahan` — tabel `developer` baru, `perumahan.developerId` (nullable), endpoint publik `GET /public/developers` + `/:slug`, dan perluasan response `UNIT-04` supaya card di Omahe bisa tampilkan + link ke nama developer.
 - Open question yang dicatat di epic: siapa yang mengelola relasi developer↔perumahan (draft: principal-only, mirip pola `AUTH-04`).
+
+## Kontak langsung di card (WhatsApp + Telepon) (2026-09-13)
+- **Keputusan**: setiap card properti/perumahan (homepage, hasil pencarian, direktori developer, profil developer) menampilkan tombol **WhatsApp** (warna brand WhatsApp `#25D366` — dipertahankan apa adanya karena universal/gampang dikenali, bukan pelanggaran brand Omahe) dan **Telepon** (ikon outline warna primary Omahe).
+- **Belum diputuskan** (perlu keputusan lanjutan sebelum implementasi nyata): nomor WhatsApp/telepon itu milik siapa — perumahan (per-project), developer (per-company), atau marketing yang pegang unit (`unit.marketingUserId` di backend `perumahan`)? Dan apakah datanya perlu field baru di backend `perumahan`/`DEVELOPER-01`, atau cukup nomor kontak umum Omahe yang mem-forward. Placeholder di mockup belum terhubung ke data nyata manapun.
+
+## Mobile-first (2026-09-13)
+- **Keputusan**: desain Omahe wajib mobile-first, bukan cuma desktop yang "menyempit". Pola mobile yang dipakai: header dengan hamburger menu, search bar bertumpuk vertikal, filter pencarian jadi horizontal scrollable chips (bukan sidebar permanen), hasil pencarian jadi kartu horizontal ringkas, dan halaman detail perumahan pakai **sticky bottom bar** (WhatsApp + Ajukan) supaya CTA utama selalu terlihat tanpa menggambar fake status bar/keyboard.
+
+## Mockup visual (2026-09-13)
+- Draf visual 10 artboard (desktop + mobile) sudah dibuat mencakup: Homepage, Hasil Pencarian, Direktori Developer, Profil Developer, Detail Perumahan, Simulasi KPR.
+- Published sebagai Claude Artifact (Design Canvas), privat milik akun `hadirapp.dev@gmail.com`: https://claude.ai/code/artifact/5d4fa421-0da2-4461-af7d-96be65191a33 — kalau link ini basi/dipindah, cari ulang lewat daftar artifact akun tsb (judul "Omahe Marketplace Mockup").
+- Ini masih statis (bukan clickable prototype) — placeholder foto pakai blok gradien + ikon rumah (bukan foto asli), data developer/harga di mockup adalah data contoh, bukan data real.
