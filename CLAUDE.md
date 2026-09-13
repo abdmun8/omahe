@@ -26,15 +26,20 @@ QR referral kerjasama perumahan×perusahaan mengarah ke `/p/:slug` (stabil, tida
 
 ### Pencarian & granularitas (epic `UNIT-04` di repo `perumahan`)
 
-Hasil pencarian Omahe granularitasnya **per-unit/tipe rumah** (bukan per-project) — konsumsi `GET /public/units` (paginasi, filter `regionKode`/`hargaMin`/`hargaMax`/`tipe`/`perumahanSlug`, cuma unit `status=tersedia`). Detail: `docs/epics/UNIT-04-pencarian-publik-lintas-perumahan.md` di repo `perumahan`. Rumah Second **di luar scope** — backend `perumahan` tidak punya model data resale sama sekali.
+Hasil pencarian Omahe granularitasnya **per-unit/tipe rumah** (bukan per-project) — konsumsi `GET /public/units` (paginasi, filter `regionKode`/`hargaMin`/`hargaMax`/`tipe`/`perumahanSlug`, cuma unit `status=tersedia`). Direktori developer (`/developer`) pakai `GET /public/perumahan` (list per-project, count unit tersedia) — endpoint terpisah, sama-sama di epic `UNIT-04`. Detail: `docs/epics/UNIT-04-pencarian-publik-lintas-perumahan.md` di repo `perumahan`. Rumah Second **di luar scope** — backend `perumahan` tidak punya model data resale sama sekali.
+
+## Site map (draf)
+
+Murni B2C (bukan rekrutmen developer/mitra — itu tetap `SITE-01` di repo `perumahan`, terpisah): `/` (homepage+search), `/cari` (hasil per-unit), `/developer` (direktori project), `/developer/:slug` (detail, Omahe-rendered, CTA ke `/ajukan/:slug?ref=...`), `/kpr` (kalkulator), `/tentang`, `/kontak`, `/privasi`, `/syarat-ketentuan`. Detail unit tersendiri (`/unit/:id`) ditunda — cukup anchor di `/developer/:slug`. Rincian: `docs/user-story.md` §Site map.
 
 ## Stack (landing)
 
 - Framework: SvelteKit (SSR untuk SEO di halaman publik, prerender untuk halaman statis)
-- Runtime: Bun
+- Dev/tooling: Bun (`bun install`, `bun run dev`), konsisten dengan repo `perumahan`
+- Deploy: Vercel untuk sementara (`@sveltejs/adapter-vercel`) — repo GitHub `abdmun8/omahe` (personal, bukan org `hadirapp-com`, khusus tahap ini). Runtime produksi jadi Node/Edge function Vercel, BUKAN Bun — Bun cuma dipakai lokal.
 - Node version: lihat `.nvmrc`
 - Data: fetch dari API admin via SvelteKit `load` functions (server-side)
-- Pertimbangkan cache layer di depan API admin untuk menahan traffic publik yang lebih tinggi dari traffic admin
+- Cache: pakai cache bawaan Vercel (edge cache/ISR per-route) dulu selama di Vercel, bukan Redis terpisah — evaluasi ulang kalau nanti pindah infra sendiri
 
 ## Theme
 

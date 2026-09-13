@@ -49,3 +49,19 @@ Mari diskusikan, mana yang lebih baik kita pakai? saya tidak prefer nextjs karen
 
 ## Theme color
 - Diturunkan dari `omahe-logo.jpeg`: hijau tua sebagai primary, gold sebagai accent. Diimplementasikan sebagai design tokens/CSS variables agar warna mudah diganti.
+
+## Scope B2C vs B2B (2026-09-13)
+- **Keputusan**: Omahe murni marketplace **konsumen (B2C)** — cari & lihat rumah untuk dibeli. Halaman rekrutmen developer/agen/mitra baru (jual sistem hadirapp, B2B) TETAP scope terpisah — sudah ada epic `SITE-01-landing-principal.md` (`todo`) di repo `perumahan` untuk itu, tidak digabung ke Omahe. Bisa disambung lewat link CTA dari Omahe ke sana nanti kalau perlu, bukan dibangun di dalam Omahe.
+
+## Site map (draf awal, 2026-09-13)
+| Route | Isi | Sumber data |
+|---|---|---|
+| `/` | Homepage — hero search (lokasi/harga/tipe), project unggulan, value prop, link ke direktori & KPR | `GET /public/units` (highlight), statis |
+| `/cari` | Hasil pencarian, granularitas per-unit — filter lokasi/harga/tipe/developer, pagination | `GET /public/units` (`UNIT-04`) |
+| `/developer` | Direktori project/developer — kartu per perumahan (nama, foto, lokasi, jumlah tipe tersedia) | `GET /public/perumahan` (`UNIT-04`, ditambahkan setelah diskusi site map) |
+| `/developer/:slug` | Detail satu perumahan (Omahe-rendered) — hero, galeri, fasilitas, lokasi, testimoni, FAQ (reuse konten `sections` yang diisi admin perumahan lewat `LANDING-02`) + daftar semua tipe unit di project itu + CTA "Ajukan" → `/ajukan/:slug?ref=...` (passthrough `ref`, lihat `LANDING-05`) | `GET /public/perumahan/:slug` + `GET /public/units?perumahanSlug=` |
+| `/kpr` | Simulasi cicilan KPR — kalkulator mandiri client-side (flat/anuitas), tanpa backend | — |
+| `/tentang`, `/kontak` | Corporate info Omahe — statis | — |
+| `/privasi`, `/syarat-ketentuan` | Legal Omahe sendiri (beda dari `/legal/:kind` milik app `perumahan` yang khusus proses booking) | statis |
+
+Detail unit sebagai halaman tersendiri (`/unit/:id`) **ditunda** — cukup anchor/section di `/developer/:slug` untuk MVP, karena foto & deskripsi cuma ada di level perumahan (bukan per-unit), jadi halaman detail unit sendiri isinya akan tipis. Bisa dipecah nanti kalau ada kebutuhan deep-link dari hasil pencarian ke unit spesifik.
