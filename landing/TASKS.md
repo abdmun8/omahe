@@ -34,11 +34,20 @@ Urutan boleh disusun ulang; jangan hapus item yang belum selesai.
       `contact-buttons.svelte` lulus. (2026-09-13, implementor pi/glm-5.3,
       review Claude — diverifikasi independen: `bun test` 23 pass + 4 skip,
       `bun run test:component` 4 pass, `check`/`build` tetap hijau)
-- [ ] **Component test dasar (2/2) — unit-card** — setelah (1/2) beres:
-      tes `unit-card.svelte` pakai toolchain yang sama (harga tampil benar,
-      link developer hanya muncul kalau `developer` tidak null, badge "unit
-      tersisa" hanya muncul kalau `unitTersedia <= 3`, tombol WA/Telepon
-      selalu ada).
+- [x] **Component test dasar (2/2) — unit-card** — 7 tes: harga ringkas,
+      baris developer (muncul/tidak), badge "unit tersisa" (muncul kalau
+      `unitTersedia <= 3`), tombol WA/Telepon selalu ada, dan link nama
+      perumahan (`hrefDetail`) bawa `?ref=` yang disisipkan SEBELUM
+      `#tipe-unit`. `unit-card.svelte` meng-import `$lib/ref` →
+      `$env/dynamic/public` (modul virtual, tidak resolve di plugin svelte
+      polos vitest.config.ts) — di-mock per-file via `vi.mock('$lib/ref')`.
+      **Revisi reviewer**: draft awal implementor punya mock `withRef` yang
+      tidak menangani pemisahan `#hash` (semua test awalnya pakai
+      `ref=null` jadi celah ini tidak ketahuan sendiri) — diminta perbaiki
+      jadi tiruan baris-per-baris `ref.ts` + tambah test `ref` non-null pada
+      link yang justru mengandung hash (`hrefDetail`), supaya celah itu
+      sekalian kebuktikan tertutup. (2026-09-13, implementor pi/glm-5.3,
+      review + 1 revisi Claude)
 - [ ] **Aksesibilitas pass** — audit manual: kontras warna accent/primary di
       atas putih & di atas gelap, semua ikon dekoratif punya `aria-hidden`,
       urutan fokus hamburger menu & filter chip, `<details>` FAQ bisa
