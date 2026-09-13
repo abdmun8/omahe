@@ -5,11 +5,13 @@
 	Hijau WhatsApp `#25D366` dipertahankan apa adanya — itu pengenal, bukan
 	pelanggaran brand Omahe. Telepon pakai outline warna primary.
 
-	BELUM DIPUTUSKAN nomor ini milik siapa (perumahan / developer / marketing
-	pemegang unit). Sampai diputuskan, `nomor` default ke kontak Omahe dan
-	`konteks` disisipkan ke pesan pembuka supaya lead tetap bisa ditelusuri
-	ke properti mana. Begitu backend `perumahan` punya field kontaknya,
-	yang berubah cuma prop `nomor` dari pemanggil.
+	Keputusan (2026-09-13): untuk tahap awal, nomor SELALU nomor kontak
+	umum Omahe (bukan per-perumahan/developer/marketing) — `nomor` default
+	ke `SITE.whatsapp`/`SITE.telepon`, dan `konteks` disisipkan ke pesan
+	pembuka supaya lead tetap bisa ditelusuri ke properti mana. Field
+	kontak per-entitas boleh menyusul nanti kalau dibutuhkan; yang berubah
+	cuma prop `nomorWhatsapp`/`nomorTelepon` dari pemanggil, bukan komponen
+	ini.
 -->
 <script lang="ts">
 	import { SITE } from '$lib/config';

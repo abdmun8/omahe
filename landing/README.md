@@ -77,13 +77,14 @@ src/routes/   site map: /, /cari, /developer[/:companySlug], /perumahan/:slug,
               /kpr, /tentang, /kontak, /privasi, /syarat-ketentuan, /sitemap.xml
 ```
 
-## Catatan yang masih menggantung
+## Keputusan yang berlaku sekarang (2026-09-13)
 
-- **Nomor kontak di kartu properti** belum diputuskan sumbernya (perumahan /
-  developer / marketing pemegang unit). Sementara memakai nomor Omahe di
-  `src/lib/config.ts`, dengan nama properti disisipkan ke pesan pembuka WA
-  supaya lead tetap bisa ditelusuri.
-- **`/privasi` dan `/syarat-ketentuan` masih draf** — belum ditinjau penasihat
-  hukum, dan sudah diberi `noindex` sampai ditinjau.
-- **Granularitas `GET /public/units`** — lihat "ASUMSI YANG PERLU
-  DIKONFIRMASI" di `../docs/api-contract.md`.
+- **Nomor kontak di kartu properti**: nomor Omahe (`src/lib/config.ts`)
+  untuk semua kartu, bukan per-perumahan/developer/marketing — nama properti
+  disisipkan ke pesan pembuka WA supaya lead tetap bisa ditelusuri. Field
+  kontak per-entitas bisa menyusul nanti kalau dibutuhkan.
+- **`/privasi` dan `/syarat-ketentuan` sengaja masih draf + `noindex`** —
+  ditinjau ulang menjelang go-live, tidak memblokir pekerjaan lain sekarang.
+- **Granularitas `GET /public/units`**: satu baris = satu (perumahan, tipe),
+  `GROUP BY` di backend `perumahan`, bukan di-grouping ulang di Omahe. Detail:
+  `../docs/api-contract.md`.

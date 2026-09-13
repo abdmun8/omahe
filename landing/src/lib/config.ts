@@ -6,11 +6,12 @@ export const SITE = {
 		'Cari rumah baru dari pengembang terpercaya di seluruh Indonesia. Bandingkan tipe, harga, dan lokasi, lalu ajukan langsung.',
 	url: 'https://omahe.id',
 	/**
-	 * Kontak fallback Omahe. CATATAN: sumber nomor kontak per-properti BELUM
-	 * DIPUTUSKAN (perumahan / developer / marketing pemegang unit — lihat
-	 * `docs/user-story.md` §Kontak langsung di card). Selama belum, tombol
-	 * WhatsApp/Telepon di kartu memakai nomor ini dan menyebut nama properti
-	 * di pesan pembuka, supaya lead tetap bisa ditelusuri.
+	 * Kontak fallback Omahe. Keputusan (2026-09-13, `docs/user-story.md`
+	 * §Kontak langsung di card): untuk tahap awal, SEMUA tombol
+	 * WhatsApp/Telepon di kartu memakai nomor ini (bukan per-perumahan/
+	 * developer/marketing) — nama properti disisipkan ke pesan pembuka
+	 * supaya lead tetap bisa ditelusuri. Field kontak per-entitas bisa
+	 * menyusul sebagai iterasi terpisah kalau dibutuhkan nanti.
 	 */
 	whatsapp: '0811000000',
 	telepon: '0811000000',

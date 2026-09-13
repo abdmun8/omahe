@@ -51,7 +51,7 @@ perumahan `isActive=true`.
 }
 ```
 
-### ASUMSI YANG PERLU DIKONFIRMASI — granularitas baris
+### Keputusan (2026-09-13) — granularitas baris: `GROUP BY` di backend
 
 Keputusan produk bilang kartu hasil pencarian adalah **per tipe rumah**
 ("tiap tipe unit mis. 'Tipe 36' jadi kartu sendiri"), sementara epic bilang
@@ -59,15 +59,17 @@ query-nya **di level `unit`**. Dua hal itu tidak otomatis sama: satu
 perumahan bisa punya 12 baris `unit` bertipe "Tipe 36/72" yang identik di
 mata konsumen.
 
-Omahe di sini mengasumsikan endpoint mengembalikan **satu baris per
-(perumahan, tipe)** — hasil `GROUP BY` di level unit, dengan `unitTersedia`
-sebagai `COUNT` dan `hargaMin`/`hargaMax` sebagai rentang harganya. Kalau
-tidak, hasil pencarian akan penuh kartu kembar.
+**Keputusan**: endpoint `GET /public/units` mengembalikan **satu baris per
+(perumahan, tipe)** — hasil `GROUP BY` DI BACKEND, dengan `unitTersedia`
+sebagai `COUNT` dan `hargaMin`/`hargaMax` sebagai rentang harganya. Ini
+harus dikerjakan di backend `perumahan` (bagian dari epic `UNIT-04`),
+BUKAN di-grouping ulang di Omahe — kalau backend mengirim baris `unit`
+mentah lalu Omahe yang mengelompokkan, paginasi jadi tidak akurat (halaman
+berisi 12 unit bisa menyusut jadi 2-3 kartu setelah dikelompokkan).
 
-Kalau UNIT-04 nanti diputuskan mengembalikan baris `unit` mentah, yang
-berubah cuma `getUnits()` di `landing/src/lib/api/client.ts` (grouping
-pindah ke sisi Omahe) — tapi paginasinya jadi salah (halaman berisi 12 unit
-bisa menyusut jadi 2 kartu), jadi **lebih baik diputuskan di backend**.
+`landing/src/lib/api/fixtures.ts` dan `landing/src/lib/api/types.ts` sudah
+dibuat sesuai kontrak ini — tidak perlu berubah saat UNIT-04
+diimplementasikan, selama backend mengikuti keputusan di atas.
 
 Field operasional (`blok`, `nomor`, `marketingUserId`, `siteplanSheetId`,
 `posX`, `posY`) tidak boleh ada di response ini.
