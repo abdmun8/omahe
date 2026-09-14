@@ -15,8 +15,13 @@ bun run dev
 ```
 
 Tanpa `OMAHE_API_BASE_URL`, seluruh data diambil dari
-`src/lib/api/fixtures.ts` — jadi repo ini bisa dikembangkan **sebelum** epic
-`UNIT-04` dan `DEVELOPER-01` di repo `perumahan` selesai.
+`src/lib/api/fixtures.ts` — awalnya supaya repo ini bisa dikembangkan
+**sebelum** epic `UNIT-04`/`DEVELOPER-01`/`LANDING-05` di repo `perumahan`
+selesai. **Update 2026-09-14**: ketiganya sekarang `done` dan live di
+produksi — flag `OMAHE_API_SEARCH` di bawah masih relevan sebagai
+saklar bertahap, tapi alasan "belum ada backend"-nya sudah tidak berlaku;
+lihat `../docs/api-contract.md` §Status untuk shape aktual (beberapa
+field fixture perlu dicek ulang sebelum switch penuh).
 
 | Perintah                 | Kegunaan                                                        |
 | ------------------------ | --------------------------------------------------------------- |
@@ -37,9 +42,11 @@ Diatur lewat dua env (lihat `.env.example`):
 | terisi               | `0`                | **API asli**     | fixture               |
 | terisi               | `1`                | **API asli**     | **API asli**          |
 
-Baris tengah adalah keadaan sekarang begitu backend tersedia:
-`GET /public/perumahan/:slug` memang sudah ada, sementara `GET /public/units`
-dan `GET /public/developers` masih `todo`. Peralihannya per-endpoint, tanpa
+`GET /public/perumahan/:slug`, `GET /public/units`, dan
+`GET /public/developers[/:slug]` SEMUA sudah ada di produksi per
+2026-09-14 (lihat `../docs/api-contract.md` §Status) — baris mana yang
+dipakai sekarang di repo ini tergantung kapan env di atas benar-benar
+diisi, bukan lagi ketersediaan backend. Peralihannya per-endpoint, tanpa
 mengubah satu pun komponen.
 
 ## Yang wajib dijaga di setiap PR

@@ -1,12 +1,18 @@
 /**
- * Data contoh — dipakai HANYA selama endpoint `GET /public/units`,
- * `/public/developers`, dan `/public/developers/:slug` belum ada di backend
- * `perumahan` (epic UNIT-04 & DEVELOPER-01, keduanya masih `todo`).
+ * Data contoh — dipakai selama `OMAHE_API_SEARCH` belum diset (lihat
+ * `client.ts`/README). Endpoint asli (`GET /public/units`,
+ * `/public/developers`, `/public/developers/:slug`) SUDAH ADA di backend
+ * `perumahan` per 2026-09-14 (epic `UNIT-04` & `DEVELOPER-01` selesai) —
+ * file ini sekarang murni saklar bertahap, bukan lagi menunggu backend.
+ * Sebelum switch penuh, cek `docs/api-contract.md` §Status: shape asli
+ * `/public/developers[/:slug]` LEBIH RINGKAS dari yang dikarang di sini
+ * (tidak ada `cakupanLokasi`, dan `proyek[]` di detail developer tidak
+ * punya `regionNama`/`hargaMulai`/`unitTersedia`).
  *
  * BUKAN data nyata. Nama developer/perumahan/harga di sini karangan, sama
- * seperti mockup visual (`docs/user-story.md` §Mockup visual). Begitu
- * endpoint asli mendarat, set `OMAHE_API_BASE_URL` + `OMAHE_API_HAS_SEARCH=1`
- * dan file ini berhenti terpakai tanpa mengubah satu pun komponen.
+ * seperti mockup visual (`docs/user-story.md` §Mockup visual). Set
+ * `OMAHE_API_BASE_URL` + `OMAHE_API_SEARCH=1` untuk switch ke API asli
+ * tanpa mengubah satu pun komponen.
  *
  * `fotoUrl` sengaja `null` di seluruh fixture — placeholder gradien yang
  * dipakai komponen kartu adalah jalur yang SAMA dengan kondisi presign

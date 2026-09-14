@@ -3,19 +3,22 @@
  * file ini cuma mirror TypeScript-nya (Omahe consume API, tidak pernah
  * menyentuh DB `perumahan` langsung; CLAUDE.md §Arsitektur).
  *
- * Status tiap endpoint per 2026-09-13:
- *   `GET /public/perumahan/:slug`  — SUDAH ADA (epic LANDING-01 + LANDING-02)
- *   `GET /public/units`            — BELUM ADA (epic UNIT-04, `todo`)
- *   `GET /public/developers`       — BELUM ADA (epic DEVELOPER-01, `todo`)
- *   `GET /public/developers/:slug` — BELUM ADA (epic DEVELOPER-01, `todo`)
+ * Status tiap endpoint per 2026-09-14 — SEMUA sudah ada di produksi
+ * `perumahan` (epic `DEVELOPER-01`/`UNIT-04`/`LANDING-05` selesai):
+ *   `GET /public/perumahan/:slug`  — ADA (LANDING-01/02, diperluas
+ *                                    DEVELOPER-01/UNIT-04/LANDING-05)
+ *   `GET /public/units`            — ADA (UNIT-04)
+ *   `GET /public/developers`       — ADA (DEVELOPER-01)
+ *   `GET /public/developers/:slug` — ADA (DEVELOPER-01) — shape `proyek[]`
+ *                                    LEBIH RINGKAS dari tipe di bawah,
+ *                                    lihat `docs/api-contract.md` §3
  *
- * Selama tiga yang terakhir belum ada, `src/lib/api/fixtures.ts` yang
- * dipakai (lihat `client.ts`). Bentuk fixture SENGAJA dibuat identik dengan
- * tipe di bawah supaya saat endpoint asli mendarat, yang berubah cuma
- * sumber datanya — bukan satu pun komponen.
- *
- * Asumsi yang perlu dikonfirmasi saat UNIT-04 diimplementasi di repo
- * `perumahan` — lihat `docs/api-contract.md`.
+ * Peralihan fixture→API asli BELUM dikerjakan di repo ini (`client.ts`
+ * masih pakai `src/lib/api/fixtures.ts`) — sebelum switch, cek
+ * `docs/api-contract.md` §Status: beberapa field di tipe/fixture di bawah
+ * (mis. `cakupanLokasi` developer, `regionNama`/`hargaMulai`/
+ * `unitTersedia` per-proyek di developer detail) TERNYATA TIDAK ada di
+ * response asli.
  */
 
 /** Semua endpoint backend `perumahan` membungkus payload seperti ini. */

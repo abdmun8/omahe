@@ -5,7 +5,7 @@ Tagline: "Where your story begins".
 
 ## Status
 
-Skeleton app SvelteKit sudah berdiri di `landing/` — seluruh route site map di bawah sudah dirender, lengkap dengan design token, passthrough `?ref=`, dan kalkulator KPR. Data masih dari fixture (`landing/src/lib/api/fixtures.ts`) karena `GET /public/units` dan `GET /public/developers` di repo `perumahan` belum ada; peralihan ke API asli diatur env, per-endpoint, tanpa mengubah komponen — lihat `landing/README.md`.
+Skeleton app SvelteKit sudah berdiri di `landing/` — seluruh route site map di bawah sudah dirender, lengkap dengan design token, passthrough `?ref=`, dan kalkulator KPR. Data masih dari fixture (`landing/src/lib/api/fixtures.ts`); peralihan ke API asli diatur env, per-endpoint, tanpa mengubah komponen — lihat `landing/README.md`. **Update 2026-09-14**: ketiga epic backend yang diminta (`DEVELOPER-01`, `UNIT-04`, `LANDING-05`) sudah `done` dan live di produksi `perumahan` — `GET /public/units`, `GET /public/developers[/:slug]`, `GET /public/perumahan` (list), dan perluasan `GET /public/perumahan/:slug` (`developer`, `regionNama`, `redirectUrl`) semua sudah bisa dipakai. Peralihan fixture→API asli belum dikerjakan di sisi Omahe — lihat `docs/api-contract.md` §Status untuk detail shape aktual (beberapa field yang tadinya diasumsikan, mis. `cakupanLokasi` developer, ternyata TIDAK diimplementasikan — cek sebelum switch).
 
 Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dari repo `perumahan` (termasuk asumsi yang masih perlu dikonfirmasi): `docs/api-contract.md`.
 
@@ -14,31 +14,33 @@ Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dar
 Landing/marketplace ini **terpisah** dari aplikasi admin yang sudah ada dan berjalan di repo `~/projects/perumahan`:
 
 - **Admin/backend (existing, repo `perumahan`)**: Hono + Bun + Postgres, frontend React. Ini aplikasi booking & referral **multi-tenant** — satu tenant = satu `perumahan` (proyek hunian). Sudah punya alur booking konsumen penuh, referral QR (perusahaan mitra), komisi 2 tingkat, dan **landing page publik per perumahan sendiri** (`/p/:slug`, section builder Hero/Gallery/Pricing/dll) + alur `/ajukan/:slug`. Sumber kebenaran domain: `docs/PRD.md` di repo tsb.
-- **`developer` (perusahaan pengembang) adalah entitas TERPISAH dari `perumahan`** (epic `DEVELOPER-01`, `todo`) — satu developer bisa menaungi banyak proyek `perumahan`. Jangan disamakan; `perumahan.developerId` nullable.
-- API publik yang sudah ada: `GET /public/perumahan/:slug` (satu perumahan, tanpa auth). **Belum ada** endpoint list/search lintas-perumahan — akan ditambahkan lewat epic `UNIT-04` di repo `perumahan` (`GET /public/units`, lihat bawah).
+- **`developer` (perusahaan pengembang) adalah entitas TERPISAH dari `perumahan`** (epic `DEVELOPER-01`, `done` 2026-09-13) — satu developer bisa menaungi banyak proyek `perumahan`. Jangan disamakan; `perumahan.developerId` nullable.
+- API publik yang sudah ada (semua tanpa auth): `GET /public/perumahan/:slug` (satu perumahan, LANDING-01/02, diperluas DEVELOPER-01/UNIT-04/LANDING-05), `GET /public/units` (pencarian per-tipe lintas-perumahan, UNIT-04, `done` 2026-09-14), `GET /public/perumahan` (direktori list perumahan aktif, UNIT-04, `done` 2026-09-14 — belum ada halaman Omahe yang eksplisit memakainya), `GET /public/developers[/:slug]` (DEVELOPER-01, `done` 2026-09-13). Detail shape aktual per endpoint (termasuk koreksi vs asumsi awal): `docs/api-contract.md`.
 - **Landing/Marketplace (repo ini, `landing/`)**: SvelteKit, dijalankan di Bun runtime (konsisten dengan admin). Consume + extend API dari `perumahan` — tidak akses DB-nya langsung. Omahe berperan sebagai (1) direktori/pencarian lintas-perumahan (gap yang belum ada di `perumahan`) dan (2) render sendiri halaman detail per developer/perumahan (keputusan: bukan link-out ke `/p/:slug` yang sudah ada, meski itu artinya ada duplikasi UI landing page dengan React di `perumahan` — trade-off yang disadari, lihat `docs/user-story.md`).
 - Booking, verifikasi KPR, dan komisi/referral **tidak dibangun ulang** di Omahe — itu tetap alur `perumahan` yang sudah jadi.
 
 Alasan pisah: landing itu public-facing/SEO-heavy/read-mostly, admin itu internal/write-heavy — kebutuhan render dan scaling berbeda.
 
-### Redirect `/p/:slug` per-tenant (epic `LANDING-05` di repo `perumahan`)
+### Redirect `/p/:slug` per-tenant (epic `LANDING-05` di repo `perumahan`, `done` 2026-09-14)
 
-QR referral kerjasama perumahan×perusahaan mengarah ke `/p/:slug` (stabil, tidak boleh berubah). Per-tenant, perumahan owner bisa isi field `omaheLandingUrl` sendiri (self-service) — kalau terisi, `/p/:slug` redirect ke halaman tenant tsb di Omahe; kalau kosong, tetap fallback ke section builder lama. Detail: `docs/epics/LANDING-05-redirect-omahe.md` di repo `perumahan`.
+QR referral kerjasama perumahan×perusahaan mengarah ke `/p/:slug` (stabil, tidak boleh berubah). Per-tenant, perumahan owner bisa isi field `omaheLandingUrl` sendiri (self-service) — kalau terisi, `/p/:slug` (app `perumahan`) redirect client-side ke halaman tenant tsb di Omahe, SELURUH query string ikut terbawa; kalau kosong, tetap fallback ke section builder lama. Detail: `docs/epics/LANDING-05-redirect-omahe.md` di repo `perumahan`.
+
+**GOTCHA arsitektur belum terselesaikan (2026-09-14)** — `GET /public/perumahan/:slug` (endpoint yang API-contract.md §4 bilang "Omahe sudah memakainya apa adanya" untuk render `/perumahan/:slug`) SEKARANG melakukan *skip-resolve*: kalau tenant itu punya `omahe_landing_url` terisi, endpoint balikin `redirectUrl` TAPI `deskripsi`/`photos`/`sections`/`developer`/`regionNama` SEMUA kosong/null (optimasi ini didesain dengan asumsi HANYA `/p/:slug` React yang manggil endpoint ini, dan dia redirect duluan jadi datanya tidak pernah dipakai). Tenant dengan `omaheLandingUrl` terisi justru tenant yang PALING relevan buat Omahe (mereka MEMILIH Omahe sebagai landing utama) — kalau Omahe memanggil endpoint publik yang SAMA untuk render `/perumahan/:slug` miliknya sendiri, Omahe akan dapat profil KOSONG untuk tenant-tenant ini. Belum diputuskan solusinya (opsi: endpoint terpisah untuk Omahe yang tidak ikut skip-resolve, atau param query untuk minta full-resolve meski redirectUrl terisi) — WAJIB dibahas/diselesaikan SEBELUM Omahe mulai konsumsi `GET /public/perumahan/:slug` sungguhan untuk tenant yang sudah migrasi.
 
 **Kewajiban wajib di sisi Omahe**: setiap halaman detail developer/perumahan harus baca query param `ref` dari URL saat dibuka, dan meneruskannya lagi ke SETIAP link CTA booking (`/ajukan/:slug?ref=...`) yang balik ke app `perumahan`. Kalau `ref` hilang di satu saja titik hop (QR → `/p/:slug` → Omahe → `/ajukan/:slug`), komisi referral perusahaan mitra tidak tercatat (PRD §4 & §7 repo `perumahan`) — cek ini di setiap PR yang menyentuh routing/CTA booking.
 
-### Pencarian & granularitas (epic `UNIT-04` di repo `perumahan`)
+### Pencarian & granularitas (epic `UNIT-04` di repo `perumahan`, `done` 2026-09-14)
 
-Hasil pencarian Omahe granularitasnya **per-unit/tipe rumah** (bukan per-project) — konsumsi `GET /public/units` (paginasi, filter `regionKode`/`hargaMin`/`hargaMax`/`tipe`/`perumahanSlug`, cuma unit `status=tersedia`). Detail: `docs/epics/UNIT-04-pencarian-publik-lintas-perumahan.md` di repo `perumahan`. Rumah Second **di luar scope** — backend `perumahan` tidak punya model data resale sama sekali.
+Hasil pencarian Omahe granularitasnya **per-unit/tipe rumah** (bukan per-project) — konsumsi `GET /public/units` (paginasi, filter `regionKode`/`hargaMin`/`hargaMax`/`tipe`/`perumahanSlug`, cuma unit `status=tersedia`, dikelompokkan per (perumahan, tipe) di backend). **Tidak ada** filter `developerSlug` di endpoint ini (sempat diasumsikan di `docs/api-contract.md`, TIDAK diimplementasikan — filter by developer harus lewat `perumahanSlug` per-perumahan atau di sisi Omahe). Endpoint direktori list `GET /public/perumahan` (perumahan aktif + `jumlahTipeTersedia`, filter `regionKode`) juga sudah ada, belum ada halaman Omahe yang eksplisit memakainya. Detail: `docs/epics/UNIT-04-pencarian-publik-lintas-perumahan.md` di repo `perumahan`, shape aktual: `docs/api-contract.md`. Rumah Second **di luar scope** — backend `perumahan` tidak punya model data resale sama sekali.
 
-### Entitas Developer terpisah dari Perumahan (epic `DEVELOPER-01` di repo `perumahan`)
+### Entitas Developer terpisah dari Perumahan (epic `DEVELOPER-01` di repo `perumahan`, `done` 2026-09-13)
 
 **Revisi URL penting** — `/developer/:slug` yang dulu dipakai untuk detail SATU PERUMAHAN sudah TIDAK BENAR sejak keputusan ini. Skema baru:
 - `/developer` — direktori **perusahaan developer** (`GET /public/developers`)
-- `/developer/:companySlug` — profil satu developer + daftar proyek perumahan miliknya (`GET /public/developers/:slug`)
+- `/developer/:companySlug` — profil satu developer + daftar proyek perumahan miliknya (`GET /public/developers/:slug` — perhatikan: item `proyek[]` di response HANYA `{id, nama, slug, fotoUrl}`, TIDAK ada `regionNama`/`hargaMulai`/`unitTersedia` per proyek meski sempat diasumsikan di `docs/api-contract.md` — kalau butuh info itu per-proyek, panggil `GET /public/units?perumahanSlug=...` terpisah)
 - `/perumahan/:slug` — detail satu proyek perumahan (Omahe-rendered) — **ganti nama dari `/developer/:slug` lama**. Tampilkan baris "Dikembangkan oleh [Developer]" link ke `/developer/:companySlug`.
 
-Detail: `docs/epics/DEVELOPER-01-entitas-pengembang.md` di repo `perumahan`.
+Detail: `docs/epics/DEVELOPER-01-entitas-pengembang.md` di repo `perumahan`, shape aktual: `docs/api-contract.md`.
 
 ## Site map (draf, direvisi setelah `DEVELOPER-01`)
 
