@@ -5,7 +5,16 @@ Tagline: "Where your story begins".
 
 ## Status
 
-Skeleton app SvelteKit sudah berdiri di `landing/` — seluruh route site map di bawah sudah dirender, lengkap dengan design token, passthrough `?ref=`, dan kalkulator KPR. Data masih dari fixture (`landing/src/lib/api/fixtures.ts`); peralihan ke API asli diatur env, per-endpoint, tanpa mengubah komponen — lihat `landing/README.md`. **Update 2026-09-14**: ketiga epic backend yang diminta (`DEVELOPER-01`, `UNIT-04`, `LANDING-05`) sudah `done` dan live di produksi `perumahan` — `GET /public/units`, `GET /public/developers[/:slug]`, `GET /public/perumahan` (list), dan perluasan `GET /public/perumahan/:slug` (`developer`, `regionNama`, `redirectUrl`) semua sudah bisa dipakai. Peralihan fixture→API asli belum dikerjakan di sisi Omahe — lihat `docs/api-contract.md` §Status untuk detail shape aktual (beberapa field yang tadinya diasumsikan, mis. `cakupanLokasi` developer, ternyata TIDAK diimplementasikan — cek sebelum switch).
+Skeleton app SvelteKit sudah berdiri di `landing/` — seluruh route site map di bawah sudah dirender, lengkap dengan design token, passthrough `?ref=`, dan kalkulator KPR. Peralihan fixture→API asli diatur env, per-endpoint, tanpa mengubah komponen — lihat `landing/README.md`.
+
+**Update 2026-09-15 — peralihan ke API asli SELESAI & diverifikasi live**: ketiga epic backend (`DEVELOPER-01`, `UNIT-04`, `LANDING-05`) `done`, PLUS epic follow-up `LANDING-06` (`?full=1` — bypass skip-resolve `LANDING-05` supaya Omahe dapat profil lengkap untuk tenant yang sudah migrasi, bukan Omahe cuma dapat profil kosong seperti sebelumnya). Sisi Omahe sudah dikoreksi mengikuti shape API asli (bukan lagi asumsi dari `api-contract.md`):
+- `cakupanLokasi` developer — dihapus dari tipe + UI (tidak ada penggantinya, keputusan produk).
+- Stats per-proyek (`regionNama`/`hargaMulai`/`unitTersedia`) di halaman detail developer — di-enrich `client.ts::getDeveloper` via `GET /public/units?perumahanSlug=...` per proyek (paralel), field tetap tampil di UI.
+- Filter `developerSlug` di `/cari` — di-strip sebelum fetch backend (tidak didukung), difilter client-side di Omahe.
+- `getPerumahan` mengirim `?full=1` (LANDING-06) supaya tenant migrasi dapat profil lengkap.
+- `getRegions` fail-soft ke `[]` kalau `GET /public/regions` 404 (endpoint itu memang belum ada, §5 gap terbuka) — TANPA fallback ini homepage & `/cari` 404 TOTAL begitu `OMAHE_API_SEARCH=1` dinyalakan (ditemukan lewat verifikasi live, bukan cuma baca kode).
+
+Diverifikasi live 2026-09-15: seed data nyata ke Postgres dev `perumahan` (developer + 2 perumahan salah satunya bertanda migrasi + unit), `OMAHE_API_BASE_URL`/`OMAHE_API_SEARCH=1` di `.env` lokal, `bun run dev` bareng backend — homepage, `/cari`, `/developer`, `/developer/:slug`, `/perumahan/:slug` (termasuk tenant migrasi) semua render data asli, HTTP 200, tanpa `undefined`/`NaN`. Data uji sudah dibersihkan dari dev DB. Detail shape final: `docs/api-contract.md` §Status (kedua gap ditandai selesai, `GET /public/regions` §5 masih gap terbuka tapi sudah fail-soft, bukan blocker).
 
 Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dari repo `perumahan` (termasuk asumsi yang masih perlu dikonfirmasi): `docs/api-contract.md`.
 
