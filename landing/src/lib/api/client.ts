@@ -69,8 +69,13 @@ export async function getUnits(fetchFn: Fetch, query: UnitQuery): Promise<Pagina
 	const pageSize = Math.min(48, Math.max(1, query.pageSize ?? DEFAULT_PAGE_SIZE));
 
 	if (hasSearchApi()) {
+		// `developerSlug` TIDAK ada di backend (api-contract.md §1) — kalau
+		// tetap dikirim, backend mengabaikannya diam-diam dan filter developer
+		// tidak beneran bekerja. Keluarkan dari query backend, lalu filter
+		// client-side di bawah.
+		const { developerSlug, ...backendQuery } = query;
 		const params = new URLSearchParams();
-		for (const [key, value] of Object.entries({ ...query, page, pageSize })) {
+		for (const [key, value] of Object.entries({ ...backendQuery, page, pageSize })) {
 			if (value !== undefined && value !== '') params.set(key, String(value));
 		}
 		const url = `${baseUrl()}/public/units?${params}`;
@@ -83,7 +88,14 @@ export async function getUnits(fetchFn: Fetch, query: UnitQuery): Promise<Pagina
 			error(502, 'Data sedang tidak bisa dimuat. Coba lagi sebentar lagi.');
 		}
 		const body = (await res.json()) as { data: UnitListing[]; meta: PageMeta };
-		return { items: body.data, meta: body.meta };
+		// Trade-off yang disadari: `meta` (termasuk `total`) TIDAK disesuaikan
+		// setelah filter developer — paginasi jadi kurang presisi saat filter
+		// aktif (api-contract.md §1). Perbaikannya butuh facet di backend,
+		// di luar scope ini.
+		const items = developerSlug
+			? body.data.filter((u) => u.developer?.slug === developerSlug)
+			: body.data;
+		return { items, meta: body.meta };
 	}
 
 	return filterFixtureUnits({ ...query, page, pageSize });
@@ -120,6 +132,24 @@ export async function getFeaturedUnits(fetchFn: Fetch, limit = 6): Promise<UnitL
 // Developer (DEVELOPER-01)
 // ---------------------------------------------------------------------------
 
+/**
+ * Shape MENTAH `GET /public/developers/:slug` (api-contract.md §3) —
+ * `proyek[]` HANYA `{id, nama, slug, fotoUrl}`, TANPA stats per-proyek.
+ * Internal `client.ts` saja; jangan paksa `apiGet<DeveloperDetail>` untuk
+ * shape ini — tipe publik sudah punya field stats yang belum ada di
+ * response mentah (TypeScript diam, tapi runtime-nya `undefined`).
+ */
+interface RawDeveloperProject {
+	id: string;
+	nama: string;
+	slug: string;
+	fotoUrl: string | null;
+}
+
+interface DeveloperDetailRaw extends Omit<DeveloperDetail, 'proyek'> {
+	proyek: RawDeveloperProject[];
+}
+
 export async function getDevelopers(fetchFn: Fetch): Promise<DeveloperSummary[]> {
 	if (hasSearchApi()) return apiGet<DeveloperSummary[]>(fetchFn, '/public/developers');
 	return fixtures.DEVELOPER_SUMMARIES;
@@ -127,7 +157,31 @@ export async function getDevelopers(fetchFn: Fetch): Promise<DeveloperSummary[]>
 
 export async function getDeveloper(fetchFn: Fetch, slug: string): Promise<DeveloperDetail> {
 	if (hasSearchApi()) {
-		return apiGet<DeveloperDetail>(fetchFn, `/public/developers/${encodeURIComponent(slug)}`);
+		const raw = await apiGet<DeveloperDetailRaw>(
+			fetchFn,
+			`/public/developers/${encodeURIComponent(slug)}`
+		);
+		// Enrichment stats per-proyek (api-contract.md §3): response mentah
+		// tidak punya `regionNama`/`hargaMulai`/`unitTersedia` — ambil dari
+		// `GET /public/units?perumahanSlug=<slug>` per proyek, PARALEL
+		// (`Promise.all`; ini SSR di `+page.server.ts`, N request paralel tidak
+		// menambah round-trip di browser). Satu item hasil filter
+		// `perumahanSlug` pasti share `perumahan` yang sama.
+		const proyek = await Promise.all(
+			raw.proyek.map(async (p) => {
+				const { items } = await getUnits(fetchFn, { perumahanSlug: p.slug, page: 1, pageSize: 48 });
+				const harga = items.map((u) => u.hargaMin).filter((h): h is number => h !== null);
+				return {
+					nama: p.nama,
+					slug: p.slug,
+					fotoUrl: p.fotoUrl,
+					regionNama: items[0]?.perumahan.regionNama ?? null,
+					hargaMulai: harga.length > 0 ? Math.min(...harga) : null,
+					unitTersedia: items.reduce((sum, u) => sum + u.unitTersedia, 0)
+				};
+			})
+		);
+		return { ...raw, proyek };
 	}
 	const detail = fixtures.developerDetail(slug);
 	if (!detail) error(404, 'Developer tidak ditemukan.');

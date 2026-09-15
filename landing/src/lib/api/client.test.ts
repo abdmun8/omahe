@@ -10,6 +10,7 @@
  */
 import { describe, expect, test } from 'bun:test';
 import { getPerumahan, getUnits } from './client';
+import { UNIT_LISTINGS } from './fixtures';
 
 /**
  * Penjaga anti-network: dilempar masuk sebagai `fetchFn`. Di mode fixture
@@ -40,6 +41,26 @@ describe('client (mode fixture, env kosong)', () => {
 
 	test('getUnits: perumahanSlug tidak match apa pun → resolve kosong, bukan throw', async () => {
 		const hasil = await getUnits(fetchDummy, { perumahanSlug: 'slug-tidak-ada' });
+		expect(hasil.items).toEqual([]);
+		expect(hasil.meta.total).toBe(0);
+	});
+
+	// `developerSlug` TIDAK ada di backend asli (api-contract.md §1) — di
+	// mode ini filter harusnya jalan LOKAL (`filterFixtureUnits` pakai field
+	// `developer.slug` di tiap item mock). Penjaga jalur API asli (strip
+	// `developerSlug` sebelum fetch + filter client-side) ada di
+	// `client.api.test.ts`.
+	test('getUnits: developerSlug → hanya listing milik developer itu, meta.total ikut presisi', async () => {
+		const hasil = await getUnits(fetchDummy, { developerSlug: 'nusa-land-development' });
+		const diharapkan = UNIT_LISTINGS.filter((u) => u.developer?.slug === 'nusa-land-development');
+		expect(diharapkan.length).toBeGreaterThan(0);
+		expect(hasil.items.length).toBe(diharapkan.length);
+		expect(hasil.items.every((u) => u.developer?.slug === 'nusa-land-development')).toBe(true);
+		expect(hasil.meta.total).toBe(diharapkan.length);
+	});
+
+	test('getUnits: developerSlug tidak match apa pun → resolve kosong, bukan throw', async () => {
+		const hasil = await getUnits(fetchDummy, { developerSlug: 'developer-tidak-ada' });
 		expect(hasil.items).toEqual([]);
 		expect(hasil.meta.total).toBe(0);
 	});

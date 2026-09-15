@@ -14,11 +14,16 @@
  *                                    lihat `docs/api-contract.md` §3
  *
  * Peralihan fixture→API asli BELUM dikerjakan di repo ini (`client.ts`
- * masih pakai `src/lib/api/fixtures.ts`) — sebelum switch, cek
- * `docs/api-contract.md` §Status: beberapa field di tipe/fixture di bawah
- * (mis. `cakupanLokasi` developer, `regionNama`/`hargaMulai`/
- * `unitTersedia` per-proyek di developer detail) TERNYATA TIDAK ada di
- * response asli.
+ * masih pakai `src/lib/api/fixtures.ts`) — koreksi shape 2026-09-14 SUDAH
+ * ditangani di sisi tipe/klien (2026-09-15): `cakupanLokasi` developer
+ * TIDAK ada di response asli dan SUDAH dihapus dari tipe + UI (badge
+ * "Cakupan" disembunyikan sepenuhnya, keputusan produk), sedangkan
+ * `regionNama`/`hargaMulai`/`unitTersedia` per-proyek di developer detail
+ * memang TIDAK ada di response asli TAPI field-nya DIPERTAHANKAN di UI —
+ * datanya diisi oleh enrichment tambahan sisi Omahe di
+ * `client.ts::getDeveloper` (satu panggilan `GET /public/units?
+ * perumahanSlug=<slug>` per proyek, paralel), bukan langsung dari
+ * endpoint developer. Lihat `docs/api-contract.md` §2/§3.
  */
 
 /** Semua endpoint backend `perumahan` membungkus payload seperti ini. */
@@ -111,8 +116,6 @@ export interface DeveloperSummary {
 	logoUrl: string | null;
 	/** Jumlah proyek perumahan `isActive=true` milik developer ini. */
 	jumlahProyek: number;
-	/** Nama region proyek-proyeknya, sudah dedupe. Untuk baris "cakupan". */
-	cakupanLokasi: string[];
 }
 
 export interface DeveloperDetail extends DeveloperSummary {
@@ -128,6 +131,14 @@ export interface DeveloperProject {
 	hargaMulai: number | null;
 	unitTersedia: number;
 }
+
+// Catatan (2026-09-15): `GET /public/developers/:slug` asli hanya
+// mengembalikan `proyek[]` berisi `{id, nama, slug, fotoUrl}` — field stats
+// per-proyek di atas (`regionNama`/`hargaMulai`/`unitTersedia`) TIDAK ada
+// di response asli; di jalur API asli, `client.ts::getDeveloper` mengisi
+// semuanya lewat enrichment `GET /public/units?perumahanSlug=<slug>` per
+// proyek (lihat blok komentar atas file ini). Jalur fixture mengkomputasi
+// stats langsung dari data mock lokal.
 
 // ---------------------------------------------------------------------------
 // LANDING-01 / LANDING-02 — detail satu perumahan (endpoint SUDAH ADA)

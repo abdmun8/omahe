@@ -40,12 +40,5 @@
 		<p class="text-muted mt-3 line-clamp-3 text-sm leading-relaxed">{developer.deskripsi}</p>
 	{/if}
 
-	{#if developer.cakupanLokasi.length > 0}
-		<p class="text-muted mt-3 text-xs">
-			<span class="text-ink font-medium">Cakupan:</span>
-			{developer.cakupanLokasi.join(' · ')}
-		</p>
-	{/if}
-
 	<ContactButtons konteks="proyek dari {developer.nama}" class="mt-4" />
 </article>

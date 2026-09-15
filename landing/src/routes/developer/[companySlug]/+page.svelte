@@ -81,13 +81,6 @@
 		{#if data.developer.deskripsi}
 			<p class="text-muted mt-4 max-w-3xl text-sm leading-relaxed">{data.developer.deskripsi}</p>
 		{/if}
-
-		{#if data.developer.cakupanLokasi.length > 0}
-			<p class="text-muted mt-3 text-sm">
-				<span class="text-ink font-medium">Cakupan lokasi:</span>
-				{data.developer.cakupanLokasi.join(' · ')}
-			</p>
-		{/if}
 	</div>
 </div>
 

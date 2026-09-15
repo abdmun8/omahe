@@ -6,8 +6,11 @@
  * file ini sekarang murni saklar bertahap, bukan lagi menunggu backend.
  * Sebelum switch penuh, cek `docs/api-contract.md` §Status: shape asli
  * `/public/developers[/:slug]` LEBIH RINGKAS dari yang dikarang di sini
- * (tidak ada `cakupanLokasi`, dan `proyek[]` di detail developer tidak
- * punya `regionNama`/`hargaMulai`/`unitTersedia`).
+ * (tidak ada `cakupanLokasi` — sudah dihapus dari fixture + UI 2026-09-15;
+ * `proyek[]` di detail developer tidak punya `regionNama`/`hargaMulai`/
+ * `unitTersedia` di response asli — jalur API asli mengisi stats itu via
+ * enrichment `getUnits` per proyek di `client.ts`, jalur fixture di bawah
+ * mengkomputasinya langsung dari data mock lokal).
  *
  * BUKAN data nyata. Nama developer/perumahan/harga di sini karangan, sama
  * seperti mockup visual (`docs/user-story.md` §Mockup visual). Set
@@ -189,10 +192,7 @@ export const DEVELOPER_SUMMARIES: DeveloperSummary[] = DEVELOPERS.map((d) => {
 	return {
 		...d,
 		logoUrl: null,
-		jumlahProyek: proyek.length,
-		cakupanLokasi: [
-			...new Set(proyek.map((p) => regionNama(p.regionKode)).filter((x) => x !== null))
-		]
+		jumlahProyek: proyek.length
 	};
 });
 

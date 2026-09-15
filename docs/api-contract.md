@@ -35,13 +35,13 @@ ditandai eksplisit per-section.
 
 Semua endpoint di atas SEKARANG BISA dipakai — peralihan dari
 `landing/src/lib/api/fixtures.ts` ke API asli (env per-endpoint, lihat
-`landing/README.md`) sudah bisa dikerjakan kapan saja. **Belum
-dikerjakan** di sisi Omahe per 2026-09-14 — `landing/src/lib/api/types.ts`
-dan `fixtures.ts` kemungkinan perlu direvisi mengikuti koreksi shape di
-bawah (`cakupanLokasi` developer dan `regionNama`/`hargaMulai`/
-`unitTersedia` per-proyek di `/public/developers/:slug` TIDAK ada di
-response asli) SEBELUM switch, supaya tidak ada field yang diakses tapi
-selalu `undefined`.
+`landing/README.md`) sudah bisa dikerjakan kapan saja. Revisi sisi Omahe
+yang dulu tertunda (2026-09-15, `landing/src/lib/api/types.ts` +
+`client.ts`): `cakupanLokasi` developer SUDAH dihapus dari tipe + UI
+(bukan gap terbuka lagi) dan stats per-proyek
+(`regionNama`/`hargaMulai`/`unitTersedia`) di developer detail SUDAH
+di-enrich sisi Omahe via `GET /public/units?perumahanSlug=...` per proyek
+(lihat §2/§3) — tidak ada lagi field yang diakses tapi selalu `undefined`.
 
 ## 1. `GET /public/units` (UNIT-04, `done` 2026-09-14)
 
@@ -89,9 +89,13 @@ berisi 12 unit bisa menyusut jadi 2-3 kartu setelah dikelompokkan).
 `landing/src/lib/api/fixtures.ts` dan `landing/src/lib/api/types.ts` sudah
 dibuat sesuai kontrak ini — **dikonfirmasi 2026-09-14**: shape asli
 `GET /public/units` PERSIS sesuai kontrak di atas (backend mengikuti
-keputusan grouping ini), jadi endpoint ini AMAN di-switch dari fixture
-tanpa perlu revisi `types.ts` (kecuali menghapus asumsi `developerSlug`
-kalau ada di query-builder Omahe).
+keputusan grouping ini), jadi endpoint ini AMAN di-switch dari fixture.
+Asumsi `developerSlug` di query-builder Omahe SUDAH ditangani (2026-09-15):
+`client.ts::getUnits` kini TIDAK mengirim `developerSlug` ke backend dan
+memfilter client-side pakai field `developer.slug` tiap item (trade-off:
+`meta.total` tidak disesuaikan saat filter developer aktif — paginasi
+kurang presisi, disadari & diterima; perbaikan presis butuh dukungan
+backend, belum diminta).
 
 Field operasional (`blok`, `nomor`, `marketingUserId`, `siteplanSheetId`,
 `posX`, `posY`) tidak boleh ada di response ini.
@@ -99,7 +103,10 @@ Field operasional (`blok`, `nomor`, `marketingUserId`, `siteplanSheetId`,
 ## 2. `GET /public/developers` (DEVELOPER-01, `done` 2026-09-13)
 
 Shape AKTUAL (dikoreksi 2026-09-14) — `cakupanLokasi` **TIDAK
-diimplementasikan**, hapus dari asumsi Omahe kalau ada:
+diimplementasikan**. Sudah ditangani di sisi Omahe (2026-09-15, bukan gap
+terbuka lagi): field `cakupanLokasi` DIHAPUS dari `types.ts`/fixture dan
+badge "Cakupan" DIHAPUS dari UI (keputusan produk: disembunyikan
+sepenuhnya, bukan dicari penggantinya):
 
 ```jsonc
 {
@@ -125,13 +132,18 @@ AKTUAL (dikoreksi 2026-09-14) — **JAUH lebih ringkas** dari asumsi awal:
 ]
 ```
 
-`proyek[]` HANYA perumahan `isActive=true` milik developer ini. Kalau
-halaman `/developer/:companySlug` butuh `regionNama`/harga/jumlah tipe
-tersedia per proyek, panggil `GET /public/units?perumahanSlug=<slug
-proyek>` terpisah per proyek (atau `GET /public/perumahan` direktori
-list, §Status — punya `jumlahTipeTersedia` + `regionNama` per perumahan,
-TAPI tidak bisa difilter by developer, jadi butuh filter manual di sisi
-Omahe kalau dipakai untuk kasus ini).
+`proyek[]` HANYA perumahan `isActive=true` milik developer ini. Sudah
+ditangani di sisi Omahe (2026-09-15, bukan gap terbuka lagi):
+`client.ts::getDeveloper` meng-enrich stats per-proyek (`regionNama`,
+`hargaMulai`, `unitTersedia`) dengan memanggil
+`GET /public/units?perumahanSlug=<slug proyek>` per proyek secara PARALEL
+(`Promise.all` — jalur SSR, tidak menambah round-trip browser), lalu
+mengagregasi (`regionNama` dari `items[0]`, `hargaMulai` = `hargaMin`
+termurah non-null, `unitTersedia` = jumlah) — field stats tetap ada di
+`DeveloperProject` (`types.ts`) dan tetap ditampilkan UI. Alternatif
+`GET /public/perumahan` direktori list (§Status — punya
+`jumlahTipeTersedia` + `regionNama` per perumahan) tidak dipakai untuk
+kasus ini karena tidak bisa difilter by developer.
 
 ## 4. `GET /public/perumahan/:slug` — perluasan yang diminta (`done`)
 
