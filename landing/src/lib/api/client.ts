@@ -194,7 +194,18 @@ export async function getDeveloper(fetchFn: Fetch, slug: string): Promise<Develo
 
 export async function getPerumahan(fetchFn: Fetch, slug: string): Promise<PerumahanDetail> {
 	if (hasApi()) {
-		return apiGet<PerumahanDetail>(fetchFn, `/public/perumahan/${encodeURIComponent(slug)}`);
+		// `?full=1` (epic `LANDING-06`, repo `perumahan`, done 2026-09-15) —
+		// bypass optimasi skip-resolve `LANDING-05`. Tanpa ini, tenant yang
+		// SUDAH migrasi ke Omahe (`redirectUrl` terisi) akan dapat profil
+		// KOSONG dari endpoint ini (`/p/:slug` React app satu-satunya yang
+		// boleh andalkan default skip-resolve, karena dia redirect duluan
+		// dan tidak pernah render datanya) — justru tenant itu yang paling
+		// butuh profil lengkap di sini.
+		return apiGet<PerumahanDetail>(
+			fetchFn,
+			`/public/perumahan/${encodeURIComponent(slug)}`,
+			new URLSearchParams({ full: '1' })
+		);
 	}
 	const detail = fixtures.perumahanDetail(slug);
 	if (!detail) error(404, 'Perumahan tidak ditemukan.');
