@@ -217,7 +217,23 @@ export async function getPerumahan(fetchFn: Fetch, slug: string): Promise<Peruma
 // ---------------------------------------------------------------------------
 
 export async function getRegions(fetchFn: Fetch): Promise<RegionOption[]> {
-	if (hasSearchApi()) return apiGet<RegionOption[]>(fetchFn, '/public/regions');
+	if (hasSearchApi()) {
+		// `GET /public/regions` BELUM ADA di backend (api-contract.md §5, gap
+		// terbuka) — 404-nya di sini berarti "fitur ini belum diimplementasikan
+		// backend", BUKAN "resource tidak ditemukan" seperti 404 endpoint lain
+		// (unit/developer/perumahan) yang MEMANG harus jadi halaman 404 asli.
+		// Fail-soft ke array kosong (filter lokasi kosong/nonfungsi) daripada
+		// menjatuhkan SELURUH halaman lewat `error(404, ...)` di `apiGet`.
+		// Ditemukan 2026-09-15 saat verifikasi live: tanpa fallback ini,
+		// homepage & `/cari` 404 TOTAL begitu `OMAHE_API_SEARCH=1` dinyalakan
+		// (keduanya memanggil `getRegions` di load function-nya).
+		try {
+			return await apiGet<RegionOption[]>(fetchFn, '/public/regions');
+		} catch (err) {
+			console.error('[omahe:api] GET /public/regions gagal — fallback ke [] (lihat api-contract.md §5)', err);
+			return [];
+		}
+	}
 	return fixtures.REGIONS;
 }
 

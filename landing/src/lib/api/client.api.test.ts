@@ -17,11 +17,18 @@
  *      (`regionNama`/`hargaMulai`/`unitTersedia`) HARUS terisi dari
  *      enrichment `GET /public/units?perumahanSlug=...` per proyek —
  *      kalau tidak, field itu `undefined` di runtime.
+ *   3. `getRegions` TIDAK boleh menjatuhkan halaman kalau backend belum
+ *      punya `/public/regions` (api-contract.md §5, gap terbuka) — 404 di
+ *      sini WAJIB fail-soft ke `[]`, bukan melempar lewat `error(404,...)`
+ *      seperti endpoint lain. Ditemukan 2026-09-15 lewat verifikasi live:
+ *      tanpa fallback ini, homepage & `/cari` 404 TOTAL begitu
+ *      `OMAHE_API_SEARCH=1` dinyalakan (bukan cuma bug teori — nyata
+ *      menjatuhkan dua halaman sekaligus).
  */
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { env } from '$env/dynamic/private';
 import type { UnitListing } from './types';
-import { getDeveloper, getUnits } from './client';
+import { getDeveloper, getRegions, getUnits } from './client';
 
 const API = 'https://api.perumahan.test';
 
@@ -246,5 +253,26 @@ describe('getDeveloper (jalur API asli) — enrichment stats per-proyek', () => 
 		await getDeveloper(fetchMock, 'nusa-land-development');
 		// Kalau sekuensial, maksParalel tidak akan pernah > 1.
 		expect(maksParalel).toBe(3);
+	});
+});
+
+describe('getRegions (jalur API asli) — fail-soft saat backend belum implementasi', () => {
+	test('/public/regions 404 → resolve [], BUKAN throw (regresi: dulu menjatuhkan homepage & /cari)', async () => {
+		const fetchMock = (async () =>
+			new Response(JSON.stringify({ message: 'Halaman tidak ditemukan.' }), {
+				status: 404,
+				headers: { 'content-type': 'application/json' }
+			})) as unknown as typeof fetch;
+
+		const hasil = await getRegions(fetchMock);
+		expect(hasil).toEqual([]);
+	});
+
+	test('endpoint ADA & sukses → hasilnya diteruskan apa adanya (fail-soft tidak menutupi jalur normal)', async () => {
+		const fetchMock = (async () =>
+			envelope([{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' }])) as unknown as typeof fetch;
+
+		const hasil = await getRegions(fetchMock);
+		expect(hasil).toEqual([{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' }]);
 	});
 });
