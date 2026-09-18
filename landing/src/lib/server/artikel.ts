@@ -10,14 +10,14 @@ import { parseFrontmatterArtikel, urutkanTerbaru, type Artikel, type ArtikelMeta
 
 // `?raw` = isi file sebagai string; eager supaya tersedia saat prerender.
 // JANGAN ganti ke `fs.readFile` di load — jalan di dev, MATI di Vercel.
-// `CREDITS.md` dikecualikan — bukan artikel.
+// `CREDITS.md` & `PLAN.md` dikecualikan — bukan artikel.
 const semuaBerkas = import.meta.glob('/src/content/artikel/*.md', {
 	eager: true,
 	query: '?raw',
 	import: 'default'
 }) as Record<string, string>;
 const berkas = Object.fromEntries(
-	Object.entries(semuaBerkas).filter(([path]) => !path.endsWith('/CREDITS.md'))
+	Object.entries(semuaBerkas).filter(([path]) => !/[\/](CREDITS|PLAN)\.md$/.test(path))
 );
 
 /** Semua artikel terurut terbaru dulu. Validasi frontmatter fail-fast. */

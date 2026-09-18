@@ -31,7 +31,7 @@ let gagal = 0;
 const barisCredits: { slug: string; fotografer: string; halaman: string; sumber: string }[] = [];
 
 for await (const nama of new Bun.Glob('*.md').scan({ cwd: DIR_KONTEN })) {
-	if (nama === 'CREDITS.md') continue; // bukan artikel — file kredit
+	if (nama === 'CREDITS.md' || nama === 'PLAN.md') continue; // bukan artikel
 	const a = parseFrontmatterArtikel(nama, await Bun.file(`${DIR_KONTEN}/${nama}`).text());
 	const target = `${DIR_STATIS}/${a.cover.replace('/artikel/', '')}`;
 	barisCredits.push({

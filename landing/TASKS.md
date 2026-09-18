@@ -360,7 +360,7 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       Audit internal link: 0 tautan ke slug fixture. robots.txt tanpa
       perubahan. check/test(90)/build hijau. (2026-09-18, pi, review Abdul)
 
-- [ ] **Artikel (3/7): rencana editorial 30 hari** — deliverable:
+- [x] **Artikel (3/7): rencana editorial 30 hari** — deliverable:
       `src/content/artikel/PLAN.md`, BUKAN artikel. Isi: 30 judul — 10 per
       tema (`investasi`, `properti`, `perumahan`), dirotasi lintas tema
       (jangan 10 hari investasi beruntun — variasikan klaster keyword per
@@ -374,6 +374,15 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       (contoh, bukan final): "Cicilan vs Sewa: Hitungan 5 Tahun", "SHM vs
       SHGB: Bedanya Sebelum Tanda Tangan", "Tipe 36 vs 45 untuk Keluarga
       Muda".
+
+      **Hasil**: `src/content/artikel/PLAN.md` — 30 slot (Hari 1 = 2026-09-18
+      s.d. Hari 30 = 2026-10-17), 10 per tema, rotasi tanpa 3-hari-beruntun,
+      klaster keyword per minggu; per judul ada keyword+intent+angle+tanggal.
+      H1 & H8 = 2 artikel yang sudah ada. Pool 295 kandidat cover Unsplash
+      dikurasi via napi (disimpan lokal saat penyusunan; cover final dipilih
+      per artikel saat batch). PLAN.md/CREDITS.md dikecualikan dari glob
+      artikel (server module + script). Build tetap hijau.
+      (2026-09-18, pi, review Abdul)
 
 - [ ] **Artikel (4/7): mekanisme publish harian** — supaya "posting tiap
       hari" terjadi tanpa commit manual harian. Dua opsi, pilih SATU dan
