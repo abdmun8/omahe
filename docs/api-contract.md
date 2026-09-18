@@ -30,7 +30,9 @@ ditandai eksplisit per-section.
 | `GET /public/units` | UNIT-04 | **sudah ada** (`done` 2026-09-14) | `/`, `/cari`, `/perumahan/:slug` |
 | `GET /public/developers` | DEVELOPER-01 | **sudah ada** (`done` 2026-09-13) | `/`, `/developer` |
 | `GET /public/developers/:slug` | DEVELOPER-01 | **sudah ada** (`done` 2026-09-13) — shape `proyek[]` lebih ringkas dari asumsi awal, lihat §3 | `/developer/:companySlug` |
-| `GET /public/perumahan` (list) | UNIT-04 | **sudah ada** (`done` 2026-09-14), BARU — tidak ada di versi dokumen sebelumnya | belum ada halaman Omahe yang eksplisit memakainya |
+| `GET /public/perumahan` (list) | UNIT-04 | **sudah ada** (`done` 2026-09-14), BARU — tidak ada di versi dokumen sebelumnya; `+prioritas` MONET-01 | belum ada halaman Omahe yang eksplisit memakainya |
+| `GET /public/sliders` | MONET-02 | **sudah ada** (`done` 2026-09-18), BARU — lihat §7 | `/` (carousel) |
+| `POST /public/leads` | MONET-03 | **sudah ada** (`done` 2026-09-18), BARU — lihat §8 | dialog LeadForm kartu/detail partner berbayar |
 | `GET /public/regions` | — (belum dibahas) | belum ada — `/public/wilayah/{level}` ADA di `perumahan` tapi TIDAK difilter ke region yang punya perumahan aktif (lihat §5, gap masih terbuka) | opsi filter lokasi |
 
 Semua endpoint di atas SEKARANG BISA dipakai — peralihan dari
@@ -220,3 +222,77 @@ kalau kebutuhan direktori "semua project" muncul nanti.
 Booking, verifikasi KPR, dan komisi/referral tidak dibangun ulang di Omahe.
 Satu-satunya titik sentuh ke alur itu adalah link keluar
 `/ajukan/:slug?ref=...` ke app `perumahan` — lihat `landing/src/lib/ref.ts`.
+
+## 7. `GET /public/sliders` (MONET-02, `done` 2026-09-18, BARU)
+
+Slider event/kegiatan untuk carousel homepage. TANPA auth, TANPA paginasi
+(selalu array kecil). Filter di server: `status='aktif'` (disetujui
+principal) DAN dalam masa aktif (`aktifDari ≤ now ≤ aktifSampai`) DAN
+perumahan pemilik `isActive=true`. Urutan: `prioritas` efektif DESC
+(partner berbayar MONET-01 duluan) → `aktifDari` ASC (FIFO). Maks 10
+item; item yang gagal presign gambarnya DI-SKIP (bukan `gambarUrl`
+null — slide tanpa gambar tak berguna di carousel).
+
+```jsonc
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "judul": "Open House Griya Asri",
+      "subjudul": "Sabtu-Minggu, 27-28 Sep",      // nullable
+      "gambarUrl": "https://...",                // SELALU string (gagal presign = di-skip)
+      "linkUrl": "https://...",                  // nullable — null = klik default /perumahan/:slug
+      "perumahan": { "slug": "griya-asri", "nama": "Griya Asri" },
+      "prioritas": 40                             // efektif pemilik (badge styling, debug rotasi)
+    }
+  ]
+}
+```
+
+Klik slide di Omahe: `linkUrl` kalau terisi (tab baru, `rel="noopener"`),
+selain itu `/perumahan/{perumahan.slug}` **bawa passthrough `?ref=`**
+(kewajiban arsitektur — jangan putus rantai komisi mitra).
+
+## 8. `POST /public/leads` (MONET-03, `done` 2026-09-18, BARU)
+
+Submit lead dari form publik Omahe — HANYA untuk perumahan partner
+berbayar (prioritas efektif MONET-01 > 0; selain itu 404 seragam).
+TANPA auth. Body JSON:
+
+```jsonc
+{
+  "perumahanSlug": "griya-asri",     // wajib
+  "nama": "Budi",                    // wajib, 1-100
+  "telepon": "08123456789",          // wajib — dinormalisasi server ke 62xxx
+  "tipeMinat": "36/72",              // opsional, ≤50 (string tipe bebas dari /public/units)
+  "pesan": "Minta brosur",           // opsional, ≤500
+  "sumber": "card",                  // wajib: 'card' | 'slider' | 'detail' — pemanggil yang men-set
+  "ref": "QR-XXX",                   // opsional, ≤50 — passthrough ?ref= dari URL (atribusi mitra)
+  "website": ""                      // HONEYPOT — field tersembunyi, WAJIB kosong
+}
+```
+
+Respons: sukses & honeypot SAMA: `{ "success": true, "data": { "ok": true } }`.
+Error: 400 field invalid; 404 perumahan tidak ada/tidak berbayar
+(PESAN SERAGAM — jangan dipakai membedakan status komersial di UI);
+429 rate limit (3 lead / 24 jam / telepon × perumahan — pesan error
+backend sudah ramah, tampilkan apa adanya). Lead tersimpan terlihat
+staf perumahan (cap `manage_leads`) + principal di app `perumahan`,
+owner perumahan dapat notifikasi WA best-effort.
+
+UI Omahe pasca-submit: pesan sukses "Tim {nama perumahan} akan
+menghubungi Anda" + tombol sekunder WA ke nomor umum Omahe — TIDAK
+ada redirect ke WA partner (itu seluruh inti fitur ini). Checkbox
+persetujuan privasi WAJIB dicentang sebelum submit (menaut `/privasi`).
+
+## MONET-01 — field `prioritas` di endpoint lama (`done` 2026-09-18)
+
+`GET /public/units` (§1), `GET /public/developers` (§2), dan
+`GET /public/perumahan` (§6) kini menyertakan `"prioritas": <int ≥ 0>`
+per item DAN terurut prioritas efektif DESC (lalu tie-breaker stabil:
+id grup ASC / nama ASC). Prioritas efektif = max(perumahan, developer
+aktif-nya), kedaluwarsa otomatis di query-time. `0` = gratis — item
+tetap tampil urutan netral. Omahe merender badge "Promosi" kecil untuk
+`prioritas > 0`; prioritas TIDAK pernah meloloskan item dari filter
+yang seharusnya mengecualikannya.
