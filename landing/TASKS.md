@@ -169,23 +169,39 @@ Sumber kebenaran: `../docs/user-story.md` §Monetisasi + epic
 mulai sebelum endpoint publik terkait sudah `done` di backend (field
 `prioritas` di response list, `GET /public/sliders`, `POST /public/leads`).
 
-- [ ] **Badge "Promosi" + type prioritas** — `client.ts`: field
+- [x] **Badge "Promosi" + type prioritas** — `client.ts`: field
       `prioritas` (number) di `UnitListing.perumahan`, item direktori
       `/public/perumahan`, dan `DeveloperSummary`. Badge kecil "Promosi"
       di `unit-card`, `project-card`, `developer-card` untuk
       `prioritas > 0` (gaya netral, jangan menyamai badge status unit).
-- [ ] **SearchForm kompak (mobile-first)** — homepage: satu baris
+- [x] **SearchForm kompak (mobile-first)** — homepage: satu baris
       (lokasi/kata kunci + tombol) di mobile, proporsional di desktop;
       filter lengkap tetap di `/cari`; `?ref=` passthrough tidak boleh
-      hilang.
-- [ ] **Slider carousel homepage** — komponen carousel (`GET
+      hilang. Diimplementasikan lewat prop `kompak` di
+      `search-form.svelte` (dipakai homepage): mobile = flex satu baris
+      (lokasi ~42% + input tipe `flex-1` + tombol ikon "Cari" 44px) + link
+      "Filter lanjutan (harga, dll.)" ke `/cari` yang membawa lokasi/kata
+      kunci/ref live (`$derived` dari `bind:value`); select harga tetap di
+      DOM tapi `hidden sm:block` — field tersembunyi tetap ikut submit GET,
+      jadi semantik query form identik. sm+ = grid penuh sama seperti
+      varian lama (4 field, tinggi 48px). Varian default (dipakai `/cari`)
+      tidak berubah — diverifikasi live via `preview`: SSR
+      `/cari?regionKode=32.01&tipe=36` tetap merender option `selected` +
+      `value="36"` (bind:value aman untuk no-JS/SEO). Ref passthrough
+      dikunci tes komponen baru `search-form.test.ts` (10 tes: hidden
+      input di kedua varian, href link bawa ref, label sr-only ter-associate)
+      + SSR homepage `?ref=uji-ref` memperlihatkan hidden input & href
+      bawa ref. Hero homepage dirampingkan mobile saja (`py-8`, card
+      `mt-6`): baris form turun 4→2, tinggi hero+search mobile ~590px →
+      ~400px (≈2/3). (2026-09-18, implementor pi/glm-4.7)
+- [x] **Slider carousel homepage** — komponen carousel (`GET
       /public/sliders` via `client.ts::getSliders`): autoplay + swipe +
       dots + pause on hover + hormati `prefers-reduced-motion`, lazy
       load, alt = judul; klik → `linkUrl` eksternal (tab baru,
       `rel="noopener"`) ATAU default `/perumahan/{slug}` **bawa
       passthrough `?ref=`**; dirender DI ATAS search; section disembunyikan
       total (bukan spinner) saat response kosong/gagal (fail-soft).
-- [ ] **LeadFormDialog partner berbayar** — `client.ts::createLead`
+- [x] **LeadFormDialog partner berbayar** — `client.ts::createLead`
       (`POST /public/leads`, honeypot field `website` tersembunyi,
       konsen privasi wajib); tombol CTA kartu/detail dengan
       `prioritas > 0` membuka dialog INI, bukan WA; state sukses +
@@ -202,7 +218,7 @@ investasi / properti / perumahan, posting harian. Urutan item = urutan
 dependensi — jangan diacak. Semua item tunduk pada "Aturan untuk implementor"
 di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
 
-- [ ] **Prerender halaman statis (`/tentang`, `/kontak`, `/privasi`,
+- [x] **Prerender halaman statis (`/tentang`, `/kontak`, `/privasi`,
       `/syarat-ketentuan`, `/kpr`)** — lima halaman ini murni statis (tidak
       ada `load`/fetch backend) tapi masih dirender SSR per-request. Tambah
       `+page.ts` berisi `export const prerender = true;` di tiap halaman
@@ -227,6 +243,22 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
         sitemap — prerender ≠ boleh diindeks; jangan sentuh keduanya.
       - `bun run check`, `bun test`, `bun run test:component`,
         `bun run build` semua hijau.
+
+      **Hasil**: 5× `+page.ts` (`export const prerender = true`). Satu
+      perubahan di luar 5 file itu: root `+layout.ts` — `readRef(url)`
+      melempar saat prerender (SvelteKit MELARANG akses `url.searchParams`
+      build-time, build langsung gagal), jadi pemanggilnya dibungkus
+      try/catch → `ref` null di HTML bake, diisi ulang universal load
+      re-run di browser saat hidrasi; `src/lib/ref.ts` TIDAK disentuh.
+      Diverifikasi Playwright headless (chromium) terhadap `node build`:
+      HTML server `/kpr?ref` memang tanpa ref (bake); pasca-hidrasi 6+ link
+      nav header/footer membawa `?ref` (diuji `/kpr` & `/kontak`); klik
+      nav → `/cari` tetap bawa ref; homepage SSR (pembanding) tetap bawa
+      ref di HTML server — passthrough SSR tidak berubah. Output:
+      `.vercel/output/static/*.html` (Vercel) + `build/prerendered/` dengan
+      .br/.gz (Docker). Sitemap tetap tanpa privasi/syarat-ketentuan,
+      keduanya tetap noindex. `check`/`bun test` (79)/`test:component`
+      (40)/`build` kedua adapter hijau. (2026-09-18, pi, review Abdul)
 
 - [x] **Artikel (1/7): fondasi — markdown in-repo, `/artikel` +
       `/artikel/[slug]`, gambar Unsplash lokal, on-page SEO** — keputusan
@@ -363,7 +395,6 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       Setelah merge: verifikasi sitemap berisi 30+1 URL artikel, RSS valid,
       dan tidak ada tautan internal mati (`grep` slug fixture di
       `src/content/`).
-
 
 ## Aturan untuk implementor (pi/GLM)
 
