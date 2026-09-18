@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LandingSections from '$lib/components/landing-sections.svelte';
+	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import StickyCta from '$lib/components/sticky-cta.svelte';
 	import Badge from '$lib/components/ui/badge.svelte';
@@ -27,6 +28,17 @@
 	const fotoUtama = $derived(p.photos.find((f) => f.url !== null)?.url ?? null);
 
 	const urlHalaman = $derived(`${SITE.url}/perumahan/${p.slug}`);
+
+	/**
+	 * Partner berbayar (MONET-03): CTA kontak (desktop + sticky) jadi
+	 * "Form Minat" (lead masuk inbox perumahan via POST /public/leads,
+	 * sumber='detail'), bukan WA langsung. Partner gratis tetap WA.
+	 * `undefined` (respons lama tanpa MONET-01) = gratis.
+	 */
+	const partnerBerbayar = $derived(p.prioritas > 0);
+	let formMinatTerbuka = $state(false);
+	/** Opsi select tipe minat — dari daftar tipe unit di halaman ini. */
+	const opsiTipe = $derived([...new Set(data.tipeUnit.map((u) => u.tipe))]);
 
 	// JSON-LD listing — WAJIB lewat amankanJsonLd(): nama/deskripsi datang
 	// dari input admin yang tidak disanitasi di backend; teks penutup tag
@@ -165,7 +177,11 @@
 			>
 				Ajukan Unit Ini
 			</Button>
-			<ContactButtons konteks={p.nama} size="md" />
+			<ContactButtons
+				konteks={p.nama}
+				size="md"
+				onFormMinat={partnerBerbayar ? () => (formMinatTerbuka = true) : null}
+			/>
 		</div>
 	</div>
 
@@ -255,4 +271,18 @@
 	</div>
 </div>
 
-<StickyCta slug={p.slug} nama={p.nama} ref={data.ref} />
+<StickyCta slug={p.slug} nama={p.nama} ref={data.ref} prioritas={p.prioritas} />
+
+{#if partnerBerbayar}
+	<!-- Dialog desktop/CTA kolom ringkasan — sticky-cta punya instance-nya
+	     sendiri (state terpisah). Dua-duanya tak mungkin terbuka bersamaan:
+	     overlay modal menutupi tombol yang satu saat yang lain terbuka. -->
+	<LeadFormDialog
+		bind:open={formMinatTerbuka}
+		perumahanSlug={p.slug}
+		namaPerumahan={p.nama}
+		sumber="detail"
+		ref={data.ref}
+		{opsiTipe}
+	/>
+{/if}

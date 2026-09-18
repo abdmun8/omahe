@@ -21,6 +21,7 @@ import type {
 	ApiEnvelope,
 	DeveloperDetail,
 	DeveloperSummary,
+	LeadInput,
 	PageMeta,
 	Paginated,
 	PerumahanDetail,
@@ -248,6 +249,71 @@ export async function getAllProjectSlugs(fetchFn: Fetch): Promise<string[]> {
 		return [...new Set(items.map((u) => u.perumahan.slug))];
 	}
 	return fixtures.projectSlugs();
+}
+
+/**
+ * Error POST dengan status TERJAGA — dipakai route proxy `/api/lead`
+ * meneruskan status + pesan backend (mis. 429 rate limit yang sudah ramah,
+ * api-contract.md §8) apa adanya ke browser, tanpa membuka error internal.
+ */
+export class ApiError extends Error {
+	readonly status: number;
+	constructor(status: number, message: string) {
+		super(message);
+		this.name = 'ApiError';
+		this.status = status;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Lead partner berbayar (MONET-03, api-contract.md §8)
+// ---------------------------------------------------------------------------
+
+/**
+ * Submit lead form publik `POST /public/leads` — HANYA untuk perumahan
+ * partner berbayar (prioritas > 0); selain itu backend 404 seragam.
+ *
+ * PEMANGGILNYA route proxy `/api/lead`, BUKAN komponen langsung: file ini
+ * server-only (komentar atas), `$env/dynamic/private` tidak boleh masuk
+ * bundle browser — dialog merender fetch ke `/api/lead`, di sini yang
+ * meneruskan ke backend.
+ *
+ * Env-gated pola `getSliders`: fixture mode = kembalikan ok TANPA network
+ * (simpel — form dev tetap bisa "sukses" tanpa data dikirim ke mana pun).
+ * Mode API asli: POST JSON; respons sukses & honeypot SAMA
+ * `{success:true,data:{ok:true}}`, jadi cukup dibedakan statusnya.
+ */
+export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<void> {
+	if (!hasSearchApi()) return;
+
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/leads`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			// Honeypot `website` & `ref` dikirim APA ADANYA (tanpa filter klien) —
+			// keputusan honeypot ada di server, bukan di sini (api-contract.md §8).
+			body: JSON.stringify(input),
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	if (res.ok) return;
+
+	// Pesan server lebih tahu: 400 punya detail field, 429 rate limit sudah
+	// ramah, 404 PESAN SERAGAM (jangan dipakai membedakan status komersial
+	// di UI). Yang tidak berpesan → generik; error internal backend tidak
+	// pernah diteruskan mentah-mentah.
+	let serverMessage: string | null = null;
+	try {
+		const body = (await res.json()) as { message?: unknown };
+		if (typeof body.message === 'string' && body.message) serverMessage = body.message;
+	} catch {
+		// body bukan JSON — pakai pesan generik di bawah.
+	}
+	console.error(`[omahe:api] POST /public/leads → ${res.status}`);
+	throw new ApiError(res.status, serverMessage ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');
 }
 
 // ---------------------------------------------------------------------------

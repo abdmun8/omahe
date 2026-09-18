@@ -13,7 +13,7 @@
  * Yang dikunci adalah perilaku komponen terhadap field tertentu, bukan
  * isi fixture.
  */
-import { render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen } from '@testing-library/svelte';
 import { describe, expect, test, vi } from 'vitest';
 import type { UnitListing } from '$lib/api/types';
 import UnitCard from './unit-card.svelte';
@@ -164,6 +164,69 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		expect(screen.queryByText('Promosi')).toBeNull();
 		// Kartu tetap render normal walau field barunya absen.
 		expect(screen.getByText('Rp385 jt')).toBeInTheDocument();
+	});
+
+	// MONET-03: partner berbayar (prioritas > 0) — slot WA jadi "Form Minat".
+	const perumahanBerbayar = {
+		nama: 'Griya Asri',
+		slug: 'griya-asri',
+		regionKode: '32.01',
+		regionNama: 'Kab. Bogor, Jawa Barat',
+		prioritas: 50
+	};
+
+	test('prioritas > 0 → tombol "Form Minat" menggantikan WhatsApp, Telepon tetap (MONET-03)', () => {
+		render(UnitCard, { unit: buatUnit({ perumahan: perumahanBerbayar }) });
+		const konteks = '36/72 di Griya Asri'; // ${unit.tipe} di ${unit.perumahan.nama} (buatUnit default)
+
+		expect(
+			screen.getByRole('button', { name: `Isi form minat tentang ${konteks}` })
+		).toBeInTheDocument();
+		// Slot WA DIGANTI — link WA justru TIDAK boleh ada di kartu berbayar.
+		expect(
+			screen.queryByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+		).toBeNull();
+		// Telepon tidak ikut berganti.
+		expect(screen.getByRole('link', { name: `Telepon tentang ${konteks}` })).toBeInTheDocument();
+	});
+
+	test('prioritas 0 → WhatsApp muncul, tanpa tombol Form Minat (perilaku gratis tidak berubah)', () => {
+		// Default buatUnit() sudah prioritas 0 — kartu partner GRATIS.
+		render(UnitCard, { unit: buatUnit() });
+		const konteks = '36/72 di Griya Asri'; // ${unit.tipe} di ${unit.perumahan.nama} (buatUnit default)
+
+		expect(
+			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+		).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: `Isi form minat tentang ${konteks}` })).toBeNull();
+	});
+
+	test('prioritas undefined (data lama) → WhatsApp muncul, tanpa tombol Form Minat', () => {
+		// Respons API sebelum MONET-01: `undefined > 0` = false → gratis,
+		// TANPA crash — konsisten dengan gating badge "Promosi" di atas.
+		const perumahanLama = {
+			nama: 'Griya Asri',
+			slug: 'griya-asri',
+			regionKode: '32.01',
+			regionNama: 'Kab. Bogor, Jawa Barat'
+		} as UnitListing['perumahan'];
+		render(UnitCard, { unit: buatUnit({ perumahan: perumahanLama }) });
+		const konteks = '36/72 di Griya Asri'; // ${unit.tipe} di ${unit.perumahan.nama} (buatUnit default)
+
+		expect(
+			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+		).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: `Isi form minat tentang ${konteks}` })).toBeNull();
+	});
+
+	test('klik "Form Minat" → dialog lead terbuka (judul dialog terlihat)', async () => {
+		render(UnitCard, { unit: buatUnit({ perumahan: perumahanBerbayar }) });
+
+		fireEvent.click(screen.getByRole('button', { name: /Isi form minat/ }));
+
+		// Judul Dialog.Title — teks lengkap supaya unik terhadap tombol
+		// "Form Minat" yang juga memuat frasa itu.
+		expect(await screen.findByText('Form Minat — Griya Asri')).toBeInTheDocument();
 	});
 
 	test('tombol WhatsApp & Telepon selalu ada di DOM, apa pun kondisi lainnya', () => {

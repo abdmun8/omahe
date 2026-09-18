@@ -10,6 +10,7 @@
 	import { formatAngka, formatRentangHarga, formatRupiahPenuh } from '$lib/utils';
 	import { withRef } from '$lib/ref';
 	import ContactButtons from './contact-buttons.svelte';
+	import LeadFormDialog from './lead-form-dialog.svelte';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
 	import PromosiBadge from './promosi-badge.svelte';
 	import Badge from './ui/badge.svelte';
@@ -21,6 +22,15 @@
 	const hargaPenuh = $derived(
 		unit.hargaMin === null ? 'Harga belum tersedia' : formatRupiahPenuh(unit.hargaMin)
 	);
+
+	/**
+	 * Partner berbayar (MONET-03): slot WA jadi "Form Minat" (lead masuk
+	 * inbox perumahan via POST /public/leads), Telepon tetap. Partner gratis
+	 * tidak berubah sama sekali — tetap WA + Telepon. `undefined` (respons
+	 * API lama tanpa MONET-01) = gratis.
+	 */
+	const partnerBerbayar = $derived(unit.perumahan.prioritas > 0);
+	let formMinatTerbuka = $state(false);
 </script>
 
 <article
@@ -94,6 +104,22 @@
 			</p>
 		{/if}
 
-		<ContactButtons konteks="{unit.tipe} di {unit.perumahan.nama}" class="mt-3" />
+		<ContactButtons
+			konteks="{unit.tipe} di {unit.perumahan.nama}"
+			onFormMinat={partnerBerbayar ? () => (formMinatTerbuka = true) : null}
+			class="mt-3"
+		/>
+		{#if partnerBerbayar}
+			<!-- sumber='card' (api-contract.md §8): tipe unit jadi prefill,
+			     `ref` dari URL ikut terkirim (atribusi mitra). -->
+			<LeadFormDialog
+				bind:open={formMinatTerbuka}
+				perumahanSlug={unit.perumahan.slug}
+				namaPerumahan={unit.perumahan.nama}
+				sumber="card"
+				tipeMinatAwal={unit.tipe}
+				{ref}
+			/>
+		{/if}
 	</div>
 </article>

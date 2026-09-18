@@ -184,6 +184,14 @@ export interface PerumahanDetail {
 	developer?: DeveloperRef | null;
 	/** Perluasan UNIT-04 (field lokasi `perumahan.regionKode`) — optional, idem. */
 	regionNama?: string | null;
+	/**
+	 * Prioritas promosi (MONET-01, api-contract.md §4 tambahan 2026-09-18) —
+	 * int >= 0, `0` = gratis. Dipakai men-gate LeadFormDialog (MONET-03):
+	 * `> 0` → CTA kartu/detail membuka form minat, selain itu WA langsung.
+	 * Jalur `?full=1` = prioritas efektif penuh; jalur skip-resolve
+	 * LANDING-05 = own-only perumahan (tanpa lookup developer).
+	 */
+	prioritas: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -282,6 +290,38 @@ export type LandingSection =
 	| { id: string; type: 'faq'; enabled: boolean; props: FaqProps }
 	| { id: string; type: 'cta'; enabled: boolean; props: CtaProps }
 	| { id: string; type: 'contact'; enabled: boolean; props: ContactProps };
+
+// ---------------------------------------------------------------------------
+// MONET-03 — submit lead publik partner berbayar (api-contract.md §8)
+// ---------------------------------------------------------------------------
+
+/**
+ * Nilai `sumber` lead — PEMANGGIL yang men-set sesuai konteks tombolnya,
+ * bukan server (api-contract.md §8). Saat ini dipakai `card` (unit-card)
+ * dan `detail` (halaman perumahan + sticky CTA); `slider` untuk pemakaian
+ * mendatang.
+ */
+export type LeadSumber = 'card' | 'slider' | 'detail';
+
+export interface LeadInput {
+	/** Slug perumahan tujuan — HANYA partner prioritas > 0 yang lolos. */
+	perumahanSlug: string;
+	/** 1–100 karakter (validasi server). */
+	nama: string;
+	/** Wajib — dinormalisasi server ke 62xxx. */
+	telepon: string;
+	/** ≤50 — string tipe bebas dari `/public/units`. */
+	tipeMinat?: string;
+	/** ≤500. */
+	pesan?: string;
+	sumber: LeadSumber;
+	/** ≤50 — passthrough `?ref=` dari URL (atribusi mitra, kewajiban CLAUDE.md). */
+	ref?: string;
+	/** HONEYPOT — field tersembunyi; manusia WAJIB mengosongkannya, bot
+	 *  iseng mengisi. Dikirim apa adanya — server yang memutus (respons
+	 *  sukses & honeypot SAMA, jadi tidak ada yang bisa dibedakan di UI). */
+	website?: string;
+}
 
 // ---------------------------------------------------------------------------
 // Wilayah (modul `wilayah` di backend `perumahan`, data Kemendagri berjenjang)

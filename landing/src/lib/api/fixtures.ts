@@ -248,6 +248,9 @@ export function perumahanDetail(slug: string): PerumahanDetail | null {
 		photos: [],
 		developer: developerRef(p.developerSlug),
 		regionNama: regionNama(p.regionKode),
+		// MONET-01 — cermin prioritas proyek (Griya Asri Bogor = 50) supaya
+		// gate LeadFormDialog terlihat saat dev pakai fixture.
+		prioritas: p.prioritas,
 		sections: pakaiBuilder
 			? [
 					{

@@ -12,6 +12,10 @@
 	kontak per-entitas boleh menyusul nanti kalau dibutuhkan; yang berubah
 	cuma prop `nomorWhatsapp`/`nomorTelepon` dari pemanggil, bukan komponen
 	ini.
+
+	MONET-03 (2026-09-18): untuk partner BERBAYAR (`prioritas > 0`), prop
+	`onFormMinat` mengganti tombol WA dengan "Form Minat" (membuka
+	LeadFormDialog) — perilaku partner gratis TIDAK berubah sama sekali.
 -->
 <script lang="ts">
 	import { SITE } from '$lib/config';
@@ -23,6 +27,7 @@
 		nomorWhatsapp = SITE.whatsapp,
 		nomorTelepon = SITE.telepon,
 		size = 'sm',
+		onFormMinat = null,
 		class: className = ''
 	}: {
 		/** Nama properti/developer yang ditanyakan — masuk ke pesan pembuka WA. */
@@ -30,6 +35,13 @@
 		nomorWhatsapp?: string;
 		nomorTelepon?: string;
 		size?: 'sm' | 'md' | 'lg';
+		/**
+		 * Partner BERBAYAR (MONET-03): tombol WA DIGANTI tombol "Form Minat"
+		 * yang membuka LeadFormDialog (state dialognya milik pemanggil).
+		 * Null (default) = perilaku lama APA ADANYA — WA + Telepon (§Kontak
+		 * langsung di card); jangan diubah.
+		 */
+		onFormMinat?: (() => void) | null;
 		class?: string;
 	} = $props();
 
@@ -37,22 +49,46 @@
 </script>
 
 <div class="flex gap-2 {className}">
-	<Button
-		variant="whatsapp"
-		{size}
-		href={waUrl(nomorWhatsapp, pesan)}
-		target="_blank"
-		rel="noopener"
-		class="flex-1"
-		aria-label="Hubungi via WhatsApp tentang {konteks}"
-	>
-		<svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-			<path
-				d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.39a9.86 9.86 0 0 0 4.74 1.21c5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2zm5.72 14.03c-.24.67-1.4 1.28-1.93 1.32-.5.04-.96.22-3.24-.67-2.73-1.07-4.46-3.85-4.6-4.03-.13-.18-1.1-1.46-1.1-2.78 0-1.32.7-1.97.94-2.24.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.48.24.57.8 1.98.87 2.12.07.14.12.3.02.49-.1.18-.15.29-.29.45-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.27.74 1.22 1.58 1.97 1.09.97 2 1.27 2.29 1.41.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.18-.28.37-.23.62-.14.25.09 1.6.76 1.87.9.28.13.46.2.53.31.07.11.07.65-.17 1.32z"
-			/>
-		</svg>
-		WhatsApp
-	</Button>
+	{#if onFormMinat}
+		<!-- Slot WA diganti form minat (partner berbayar, api-contract.md §8).
+		     Accent emas = kuat setara WA tapi BUKAN hijau WhatsApp, supaya
+		     tidak mengesankan aksi WA; senada dengan badge "Promosi". -->
+		<Button
+			variant="accent"
+			{size}
+			onclick={onFormMinat}
+			class="flex-1"
+			aria-label="Isi form minat tentang {konteks}"
+		>
+			<svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+				<path
+					d="M15.5 3.5l5 5L8 21H3v-5L15.5 3.5z"
+					stroke="currentColor"
+					stroke-width="1.6"
+					stroke-linejoin="round"
+				/>
+				<path d="M13 6l5 5" stroke="currentColor" stroke-width="1.6" />
+			</svg>
+			Form Minat
+		</Button>
+	{:else}
+		<Button
+			variant="whatsapp"
+			{size}
+			href={waUrl(nomorWhatsapp, pesan)}
+			target="_blank"
+			rel="noopener"
+			class="flex-1"
+			aria-label="Hubungi via WhatsApp tentang {konteks}"
+		>
+			<svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+				<path
+					d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.39a9.86 9.86 0 0 0 4.74 1.21c5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2zm5.72 14.03c-.24.67-1.4 1.28-1.93 1.32-.5.04-.96.22-3.24-.67-2.73-1.07-4.46-3.85-4.6-4.03-.13-.18-1.1-1.46-1.1-2.78 0-1.32.7-1.97.94-2.24.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.48.24.57.8 1.98.87 2.12.07.14.12.3.02.49-.1.18-.15.29-.29.45-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.27.74 1.22 1.58 1.97 1.09.97 2 1.27 2.29 1.41.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.18-.28.37-.23.62-.14.25.09 1.6.76 1.87.9.28.13.46.2.53.31.07.11.07.65-.17 1.32z"
+				/>
+			</svg>
+			WhatsApp
+		</Button>
+	{/if}
 	<Button
 		variant="outline"
 		{size}
