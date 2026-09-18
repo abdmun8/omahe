@@ -1,0 +1,35 @@
+# Rilis artikel harian (re-deploy otomatis tiap pagi WIB).
+#
+# Artikel future-dated (frontmatter `tanggal` > hari ini) tersembunyi sampai
+# tanggalnya — difilter build-time oleh helper `artikelTayang`
+# (src/lib/artikel.ts). Workflow ini cukup MEMICU re-deploy commit terakhir:
+# build baru = artikel yang tanggalnya sudah tiba otomatis tayang, tanpa
+# commit manual harian. (Backlog: landing/TASKS.md item "Artikel (4/7)".)
+#
+# Setup sekali: buat Deploy Hook di Vercel (Project → Settings → Git → Deploy
+# Hooks), lalu simpan URL-nya sebagai repository secret
+# `VERCEL_DEPLOY_HOOK_URL` (Settings → Secrets and variables → Actions).
+# Tanpa secret itu, workflow gagal eksplisit (bukan diam-diam skip).
+
+name: Rilis artikel harian
+
+on:
+  schedule:
+    # 22:30 UTC = 05:30 WIB — artikel hari itu tayang sebelum jam kerja.
+    - cron: '30 22 * * *'
+  # Bisa dipicu manual dari tab Actions (mis. utk rilis di luar jadwal).
+  workflow_dispatch: {}
+
+jobs:
+  deploy-hook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Picu deploy hook Vercel (re-deploy commit terakhir)
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            echo "::error::Secret VERCEL_DEPLOY_HOOK_URL belum diset (lihat .github/workflows/artikel-harian.yml)"
+            exit 1
+          fi
+          curl -fsS -X POST --retry 3 --retry-delay 5 "$VERCEL_DEPLOY_HOOK_URL"
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}

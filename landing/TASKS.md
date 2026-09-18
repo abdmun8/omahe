@@ -384,7 +384,7 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       artikel (server module + script). Build tetap hijau.
       (2026-09-18, pi, review Abdul)
 
-- [ ] **Artikel (4/7): mekanisme publish harian** — supaya "posting tiap
+- [x] **Artikel (4/7): mekanisme publish harian** — supaya "posting tiap
       hari" terjadi tanpa commit manual harian. Dua opsi, pilih SATU dan
       dokumentasikan pilihannya: (1) rekomendasi — GitHub Action cron
       ~05:30 WIB memanggil Vercel deploy hook tiap pagi (re-deploy commit
@@ -396,6 +396,16 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       tidak muncul di index/detail/sitemap/RSS/terkait sebelum tanggalnya
       (semua lewat helper yang sama), dan muncul otomatis setelah re-build
       dengan tanggal yang dimajukan.
+
+      **Hasil**: opsi (1) cron dipilih — `.github/workflows/artikel-harian.yml`
+      (22:30 UTC = 05:30 WIB, `workflow_dispatch` utk manual, gagal eksplisit
+      kalau secret `VERCEL_DEPLOY_HOOK_URL` belum diset) + fallback batch &
+      varian self-host Docker didokumentasikan di README §Rilis artikel
+      harian. Semua konsumen tanggal sudah lewat helper `artikelTayang`
+      (item 1/7) — tidak ada kondisi tersebar. "Muncul setelah re-build
+      dengan tanggal dimajukan" terbukti di pengujian item 2/7 (tanggal
+      sementara dimajukan → artikel muncul di index/detail/sitemap →
+      direvert). (2026-09-18, pi, review Abdul)
 
 - [ ] **Artikel (5/7): pilot 3 artikel (checkpoint kualitas)** — tulis 3
       artikel (satu per tema) sesuai PLAN.md + format fondasi (gambar sudah

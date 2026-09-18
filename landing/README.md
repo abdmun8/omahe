@@ -49,6 +49,20 @@ lokal/CI tetap adapter Vercel). Semua env app dibaca runtime (`$env/dynamic`),
 satu image dipakai lintas environment. Detail: `../docker-compose.yml`,
 `Dockerfile` di direktori ini.
 
+## Rilis artikel harian
+
+Artikel future-dated tersembunyi sampai `tanggal`-nya (helper `artikelTayang`,
+build-time). Supaya "posting tiap hari" terjadi tanpa commit harian,
+`.github/workflows/artikel-harian.yml` memicu **Vercel deploy hook tiap
+05:30 WIB** (re-deploy commit terakhir → build baru melepas artikel hari
+itu). Setup sekali: simpan URL deploy hook sebagai repo secret
+`VERCEL_DEPLOY_HOOK_URL`.
+
+Fallback yang disadari: tanpa cron, deploy manual batch 2–3×/minggu juga
+valid — tiap deploy melepas beberapa artikel sekaligus, SEO tidak
+ terpengaruh. Untuk self-host Docker: ganti langkah curl dengan
+`docker compose up --build -d landing` di cron server.
+
 ## Sumber data: tiga tahap
 
 Diatur lewat dua env (lihat `.env.example`):
