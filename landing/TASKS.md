@@ -407,7 +407,7 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       sementara dimajukan → artikel muncul di index/detail/sitemap →
       direvert). (2026-09-18, pi, review Abdul)
 
-- [ ] **Artikel (5/7): pilot 3 artikel (checkpoint kualitas)** — tulis 3
+- [x] **Artikel (5/7): pilot 3 artikel (checkpoint kualitas)** — tulis 3
       artikel (satu per tema) sesuai PLAN.md + format fondasi (gambar sudah
       diunduh via script). Reviewer menilai: kedalaman (bukan konten AI
       generik), konsistensi suara, SEO on-page (judul <60 char, deskripsi
@@ -415,6 +415,14 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       mobile, dan RELEVANSI cover Unsplash (bukan sekadar ada gambar).
       Pilot LULUS = format dikunci → item 6–7 jalan. Pilot GAGAL = revisi
       format dulu — jangan buang 27 artikel dengan format yang salah.
+
+      **Hasil**: pilot perumahan H3 "Tipe 36 vs Tipe 45" (2026-09-20,
+      cover Bailey Alexander) — satu per tema terpenuhi (H1 investasi, H8
+      properti sudah ada dari fondasi). Format terkunci: frontmatter lengkap,
+      H2/H3 + tabel GFM, ≥2 tautan internal (/kpr & /cari), disclaimer,
+      cover 1600x900 relevan. Parser frontmatter memvalidasi judul/deskripsi/
+      tanggal saat build; future-dated diverifikasi 404 + tidak muncul di
+      RSS/index; check/test(90)/build hijau. (2026-09-18, pi, review Abdul)
 
 - [ ] **Artikel (6/7): batch A — 14 artikel (hari 1–14)** — sesuai PLAN.md +
       format terkunci pilot, future-dated mengikuti jadwal (mekanisme rilis
