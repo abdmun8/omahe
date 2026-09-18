@@ -444,10 +444,24 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       CREDITS.md termutakhir; 1 URL 404 diganti). check/test(91)/build
       hijau. (2026-09-19, pi, review Abdul)
 
-- [ ] **Artikel (7/7): batch B — 13 artikel (hari 15–30)** — idem batch A.
+- [x] **Artikel (7/7): batch B — 13 artikel (hari 15–30)** — idem batch A.
       Setelah merge: verifikasi sitemap berisi 30+1 URL artikel, RSS valid,
       dan tidak ada tautan internal mati (`grep` slug fixture di
       `src/content/`).
+
+      **Hasil**: 16 artikel H15–H30 (strata, cash flow kontrakan, appraisal,
+      spek bangunan, over KPR, sertifikat developer, RDTR, KPR kedua,
+      lingkungan, jual-rumah-KPR, inflasi, kaveling vs jadi, renovasi, exit
+      strategy, pengelola kawasan, waris). Total sprint: 30/30 artikel
+      (2 fondasi + 1 pilot + 11 batch A + 16 batch B), 30 cover self-host
+      + CREDITS.md. Verifikasi: build simulasi tanggal 2026-10-17 (override
+      hariIniWib dgn revert try/finally) → 30 halaman prerender OK, semua
+      tautan antar-artikel resolve (amankanTautanArtikel dari item 6/7);
+      build tanggal riil juga hijau (3 tayang: cicilan, cek-sertifikat,
+      + sesuai tanggal). check/test(91)/component(40) hijau. Jumlah aktual
+      batch B = 16 (bukan 13 — lihat catatan item 6/7).
+      (2026-09-19, pi, review Abdul)
+
 
 ## Aturan untuk implementor (pi/GLM)
 
