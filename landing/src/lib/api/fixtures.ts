@@ -25,6 +25,7 @@ import type {
 	DeveloperDetail,
 	DeveloperSummary,
 	PerumahanDetail,
+	PublicSlider,
 	RegionOption,
 	UnitListing
 } from './types';
@@ -308,3 +309,45 @@ export function perumahanDetail(slug: string): PerumahanDetail | null {
 export function projectSlugs(): string[] {
 	return PROJECTS.map((p) => p.slug);
 }
+
+/**
+ * Slider homepage (MONET-02, `GET /public/sliders` — api-contract.md §7).
+ * Urutan di fixture sengaja sudah "sesuai server": prioritas efektif DESC
+ * (server yang mengurutkan, Omahe tidak mengurutkan ulang). Satu slide
+ * ber-`linkUrl` eksternal supaya jalur "tab baru + rel=noopener" ikut
+ * terlihat saat dev pakai fixture.
+ *
+ * `gambarUrl` HARUS string (kontrak: item gagal presign di-skip server, bukan
+ * null — beda dari `fotoUrl` kartu lain yang sengaja null). URL di bawah
+ * placeholder foto (picsum, seed tetap) — hanya dipakai mode fixture di dev.
+ */
+export const SLIDERS: PublicSlider[] = [
+	{
+		id: '00000000-0000-4000-8000-000000000101',
+		judul: 'Open House Griya Asri Bogor',
+		subjudul: 'Sabtu–Minggu, 26–27 September · doorprize 1 unit canopy',
+		gambarUrl: 'https://picsum.photos/seed/omahe-open-house/1600/900',
+		linkUrl: null,
+		perumahan: { slug: 'griya-asri-bogor', nama: 'Griya Asri Bogor' },
+		prioritas: 50
+	},
+	{
+		id: '00000000-0000-4000-8000-000000000102',
+		judul: 'Seminar Pertama Beli Rumah',
+		subjudul: null,
+		gambarUrl: 'https://picsum.photos/seed/omahe-seminar-kpr/1600/900',
+		// Eksternal → komponen wajib buka tab baru dengan rel=noopener.
+		linkUrl: 'https://example.com/seminar-pertama-beli-rumah',
+		perumahan: { slug: 'villa-kenanga-residence', nama: 'Villa Kenanga Residence' },
+		prioritas: 20
+	},
+	{
+		id: '00000000-0000-4000-8000-000000000103',
+		judul: 'Groundbreaking Cakrawala Hills',
+		subjudul: 'Fase 2 resmi dimulai — unit awal harga pra-rilis',
+		gambarUrl: 'https://picsum.photos/seed/omahe-groundbreaking/1600/900',
+		linkUrl: null,
+		perumahan: { slug: 'cakrawala-hills-bandung', nama: 'Cakrawala Hills Bandung' },
+		prioritas: 0
+	}
+];

@@ -3,6 +3,7 @@
 	import { withRef } from '$lib/ref';
 	import DeveloperCard from '$lib/components/developer-card.svelte';
 	import SearchForm from '$lib/components/search-form.svelte';
+	import SliderCarousel from '$lib/components/slider-carousel.svelte';
 	import UnitCard from '$lib/components/unit-card.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import type { PageData } from './$types';
@@ -17,6 +18,15 @@
 	<meta property="og:description" content={SITE.deskripsi} />
 	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
+
+<!-- Slider event/kegiatan (MONET-02) — DI ATAS hero-search, container
+     sama dengan hero. `getSliders` fail-soft ke [] (api-contract.md §7):
+     kosong → section ini hilang total, bukan skeleton/spinner menetap. -->
+{#if data.sliders.length > 0}
+	<section aria-label="Event & kegiatan" class="mx-auto max-w-6xl px-4 pt-4 sm:pt-6">
+		<SliderCarousel sliders={data.sliders} ref={data.ref} />
+	</section>
+{/if}
 
 <!-- Hero + pencarian. Padding vertikal lebih ramping di mobile (default)
      supaya hero+search tidak menggerus layar pertama — sm+ tetap seperti

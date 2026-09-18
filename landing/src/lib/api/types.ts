@@ -291,3 +291,37 @@ export interface RegionOption {
 	kode: string;
 	nama: string;
 }
+
+// ---------------------------------------------------------------------------
+// MONET-02 — slider event/kegiatan homepage (api-contract.md §7)
+// ---------------------------------------------------------------------------
+
+/**
+ * Satu slide carousel homepage. Response `GET /public/sliders` berupa
+ * `ApiEnvelope<PublicSlider[]>` (tanpa paginasi, maks 10) — urutan sudah
+ * benar di server (prioritas efektif DESC → FIFO), JANGAN diurutkan ulang
+ * di sini. Filter masa-aktif & status juga diurus server.
+ */
+export interface PublicSlider {
+	id: string;
+	judul: string;
+	subjudul: string | null;
+	/**
+	 * SELALU string — item yang gagal presign gambarnya di-skip di server
+	 * (bukan `gambarUrl: null`; slide tanpa gambar tak berguna di carousel).
+	 */
+	gambarUrl: string;
+	/**
+	 * null = klik slide menuju default `/perumahan/{perumahan.slug}`
+	 * (lewat `withRef()` — passthrough `?ref=` wajib). Terisi = URL eksternal,
+	 * dibuka di tab baru dengan `rel="noopener"`.
+	 */
+	linkUrl: string | null;
+	/** Perumahan pemilik slider — tujuan link default & konteks alt. */
+	perumahan: { slug: string; nama: string };
+	/**
+	 * Prioritas efektif pemilik (MONET-01). Hanya relevan untuk urutan
+	 * server-side — slider bukan kartu listing, JANGAN dirender sebagai badge.
+	 */
+	prioritas: number;
+}

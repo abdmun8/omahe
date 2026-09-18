@@ -24,6 +24,7 @@ import type {
 	PageMeta,
 	Paginated,
 	PerumahanDetail,
+	PublicSlider,
 	RegionOption,
 	UnitListing,
 	UnitQuery
@@ -230,7 +231,10 @@ export async function getRegions(fetchFn: Fetch): Promise<RegionOption[]> {
 		try {
 			return await apiGet<RegionOption[]>(fetchFn, '/public/regions');
 		} catch (err) {
-			console.error('[omahe:api] GET /public/regions gagal — fallback ke [] (lihat api-contract.md §5)', err);
+			console.error(
+				'[omahe:api] GET /public/regions gagal — fallback ke [] (lihat api-contract.md §5)',
+				err
+			);
 			return [];
 		}
 	}
@@ -244,4 +248,35 @@ export async function getAllProjectSlugs(fetchFn: Fetch): Promise<string[]> {
 		return [...new Set(items.map((u) => u.perumahan.slug))];
 	}
 	return fixtures.projectSlugs();
+}
+
+// ---------------------------------------------------------------------------
+// Slider homepage (MONET-02)
+// ---------------------------------------------------------------------------
+
+/**
+ * Slider event/kegiatan carousel homepage (api-contract.md §7). Urutan,
+ * filter status/masa-aktif, dan batas 10 item diurus server — jangan
+ * diurutkan/difilter ulang di sini.
+ *
+ * Env-gated mengikuti pola pencarian (`hasSearchApi()`): fixture saat
+ * `OMAHE_API_SEARCH` off, API asli saat on — slider terbit bareng epic
+ * `MONET-02` yang sudah `done`, jadi tidak butuh saklar tersendiri.
+ *
+ * Fail-soft ke `[]` pola `getRegions`: slider aksesoris homepage — kalau
+ * endpoint gagal/404/shape tak dikenal, section-nya hilang TOTAL (bukan
+ * menjatuhkan seluruh halaman lewat `error()` bawaan `apiGet`).
+ */
+export async function getSliders(fetchFn: Fetch): Promise<PublicSlider[]> {
+	if (!hasSearchApi()) return fixtures.SLIDERS;
+	try {
+		const data = await apiGet<PublicSlider[]>(fetchFn, '/public/sliders');
+		return Array.isArray(data) ? data : [];
+	} catch (err) {
+		console.error(
+			'[omahe:api] GET /public/sliders gagal — fallback ke [] (section disembunyikan)',
+			err
+		);
+		return [];
+	}
 }
