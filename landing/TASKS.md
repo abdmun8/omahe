@@ -330,7 +330,7 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       `test:component` (40)/`build` kedua adapter hijau.
       (2026-09-18, pi, review Abdul)
 
-- [ ] **Artikel (2/7): distribusi — sitemap per-artikel (lastmod NYATA),
+- [x] **Artikel (2/7): distribusi — sitemap per-artikel (lastmod NYATA),
       RSS, artikel terkait** —
       - `sitemap.xml`: tambah `/artikel` + semua URL artikel yang tayang;
         `<lastmod>` artikel diambil dari `tanggal` frontmatter (nyata per
@@ -348,6 +348,17 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
         asli → tautan mati diam-diam di produksi.
       - `robots.txt`: tidak perlu perubahan (semua artikel indexable) —
         cukup konfirmasi, jangan tambah apa pun.
+
+      **Hasil**: sitemap + `/artikel` (17 URL — artikel detail pakai
+      `<lastmod>` NYATA dari frontmatter, halaman lain tetap timestamp
+      build; privasi/syarat-ketentuan tetap tidak bocor — diverifikasi
+      parse XML, bukan grep). RSS `/rss.xml` (RSS 2.0, escapeXml, pubDate
+      RFC 822 dari tanggal WIB, s-maxage=3600) + `<link rel="alternate">`
+      di root layout — terparse valid. Terkait: 3 se-tag terbaru fallback
+      lintas tag, build-time; terbukti render lewat tes sementara (tanggal
+      artikel future dimajukan → section muncul → direvert bersih).
+      Audit internal link: 0 tautan ke slug fixture. robots.txt tanpa
+      perubahan. check/test(90)/build hijau. (2026-09-18, pi, review Abdul)
 
 - [ ] **Artikel (3/7): rencana editorial 30 hari** — deliverable:
       `src/content/artikel/PLAN.md`, BUKAN artikel. Isi: 30 judul — 10 per

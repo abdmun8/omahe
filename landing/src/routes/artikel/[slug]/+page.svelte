@@ -145,4 +145,34 @@
 			← Semua artikel
 		</a>
 	</p>
+
+	{#if data.terkait.length > 0}
+		<aside class="mt-10" aria-label="Artikel terkait">
+			<h2 class="font-display text-ink text-lg font-bold">Artikel terkait</h2>
+			<ul class="mt-4 grid list-none gap-5 sm:grid-cols-3">
+				{#each data.terkait as t (t.slug)}
+					<li>
+						<a href={withRef(`/artikel/${t.slug}`, ref)} class="group block">
+							<img
+								src={t.cover}
+								alt={t.judul}
+								width="1600"
+								height="900"
+								loading="lazy"
+								decoding="async"
+								class="aspect-video w-full rounded-xl object-cover"
+							/>
+							<div class="mt-2 flex items-center gap-2">
+								<Badge variant="accent">{t.tag}</Badge>
+								<time datetime={t.tanggal} class="text-muted text-xs">{formatTanggalArtikel(t.tanggal)}</time>
+							</div>
+							<h3 class="font-display text-ink group-hover:text-primary mt-1 text-sm font-bold leading-snug">
+								{t.judul}
+							</h3>
+						</a>
+					</li>
+				{/each}
+			</ul>
+		</aside>
+	{/if}
 </div>

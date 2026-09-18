@@ -23,9 +23,17 @@ export const load: PageServerLoad = ({ params }) => {
 
 	// HTML dirender di sini (server/build-time) supaya isi markdown tidak
 	// pernah masuk bundle JS client — halaman menerima HTML jadi.
+	// Artikel terkait: 3 terbaru SE-TAG dulu (fallback lintas tag bila
+	// kurang) — dirender build-time, bukan runtime.
+	const lain = daftar.filter((x) => x.slug !== params.slug);
+	const terkait = [...lain.filter((x) => x.tag === daftar[i].tag), ...lain.filter((x) => x.tag !== daftar[i].tag)]
+		.slice(0, 3)
+		.map(metaArtikel);
+
 	return {
 		artikel: metaArtikel(daftar[i]),
 		html: renderArtikelHtml(daftar[i].markdown),
+		terkait,
 		// Daftar terurut terbaru dulu: indeks lebih besar = lebih lama.
 		sebelumnya: i + 1 < daftar.length ? metaArtikel(daftar[i + 1]) : null,
 		berikutnya: i > 0 ? metaArtikel(daftar[i - 1]) : null

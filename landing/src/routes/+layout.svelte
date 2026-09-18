@@ -35,6 +35,7 @@
 	<meta property="og:type" content="website" />
 	<meta property="og:locale" content="id_ID" />
 	<link rel="canonical" href={`${SITE.url}${page.url.pathname}`} />
+	<link rel="alternate" type="application/rss+xml" title="Artikel Omahe" href={`${SITE.url}/rss.xml`} />
 	<!--
 		JSON-LD Organization. Tag <script>-nya ikut disuntik lewat {@html}
 		karena Svelte 5 menganggap <script> apa pun jenisnya di level komponen
