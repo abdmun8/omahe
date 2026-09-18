@@ -424,10 +424,25 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       tanggal saat build; future-dated diverifikasi 404 + tidak muncul di
       RSS/index; check/test(90)/build hijau. (2026-09-18, pi, review Abdul)
 
-- [ ] **Artikel (6/7): batch A — 14 artikel (hari 1–14)** — sesuai PLAN.md +
+- [x] **Artikel (6/7): batch A — 14 artikel (hari 1–14)** — sesuai PLAN.md +
       format terkunci pilot, future-dated mengikuti jadwal (mekanisme rilis
       = item 4). Verifikasi per artikel sama dengan pilot + semua test hijau
       + build size masih sehat.
+
+      **Hasil**: 11 artikel baru (H2 cek sertifikat BPN, H4 DP 10vs20, H5
+      cluster, H6 BPHTB, H7 fixed vs floating, H9 site plan, H10 rumah
+      sebagai aset, H11 lelang, H12 subsidi, H13 properti vs emas, H14
+      IMB/PBG) — temuan desain penting saat verifikasi: artikel hari ini
+      yang menaut artikel future memecah build (crawler prerender menolak
+      link 404) DAN bikin 404 bagi pengunjung; diperbaiki dengan
+      `amankanTautanArtikel()` (link ke slug belum tayang didegradasi ke
+      /artikel saat build; rebuild harian deploy hook otomatis
+      memulihkannya begitu target tayang) + unit test. Diverifikasi live:
+      cek-sertifikat tayang, tautannya ke SHM (09-25) tertulis /artikel,
+      akses langsung SHM 404. Jumlah aktual batch A = 11 (bukan 14 —
+      H1/H3/H8 sudah terpenuhi fondasi+pilot). Cover via script (14 jpg,
+      CREDITS.md termutakhir; 1 URL 404 diganti). check/test(91)/build
+      hijau. (2026-09-19, pi, review Abdul)
 
 - [ ] **Artikel (7/7): batch B — 13 artikel (hari 15–30)** — idem batch A.
       Setelah merge: verifikasi sitemap berisi 30+1 URL artikel, RSS valid,

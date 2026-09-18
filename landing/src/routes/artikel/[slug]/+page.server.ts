@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { artikelTayang } from '$lib/artikel';
+import { amankanTautanArtikel, artikelTayang } from '$lib/artikel';
 import { bacaArtikel, hariIniWib, metaArtikel, renderArtikelHtml } from '$lib/server/artikel';
 import type { EntryGenerator, PageServerLoad } from './$types';
 
@@ -23,6 +23,10 @@ export const load: PageServerLoad = ({ params }) => {
 
 	// HTML dirender di sini (server/build-time) supaya isi markdown tidak
 	// pernah masuk bundle JS client — halaman menerima HTML jadi.
+	// Tautan ke artikel yang belum tayang dinonaktifkan dulu (ke /artikel) —
+	// crawler prerender menolak link 404; rebuild harian memulihkannya.
+	const slugTayang = new Set(daftar.map((a) => a.slug));
+	const html = amankanTautanArtikel(renderArtikelHtml(daftar[i].markdown), slugTayang);
 	// Artikel terkait: 3 terbaru SE-TAG dulu (fallback lintas tag bila
 	// kurang) — dirender build-time, bukan runtime.
 	const lain = daftar.filter((x) => x.slug !== params.slug);
@@ -32,7 +36,7 @@ export const load: PageServerLoad = ({ params }) => {
 
 	return {
 		artikel: metaArtikel(daftar[i]),
-		html: renderArtikelHtml(daftar[i].markdown),
+		html,
 		terkait,
 		// Daftar terurut terbaru dulu: indeks lebih besar = lebih lama.
 		sebelumnya: i + 1 < daftar.length ? metaArtikel(daftar[i + 1]) : null,

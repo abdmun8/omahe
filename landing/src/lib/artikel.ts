@@ -129,3 +129,20 @@ export function formatTanggalArtikel(tanggal: string): string {
 		timeZone: 'UTC'
 	});
 }
+
+/**
+ * Nonaktifkan tautan `/artikel/<slug>` yang targetnya BELUM tayang →
+ * diarahkan ke `/artikel` (teks tetap). Dipakai pada HTML body hasil
+ * `marked` sebelum dirender — tanpa ini:
+ *   1. crawler prerender GAGAL (link ke halaman 404 = error build), dan
+ *   2. pengunjung dapat 404 dari artikel hari ini yang menaut artikel
+ *      pekan depan.
+ * Berkat rebuild harian (deploy hook), tautan ini otomatis jadi langsung
+ * begitu target tayang di build berikutnya. Set `slugTayang` = semua slug
+ * yang lolos `artikelTayang`.
+ */
+export function amankanTautanArtikel(html: string, slugTayang: Set<string>): string {
+	return html.replace(/href="(\/artikel\/([a-z0-9-]+))"/g, (utuh, _path: string, slug: string) =>
+		slugTayang.has(slug) ? utuh : 'href="/artikel"'
+	);
+}

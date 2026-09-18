@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import {
+	amankanTautanArtikel,
 	artikelTayang,
 	formatTanggalArtikel,
 	parseFrontmatterArtikel,
@@ -96,6 +97,18 @@ describe('urutkanTerbaru', () => {
 	test('terbaru dulu, tie-break slug deterministik', () => {
 		const urut = urutkanTerbaru([buat('b', '2026-09-01'), buat('a', '2026-09-18'), buat('c', '2026-09-18')]);
 		expect(urut.map((x) => x.slug)).toEqual(['a', 'c', 'b']);
+	});
+});
+
+describe('amankanTautanArtikel', () => {
+	test('tautan ke artikel belum tayang → /artikel; yang tayang utuh', () => {
+		const html =
+			'<p>Lihat <a href="/artikel/sudah-tayang">A</a> dan <a href="/artikel/belum-tayang">B</a>, plus <a href="/kpr">KPR</a>.</p>';
+		const hasil = amankanTautanArtikel(html, new Set(['sudah-tayang']));
+		expect(hasil).toContain('href="/artikel/sudah-tayang"');
+		expect(hasil).not.toContain('/artikel/belum-tayang');
+		expect(hasil).toContain('<a href="/artikel">B</a>');
+		expect(hasil).toContain('href="/kpr"'); // tautan non-artikel tidak disentuh
 	});
 });
 
