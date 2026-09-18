@@ -228,7 +228,7 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       - `bun run check`, `bun test`, `bun run test:component`,
         `bun run build` semua hijau.
 
-- [ ] **Artikel (1/7): fondasi — markdown in-repo, `/artikel` +
+- [x] **Artikel (1/7): fondasi — markdown in-repo, `/artikel` +
       `/artikel/[slug]`, gambar Unsplash lokal, on-page SEO** — keputusan
       produk: konten artikel HIDUP DI REPO sebagai markdown
       (`src/content/artikel/*.md`), TANPA CMS/DB/API backend. Halaman artikel
@@ -277,6 +277,26 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
         `build/prerendered/artikel` terisi; satu artikel dicek manual:
         canonical `SITE.url/artikel/...`, JSON-LD di-parse (bukan grep),
         og:image absolut, artikel future-dated TIDAK tampil.
+
+      **Hasil**: parser/filter murni di `src/lib/artikel.ts` (+11 unit
+      test, termasuk validasi fail-fast frontmatter) + glue build-time di
+      `src/lib/server/artikel.ts` (glob `?raw` + `marked`) — isi markdown
+      TIDAK pernah masuk bundle JS client (diverifikasi grep chunk
+      immutable kosong); halaman detail menerima HTML jadi via data load.
+      Route `/artikel` (filter `?tag=` client-side, guard `browser` karena
+      `url.searchParams` dilarang saat prerender) + `/artikel/[slug]`
+      (`entries` dari artikel tayang) keduanya prerender. Script
+      `scripts/ambil-gambar-artikel.ts` mengunduh cover Unsplash
+      1600×900 (`fm=jpg&fit=crop`) → `static/artikel/`, regenerasi
+      `CREDITS.md`; 2 artikel contoh (1 tayang, 1 future-dated
+      2026-09-25). JSON-LD Article+Breadcrumb via `amankanJsonLd()`
+      ter-parse valid (3 blok); og:image/canonical absolut; artikel
+      future-dated 404 & tidak bocor di index. Passthrough `?ref=`:
+      nav via `withRef` seperti biasa + link body markdown di-rewrite
+      `$effect` pasca-hidrasi — diverifikasi Playwright (nav + body
+      bawa ref, klik `/kpr` utuh). `check`/`bun test` (90)/
+      `test:component` (40)/`build` kedua adapter hijau.
+      (2026-09-18, pi, review Abdul)
 
 - [ ] **Artikel (2/7): distribusi — sitemap per-artikel (lastmod NYATA),
       RSS, artikel terkait** —

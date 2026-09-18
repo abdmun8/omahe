@@ -22,6 +22,7 @@ export const NAV = [
 	{ href: '/cari', label: 'Cari Rumah' },
 	{ href: '/developer', label: 'Developer' },
 	{ href: '/kpr', label: 'Simulasi KPR' },
+	{ href: '/artikel', label: 'Artikel' },
 	{ href: '/tentang', label: 'Tentang' },
 	{ href: '/kontak', label: 'Kontak' }
 ] as const;

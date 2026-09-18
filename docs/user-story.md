@@ -130,4 +130,12 @@ Keputusan desain didelegasikan architect 2026-09-18.
   `POST /public/leads`. Sukses: "Tim {perumahan} akan menghubungi Anda"
   + tombol sekunder WA ke nomor umum Omahe. Tombol Telepon tetap nomor
   umum Omahe. **Partner gratis TIDAK berubah** (WA nomor umum, keputusan
-  2026-09-13 di atas tetap berlaku untuk mereka).
+  2026-09-13 di atas tetap berlaku untuk mereka).- **Artikel/blog (2026-09-18)**: konten artikel HIDUP DI REPO sebagai
+  markdown (`src/content/artikel/*.md` + frontmatter), TANPA CMS/DB/API —
+  di-prerender build-time (SEO + TTFB ~nol di Vercel & Docker), future-
+  dated tersembunyi sampai tanggalnya (helper tunggal `artikelTayang`).
+  Cover diambil dari Unsplash tapi SELF-HOST (diunduh via
+  `scripts/ambil-gambar-artikel.ts`, di-commit, dicatat di `CREDITS.md`) —
+  bukan hotlink. Rencana 30 artikel/30 hari (investasi/properti/perumahan)
+  + mekanisme rilis harian: backlog `landing/TASKS.md` §Sprint SEO &
+  artikel.
