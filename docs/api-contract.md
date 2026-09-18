@@ -296,3 +296,9 @@ aktif-nya), kedaluwarsa otomatis di query-time. `0` = gratis — item
 tetap tampil urutan netral. Omahe merender badge "Promosi" kecil untuk
 `prioritas > 0`; prioritas TIDAK pernah meloloskan item dari filter
 yang seharusnya mengecualikannya.
+
+**2026-09-18 (tambahan)**: `GET /public/perumahan/:slug` (§4) juga kini
+menyertakan `prioritas` (efektif penuh di jalur `?full=1`; jalur
+skip-resolve LANDING-05 = own-only, tanpa lookup developer) — dipakai
+halaman detail Omahe untuk men-gate LeadFormDialog MONET-03 di
+sticky-CTA.
