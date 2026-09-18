@@ -2,6 +2,7 @@
 	import type { DeveloperSummary } from '$lib/api/types';
 	import { withRef } from '$lib/ref';
 	import ContactButtons from './contact-buttons.svelte';
+	import PromosiBadge from './promosi-badge.svelte';
 	import Badge from './ui/badge.svelte';
 
 	let { developer, ref = null }: { developer: DeveloperSummary; ref?: string | null } = $props();
@@ -32,7 +33,14 @@
 					{developer.nama}
 				</a>
 			</h3>
-			<Badge class="mt-1">{developer.jumlahProyek} proyek aktif</Badge>
+			<!-- MONET-01: badge "Promosi" sebaris dengan badge jumlah proyek,
+			     wrap ke bawah di layar sempit (mobile-first). -->
+			<div class="mt-1 flex flex-wrap items-center gap-1.5">
+				<Badge>{developer.jumlahProyek} proyek aktif</Badge>
+				{#if developer.prioritas > 0}
+					<PromosiBadge />
+				{/if}
+			</div>
 		</div>
 	</div>
 

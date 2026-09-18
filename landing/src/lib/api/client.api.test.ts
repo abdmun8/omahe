@@ -56,7 +56,8 @@ const unit = (
 		nama: perumahanSlug,
 		slug: perumahanSlug,
 		regionKode: '32.01',
-		regionNama: 'Kab. Bogor, Jawa Barat'
+		regionNama: 'Kab. Bogor, Jawa Barat',
+		prioritas: 0
 	},
 	developer: developerSlug === null ? null : { nama: `PT ${developerSlug}`, slug: developerSlug },
 	fotoUrl: null

@@ -43,6 +43,10 @@ export const REGIONS: RegionOption[] = [
 interface FixtureProject {
 	nama: string;
 	slug: string;
+	/** MONET-01 — kebanyakan 0; TEPAT SATU proyek 40+ supaya badge
+	 * "Promosi" terlihat saat dev pakai fixture (cermin prioritas efektif
+	 * di API asli, yang juga selalu minoritas). */
+	prioritas: number;
 	regionKode: string;
 	deskripsi: string;
 	developerSlug: string | null;
@@ -60,6 +64,7 @@ const PROJECTS: FixtureProject[] = [
 	{
 		nama: 'Griya Asri Bogor',
 		slug: 'griya-asri-bogor',
+		prioritas: 50,
 		regionKode: '32.01',
 		developerSlug: 'nusa-land-development',
 		alamat: 'Jl. Raya Tajur No. 88, Ciawi, Kab. Bogor',
@@ -74,6 +79,7 @@ const PROJECTS: FixtureProject[] = [
 	{
 		nama: 'Villa Kenanga Residence',
 		slug: 'villa-kenanga-residence',
+		prioritas: 0,
 		regionKode: '32.71',
 		developerSlug: 'nusa-land-development',
 		alamat: 'Jl. Kenanga Raya No. 12, Tanah Sareal, Kota Bogor',
@@ -87,6 +93,7 @@ const PROJECTS: FixtureProject[] = [
 	{
 		nama: 'Cakrawala Hills Bandung',
 		slug: 'cakrawala-hills-bandung',
+		prioritas: 0,
 		regionKode: '32.73',
 		developerSlug: 'cakrawala-griya-utama',
 		alamat: 'Jl. Setiabudi Atas KM 12, Ledeng, Kota Bandung',
@@ -100,6 +107,7 @@ const PROJECTS: FixtureProject[] = [
 	{
 		nama: 'Sentosa Park Sidoarjo',
 		slug: 'sentosa-park-sidoarjo',
+		prioritas: 0,
 		regionKode: '35.15',
 		developerSlug: 'bumi-sentosa-properti',
 		alamat: 'Jl. Raya Wage No. 45, Taman, Kab. Sidoarjo',
@@ -113,6 +121,7 @@ const PROJECTS: FixtureProject[] = [
 	{
 		nama: 'Bumi Sentosa Regency',
 		slug: 'bumi-sentosa-regency',
+		prioritas: 0,
 		regionKode: '33.74',
 		developerSlug: 'bumi-sentosa-properti',
 		alamat: 'Jl. Ngaliyan Raya No. 7, Ngaliyan, Kota Semarang',
@@ -126,6 +135,7 @@ const PROJECTS: FixtureProject[] = [
 	{
 		nama: 'Puri Mentari Tangerang',
 		slug: 'puri-mentari-tangerang',
+		prioritas: 0,
 		regionKode: '36.71',
 		developerSlug: null,
 		alamat: 'Jl. Gatot Subroto KM 5, Jatiuwung, Kota Tangerang',
@@ -140,6 +150,9 @@ const DEVELOPERS = [
 		id: 'dev-nusa-land',
 		nama: 'PT Nusa Land Development',
 		slug: 'nusa-land-development',
+		// SATU-satunya developer berprioritas di fixture (60) — pasangan
+		// badge-nya dengan Griya Asri Bogor (50) di atas.
+		prioritas: 60,
 		deskripsi:
 			'Pengembang perumahan menengah di Jabodetabek sejak 2009. Fokus pada cluster skala kecil-menengah dengan serah terima tepat waktu.'
 	},
@@ -147,6 +160,7 @@ const DEVELOPERS = [
 		id: 'dev-cakrawala',
 		nama: 'PT Cakrawala Griya Utama',
 		slug: 'cakrawala-griya-utama',
+		prioritas: 0,
 		deskripsi:
 			'Pengembang asal Bandung yang menggarap lahan berkontur di kawasan Bandung utara dan Lembang.'
 	},
@@ -154,6 +168,7 @@ const DEVELOPERS = [
 		id: 'dev-bumi-sentosa',
 		nama: 'PT Bumi Sentosa Properti',
 		slug: 'bumi-sentosa-properti',
+		prioritas: 0,
 		deskripsi:
 			'Menggarap perumahan subsidi dan komersial di Jawa Tengah dan Jawa Timur, dengan lebih dari 4.000 unit terbangun.'
 	}
@@ -180,7 +195,8 @@ export const UNIT_LISTINGS: UnitListing[] = PROJECTS.flatMap((p) =>
 			nama: p.nama,
 			slug: p.slug,
 			regionKode: p.regionKode,
-			regionNama: regionNama(p.regionKode)
+			regionNama: regionNama(p.regionKode),
+			prioritas: p.prioritas
 		},
 		developer: developerRef(p.developerSlug),
 		fotoUrl: null

@@ -61,7 +61,8 @@ function buatUnit(override: Partial<UnitListing> = {}): UnitListing {
 			nama: 'Griya Asri',
 			slug: 'griya-asri',
 			regionKode: '32.01',
-			regionNama: 'Kab. Bogor, Jawa Barat'
+			regionNama: 'Kab. Bogor, Jawa Barat',
+			prioritas: 0
 		},
 		developer: null,
 		fotoUrl: null,
@@ -126,6 +127,45 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		expect(screen.getByText('10 unit tersedia')).toBeInTheDocument();
 	});
 
+	test('badge "Promosi" muncul kalau perumahan.prioritas > 0 (MONET-01)', () => {
+		render(UnitCard, {
+			unit: buatUnit({
+				perumahan: {
+					nama: 'Griya Asri',
+					slug: 'griya-asri',
+					regionKode: '32.01',
+					regionNama: 'Kab. Bogor, Jawa Barat',
+					prioritas: 50
+				}
+			})
+		});
+
+		expect(screen.getByText('Promosi')).toBeInTheDocument();
+	});
+
+	test('badge "Promosi" tidak muncul kalau perumahan.prioritas 0', () => {
+		// Default buatUnit() sudah prioritas 0 (gratis) — tidak ada badge.
+		render(UnitCard, { unit: buatUnit() });
+
+		expect(screen.queryByText('Promosi')).toBeNull();
+	});
+
+	test('badge "Promosi" tidak muncul kalau prioritas undefined (data lama), tanpa crash', () => {
+		// Response API sebelum MONET-01 tidak punya field ini — komponen
+		// harus tetap render utuh, bukan error karena `undefined > 0`.
+		const perumahanLama = {
+			nama: 'Griya Asri',
+			slug: 'griya-asri',
+			regionKode: '32.01',
+			regionNama: 'Kab. Bogor, Jawa Barat'
+		} as UnitListing['perumahan'];
+		render(UnitCard, { unit: buatUnit({ perumahan: perumahanLama }) });
+
+		expect(screen.queryByText('Promosi')).toBeNull();
+		// Kartu tetap render normal walau field barunya absen.
+		expect(screen.getByText('Rp385 jt')).toBeInTheDocument();
+	});
+
 	test('tombol WhatsApp & Telepon selalu ada di DOM, apa pun kondisi lainnya', () => {
 		// Nama perumahan sengaja dibedakan antar varian: cleanup hanya jalan
 		// per-test (afterEach), jadi kedua kartu sempat hidup bersamaan di
@@ -140,7 +180,8 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 					nama: 'Villa Puncak Asri',
 					slug: 'villa-puncak-asri',
 					regionKode: '32.03',
-					regionNama: 'Kab. Cianjur, Jawa Barat'
+					regionNama: 'Kab. Cianjur, Jawa Barat',
+					prioritas: 0
 				}
 			})
 		];

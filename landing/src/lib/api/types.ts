@@ -85,6 +85,12 @@ export interface UnitListingPerumahan {
 	regionKode: string | null;
 	/** Nama region siap tampil, mis. "Kab. Bogor, Jawa Barat". */
 	regionNama: string | null;
+	/**
+	 * Prioritas promosi perumahan induk (MONET-01, `done` 2026-09-18) —
+	 * int >= 0, `0` = gratis/urutan netral. Badge "Promosi" dirender untuk
+	 * nilai > 0. Prioritas TIDAK pernah meloloskan item dari filter.
+	 */
+	prioritas: number;
 }
 
 export interface DeveloperRef {
@@ -116,12 +122,21 @@ export interface DeveloperSummary {
 	logoUrl: string | null;
 	/** Jumlah proyek perumahan `isActive=true` milik developer ini. */
 	jumlahProyek: number;
+	/** Prioritas promosi (MONET-01) — semantik sama dengan
+	 * `UnitListingPerumahan.prioritas`; badge "Promosi" untuk nilai > 0. */
+	prioritas: number;
 }
 
 export interface DeveloperDetail extends DeveloperSummary {
 	proyek: DeveloperProject[];
 }
 
+// Catatan (2026-09-18, MONET-01): field `prioritas` hanya dijamin di
+// `GET /public/units` (di `UnitListingPerumahan`), `GET /public/developers`
+// (`DeveloperSummary`), dan `GET /public/perumahan` (direktori — belum ada
+// tipenya di sini karena belum ada halaman Omahe yang memakainya).
+// `DeveloperProject` (proyek[] di detail developer) TIDAK membawa
+// `prioritas` — jangan tambahkan sendiri tanpa konfirmasi backend.
 export interface DeveloperProject {
 	nama: string;
 	slug: string;
