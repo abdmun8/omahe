@@ -32,6 +32,23 @@ field fixture perlu dicek ulang sebelum switch penuh).
 | `bun run check`          | type-check Svelte + TS                                          |
 | `bun run format`         | Prettier                                                        |
 
+## Docker (self-host / staging)
+
+```bash
+# dari root repo
+
+docker compose up --build                      # produksi, host :3000
+LANDING_PORT=8080 docker compose up --build    # host :8080 (server multi-app)
+OMAHE_API_BASE_URL= docker compose up --build  # mode fixture (tanpa backend)
+docker compose --profile dev up dev            # dev server + HMR :5173 (Bun)
+```
+
+Build multi-stage: stage build pakai Bun (`oven/bun`), runtime pakai Node 24
+(`adapter-node`, dipilih lewat `OMAHE_ADAPTER=node` saat build — default build
+lokal/CI tetap adapter Vercel). Semua env app dibaca runtime (`$env/dynamic`),
+satu image dipakai lintas environment. Detail: `../docker-compose.yml`,
+`Dockerfile` di direktori ini.
+
 ## Sumber data: tiga tahap
 
 Diatur lewat dua env (lihat `.env.example`):

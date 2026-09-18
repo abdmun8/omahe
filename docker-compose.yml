@@ -1,0 +1,72 @@
+# Omahe landing — Docker Compose.
+#
+#   docker compose up --build                # produksi: build image lalu jalan di :3000
+#   docker compose --profile dev up dev      # pengembangan: vite dev + HMR di :5173 (Bun)
+#
+# PORT HOST bisa diubah (server ini multi-app, port sering bentrok):
+#   LANDING_PORT=8080 docker compose up      # host :8080 → container :3000
+#   LANDING_DEV_PORT=5174 docker compose --profile dev up dev
+# Port internal container tetap 3000 — tidak pernah bentrok dengan app lain
+# karena tiap container punya network namespace sendiri.
+#
+# Semua env dibaca runtime ($env/dynamic), bukan di-bake saat build — jadi
+# konfigurasi cukup lewat env di bawah / file `.env` di `landing/`.
+#
+# CATATAN `host.docker.internal`: backend `perumahan` di host Anda listen di
+# :3000 — dari dalam container, `localhost` BUKAN host, jadi default env di
+# bawah mengarah ke sana. Kalau backend juga di-compose, ganti ke nama service-
+# nya (mis. `http://perumahan:3000`) di network yang sama.
+
+name: omahe
+
+services:
+  landing:
+    build:
+      context: ./landing
+    image: omahe-landing
+    restart: unless-stopped
+    ports:
+      # Port host kiri (bisa diubah via LANDING_PORT), port container kanan tetap 3000.
+      - '${LANDING_PORT:-3000}:3000'
+    # `.env` landing ikut termuat bila ada (mis. OMAHE_API_SEARCH=1);
+    # `environment` di bawah menimpa nilai yang tidak relevan di dalam container.
+    env_file:
+      - path: ./landing/.env
+        required: false
+    environment:
+      # Kosongkan (= fixture) dengan `OMAHE_API_BASE_URL= docker compose up` —
+      # interpolasi memakai `-` (bukan `:-`) supaya string kosong tetap kosong.
+      OMAHE_API_BASE_URL: ${OMAHE_API_BASE_URL-http://host.docker.internal:3000}
+      PUBLIC_BOOKING_BASE_URL: ${PUBLIC_BOOKING_BASE_URL:-http://host.docker.internal:3000}
+      # ORIGIN wajib diganti kalau ada reverse proxy/domain di depan
+      # (mis. OMAHE_ORIGIN=https://omahe.id) — string kosong ditolak adapter-node.
+      # Default mengikuti LANDING_PORT supaya URL absolut tetap benar.
+      ORIGIN: ${OMAHE_ORIGIN:-http://localhost:${LANDING_PORT:-3000}}
+    extra_hosts:
+      # `host.docker.internal` di Linux (Docker Desktop sudah punya bawaan).
+      - 'host.docker.internal:host-gateway'
+
+  # --- Pengembangan (profile terpisah, tidak jalan secara default) ----------
+  dev:
+    profiles: ['dev']
+    image: oven/bun:1.2
+    working_dir: /app
+    command: sh -c 'bun install --frozen-lockfile && bun run dev --host 0.0.0.0 --port 5173'
+    ports:
+      - '${LANDING_DEV_PORT:-5173}:5173'
+    volumes:
+      - ./landing:/app
+      # Isolasi node_modules container agar tidak menimpa punya host.
+      - dev_node_modules:/app/node_modules
+    env_file:
+      - path: ./landing/.env
+        required: false
+    environment:
+      # Dari dalam container, backend di host = host.docker.internal.
+      OMAHE_API_BASE_URL: ${OMAHE_API_BASE_URL-http://host.docker.internal:3000}
+      PUBLIC_BOOKING_BASE_URL: ${PUBLIC_BOOKING_BASE_URL:-http://host.docker.internal:3000}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+volumes:
+  dev_node_modules:

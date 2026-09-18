@@ -1,0 +1,11 @@
+node_modules
+.svelte-kit
+.vercel
+.env
+.env.*
+!.env.example
+.git
+.vscode
+*.md
+Dockerfile
+.dockerignore

@@ -1,4 +1,5 @@
-import adapter from '@sveltejs/adapter-vercel';
+import adapterNode from '@sveltejs/adapter-node';
+import adapterVercel from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
@@ -15,7 +16,14 @@ export default defineConfig({
 
 			// Deploy sementara di Vercel (CLAUDE.md §Stack) — runtime produksi Node
 			// function Vercel, BUKAN Bun; Bun cuma dipakai lokal (`bun run dev`).
-			adapter: adapter({ runtime: 'nodejs22.x' }),
+			//
+			// `OMAHE_ADAPTER=node` (env saat build) memilih `adapter-node` untuk
+			// Docker/self-host (`landing/Dockerfile`) — menghasilkan standalone
+			// server `node build`. Default (tanpa env) tetap Vercel.
+			adapter:
+				process.env.OMAHE_ADAPTER === 'node'
+					? adapterNode()
+					: adapterVercel({ runtime: 'nodejs22.x' }),
 
 			alias: {
 				$components: 'src/lib/components'
