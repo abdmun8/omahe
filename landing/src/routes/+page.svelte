@@ -18,9 +18,11 @@
 	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
 
-<!-- Hero + pencarian -->
+<!-- Hero + pencarian. Padding vertikal lebih ramping di mobile (default)
+     supaya hero+search tidak menggerus layar pertama — sm+ tetap seperti
+     semula. -->
 <section class="bg-primary">
-	<div class="mx-auto max-w-6xl px-4 py-12 sm:py-20">
+	<div class="mx-auto max-w-6xl px-4 py-8 sm:py-20">
 		<p class="font-display text-accent-light text-sm font-semibold tracking-wide uppercase">
 			{SITE.tagline}
 		</p>
@@ -32,8 +34,10 @@
 			ajukan langsung tanpa perantara.
 		</p>
 
-		<div class="mt-8 rounded-2xl bg-white p-4 shadow-lg sm:p-5">
-			<SearchForm regions={data.regions} ref={data.ref} />
+		<!-- `kompak`: di mobile form cuma satu baris + link "Filter lanjutan";
+		     filter lengkap tetap ada di /cari. -->
+		<div class="mt-6 rounded-2xl bg-white p-4 shadow-lg sm:mt-8 sm:p-5">
+			<SearchForm regions={data.regions} ref={data.ref} kompak />
 		</div>
 	</div>
 </section>
