@@ -193,6 +193,158 @@ mulai sebelum endpoint publik terkait sudah `done` di backend (field
       berubah; `ref` dari URL ikut terkirim; sumber (`card|slider|detail`)
       di-set pemanggilnya.
 
+## Sprint SEO & artikel (ditambahkan 2026-09-15)
+
+Dua tujuan: (1) optimasi TTFB halaman statis via prerender — host-agnostic,
+berguna di Vercel maupun Docker self-host; (2) fitur artikel/blog sebagai
+mesin content-marketing SEO: 30 artikel untuk 30 hari berikutnya, tema
+investasi / properti / perumahan, posting harian. Urutan item = urutan
+dependensi — jangan diacak. Semua item tunduk pada "Aturan untuk implementor"
+di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
+
+- [ ] **Prerender halaman statis (`/tentang`, `/kontak`, `/privasi`,
+      `/syarat-ketentuan`, `/kpr`)** — lima halaman ini murni statis (tidak
+      ada `load`/fetch backend) tapi masih dirender SSR per-request. Tambah
+      `+page.ts` berisi `export const prerender = true;` di tiap halaman
+      (flag prerender TIDAK boleh di `+page.svelte` — SvelteKit hanya membaca
+      config dari modul `+page(.server).js/.ts`).
+
+      **GOTCHA `?ref=` (wajib diverifikasi end-to-end — ini kunci komisi
+      referral, lihat CLAUDE.md):** root `+layout.ts` membaca `ref` dari
+      `url` saat load. Saat prerender, load dijalankan build-time TANPA query
+      string → HTML awal berisi `ref` kosong; universal load di-re-run
+      browser saat hydration dengan query lengkap. Buktikan: `bun run build
+      && bun run preview`, buka `/kpr?ref=uji` (dan `/kontak?ref=uji`) —
+      SETELAH hydration, semua link yang memakai `page.data.ref`/`withRef`
+      harus bawa `ref=uji`; bandingkan dengan halaman SSR yang tidak
+      di-prerender. Kalau ref TIDAK terbaca pasca-hydration: JANGAN paksa,
+      batalkan item dan laporkan (passthrough komisi > TTFB).
+
+      Verifikasi lain:
+      - `OMAHE_ADAPTER=node bun run build` → `build/prerendered/` berisi
+        kelima halaman (Docker self-host dapat manfaat yang sama).
+      - `/privasi` & `/syarat-ketentuan` TETAP noindex dan TETAP TIDAK masuk
+        sitemap — prerender ≠ boleh diindeks; jangan sentuh keduanya.
+      - `bun run check`, `bun test`, `bun run test:component`,
+        `bun run build` semua hijau.
+
+- [ ] **Artikel (1/7): fondasi — markdown in-repo, `/artikel` +
+      `/artikel/[slug]`, gambar Unsplash lokal, on-page SEO** — keputusan
+      produk: konten artikel HIDUP DI REPO sebagai markdown
+      (`src/content/artikel/*.md`), TANPA CMS/DB/API backend. Halaman artikel
+      harus render identik di mode fixture maupun API asli, dan tidak pernah
+      5xx gara-gara backend.
+
+      - Frontmatter per artikel: `judul`, `deskripsi` (≤160 char — menjadi
+        meta description + og:description), `tanggal` (`YYYY-MM-DD`, tanggal
+        publish WIB), `tag` (`investasi`|`properti`|`perumahan`), `cover`
+        (path di bawah `/artikel/`), `penulis`.
+      - Baca konten build-time via
+        `import.meta.glob('/src/content/artikel/*.md', { eager: true, query: '?raw', import: 'default' })`.
+        **GOTCHA: JANGAN pakai `fs.readFile` di load** — jalan di dev lokal
+        tapi MATI di Vercel (fs tidak ke-bundle di serverless).
+      - Markdown → HTML via `marked`; parser frontmatter boleh `gray-matter`
+        atau hand-rolled — pilih yang paling sedikit dependency baru.
+      - **Helper tunggal `artikelTayang(list, hariIni)`**: hanya artikel
+        `tanggal <= hari ini` yang tampil (future-dated = tersembunyi).
+        SATU fungsi dipakai semua konsumen (index, detail, sitemap, RSS,
+        terkait) — jangan copy-paste kondisinya; satu titik lupa = artikel
+        future-dated bocor duluan.
+      - **Gambar Unsplash**: JANGAN hotlink `images.unsplash.com` di produksi
+        (latency dari Indonesia + dependency eksternal). Script bun
+        `scripts/ambil-gambar-artikel.ts`: unduh dari URL Unsplash dengan
+        param ukuran/quality (`?auto=format&fit=crop&w=1600&q=80`) → simpan
+        `static/artikel/<slug>-cover.jpg`, file di-commit ke repo (bukan
+        fetch saat build CI — network di CI itu rapuh). Catat URL sumber +
+        nama fotografer di `src/content/artikel/CREDITS.md` (lisensi
+        Unsplash: komersial boleh, atribusi tidak wajib — tapi dicatat).
+      - Routing: `/artikel` (index urut `tanggal` desc; filter tag via query
+        `?tag=` client-side — canonical TETAP `/artikel` polos) dan
+        `/artikel/[slug]` detail. Keduanya `prerender = true`; route dinamis
+        WAJIB export `entries` (listing slug dari glob yang sama, bukan fs).
+      - On-page SEO per artikel: `<svelte:head>` title (<60 char) + meta
+        description, `og:type=article`, og:image cover absolut, JSON-LD
+        `Article` + `BreadcrumbList` — pakai `amankanJsonLd()` dari
+        `src/lib/jsonld.ts` (pola & escape `</` sudah teruji, jangan buat
+        pola baru), navigasi artikel sebelum/berikutnya.
+      - Nav: tambahkan tautan "Artikel" di header & footer mengikuti pola
+        link yang sudah ada (perilaku `?ref=`-nya ikut pola global).
+      - Layout artikel mobile-first, lebar teks `max-w-prose`, pakai design
+        token yang ada — jangan perkenalkan gaya baru.
+      - Update dokumen: site map di `../CLAUDE.md` + keputusan "blog markdown
+        in-repo, bukan CMS" di `../docs/user-story.md` §Keputusan.
+      - Verifikasi: `check`/`bun test`/`test:component`/`build` hijau;
+        `build/prerendered/artikel` terisi; satu artikel dicek manual:
+        canonical `SITE.url/artikel/...`, JSON-LD di-parse (bukan grep),
+        og:image absolut, artikel future-dated TIDAK tampil.
+
+- [ ] **Artikel (2/7): distribusi — sitemap per-artikel (lastmod NYATA),
+      RSS, artikel terkait** —
+      - `sitemap.xml`: tambah `/artikel` + semua URL artikel yang tayang;
+        `<lastmod>` artikel diambil dari `tanggal` frontmatter (nyata per
+        artikel — BEDA dari halaman API yang cuma punya timestamp build;
+        jangan ubah perilaku lastmod halaman lain).
+      - RSS `/rss.xml` (`+server.ts`, pola cache seperti sitemap,
+        `s-maxage`), 20 artikel terbaru, URL absolut via `SITE.url`, plus
+        `<link rel="alternate" type="application/rss+xml">` di root layout.
+      - Artikel terkait: 3 artikel `tag` sama terbaru (fallback tag lain
+        bila kurang) — dirender build-time, bukan runtime.
+      - **Audit internal linking**: setiap artikel minimal 2 tautan internal
+        ke route yang PASTI ada di kedua mode data (`/cari`, `/kpr`,
+        `/artikel/...`). JANGAN tautkan ke slug fixture spesifik
+        (`/perumahan/griya-asri-bogor` dll) — slug itu tidak ada di mode API
+        asli → tautan mati diam-diam di produksi.
+      - `robots.txt`: tidak perlu perubahan (semua artikel indexable) —
+        cukup konfirmasi, jangan tambah apa pun.
+
+- [ ] **Artikel (3/7): rencana editorial 30 hari** — deliverable:
+      `src/content/artikel/PLAN.md`, BUKAN artikel. Isi: 30 judul — 10 per
+      tema (`investasi`, `properti`, `perumahan`), dirotasi lintas tema
+      (jangan 10 hari investasi beruntun — variasikan klaster keyword per
+      minggu). Per judul: keyword target + search intent, angle unik,
+      tanggal publish, pilihan cover Unsplash (URL + fotografer). Bar
+      kualitas untuk menilai batch nanti: 800–1200+ kata, struktur H2/H3,
+      angka konkret (simulasi KPR, hitungan DP/cicilan nyata), E-E-A-T
+      konteks pasar Indonesia, satu suara bahasa Indonesia konsisten dengan
+      copy site. WAJIB: disclaimer "bukan nasihat keuangan" di artikel
+      bertema investasi; JANGAN janji imbal hasil/ROI spesifik. Arah judul
+      (contoh, bukan final): "Cicilan vs Sewa: Hitungan 5 Tahun", "SHM vs
+      SHGB: Bedanya Sebelum Tanda Tangan", "Tipe 36 vs 45 untuk Keluarga
+      Muda".
+
+- [ ] **Artikel (4/7): mekanisme publish harian** — supaya "posting tiap
+      hari" terjadi tanpa commit manual harian. Dua opsi, pilih SATU dan
+      dokumentasikan pilihannya: (1) rekomendasi — GitHub Action cron
+      ~05:30 WIB memanggil Vercel deploy hook tiap pagi (re-deploy commit
+      terakhir; build baru = helper `artikelTayang` melepas artikel yang
+      tanggalnya tiba); (2) fallback yang disadari — publish batch manual
+      2–3x/minggu, tiap deploy melepas beberapa artikel sekaligus (SEO
+      tidak terpengaruh; moving parts lebih sedikit). Konfigurasi via
+      secret/env, dokumentasikan di `README.md`. Verifikasi: future-dated
+      tidak muncul di index/detail/sitemap/RSS/terkait sebelum tanggalnya
+      (semua lewat helper yang sama), dan muncul otomatis setelah re-build
+      dengan tanggal yang dimajukan.
+
+- [ ] **Artikel (5/7): pilot 3 artikel (checkpoint kualitas)** — tulis 3
+      artikel (satu per tema) sesuai PLAN.md + format fondasi (gambar sudah
+      diunduh via script). Reviewer menilai: kedalaman (bukan konten AI
+      generik), konsistensi suara, SEO on-page (judul <60 char, deskripsi
+      ≤160, hierarki heading, ≥2 internal link), JSON-LD valid, render
+      mobile, dan RELEVANSI cover Unsplash (bukan sekadar ada gambar).
+      Pilot LULUS = format dikunci → item 6–7 jalan. Pilot GAGAL = revisi
+      format dulu — jangan buang 27 artikel dengan format yang salah.
+
+- [ ] **Artikel (6/7): batch A — 14 artikel (hari 1–14)** — sesuai PLAN.md +
+      format terkunci pilot, future-dated mengikuti jadwal (mekanisme rilis
+      = item 4). Verifikasi per artikel sama dengan pilot + semua test hijau
+      + build size masih sehat.
+
+- [ ] **Artikel (7/7): batch B — 13 artikel (hari 15–30)** — idem batch A.
+      Setelah merge: verifikasi sitemap berisi 30+1 URL artikel, RSS valid,
+      dan tidak ada tautan internal mati (`grep` slug fixture di
+      `src/content/`).
+
+
 ## Aturan untuk implementor (pi/GLM)
 
 - Baca `../CLAUDE.md`, `README.md`, dan file yang relevan dengan tugasnya
