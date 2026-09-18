@@ -15,9 +15,14 @@
  * `*.test.ts`-nya sama-sama dijemput `bun test`, dan di runner itu tidak
  * ada DOM (apalagi compiler .svelte) — tanpa guard, file ini akan
  * menggagalkan `bun test` yang tetap harus 23 pass.
+ *
+ * Iterasi 1 GA4: klik WA/Telepon juga memicu event `whatsapp_click`/
+ * `phone_click` (src/lib/analytics.ts) — dikunci di sini bahwa perilaku/
+ * render TIDAK berubah, dan nilai param memakai `entitas` kalau diberikan,
+ * fallback `konteks` apa adanya kalau tidak (tanpa PII).
  */
-import { render, screen } from '@testing-library/svelte';
-import { describe, expect, test } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/svelte';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { SITE } from '$lib/config';
 import { normalisasiNomor } from '$lib/utils';
 import ContactButtons from './contact-buttons.svelte';
@@ -29,6 +34,10 @@ const KONTEKS = 'Tipe 36 di Griya Asri';
 // `perumahan` (lihat komentar `normalisasiNomor`).
 const wa = normalisasiNomor(SITE.whatsapp);
 const telepon = normalisasiNomor(SITE.telepon);
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
 
 describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
 	test('nomor default dari SITE ternormalisasi ke 62xxx', () => {
@@ -66,5 +75,34 @@ describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
 			screen.queryByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` })
 		).not.toBeUndefined();
 		expect(screen.queryByRole('link', { name: `Telepon tentang ${KONTEKS}` })).not.toBeUndefined();
+	});
+
+	test('klik WhatsApp/Telepon → event GA, tanpa entitas → konteks apa adanya', async () => {
+		const gtag = vi.fn();
+		vi.stubGlobal('gtag', gtag);
+		render(ContactButtons, { konteks: KONTEKS });
+
+		await fireEvent.click(
+			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` })
+		);
+		await fireEvent.click(screen.getByRole('link', { name: `Telepon tentang ${KONTEKS}` }));
+
+		expect(gtag).toHaveBeenCalledWith('event', 'whatsapp_click', { perumahan: KONTEKS });
+		expect(gtag).toHaveBeenCalledWith('event', 'phone_click', { perumahan: KONTEKS });
+	});
+
+	test('prop entitas → jadi nilai param event; pesan WA tetap pakai konteks penuh', async () => {
+		const gtag = vi.fn();
+		vi.stubGlobal('gtag', gtag);
+		render(ContactButtons, { konteks: KONTEKS, entitas: 'Griya Asri' });
+
+		await fireEvent.click(
+			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` })
+		);
+
+		expect(gtag).toHaveBeenCalledWith('event', 'whatsapp_click', { perumahan: 'Griya Asri' });
+		// Perilaku lama TIDAK berubah — pesan pembuka WA tetap memuat konteks.
+		const wa = screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` });
+		expect(wa.getAttribute('href')).toContain(encodeURIComponent(KONTEKS));
 	});
 });

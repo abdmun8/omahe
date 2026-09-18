@@ -12,9 +12,14 @@
  * (specifier asli menarik modul virtual `$env/dynamic/public` yang tidak
  * ada di plugin svelte polos) — `withRef()` ditiru baris-per-baris
  * termasuk pemisahan `#hash`.
+ *
+ * Iterasi 1 GA4: submit form → event `search` (src/lib/analytics.ts).
+ * Dikunci: shape param sesuai isian (kosong → ter-strip), varian form
+ * benar (`home_kompak` vs `cari`), dan handler TIDAK preventDefault —
+ * submit GET native tetap terjadi (no-JS tetap jalan).
  */
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { RegionOption } from '$lib/api/types';
 import SearchForm from './search-form.svelte';
 
@@ -32,6 +37,10 @@ const REGIONS: RegionOption[] = [
 	{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' },
 	{ kode: '31.71', nama: 'Jakarta Selatan, DKI Jakarta' }
 ];
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
 
 describe.skipIf(typeof document === 'undefined')('SearchForm', () => {
 	test('form submit GET ke /cari — semantik routing tidak berubah', () => {
@@ -136,5 +145,51 @@ describe.skipIf(typeof document === 'undefined')('SearchForm', () => {
 		render(SearchForm, { regions: REGIONS });
 
 		expect(screen.queryByRole('link', { name: /Filter lanjutan/ })).toBeNull();
+	});
+
+	test('submit → event GA search dengan param sesuai isian (varian default = cari)', async () => {
+		const gtag = vi.fn();
+		vi.stubGlobal('gtag', gtag);
+		const { container } = render(SearchForm, { regions: REGIONS });
+
+		await fireEvent.change(screen.getByLabelText('Lokasi'), { target: { value: '31.71' } });
+		await fireEvent.change(screen.getByLabelText('Harga maksimal'), {
+			target: { value: '500000000' }
+		});
+		await fireEvent.input(screen.getByLabelText('Tipe rumah'), { target: { value: ' 45 ' } });
+
+		fireEvent.submit(container.querySelector('form')!);
+
+		// `search_term` di-trim; harga_max jadi angka; harga_min tidak ada di
+		// form → undefined → ter-strip total (tidak muncul sebagai key).
+		expect(gtag).toHaveBeenCalledWith('event', 'search', {
+			search_term: '45',
+			region: '31.71',
+			harga_max: 500_000_000,
+			form: 'cari'
+		});
+	});
+
+	test('submit varian kompak → form: home_kompak; isian kosong ter-strip total', () => {
+		const gtag = vi.fn();
+		vi.stubGlobal('gtag', gtag);
+		const { container } = render(SearchForm, { regions: REGIONS, kompak: true });
+
+		fireEvent.submit(container.querySelector('form')!);
+
+		// Semua param kosong → undefined → ter-strip; sisa cuma nama varian.
+		expect(gtag).toHaveBeenCalledWith('event', 'search', { form: 'home_kompak' });
+	});
+
+	test('submit TIDAK dicegah — handler tanpa preventDefault, submit GET native tetap jalan', () => {
+		// Passthrough ?ref= & bookmarkable URL tergantung submit native; event
+		// GA tidak boleh mencegahnya (preventDefault = pencarian mati saat JS aktif).
+		vi.stubGlobal('gtag', vi.fn());
+		const { container } = render(SearchForm, { regions: REGIONS });
+
+		const event = new Event('submit', { bubbles: true, cancelable: true });
+		container.querySelector('form')!.dispatchEvent(event);
+
+		expect(event.defaultPrevented).toBe(false);
 	});
 });

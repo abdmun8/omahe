@@ -22,6 +22,11 @@
  * `vi.stubGlobal` — itu yang dipakai komponen (`fetch('/api/lead', ...)`),
  * dan responsnya cukup objek polos `{ok, status, json}` karena komponen
  * hanya membaca `res.ok` dan `res.json()`.
+ *
+ * Iterasi 1 GA4: dua event analitik dikunci juga — `lead_form_open` saat
+ * dialog dibuka dan `lead_form_submit` saat submit SUKSES. Yang paling
+ * kritis: TIDAK ada PII (nama/nomor telepon pengunjung) yang bocor ke
+ * parameter event — aturan Google ToS (src/lib/analytics.ts).
  */
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { waitFor } from '@testing-library/dom';
@@ -52,6 +57,14 @@ function stubFetch(res: ResLike) {
 	return fetchMock;
 }
 
+/** Stub `window.gtag` (jsdom: globalThis === window) — dipulihkan oleh
+ *  `vi.unstubAllGlobals()` di afterEach bawah. */
+function stubGtag() {
+	const gtagMock = vi.fn();
+	vi.stubGlobal('gtag', gtagMock);
+	return gtagMock;
+}
+
 /** Centang persetujuan privasi. `bind:checked` milik Svelte 5 mendengar
  *  event `change`, dan dispatchEvent jsdom TIDAK menjalankan activation
  *  behavior checkbox (klik mentah tidak men-toggle checked) — set properti
@@ -80,6 +93,45 @@ afterEach(() => {
 });
 
 describe.skipIf(typeof document === 'undefined')('LeadFormDialog', () => {
+	test('dialog dibuka (mount open=true) → event GA lead_form_open tanpa isi form', async () => {
+		const gtagMock = stubGtag();
+		render(LeadFormDialog, { props: propsDasar() });
+
+		// $effect berjalan pasca-mount — jangan assert sinkron.
+		await waitFor(() =>
+			expect(gtagMock).toHaveBeenCalledWith('event', 'lead_form_open', {
+				perumahan: 'Griya Asri',
+				sumber: 'card'
+			})
+		);
+	});
+
+	test('submit sukses → event GA lead_form_submit TANPA PII (nama/telepon tidak bocor)', async () => {
+		const gtagMock = stubGtag();
+		stubFetch({ ok: true, status: 200, json: async () => ({ ok: true }) });
+		render(LeadFormDialog, { props: propsDasar() });
+
+		isiWajibDanSubmit(); // isi nama '  Budi Santoso  ' + telepon '081234567890'
+		await screen.findByText('Terima kasih, tim Griya Asri akan menghubungi Anda.');
+
+		// Mount (open=true) juga memicu lead_form_open — cari yang lead_form_submit.
+		const submitCall = gtagMock.mock.calls.find(
+			(call) => call[0] === 'event' && call[1] === 'lead_form_submit'
+		);
+		expect(submitCall).toBeDefined();
+		const params = submitCall![2] as Record<string, unknown>;
+		expect(params).toEqual({
+			perumahan: 'Griya Asri',
+			sumber: 'card',
+			tipe_minat: 'Tipe 36/72',
+			ada_ref: true
+		});
+		// ATURAN ToS: nilai nama/telepon pengunjung TIDAK boleh ada di params
+		// event GA — dicek sebagai string penuh, bukan cuma nama properti.
+		const serial = JSON.stringify(params);
+		expect(serial).not.toContain('Budi Santoso');
+		expect(serial).not.toContain('081234567890');
+	});
 	test('field nama/telepon/checkbox privasi ada, honeypot tersembunyi, submit disabled awal', () => {
 		const { container } = render(LeadFormDialog, { props: propsDasar() });
 

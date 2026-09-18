@@ -18,12 +18,14 @@
 	LeadFormDialog) — perilaku partner gratis TIDAK berubah sama sekali.
 -->
 <script lang="ts">
+	import { trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
 	import { telUrl, waUrl } from '$lib/utils';
 	import Button from './ui/button.svelte';
 
 	let {
 		konteks,
+		entitas = undefined,
 		nomorWhatsapp = SITE.whatsapp,
 		nomorTelepon = SITE.telepon,
 		size = 'sm',
@@ -32,6 +34,12 @@
 	}: {
 		/** Nama properti/developer yang ditanyakan — masuk ke pesan pembuka WA. */
 		konteks: string;
+		/**
+		 * Nama entitas BERSIH (perumahan/developer) untuk pelaporan GA —
+		 * opsional; kalau tidak diberikan, `konteks` dipakai apa adanya.
+		 * TIDAK mengubah perilaku/render — cuma nilai param event analitik.
+		 */
+		entitas?: string;
 		nomorWhatsapp?: string;
 		nomorTelepon?: string;
 		size?: 'sm' | 'md' | 'lg';
@@ -46,6 +54,17 @@
 	} = $props();
 
 	const pesan = $derived(`Halo, saya ingin tanya tentang ${konteks} yang saya lihat di Omahe.`);
+
+	// Iterasi 1 GA4: klik WA/Telepon dilaporkan tanpa PII — hanya nama
+	// perumahan/developer (`entitas` kalau ada, kalau tidak `konteks` apa
+	// adanya). Tombol tetap link sungguhan — tracking tidak mencegat navigasi.
+	function lacakWhatsapp() {
+		trackEvent('whatsapp_click', { perumahan: entitas ?? konteks });
+	}
+
+	function lacakTelepon() {
+		trackEvent('phone_click', { perumahan: entitas ?? konteks });
+	}
 </script>
 
 <div class="flex gap-2 {className}">
@@ -78,6 +97,7 @@
 			href={waUrl(nomorWhatsapp, pesan)}
 			target="_blank"
 			rel="noopener"
+			onclick={lacakWhatsapp}
 			class="flex-1"
 			aria-label="Hubungi via WhatsApp tentang {konteks}"
 		>
@@ -93,6 +113,7 @@
 		variant="outline"
 		{size}
 		href={telUrl(nomorTelepon)}
+		onclick={lacakTelepon}
 		class="flex-1"
 		aria-label="Telepon tentang {konteks}"
 	>

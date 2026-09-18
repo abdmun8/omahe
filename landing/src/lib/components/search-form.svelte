@@ -14,6 +14,7 @@
 -->
 <script lang="ts">
 	import type { RegionOption } from '$lib/api/types';
+	import { trackEvent } from '$lib/analytics';
 	import { REF_PARAM, withRef } from '$lib/ref';
 	import { cn } from '$lib/utils';
 	import Button from './ui/button.svelte';
@@ -57,6 +58,28 @@
 		return withRef(`/cari${qs ? `?${qs}` : ''}`, ref);
 	});
 
+	// Iterasi 1 GA4: event inti 'search' — SATU handler untuk kedua varian.
+	// TANPA preventDefault: form tetap submit GET native (no-JS tetap jalan,
+	// URL hasil tetap bisa di-bookmark); event GA cuma payload tambahan yang
+	// dikirim saat pengunjung menekan tombol. Nilai kosong → undefined →
+	// di-strip sebelum dikirim (src/lib/analytics.ts). Tidak ada PII di sini
+	// — hanya kata kunci tipe/lokasi/harga, bukan input pribadi pengunjung.
+	function lacakSubmit(e: SubmitEvent) {
+		const form = e.currentTarget as HTMLFormElement;
+		const hargaMaks = (form.elements.namedItem('hargaMax') as HTMLSelectElement | null)?.value;
+		trackEvent('search', {
+			search_term: kataKunci.trim() || undefined,
+			region: lokasi || undefined,
+			// Form belum punya filter harga MINIMUM — slot disiapkan (selalu
+			// ter-strip) untuk kalau nanti field-nya benar-benar ada.
+			harga_min: undefined,
+			harga_max: hargaMaks ? Number(hargaMaks) : undefined,
+			// Homepage = varian kompak; /cari = varian penuh. ('home' disiapkan
+			// untuk homepage varian penuh kalau suatu saat ada — butuh prop baru.)
+			form: kompak ? 'home_kompak' : 'cari'
+		});
+	}
+
 	// Kelas dasar field TANPA tinggi — tingginya dipisah supaya varian kompak
 	// tidak mengirim h-11 dan h-12 sekaligus (arbitrase CSS order terlalu
 	// rapuh; lihat `cn()` = twMerge yang menyelesaikan konflik per-breakpoint).
@@ -69,6 +92,7 @@
 <form
 	action="/cari"
 	method="GET"
+	onsubmit={lacakSubmit}
 	class={cn(
 		'gap-3',
 		kompak

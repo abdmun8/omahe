@@ -6,6 +6,12 @@ export const SITE = {
 		'Cari rumah baru dari pengembang terpercaya di seluruh Indonesia. Bandingkan tipe, harga, dan lokasi, lalu ajukan langsung.',
 	url: 'https://omahe.id',
 	/**
+	 * Measurement ID Google Analytics 4. ID measurement memang PUBLIK by
+	 * design (terlihat di source HTML setiap halaman) — aman ditulis di
+	 * kode, bukan secret/env. Instrumentasi: `src/lib/analytics.ts`.
+	 */
+	gaMeasurementId: 'G-43S1SXD3GF',
+	/**
 	 * Kontak fallback Omahe. Keputusan (2026-09-13, `docs/user-story.md`
 	 * §Kontak langsung di card): untuk tahap awal, SEMUA tombol
 	 * WhatsApp/Telepon di kartu memakai nomor ini (bukan per-perumahan/

@@ -23,6 +23,7 @@
 	import { Dialog } from 'bits-ui';
 	import X from '@lucide/svelte/icons/x';
 	import type { LeadSumber } from '$lib/api/types';
+	import { trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
 	import { waUrl } from '$lib/utils';
 	import Button from './ui/button.svelte';
@@ -87,6 +88,15 @@
 		}
 	});
 
+	// Iterasi 1 GA4: dialog DIBUKA → 'lead_form_open' (nama perumahan +
+	// sumber CTA). Tanpa isi form apa pun — nama/telepon pengunjung tidak
+	// boleh masuk GA (aturan ToS, lihat src/lib/analytics.ts).
+	$effect(() => {
+		if (open) {
+			trackEvent('lead_form_open', { perumahan: namaPerumahan, sumber });
+		}
+	});
+
 	async function kirim(e: SubmitEvent) {
 		e.preventDefault();
 		if (proses) return;
@@ -120,6 +130,16 @@
 				throw new Error(teks);
 			}
 			sukses = true;
+			// Iterasi 1 GA4: submit SUKSES → 'lead_form_submit' — HANYA metadata
+			// non-identitas. Nama & nomor telepon pengunjung TIDAK PERNAH masuk
+			// sini (aturan Google ToS, lihat src/lib/analytics.ts); `tipe_minat`
+			// bisa undefined (ter-strip) kalau dibiarkan kosong.
+			trackEvent('lead_form_submit', {
+				perumahan: namaPerumahan,
+				sumber,
+				tipe_minat: tipeMinat.trim() || undefined,
+				ada_ref: Boolean(ref)
+			});
 		} catch (err) {
 			pesanError =
 				err instanceof Error ? err.message : 'Pengiriman gagal. Coba lagi sebentar lagi.';
