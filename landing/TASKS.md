@@ -162,6 +162,37 @@ Urutan boleh disusun ulang; jangan hapus item yang belum selesai.
 
       **Backlog ini sekarang kosong** — semua item tuntas.
 
+## Monetisasi Omahe (2026-09-18 — antre, TUNGGU backend `MONET-01..03`)
+
+Sumber kebenaran: `../docs/user-story.md` §Monetisasi + epic
+`MONET-{01,02,03}` di repo `~/projects/perumahan/docs/epics/`. Jangan
+mulai sebelum endpoint publik terkait sudah `done` di backend (field
+`prioritas` di response list, `GET /public/sliders`, `POST /public/leads`).
+
+- [ ] **Badge "Promosi" + type prioritas** — `client.ts`: field
+      `prioritas` (number) di `UnitListing.perumahan`, item direktori
+      `/public/perumahan`, dan `DeveloperSummary`. Badge kecil "Promosi"
+      di `unit-card`, `project-card`, `developer-card` untuk
+      `prioritas > 0` (gaya netral, jangan menyamai badge status unit).
+- [ ] **SearchForm kompak (mobile-first)** — homepage: satu baris
+      (lokasi/kata kunci + tombol) di mobile, proporsional di desktop;
+      filter lengkap tetap di `/cari`; `?ref=` passthrough tidak boleh
+      hilang.
+- [ ] **Slider carousel homepage** — komponen carousel (`GET
+      /public/sliders` via `client.ts::getSliders`): autoplay + swipe +
+      dots + pause on hover + hormati `prefers-reduced-motion`, lazy
+      load, alt = judul; klik → `linkUrl` eksternal (tab baru,
+      `rel="noopener"`) ATAU default `/perumahan/{slug}` **bawa
+      passthrough `?ref=`**; dirender DI ATAS search; section disembunyikan
+      total (bukan spinner) saat response kosong/gagal (fail-soft).
+- [ ] **LeadFormDialog partner berbayar** — `client.ts::createLead`
+      (`POST /public/leads`, honeypot field `website` tersembunyi,
+      konsen privasi wajib); tombol CTA kartu/detail dengan
+      `prioritas > 0` membuka dialog INI, bukan WA; state sukses +
+      tombol sekunder WA nomor umum; tombol WA partner gratis TIDAK
+      berubah; `ref` dari URL ikut terkirim; sumber (`card|slider|detail`)
+      di-set pemanggilnya.
+
 ## Aturan untuk implementor (pi/GLM)
 
 - Baca `../CLAUDE.md`, `README.md`, dan file yang relevan dengan tugasnya

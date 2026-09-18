@@ -99,3 +99,35 @@ Detail unit sebagai halaman tersendiri (`/unit/:id`) **ditunda** — cukup ancho
 
 ## Halaman legal (`/privasi`, `/syarat-ketentuan`) (2026-09-13)
 - **Keputusan**: naskah `/privasi` dan `/syarat-ketentuan` (`landing/src/routes/privasi`, `.../syarat-ketentuan`) tetap berstatus **draf** — sudah diberi `<meta name="robots" content="noindex">` dan banner "Draf, belum ditinjau penasihat hukum" di halamannya sendiri. Ini TIDAK memblokir pekerjaan lain; ditinjau ulang menjelang go-live, dan `noindex` baru dilepas setelah naskah final disetujui penasihat hukum.
+
+## Monetisasi: ranking berbayar, slider event, lead form (2026-09-18)
+
+Permintaan user 2026-09-18; rincian lengkap + task backend di repo
+`perumahan` `docs/epics/MONET-{01,02,03}-*.md` (sumber kebenaran).
+Keputusan desain didelegasikan architect 2026-09-18.
+
+- **Ranking berbayar (`MONET-01`)**: partner berbayar (prioritas efektif
+  > 0 — angka 0–100 di-set principal, kedaluwarsa otomatis) tampil lebih
+  atas di hasil `/cari`, direktori developer & perumahan. API publik
+  mengekspos field `prioritas` per item; Omahe merender badge **"Promosi"**
+  kecil untuk `prioritas > 0` (transparansi — hasil pencarian user tetap
+  terurut relevansi terhadap filter, item berbayar tak pernah lolos dari
+  filter yang mengecualikannya).
+- **Slider event homepage (`MONET-02`)**: carousel di ATAS search di
+  homepage, isi = event/kegiatan perumahan (gambar + judul + masa aktif
+  max 30 hari, submit tenant → approval principal, `GET /public/sliders`).
+  Klik slide → default halaman `/perumahan/:slug` pemiliknya (bawa
+  passthrough `?ref=`!), atau `linkUrl` eksternal hasil approval
+  (tab baru). Gratis untuk tenant v1; urutan rotasi pakai prioritas
+  efektif (hook monetisasi). Slider TIDAK muncul di `/cari`.
+- **Search kompak**: `SearchForm` homepage dikecilkan jadi satu baris
+  kompak di mobile (input lokasi/kata kunci + tombol cari; filter lengkap
+  tetap di halaman `/cari`) karena ruang atas diambil slider — desktop
+  menyusut secara proporsional, fungsi tidak berkurang.
+- **Lead form partner berbayar (`MONET-03`)**: kartu/detail partner
+  berbayar TIDAK lagi WA langsung — tombol CTA membuka dialog form
+  (nama + no HP wajib, tipe minat opsional, persetujuan privasi) →
+  `POST /public/leads`. Sukses: "Tim {perumahan} akan menghubungi Anda"
+  + tombol sekunder WA ke nomor umum Omahe. Tombol Telepon tetap nomor
+  umum Omahe. **Partner gratis TIDAK berubah** (WA nomor umum, keputusan
+  2026-09-13 di atas tetap berlaku untuk mereka).
