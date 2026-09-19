@@ -23,7 +23,7 @@
      sama dengan hero. `getSliders` fail-soft ke [] (api-contract.md §7):
      kosong → section ini hilang total, bukan skeleton/spinner menetap. -->
 {#if data.sliders.length > 0}
-	<section aria-label="Event & kegiatan" class="mx-auto max-w-6xl px-4 pt-4 sm:pt-6">
+	<section aria-label="Event & kegiatan" class="mx-auto max-w-6xl px-4 pt-4 pb-4 sm:pt-6 sm:pb-6">
 		<SliderCarousel sliders={data.sliders} ref={data.ref} />
 	</section>
 {/if}

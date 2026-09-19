@@ -23,6 +23,7 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import type { PublicSlider } from '$lib/api/types';
+	import { trackEvent } from '$lib/analytics';
 	import { withRef } from '$lib/ref';
 
 	let { sliders, ref = null }: { sliders: PublicSlider[]; ref?: string | null } = $props();
@@ -34,6 +35,21 @@
 	let matiPermanen = $state(false);
 	/** `prefers-reduced-motion` — hanya relevan di browser (SSR: false). */
 	let gerakDikurangi = $state(false);
+
+	// Iterasi 2 GA4: IMPRESI slide aktif — terkirim SEKALI setiap kali `aktif`
+	// berubah (saat mount + tiap pindah: autoplay/swipe/dot/panah), BUKAN
+	// berulang-ulang saat re-render biasa — efek Svelte hanya jalan di browser
+	// dan satu-satunya dependensinya `aktif`. `trackEvent` no-op yang aman
+	// kalau gtag belum termuat (dev/ad-blocker) dan tidak mengirim PII.
+	$effect(() => {
+		const slider = sliders[aktif];
+		if (!slider) return;
+		trackEvent('slider_view', {
+			perumahan: slider.perumahan.nama,
+			judul: slider.judul,
+			posisi: aktif + 1
+		});
+	});
 
 	$effect(() => {
 		// Optional-call: jsdom (component test) tidak punya matchMedia —
@@ -122,6 +138,17 @@
 		}
 		return { href: withRef(`/perumahan/${slider.perumahan.slug}`, ref) };
 	}
+
+	// Iterasi 2 GA4: klik slide — penanda perumahan/judul + jenis tujuan
+	// (eksternal/internal), tanpa PII. Klik yang tersisa dari gesture swipe
+	// sudah diblokir `cegahKlikSetelahGeser` SEBELUM sampai ke sini.
+	function lacakKlikSlide(slider: PublicSlider) {
+		trackEvent('slider_click', {
+			perumahan: slider.perumahan.nama,
+			judul: slider.judul,
+			link: slider.linkUrl ? 'eksternal' : 'internal'
+		});
+	}
 </script>
 
 {#if sliders.length > 0}
@@ -149,13 +176,18 @@
 			>
 				{#each sliders as slider, i (slider.id)}
 					<div class="relative w-full shrink-0">
-						<a {...tautanSlide(slider)} class="block" draggable="false">
+						<a
+							{...tautanSlide(slider)}
+							class="block"
+							draggable="false"
+							onclick={() => lacakKlikSlide(slider)}
+						>
 							<img
 								src={slider.gambarUrl}
 								alt={slider.judul}
 								loading={i === 0 ? 'eager' : 'lazy'}
 								fetchpriority={i === 0 ? 'high' : undefined}
-								class="h-[210px] w-full object-cover md:h-[400px] lg:h-[480px]"
+								class="h-[180px] w-full object-cover sm:h-[220px] md:h-[280px] lg:h-[320px]"
 							/>
 							<!-- Scrim gradien bawah: jaga kontras teks AA di atas gambar apa pun. -->
 							<div
