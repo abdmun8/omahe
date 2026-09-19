@@ -161,6 +161,29 @@ double-count, termasuk navigasi SPA).
   PERNAH dikirim — hanya nama properti/developer/tipe/judul/slot non-identitas.
   Dikunci test di lead-form-dialog.test.ts.
 - `/privasi` memuat butir analitik (cookie Google, tanpa data identitas).
+- **Daftar custom dimension yang perlu didaftarkan di admin GA4** (nama
+  parameter case-sensitive, scope SEMUA `Event`):
+  | Prioritas | Dimension name | Event parameter | Dipakai di event |
+  |---|---|---|---|
+  | wajib | Nama Perumahan | `perumahan` | select_property, slider_view, slider_click, whatsapp_click, phone_click, lead_form_open, lead_form_submit, cta_ajukan |
+  | wajib | Nama Developer | `developer` | select_property, select_developer |
+  | wajib | Sumber Klik | `source` | select_property, select_developer |
+  | wajib | Sumber Lead | `sumber` | lead_form_open, lead_form_submit |
+  | tinggi | Tipe Unit | `tipe` | select_property |
+  | tinggi | Tipe Diminati | `tipe_minat` | lead_form_submit |
+  | tinggi | Ada Kode Referral | `ada_ref` | lead_form_submit, cta_ajukan |
+  | sedang | Judul Slider | `judul` | slider_view, slider_click |
+  | sedang | Jenis Link Slider | `link` | slider_click |
+  | sedang | Varian Form | `form` | search |
+  | sedang | Kode Region | `region` | search |
+  | sedang | Metode Bunga | `metode` | kpr_simulasi |
+  | opsional | Posisi Slide | `posisi` | slider_view |
+  | opsional | Prioritas Partner | `prioritas` | select_property |
+  Custom metrics (tab terpisah, unit Standard kecuali disebut): `harga`
+  (Currency), `cicilan_bulatan` (Currency), `harga_max` (Standard),
+  `dp_persen`, `tenor_tahun`, `bunga_persen`. `search_term` SUDAH dimensi
+  standar GA4 — tidak perlu didaftarkan. Data historis sebelum
+  pendaftaran umumnya kosong → daftarkan sebelum trafik mengalir.
 - Catatan pelaporan: param kustom (`perumahan`, `developer`, `source`, dst.)
   perlu didaftarkan sebagai custom dimension di admin GA4 agar bisa dipakai
   di laporan utama; real-time sudah terlihat apa adanya.
