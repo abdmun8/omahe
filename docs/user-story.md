@@ -139,3 +139,28 @@ Keputusan desain didelegasikan architect 2026-09-18.
   bukan hotlink. Rencana 30 artikel/30 hari (investasi/properti/perumahan)
   + mekanisme rilis harian: backlog `landing/TASKS.md` §Sprint SEO &
   artikel.
+
+
+## Google Analytics 4 (2026-09-18)
+
+Measurement ID `G-43S1SXD3GF` (publik by design). Implementasi:
+`src/lib/analytics.ts` (helper `trackEvent`/`trackPageView`/`trackCtaAjukan`,
+no-op aman saat SSR/dev/blocker, param `undefined` di-strip), gtag.js dimuat
+di `+layout.svelte` HANYA saat `import.meta.env.PROD` (localhost bersih),
+`send_page_view: false` + pageview manual via `afterNavigate` (anti
+double-count, termasuk navigasi SPA).
+
+- **Yang dilacak**: semua pageview; event `search` (region/tipe/harga/varian
+  form), `select_property` (perumahan/developer/tipe/source/prioritas),
+  `select_developer`, `slider_view` (impression per slide aktif) +
+  `slider_click` (internal/eksternal), `whatsapp_click`/`phone_click`
+  (entitas = nama perumahan/developer), `lead_form_open`/`lead_form_submit`
+  (perumahan, sumber card/slider/detail, tipe minat, ada_ref),
+  `cta_ajukan` (perumahan, ada_ref), `kpr_simulasi` (input dibulatkan kasar).
+- **Larangan PII** (ToS Google): nama/nomor telepon/isi pesan user TIDAK
+  PERNAH dikirim — hanya nama properti/developer/tipe/judul/slot non-identitas.
+  Dikunci test di lead-form-dialog.test.ts.
+- `/privasi` memuat butir analitik (cookie Google, tanpa data identitas).
+- Catatan pelaporan: param kustom (`perumahan`, `developer`, `source`, dst.)
+  perlu didaftarkan sebagai custom dimension di admin GA4 agar bisa dipakai
+  di laporan utama; real-time sudah terlihat apa adanya.

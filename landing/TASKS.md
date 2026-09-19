@@ -209,6 +209,15 @@ mulai sebelum endpoint publik terkait sudah `done` di backend (field
       berubah; `ref` dari URL ikut terkirim; sumber (`card|slider|detail`)
       di-set pemanggilnya.
 
+- [x] **Google Analytics 4 `G-43S1SXD3GF`** — fondasi (`src/lib/analytics.ts`
+      + `+layout.svelte`, PROD-only, pageview `afterNavigate` anti
+      double-count) + instrument penuh: `search`, `select_property`,
+      `select_developer`, `slider_view`/`slider_click`,
+      `whatsapp_click`/`phone_click` (entitas), `lead_form_open`/`lead_form_submit`,
+      `cta_ajukan`, `kpr_simulasi`; TANPA PII (ToS Google, dikunci test);
+      butir analitik di `/privasi`. Detail taksonomi: `../docs/user-story.md`
+      §Google Analytics. (2026-09-18, implementor pi/glm-4.7 + reviewer,
+      +23 test komponen/unit)
 ## Sprint SEO & artikel (ditambahkan 2026-09-15)
 
 Dua tujuan: (1) optimasi TTFB halaman statis via prerender — host-agnostic,
