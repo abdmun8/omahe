@@ -120,6 +120,7 @@
 		<LandingSections
 			sections={p.sections!.filter((s) => s.type === 'hero')}
 			slug={p.slug}
+			nama={p.nama}
 			ref={data.ref}
 		/>
 	</div>
@@ -191,6 +192,7 @@
 			<LandingSections
 				sections={p.sections!.filter((s) => s.type !== 'hero')}
 				slug={p.slug}
+				nama={p.nama}
 				ref={data.ref}
 			/>
 		{:else}

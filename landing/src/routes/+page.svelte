@@ -69,7 +69,7 @@
 	{:else}
 		<div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.unitUnggulan as unit (unit.id)}
-				<UnitCard {unit} ref={data.ref} />
+				<UnitCard {unit} ref={data.ref} source="homepage" />
 			{/each}
 		</div>
 	{/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { amortisasi, DEFAULT_INPUT, hitungKpr, type InputKpr } from '$lib/kpr';
+import { trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
 	import { formatAngka, formatRupiahPenuh } from '$lib/utils';
 	import Button from '$lib/components/ui/button.svelte';
@@ -38,7 +39,20 @@
 		<!-- Input -->
 		<form
 			class="border-line space-y-5 rounded-xl border bg-white p-5"
-			onsubmit={(e) => e.preventDefault()}
+			onsubmit={(e) => {
+				e.preventDefault();
+				// GA4 — niat simulasi (submit form), bukan tiap ketikan/`$derived`
+				// berubah (yang akan banjir event). Nilai dibulatkan kasar supaya
+				// kardinalitas param rendah di laporan; TANPA data identitas user.
+				trackEvent('kpr_simulasi', {
+					harga: Math.round(input.harga / 1_000_000) * 1_000_000,
+					dp_persen: input.dpPersen,
+					tenor_tahun: input.tenorTahun,
+					bunga_persen: input.bungaPersen,
+					metode: input.metode,
+					cicilan_bulatan: Math.round(hasil.cicilanBulanan / 100_000) * 100_000
+				});
+			}}
 		>
 			<div>
 				<label for="kpr-harga" class={kelasLabel}>Harga rumah</label>

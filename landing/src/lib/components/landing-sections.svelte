@@ -13,6 +13,7 @@
 -->
 <script lang="ts">
 	import type { LandingSection } from '$lib/api/types';
+	import { trackCtaAjukan } from '$lib/analytics';
 	import { ajukanUrl } from '$lib/ref';
 	import Button from './ui/button.svelte';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
@@ -20,8 +21,16 @@
 	let {
 		sections,
 		slug,
+		nama,
 		ref = null
-	}: { sections: LandingSection[]; slug: string; ref?: string | null } = $props();
+	}: { sections: LandingSection[]; slug: string; nama: string; ref?: string | null } = $props();
+
+	// Iterasi 2 GA4: SEMUA tombol CTA ke /ajukan/:slug yang dirender section
+	// builder lewat helper yang sama dengan sticky-cta (taksonomi konsisten,
+	// tanpa PII). `ref` cuma jadi boolean `ada_ref` — nilainya tidak dikirim.
+	function lacakCta() {
+		trackCtaAjukan(nama, Boolean(ref));
+	}
 </script>
 
 {#each sections as section (section.id)}
@@ -47,6 +56,7 @@
 					size="lg"
 					class="mt-4 hidden md:inline-flex"
 					href={ajukanUrl(slug, ref)}
+					onclick={lacakCta}
 				>
 					{section.props.ctaLabel}
 				</Button>
@@ -236,7 +246,13 @@
 			{#if section.props.body}
 				<p class="mx-auto mt-2 max-w-xl text-sm text-white/80">{section.props.body}</p>
 			{/if}
-			<Button variant="accent" size="lg" class="mt-5" href={ajukanUrl(slug, ref)}>
+			<Button
+				variant="accent"
+				size="lg"
+				class="mt-5"
+				href={ajukanUrl(slug, ref)}
+				onclick={lacakCta}
+			>
 				{section.props.ctaLabel}
 			</Button>
 		</section>

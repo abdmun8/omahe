@@ -32,6 +32,16 @@
 			</p>
 		</section>
 		<section>
+			<h2 class="font-display text-ink text-lg font-bold">Analitik (Google Analytics)</h2>
+			<p class="mt-2">
+				Kami memakai Google Analytics untuk memahami halaman dan fitur mana yang berguna (kunjungan
+				halaman, pencarian, tombol yang ditekan, properti yang dilihat). Layanan ini dapat
+				menempatkan cookie di peramban Anda. Kami tidak mengirim nama, nomor telepon, atau identitas
+				Anda ke Google Analytics — hanya perilaku kunjungan yang tidak menyebutkan identitas. Anda
+				dapat menolaknya lewat pengaturan cookie peramban.
+			</p>
+		</section>
+		<section>
 			<h2 class="font-display text-ink text-lg font-bold">Saat Anda mengajukan unit</h2>
 			<p class="mt-2">
 				Tombol pengajuan mengarahkan Anda ke sistem pengembang yang bersangkutan. Data yang Anda isi
