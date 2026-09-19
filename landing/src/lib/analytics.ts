@@ -47,6 +47,18 @@ export function trackEvent(nama: string, params?: Record<string, ParamGA>): void
 }
 
 /**
+ * Event CTA "Ajukan" — SEMUA titik yang menaut ke `/ajukan/:slug` (sticky
+ * bar, tombol hero/cta dari section builder, tombol "Ajukan" per-tipe di
+ * halaman detail) dipasang lewat helper ini supaya taksonomi param konsisten:
+ * `perumahan` = nama proyek (bukan slug/URL), `ada_ref` = apakah kode
+ * referral mitra masih menempel di URL saat CTA diklik (diagnostik putusnya
+ * rantai komisi — CLAUDE.md §Redirect `/p/:slug`). Tidak ada PII di sini.
+ */
+export function trackCtaAjukan(perumahan: string, adaRef: boolean): void {
+	trackEvent('cta_ajukan', { perumahan, ada_ref: adaRef });
+}
+
+/**
  * Pageview manual — dipanggil root layout di `afterNavigate` (termasuk
  * initial load; `send_page_view` dimatikan di config gtag supaya tidak
  * terhitung dua kali). `page_path` = pathname saja (tanpa query) — query
