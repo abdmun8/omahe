@@ -21,7 +21,7 @@ export const SITE = {
 	 */
 	whatsapp: '0811000000',
 	telepon: '0811000000',
-	email: 'halo@omahe.id'
+	email: 'halo@omahe.co.id'
 } as const;
 
 export const NAV = [
