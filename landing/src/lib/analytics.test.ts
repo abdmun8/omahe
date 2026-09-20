@@ -22,7 +22,7 @@ function buatGtag() {
 }
 
 /** Pasang `window` tiruan; `href` menggantikan `window.location.href`. */
-function pasangWindow(gtag?: ReturnType<typeof buatGtag>, href = 'https://omahe.id/cari?ref=uji') {
+function pasangWindow(gtag?: ReturnType<typeof buatGtag>, href = 'https://www.omahe.co.id/cari?ref=uji') {
 	(globalThis as unknown as Record<string, unknown>).window = {
 		gtag,
 		location: { href }
@@ -90,7 +90,7 @@ describe('trackPageView', () => {
 		expect(gtag).toHaveBeenCalledWith('event', 'page_view', {
 			page_path: '/cari',
 			page_title: 'Cari Rumah — Omahe',
-			page_location: 'https://omahe.id/cari?ref=uji'
+			page_location: 'https://www.omahe.co.id/cari?ref=uji'
 		});
 	});
 

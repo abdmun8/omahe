@@ -1,6 +1,6 @@
 # Omahe — Landing & Marketplace
 
-SvelteKit app untuk `omahe.id`. Direktori & pencarian properti lintas-perumahan,
+SvelteKit app untuk `www.omahe.co.id`. Direktori & pencarian properti lintas-perumahan,
 plus halaman detail developer/perumahan yang dirender sendiri oleh Omahe.
 
 Konteks produk & keputusan arsitektur: `../CLAUDE.md` dan `../docs/user-story.md`.

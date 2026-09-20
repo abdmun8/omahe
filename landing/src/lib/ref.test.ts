@@ -6,7 +6,7 @@
 import { describe, expect, test } from 'bun:test';
 import { readRef, withRef } from './ref';
 
-const url = (s: string) => new URL(s, 'https://omahe.id');
+const url = (s: string) => new URL(s, 'https://www.omahe.co.id');
 
 describe('readRef', () => {
 	test('mengambil token hex 64 seperti yang dipakai kerjasama.qrCode', () => {

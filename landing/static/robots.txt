@@ -5,4 +5,4 @@ Allow: /
 # `/cari` polos (halaman berfilter sudah kirim noindex di <head> juga).
 Disallow: /cari?
 
-Sitemap: https://omahe.id/sitemap.xml
+Sitemap: https://www.omahe.co.id/sitemap.xml

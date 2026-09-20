@@ -4,7 +4,7 @@ export const SITE = {
 	tagline: 'Where your story begins',
 	deskripsi:
 		'Cari rumah baru dari pengembang terpercaya di seluruh Indonesia. Bandingkan tipe, harga, dan lokasi, lalu ajukan langsung.',
-	url: 'https://omahe.id',
+	url: 'https://www.omahe.co.id',
 	/**
 	 * Measurement ID Google Analytics 4. ID measurement memang PUBLIK by
 	 * design (terlihat di source HTML setiap halaman) — aman ditulis di

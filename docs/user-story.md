@@ -60,7 +60,13 @@ Mari diskusikan, mana yang lebih baik kita pakai? saya tidak prefer nextjs karen
 - **Keputusan**: Omahe murni marketplace **konsumen (B2C)** — cari & lihat rumah untuk dibeli. Halaman rekrutmen developer/agen/mitra baru (jual sistem hadirapp, B2B) TETAP scope terpisah — sudah ada epic `SITE-01-landing-principal.md` (`todo`) di repo `perumahan` untuk itu, tidak digabung ke Omahe. Bisa disambung lewat link CTA dari Omahe ke sana nanti kalau perlu, bukan dibangun di dalam Omahe.
 
 ## Domain & URL (2026-09-13, direvisi setelah entitas developer ditambah)
-- Domain final: **`omahe.id`**. Deploy sekarang masih di Vercel (`abdmun8/omahe`, lihat catatan Stack) — domain custom disambungkan belakangan sebelum go-live, `LANDING-05` di repo `perumahan` pakai `omahe.id` sebagai referensi resmi (bukan placeholder lagi).
+- Domain final: **`www.omahe.co.id`** — diganti dari rencana awal `omahe.id` pada
+  2026-09-20 (sebelum go-live; apex `omahe.co.id` redirect ke www, DNS di
+  Vercel). Deploy di Vercel (`abdmun8/omahe`, lihat catatan Stack).
+  **Tindak lanjut lintas-repo**: `LANDING-05` di repo `perumahan` masih
+  memakai `omahe.id` sebagai referensi resmi — perlu disinkronkan ke domain
+  baru (dokumen epic + `omaheLandingUrl` milik tenant yang sudah terisi
+  lama).
 - **Revisi pola URL** (setelah keputusan entitas `developer` terpisah dari `perumahan`, lihat epic [`DEVELOPER-01`](../../perumahan/docs/epics/DEVELOPER-01-entitas-pengembang.md) di repo `perumahan`):
   - `/developer` — direktori **perusahaan developer** (bukan proyek). Satu developer bisa menaungi banyak proyek `perumahan`.
   - `/developer/:companySlug` — profil satu developer + daftar semua proyek perumahan miliknya.
