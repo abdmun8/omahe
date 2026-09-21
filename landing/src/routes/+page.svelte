@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>Omahe — Cari Rumah Baru dari Pengembang Terpercaya</title>
+	<title>Omahe — Temukan Rumah Baru dari Pengembang Terpercaya</title>
 	<meta name="description" content={SITE.deskripsiSingkat} />
 	<meta property="og:title" content="Omahe — {SITE.tagline}" />
 	<meta property="og:description" content={SITE.deskripsiSingkat} />
