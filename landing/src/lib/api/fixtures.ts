@@ -27,7 +27,8 @@ import type {
 	PerumahanDetail,
 	PublicSlider,
 	RegionOption,
-	UnitListing
+	UnitListing,
+	PublicMitra
 } from './types';
 
 export const REGIONS: RegionOption[] = [
@@ -312,6 +313,56 @@ export function perumahanDetail(slug: string): PerumahanDetail | null {
 export function projectSlugs(): string[] {
 	return PROJECTS.map((p) => p.slug);
 }
+
+/**
+ * Mitra Profesional (MITRA-01, `GET /public/mitra` — api-contract.md §9).
+ * Fixture DEV-SAJA: di mode API asli endpoint belum ada → fail-soft []
+ * (halaman /mitra empty-state sampai backend live; JANGAN tampilkan data
+ * fiktif di produksi — nomor WA di bawah bukan nomor sungguhan). Urutan
+ * fixture = urutan server. Satu `logoUrl: null` utk jalur fallback inisial.
+ */
+export const MITRA: PublicMitra[] = [
+	{
+		id: '00000000-0000-4000-8000-000000000201',
+		nama: 'KJPT Bumi Nilai',
+		kategori: 'kjpp',
+		wilayahLayanan: 'Jabodetabek & Bandung',
+		whatsapp: '6281100000201',
+		telepon: '62211234501',
+		logoUrl: 'https://picsum.photos/seed/omahe-kjpp-bumi/400/400',
+		urutan: 1
+	},
+	{
+		id: '00000000-0000-4000-8000-000000000202',
+		nama: 'KJPP Graha Penilaian',
+		kategori: 'kjpp',
+		wilayahLayanan: 'Jawa Timur (Surabaya, Malang, Sidoarjo)',
+		whatsapp: '6281100000202',
+		telepon: null,
+		logoUrl: null,
+		urutan: 2
+	},
+	{
+		id: '00000000-0000-4000-8000-000000000203',
+		nama: 'Notaris & PPAT Andi Wijaya, S.H., M.Kn.',
+		kategori: 'notaris',
+		wilayahLayanan: 'Jakarta & Tangerang Selatan',
+		whatsapp: '6281100000203',
+		telepon: '62211234503',
+		logoUrl: 'https://picsum.photos/seed/omahe-notaris-andi/400/400',
+		urutan: 3
+	},
+	{
+		id: '00000000-0000-4000-8000-000000000204',
+		nama: 'Notaris Ratna Kencana, S.H.',
+		kategori: 'notaris',
+		wilayahLayanan: 'Bogor, Depok & sekitarnya',
+		whatsapp: '6281100000204',
+		telepon: null,
+		logoUrl: 'https://picsum.photos/seed/omahe-notaris-ratna/400/400',
+		urutan: 4
+	}
+];
 
 /**
  * Slider homepage (MONET-02, `GET /public/sliders` — api-contract.md §7).

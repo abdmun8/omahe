@@ -4,7 +4,7 @@ import { SITE } from '$lib/config';
 import { bacaArtikel, hariIniWib } from '$lib/server/artikel';
 import type { RequestHandler } from './$types';
 
-const STATIS = ['', '/cari', '/developer', '/artikel', '/kpr', '/tentang', '/kontak'];
+const STATIS = ['', '/cari', '/developer', '/artikel', '/mitra', '/kpr', '/tentang', '/kontak'];
 
 export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
 	const [slugProyek, developers, artikel] = await Promise.all([

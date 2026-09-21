@@ -31,6 +31,7 @@ export const NAV = [
 	{ href: '/developer', label: 'Developer' },
 	{ href: '/kpr', label: 'Simulasi KPR' },
 	{ href: '/artikel', label: 'Artikel' },
+	{ href: '/mitra', label: 'Mitra' },
 	{ href: '/tentang', label: 'Tentang' },
 	{ href: '/kontak', label: 'Kontak' }
 ] as const;

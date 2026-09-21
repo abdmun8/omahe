@@ -337,6 +337,23 @@ export interface RegionOption {
 // ---------------------------------------------------------------------------
 
 /**
+ * Mitra Profesional (MITRA-01, `GET /public/mitra` — api-contract.md §9).
+ * Urutan sudah benar di server (`urutan` ASC → `nama` ASC), jangan
+ * diurutkan ulang. Murni berbayar: server hanya mengirim `aktif=true`.
+ */
+export interface PublicMitra {
+	id: string;
+	nama: string;
+	kategori: 'kjpp' | 'notaris';
+	wilayahLayanan: string;
+	whatsapp: string;
+	telepon: string | null;
+	/** nullable — gagal presign/belum upload; kartu render inisial placeholder. */
+	logoUrl: string | null;
+	urutan: number;
+}
+
+/**
  * Satu slide carousel homepage. Response `GET /public/sliders` berupa
  * `ApiEnvelope<PublicSlider[]>` (tanpa paginasi, maks 10) — urutan sudah
  * benar di server (prioritas efektif DESC → FIFO), JANGAN diurutkan ulang

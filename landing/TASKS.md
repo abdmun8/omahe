@@ -472,6 +472,36 @@ di bawah (termasuk larangan menyentuh `src/lib/ref.ts`).
       (2026-09-19, pi, review Abdul)
 
 
+
+## Mitra Profesional (GitHub issue #1, 2026-09-21)
+
+Direktori KJPP & Notaris berbayar. Backend: epic `MITRA-01` di repo
+`perumahan` (schema + CRUD principal + `GET /public/mitra`). Kontrak:
+`../docs/api-contract.md` §9. Sisi Omahe dibangun fixture-first (pola
+`getSliders`) — nyala otomatis begitu endpoint backend live.
+
+- [x] **Halaman `/mitra` + nav "Mitra Profesional"** — `client.ts::getMitra`
+  (env-gated fixture, fail-soft `[]`), route `/mitra` (SSR — data ikut
+  status bayar, bukan prerender), filter `?kategori=` server-side (link
+  chip pola `/cari`), kartu: logo/inisial placeholder, badge kategori,
+  wilayah layanan, tombol WA + Telepon ke nomor MITRA (wa.me 62xxx +
+  pesan pembuka, TANPA `?ref=` — di luar rantai komisi), `+sitemap`,
+  nav (NAV config) + footer ikut otomatis. Test komponen kartu
+  (badge, nomor wa.me, fallback inisial) + fail-soft.
+
+      **Hasil**: route `/mitra` (SSR — data ikut status bayar, bukan
+      prerender) + filter `?kategori=` server-side (chip link pola /cari);
+      `getMitra` env-gated fail-soft [] (fixture HANYA dev — nomor WA
+      fiktif, jangan pernah bocor ke produksi; produksi empty-state sampai
+      MITRA-01 backend live). Kartu: logo/inisial fallback, badge
+      KJPP/Notaris, WA wa.me nomor mitra + telepon — tanpa `?ref=` (di
+      luar rantai komisi, api-contract §9). Nav label pendek "Mitra"
+      (header desktop 7 item terverifikasi muat tanpa overflow). Sitemap
+      +/mitra. Bug ketemu saat verifikasi: mode fixture mengabaikan filter
+      kategori — diperbaiki + diverifikasi per-nama-mitra. check/122 unit/
+      65 component (+5 mitra-card)/build kedua adapter hijau; /mitra
+      mobile 375px tanpa overflow. (2026-09-21, pi, review Abdul)
+
 ## Aturan untuk implementor (pi/GLM)
 
 - Baca `../CLAUDE.md`, `README.md`, dan file yang relevan dengan tugasnya

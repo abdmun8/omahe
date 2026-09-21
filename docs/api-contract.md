@@ -33,6 +33,7 @@ ditandai eksplisit per-section.
 | `GET /public/perumahan` (list) | UNIT-04 | **sudah ada** (`done` 2026-09-14), BARU — tidak ada di versi dokumen sebelumnya; `+prioritas` MONET-01 | belum ada halaman Omahe yang eksplisit memakainya |
 | `GET /public/sliders` | MONET-02 | **sudah ada** (`done` 2026-09-18), BARU — lihat §7 | `/` (carousel) |
 | `POST /public/leads` | MONET-03 | **sudah ada** (`done` 2026-09-18), BARU — lihat §8 | dialog LeadForm kartu/detail partner berbayar |
+| `GET /public/mitra` | MITRA-01 | **belum ada** (epic `todo` 2026-09-21) — lihat §9 | `/mitra` (direktori KJPP & Notaris) |
 | `GET /public/regions` | — (belum dibahas) | belum ada — `/public/wilayah/{level}` ADA di `perumahan` tapi TIDAK difilter ke region yang punya perumahan aktif (lihat §5, gap masih terbuka) | opsi filter lokasi |
 
 Semua endpoint di atas SEKARANG BISA dipakai — peralihan dari

@@ -28,7 +28,8 @@ import type {
 	PublicSlider,
 	RegionOption,
 	UnitListing,
-	UnitQuery
+	UnitQuery,
+	PublicMitra
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -314,6 +315,38 @@ export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<void
 	}
 	console.error(`[omahe:api] POST /public/leads → ${res.status}`);
 	throw new ApiError(res.status, serverMessage ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');
+}
+
+// ---------------------------------------------------------------------------
+// Mitra Profesional (MITRA-01)
+// ---------------------------------------------------------------------------
+
+/**
+ * Direktori Mitra Profesional — KJPP & Notaris (api-contract.md §9).
+ * Urutan & filter `aktif` diurus server (`urutan` ASC → `nama` ASC).
+ *
+ * Env-gated pola `getSliders`; fail-soft ke `[]` pola `getRegions`:
+ * endpoint `GET /public/mitra` belum ada di backend (MITRA-01 `todo`) —
+ * di mode API asli halaman `/mitra` menampilkan empty-state sampai
+ * backend live. JANGAN fail-soft ke fixture di sini: fixture memuat
+ * nomor WA fiktif, tidak boleh tampil di produksi.
+ */
+export async function getMitra(
+	fetchFn: Fetch,
+	kategori?: 'kjpp' | 'notaris'
+): Promise<PublicMitra[]> {
+	if (!hasSearchApi()) return kategori ? fixtures.MITRA.filter((m) => m.kategori === kategori) : fixtures.MITRA;
+	try {
+		const params = kategori ? `?kategori=${kategori}` : '';
+		const data = await apiGet<PublicMitra[]>(fetchFn, `/public/mitra${params}`);
+		return Array.isArray(data) ? data : [];
+	} catch (err) {
+		console.error(
+			'[omahe:api] GET /public/mitra gagal — fallback ke [] (empty-state, MITRA-01 belum live)',
+			err
+		);
+		return [];
+	}
 }
 
 // ---------------------------------------------------------------------------
