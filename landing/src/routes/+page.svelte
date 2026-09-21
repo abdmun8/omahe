@@ -23,7 +23,7 @@
      sama dengan hero. `getSliders` fail-soft ke [] (api-contract.md §7):
      kosong → section ini hilang total, bukan skeleton/spinner menetap. -->
 {#if data.sliders.length > 0}
-	<section aria-label="Event & kegiatan" class="mx-auto max-w-6xl px-0 pt-4 pb-4 sm:px-4 sm:pt-6 sm:pb-6">
+	<section aria-label="Event & kegiatan" class="mx-auto max-w-6xl px-0 pt-0 pb-0 lg:pt-4 lg:pb-4 sm:px-4 sm:pt-4 sm:pb-4">
 		<SliderCarousel sliders={data.sliders} ref={data.ref} />
 	</section>
 {/if}
@@ -36,8 +36,8 @@
 		<p class="font-display text-accent-light text-sm font-semibold tracking-wide uppercase">
 			{SITE.tagline}
 		</p>
-		<h1 class="font-display mt-3 max-w-2xl text-3xl font-extrabold text-white sm:text-5xl">
-			Temukan rumah yang cocok, langsung dari pengembangnya.
+		<h1 class="font-display mt-3 max-w-2xl text-2xl font-extrabold text-white sm:text-3xl">
+			Temukan hunian yang dirancang untuk memenuhi kebutuhan hidup Anda.
 		</h1>
 		<p class="mt-4 max-w-xl text-sm text-white/80 sm:text-base">
 			Pilih dari berbagai proyek properti terpercaya, bandingkan setiap detailnya — dan temukan
