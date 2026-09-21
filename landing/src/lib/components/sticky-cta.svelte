@@ -12,6 +12,7 @@
 -->
 <script lang="ts">
 	import { ajukanUrl } from '$lib/ref';
+	import { trackCtaAjukan, trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
 	import { waUrl } from '$lib/utils';
 	import LeadFormDialog from './lead-form-dialog.svelte';
@@ -27,6 +28,17 @@
 	/** undefined (respons lama tanpa MONET-01) = gratis. */
 	const partnerBerbayar = $derived(prioritas > 0);
 	let formMinatTerbuka = $state(false);
+
+	// Iterasi 2 GA4: CTA "Ajukan" + klik WA dilaporkan tanpa PII — nama
+	// perumahan + apakah kode referral masih menempel di URL. Tombol tetap
+	// link sungguhan, tracking tidak mencegat navigasi.
+	function lacakAjukan() {
+		trackCtaAjukan(nama, Boolean(ref));
+	}
+
+	function lacakWhatsapp() {
+		trackEvent('whatsapp_click', { perumahan: nama });
+	}
 </script>
 
 <div
@@ -46,10 +58,17 @@
 				class="flex-1"
 				href={waUrl(SITE.whatsapp, `Halo, saya tertarik dengan ${nama} yang saya lihat di Omahe.`)}
 				target="_blank"
-				rel="noopener">WhatsApp</Button
+				rel="noopener"
+				onclick={lacakWhatsapp}>WhatsApp</Button
 			>
 		{/if}
-		<Button variant="primary" size="lg" class="flex-1" href={ajukanUrl(slug, ref)}>Ajukan</Button>
+		<Button
+			variant="primary"
+			size="lg"
+			class="flex-1"
+			href={ajukanUrl(slug, ref)}
+			onclick={lacakAjukan}>Ajukan</Button
+		>
 	</div>
 </div>
 

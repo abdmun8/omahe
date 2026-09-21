@@ -9,11 +9,29 @@
  * render null, slide pertama aktif + prioritas loading, jalur link internal
  * (bawa `?ref=` — jalur komisi mitra) vs eksternal (tab baru + noopener),
  * dan jumlah dot = jumlah slide.
+ *
+ * Iterasi 2 GA4: `slider_view` (impresi slide aktif — sekali per perubahan
+ * `aktif`, bukan per re-render) dan `slider_click` (klik slide, jenis
+ * internal/eksternal). Autoplay TIDAK perlu dimatikan di test: jsdom tidak
+ * punya `matchMedia` (komponen pakai optional-call, lihat komentarnya) tapi
+ * interval 6 detik tidak pernah sampai tick selama tes berjalan, dan ikut
+ * ter-clear saat unmount (cleanup afterEach). Navigasi klik link internal
+ * memunculkan noise "Not implemented: navigation" dari jsdom — kosmetik,
+ * sama seperti tes komponen lain yang mengklik anchor ber-href.
  */
-import { render, screen } from '@testing-library/svelte';
-import { describe, expect, test, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/svelte';
+import { waitFor } from '@testing-library/dom';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { PublicSlider } from '$lib/api/types';
 import SliderCarousel from './slider-carousel.svelte';
+
+/** Stub `window.gtag` (jsdom: globalThis === window) — pulihkan di afterEach.
+ *  Pola sama persis dengan `lead-form-dialog.test.ts`. */
+function stubGtag() {
+	const gtagMock = vi.fn();
+	vi.stubGlobal('gtag', gtagMock);
+	return gtagMock;
+}
 
 // Komponen ini mengimpor `$lib/ref` → `$env/dynamic/public` (modul virtual
 // yang tidak resolve di plugin svelte polos vitest.config.ts) — di-mock
@@ -44,6 +62,10 @@ function buatSlider(override: Partial<PublicSlider> = {}): PublicSlider {
 }
 
 describe.skipIf(typeof document === 'undefined')('SliderCarousel', () => {
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
 	test('data kosong → tidak ada elemen sama sekali (fail-soft, bukan skeleton)', () => {
 		const { container } = render(SliderCarousel, { sliders: [] });
 
@@ -126,5 +148,82 @@ describe.skipIf(typeof document === 'undefined')('SliderCarousel', () => {
 		expect(screen.queryByRole('button', { name: /Ke slide \d/ })).toBeNull();
 		expect(screen.queryByRole('button', { name: 'Slide sebelumnya' })).toBeNull();
 		expect(screen.queryByRole('button', { name: 'Slide berikutnya' })).toBeNull();
+	});
+
+	// --- Iterasi 2 GA4 -----------------------------------------------------
+
+	test('mount 3 slide → slider_view SEKALI untuk slide 1 (posisi 1)', async () => {
+		const gtagMock = stubGtag();
+		render(SliderCarousel, {
+			sliders: [
+				buatSlider(),
+				buatSlider({ id: 'slider-2', judul: 'Seminar KPR' }),
+				buatSlider({ id: 'slider-3', judul: 'Groundbreaking' })
+			]
+		});
+
+		// $effect berjalan pasca-mount — jangan assert sinkron (pola
+		// lead-form-dialog.test.ts). SEKALI = tidak dobel per re-render biasa.
+		await waitFor(() => expect(gtagMock).toHaveBeenCalledTimes(1));
+		expect(gtagMock).toHaveBeenCalledWith('event', 'slider_view', {
+			perumahan: 'Griya Asri Bogor',
+			judul: 'Open House Griya Asri',
+			posisi: 1
+		});
+	});
+
+	test('klik dot ke slide 2 → slider_view posisi 2 SEKALI per perubahan (total 2, tidak dobel)', async () => {
+		const gtagMock = stubGtag();
+		render(SliderCarousel, {
+			sliders: [
+				buatSlider(),
+				buatSlider({ id: 'slider-2', judul: 'Seminar KPR' }),
+				buatSlider({ id: 'slider-3', judul: 'Groundbreaking' })
+			]
+		});
+		await waitFor(() => expect(gtagMock).toHaveBeenCalledTimes(1)); // mount: slide 1
+
+		await fireEvent.click(screen.getByRole('button', { name: 'Ke slide 2: Seminar KPR' }));
+
+		// Tepat 2 = 1 impresi mount + 1 per perubahan. Kalau dobel, angkanya 3
+		// dan waitFor di bawah timeout → gagal.
+		await waitFor(() => expect(gtagMock).toHaveBeenCalledTimes(2));
+		expect(gtagMock).toHaveBeenLastCalledWith('event', 'slider_view', {
+			perumahan: 'Griya Asri Bogor',
+			judul: 'Seminar KPR',
+			posisi: 2
+		});
+	});
+
+	test('klik slide internal (linkUrl null) → slider_click link "internal"', async () => {
+		const gtagMock = stubGtag();
+		const { container } = render(SliderCarousel, { sliders: [buatSlider()] });
+
+		// Aksesibel name link slide menyertakan alt gambar + judul — query
+		// lewat anchor pertama lebih tegas daripada menebak namanya.
+		await fireEvent.click(container.querySelector('a')!);
+
+		// slider_view mount juga terkirim di tes ini — cari panggilan
+		// slider_click-nya secara spesifik.
+		expect(gtagMock).toHaveBeenCalledWith('event', 'slider_click', {
+			perumahan: 'Griya Asri Bogor',
+			judul: 'Open House Griya Asri',
+			link: 'internal'
+		});
+	});
+
+	test('klik slide ber-linkUrl → slider_click link "eksternal"', async () => {
+		const gtagMock = stubGtag();
+		const { container } = render(SliderCarousel, {
+			sliders: [buatSlider({ judul: 'Webinar KPR', linkUrl: 'https://example.com/acara' })]
+		});
+
+		await fireEvent.click(container.querySelector('a')!);
+
+		expect(gtagMock).toHaveBeenCalledWith('event', 'slider_click', {
+			perumahan: 'Griya Asri Bogor',
+			judul: 'Webinar KPR',
+			link: 'eksternal'
+		});
 	});
 });

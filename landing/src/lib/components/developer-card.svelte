@@ -1,11 +1,23 @@
 <script lang="ts">
 	import type { DeveloperSummary } from '$lib/api/types';
+	import { trackEvent } from '$lib/analytics';
 	import { withRef } from '$lib/ref';
 	import ContactButtons from './contact-buttons.svelte';
 	import PromosiBadge from './promosi-badge.svelte';
 	import Badge from './ui/badge.svelte';
 
-	let { developer, ref = null }: { developer: DeveloperSummary; ref?: string | null } = $props();
+	let {
+		developer,
+		ref = null,
+		source = 'developer_dir'
+	}: { developer: DeveloperSummary; ref?: string | null; source?: string } = $props();
+
+	// Iterasi 2 GA4: klik kartu developer (link nama ke profil). Nama
+	// developer saja — tanpa PII; `source` pembeda halaman sumber dari
+	// pemanggil. Link tetap asli, tracking tidak mencegat navigasi.
+	function lacakKlikKartu() {
+		trackEvent('select_developer', { developer: developer.nama, source });
+	}
 </script>
 
 <article
@@ -29,7 +41,10 @@
 		{/if}
 		<div class="min-w-0 flex-1">
 			<h3 class="font-display text-ink text-base font-bold">
-				<a href={withRef(`/developer/${developer.slug}`, ref)} class="hover:text-primary">
+				<a
+					href={withRef(`/developer/${developer.slug}`, ref)}
+					class="hover:text-primary"
+					onclick={lacakKlikKartu}>
 					{developer.nama}
 				</a>
 			</h3>
@@ -48,5 +63,5 @@
 		<p class="text-muted mt-3 line-clamp-3 text-sm leading-relaxed">{developer.deskripsi}</p>
 	{/if}
 
-	<ContactButtons konteks="proyek dari {developer.nama}" class="mt-4" />
+	<ContactButtons konteks="proyek dari {developer.nama}" entitas={developer.nama} class="mt-4" />
 </article>

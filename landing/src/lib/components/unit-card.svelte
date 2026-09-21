@@ -7,6 +7,7 @@
 -->
 <script lang="ts">
 	import type { UnitListing } from '$lib/api/types';
+	import { trackEvent } from '$lib/analytics';
 	import { formatAngka, formatRentangHarga, formatRupiahPenuh } from '$lib/utils';
 	import { withRef } from '$lib/ref';
 	import ContactButtons from './contact-buttons.svelte';
@@ -15,7 +16,11 @@
 	import PromosiBadge from './promosi-badge.svelte';
 	import Badge from './ui/badge.svelte';
 
-	let { unit, ref = null }: { unit: UnitListing; ref?: string | null } = $props();
+	let {
+		unit,
+		ref = null,
+		source = 'search'
+	}: { unit: UnitListing; ref?: string | null; source?: string } = $props();
 
 	const hrefDetail = $derived(withRef(`/perumahan/${unit.perumahan.slug}#tipe-unit`, ref));
 	const hargaRingkas = $derived(formatRentangHarga(unit.hargaMin, unit.hargaMax));
@@ -31,6 +36,21 @@
 	 */
 	const partnerBerbayar = $derived(unit.perumahan.prioritas > 0);
 	let formMinatTerbuka = $state(false);
+
+	// Iterasi 2 GA4: klik kartu (link nama perumahan ke halaman detail).
+	// TANPA PII — hanya nama perumahan/developer/tipe + penanda halaman
+	// sumber dari pemanggil (`source`). `prioritas` hanya bila > 0 (nilai
+	// 0/undefined di-strip otomatis oleh trackEvent). Link tetap asli —
+	// tracking tidak mencegat navigasi.
+	function lacakKlikKartu() {
+		trackEvent('select_property', {
+			perumahan: unit.perumahan.nama,
+			developer: unit.developer?.nama,
+			tipe: unit.tipe,
+			source,
+			prioritas: unit.perumahan.prioritas > 0 ? unit.perumahan.prioritas : undefined
+		});
+	}
 </script>
 
 <article
@@ -68,7 +88,9 @@
 		</p>
 
 		<h3 class="text-ink mt-1 truncate text-sm font-semibold">
-			<a href={hrefDetail} class="hover:text-primary-light">{unit.perumahan.nama}</a>
+			<a href={hrefDetail} class="hover:text-primary-light" onclick={lacakKlikKartu}
+				>{unit.perumahan.nama}</a
+			>
 		</h3>
 
 		{#if unit.perumahan.regionNama}
@@ -106,6 +128,7 @@
 
 		<ContactButtons
 			konteks="{unit.tipe} di {unit.perumahan.nama}"
+			entitas={unit.perumahan.nama}
 			onFormMinat={partnerBerbayar ? () => (formMinatTerbuka = true) : null}
 			class="mt-3"
 		/>

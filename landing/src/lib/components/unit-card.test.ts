@@ -14,9 +14,21 @@
  * isi fixture.
  */
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { UnitListing } from '$lib/api/types';
 import UnitCard from './unit-card.svelte';
+
+/** Stub `window.gtag` (jsdom: globalThis === window) — pulihkan di afterEach.
+ *  Pola sama persis dengan `lead-form-dialog.test.ts`. */
+function stubGtag() {
+	const gtagMock = vi.fn();
+	vi.stubGlobal('gtag', gtagMock);
+	return gtagMock;
+}
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
 
 // Kartu ini mengimpor `$lib/ref`, yang mengimpor modul virtual `$env/dynamic/public` —
 // modul itu hanya di-resolve plugin sveltekit, sedangkan `vitest.config.ts`
@@ -217,6 +229,81 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
 		).toBeInTheDocument();
 		expect(screen.queryByRole('button', { name: `Isi form minat tentang ${konteks}` })).toBeNull();
+	});
+
+	// Iterasi 2 GA4: klik link nama perumahan → `select_property`. Param
+	// `developer`/`prioritas` ikut HANYA kalau ada/> 0 — `trackEvent` me-strip
+	// nilai `undefined` (src/lib/analytics.ts), jadi `toEqual` bisa eksak.
+	test('klik link nama perumahan → select_property dengan default source "search", tanpa developer/prioritas', async () => {
+		const gtagMock = stubGtag();
+		render(UnitCard, { unit: buatUnit() }); // developer null, prioritas 0
+
+		await fireEvent.click(screen.getByRole('link', { name: 'Griya Asri' }));
+
+		expect(gtagMock).toHaveBeenCalledTimes(1);
+		expect(gtagMock).toHaveBeenCalledWith('event', 'select_property', {
+			perumahan: 'Griya Asri',
+			tipe: '36/72',
+			source: 'search'
+		});
+	});
+
+	test('klik kartu berdeveloper + prioritas > 0 → developer & prioritas ikut di params', async () => {
+		const gtagMock = stubGtag();
+		render(UnitCard, {
+			unit: buatUnit({
+				developer: { nama: 'Citra Land Nusantara', slug: 'citra-land' },
+				perumahan: perumahanBerbayar // prioritas 50
+			})
+		});
+
+		await fireEvent.click(screen.getByRole('link', { name: 'Griya Asri' }));
+
+		expect(gtagMock).toHaveBeenCalledWith('event', 'select_property', {
+			perumahan: 'Griya Asri',
+			developer: 'Citra Land Nusantara',
+			tipe: '36/72',
+			source: 'search',
+			prioritas: 50
+		});
+	});
+
+	test('prioritas 0 → param prioritas TIDAK dikirim (bukan 0)', async () => {
+		const gtagMock = stubGtag();
+		render(UnitCard, { unit: buatUnit() }); // prioritas 0
+
+		await fireEvent.click(screen.getByRole('link', { name: 'Griya Asri' }));
+
+		const params = gtagMock.mock.calls[0][2] as Record<string, unknown>;
+		expect('prioritas' in params).toBe(false);
+	});
+
+	test('prop source meng-override default — homepage pakai "homepage" (+page.svelte)', async () => {
+		const gtagMock = stubGtag();
+		render(UnitCard, { unit: buatUnit(), source: 'homepage' });
+
+		await fireEvent.click(screen.getByRole('link', { name: 'Griya Asri' }));
+
+		expect(gtagMock).toHaveBeenCalledWith(
+			'event',
+			'select_property',
+			expect.objectContaining({ source: 'homepage' })
+		);
+	});
+
+	test('klik WhatsApp (partner gratis) → whatsapp_click dengan entitas nama perumahan', async () => {
+		const gtagMock = stubGtag();
+		render(UnitCard, { unit: buatUnit() }); // prioritas 0 → slot WA tetap ada
+		const konteks = '36/72 di Griya Asri';
+
+		await fireEvent.click(
+			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+		);
+
+		// `entitas` (nama perumahan bersih) yang jadi param — BUKAN konteks.
+		expect(gtagMock).toHaveBeenCalledWith('event', 'whatsapp_click', {
+			perumahan: 'Griya Asri'
+		});
 	});
 
 	test('klik "Form Minat" → dialog lead terbuka (judul dialog terlihat)', async () => {
