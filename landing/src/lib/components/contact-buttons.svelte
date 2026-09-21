@@ -67,7 +67,7 @@
 	}
 </script>
 
-<div class="flex gap-2 {className}">
+<div class="flex flex-wrap gap-2 {className}">
 	{#if onFormMinat}
 		<!-- Slot WA diganti form minat (partner berbayar, api-contract.md §8).
 		     Accent emas = kuat setara WA tapi BUKAN hijau WhatsApp, supaya

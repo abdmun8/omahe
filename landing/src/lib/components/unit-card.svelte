@@ -34,7 +34,7 @@
 </script>
 
 <article
-	class="border-line flex gap-3 rounded-xl border bg-white p-3 transition-shadow hover:shadow-md sm:flex-col sm:gap-0 sm:overflow-hidden sm:p-0"
+	class="border-line flex min-w-0 gap-3 rounded-xl border bg-white p-3 transition-shadow hover:shadow-md sm:flex-col sm:gap-0 sm:overflow-hidden sm:p-0"
 >
 	<div class="relative h-28 w-28 shrink-0 sm:h-44 sm:w-full">
 		{#if unit.fotoUrl}

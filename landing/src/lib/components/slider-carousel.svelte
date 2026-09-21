@@ -169,7 +169,7 @@
 		onclickcapture={cegahKlikSetelahGeser}
 	>
 		<!-- Viewport: satu slide terlihat; track digeser per 100% lewat transform. -->
-		<div class="bg-surface touch-pan-y overflow-hidden rounded-2xl">
+		<div class="bg-surface touch-pan-y overflow-hidden rounded-none sm:rounded-2xl">
 			<div
 				class="flex transition-transform duration-500 ease-out motion-reduce:transition-none"
 				style:transform={`translateX(-${aktif * 100}%)`}
