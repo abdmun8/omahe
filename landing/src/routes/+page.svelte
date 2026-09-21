@@ -13,9 +13,9 @@
 
 <svelte:head>
 	<title>Omahe — Cari Rumah Baru dari Pengembang Terpercaya</title>
-	<meta name="description" content={SITE.deskripsi} />
+	<meta name="description" content={SITE.deskripsiSingkat} />
 	<meta property="og:title" content="Omahe — {SITE.tagline}" />
-	<meta property="og:description" content={SITE.deskripsi} />
+	<meta property="og:description" content={SITE.deskripsiSingkat} />
 	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
 
@@ -40,8 +40,8 @@
 			Temukan rumah yang cocok, langsung dari pengembangnya.
 		</h1>
 		<p class="mt-4 max-w-xl text-sm text-white/80 sm:text-base">
-			Bandingkan tipe, harga, dan lokasi dari proyek perumahan aktif di seluruh Indonesia — lalu
-			ajukan langsung tanpa perantara.
+			Pilih dari berbagai proyek properti terpercaya, bandingkan setiap detailnya — dan temukan
+			rumah yang tepat untuk memulai cerita baru.
 		</p>
 
 		<!-- `kompak`: di mobile form cuma satu baris + link "Filter lanjutan";

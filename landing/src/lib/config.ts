@@ -4,6 +4,8 @@ export const SITE = {
 	tagline: 'Where your story begins',
 	deskripsi:
 		'Temukan hunian yang dirancang untuk memenuhi kebutuhan hidup Anda. Pilih dari berbagai proyek properti terpercaya, bandingkan setiap detailnya, dan temukan rumah yang tepat untuk memulai cerita baru.',
+	/** Versi ringkas (≤160 char) untuk meta/og description — SERP memotong di sekitar situ. */
+	deskripsiSingkat: 'Temukan hunian yang dirancang untuk memenuhi kebutuhan hidup Anda.',
 	url: 'https://www.omahe.co.id',
 	/**
 	 * Measurement ID Google Analytics 4. ID measurement memang PUBLIK by
