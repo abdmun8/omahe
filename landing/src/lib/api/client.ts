@@ -335,7 +335,13 @@ export async function getMitra(
 	fetchFn: Fetch,
 	kategori?: 'kjpp' | 'notaris'
 ): Promise<PublicMitra[]> {
-	if (!hasSearchApi()) return kategori ? fixtures.MITRA.filter((m) => m.kategori === kategori) : fixtures.MITRA;
+	if (!hasSearchApi()) {
+		// Fixture HANYAH di dev — nomor WA di fixture FIKTIF dan pernah bocor
+		// ke produksi saat env OMAHE_API_SEARCH lupa di-set (2026-09-22);
+		// produksi tanpa API → empty-state jujur, bukan kontak palsu.
+		if (!import.meta.env.DEV) return [];
+		return kategori ? fixtures.MITRA.filter((m) => m.kategori === kategori) : fixtures.MITRA;
+	}
 	try {
 		const params = kategori ? `?kategori=${kategori}` : '';
 		const data = await apiGet<PublicMitra[]>(fetchFn, `/public/mitra${params}`);
