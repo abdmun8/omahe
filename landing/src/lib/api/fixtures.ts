@@ -494,5 +494,16 @@ export const SLIDERS: PublicSlider[] = [
 		linkUrl: null,
 		perumahan: { slug: 'cakrawala-hills-bandung', nama: 'Cakrawala Hills Bandung' },
 		prioritas: 0
+	},
+	{
+		// MONET-04 — slide milik Omahe (tanpa perumahan), link internal:
+		// tab sama + `?ref=` lewat withRef().
+		id: '00000000-0000-4000-8000-000000000104',
+		judul: 'Hitung Cicilan KPR Anda',
+		subjudul: 'Simulasi KPR gratis — bandingkan tenor & bunga dalam hitungan detik',
+		gambarUrl: 'https://picsum.photos/seed/omahe-kpr/1600/900',
+		linkUrl: '/kpr',
+		perumahan: null,
+		prioritas: 0
 	}
 ];

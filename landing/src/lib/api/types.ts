@@ -434,8 +434,12 @@ export interface PublicSlider {
 	 * dibuka di tab baru dengan `rel="noopener"`.
 	 */
 	linkUrl: string | null;
-	/** Perumahan pemilik slider — tujuan link default & konteks alt. */
-	perumahan: { slug: string; nama: string };
+	/**
+	 * Perumahan pemilik slider — tujuan link default & konteks analytics.
+	 * `null` = slide milik OMAHE sendiri (MONET-04): `linkUrl` pasti terisi
+	 * (http(s) eksternal ATAU path internal Omahe diawali `/`).
+	 */
+	perumahan: { slug: string; nama: string } | null;
 	/**
 	 * Prioritas efektif pemilik (MONET-01). Hanya relevan untuk urutan
 	 * server-side — slider bukan kartu listing, JANGAN dirender sebagai badge.

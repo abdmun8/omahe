@@ -45,7 +45,7 @@
 		const slider = sliders[aktif];
 		if (!slider) return;
 		trackEvent('slider_view', {
-			perumahan: slider.perumahan.nama,
+			perumahan: slider.perumahan?.nama ?? 'Omahe',
 			judul: slider.judul,
 			posisi: aktif + 1
 		});
@@ -133,10 +133,28 @@
 	 * CLAUDE.md §Redirect `/p/:slug`).
 	 */
 	function tautanSlide(slider: PublicSlider) {
+		// MONET-04 — path internal Omahe (`/kpr`, `/artikel/…`): tab sama,
+		// WAJIB `withRef()` seperti link internal lain.
+		if (linkInternal(slider.linkUrl)) {
+			return { href: withRef(slider.linkUrl, ref) };
+		}
 		if (slider.linkUrl) {
 			return { href: slider.linkUrl, target: '_blank', rel: 'noopener' };
 		}
-		return { href: withRef(`/perumahan/${slider.perumahan.slug}`, ref) };
+		// Slide Omahe selalu punya link (dijamin backend); fallback aman ke beranda.
+		return {
+			href: withRef(slider.perumahan ? `/perumahan/${slider.perumahan.slug}` : '/', ref)
+		};
+	}
+
+	/** Path internal Omahe: diawali `/` tapi bukan `//` (protocol-relative). */
+	function linkInternal(url: string | null): url is string {
+		return !!url && url.startsWith('/') && !url.startsWith('//');
+	}
+
+	/** Penanda & tab baru hanya untuk link ke luar Omahe. */
+	function linkEksternal(slider: PublicSlider): boolean {
+		return !!slider.linkUrl && !linkInternal(slider.linkUrl);
 	}
 
 	// Iterasi 2 GA4: klik slide — penanda perumahan/judul + jenis tujuan
@@ -144,9 +162,9 @@
 	// sudah diblokir `cegahKlikSetelahGeser` SEBELUM sampai ke sini.
 	function lacakKlikSlide(slider: PublicSlider) {
 		trackEvent('slider_click', {
-			perumahan: slider.perumahan.nama,
+			perumahan: slider.perumahan?.nama ?? 'Omahe',
 			judul: slider.judul,
-			link: slider.linkUrl ? 'eksternal' : 'internal'
+			link: linkEksternal(slider) ? 'eksternal' : 'internal'
 		});
 	}
 </script>
@@ -199,7 +217,7 @@
 									class="font-display flex items-center gap-1.5 text-lg font-extrabold text-white sm:text-2xl"
 								>
 									{slider.judul}
-									{#if slider.linkUrl}
+									{#if linkEksternal(slider)}
 										<!-- Penanda link eksternal — ikon dekoratif, judul sudah cukup. -->
 										<ArrowUpRight class="h-4 w-4 shrink-0 sm:h-6 sm:w-6" aria-hidden="true" />
 									{/if}

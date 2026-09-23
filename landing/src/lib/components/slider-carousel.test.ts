@@ -116,6 +116,28 @@ describe.skipIf(typeof document === 'undefined')('SliderCarousel', () => {
 		expect(tautan?.getAttribute('target')).toBeNull();
 	});
 
+	test('MONET-04: slide Omahe (perumahan null) link internal /kpr → tab sama + ?ref=', () => {
+		const { container } = render(SliderCarousel, {
+			sliders: [buatSlider({ linkUrl: '/kpr', perumahan: null })],
+			ref: 'uji-ref'
+		});
+
+		const tautan = container.querySelector('a');
+		expect(tautan?.getAttribute('href')).toBe('/kpr?ref=uji-ref');
+		expect(tautan?.getAttribute('target')).toBeNull();
+	});
+
+	test('MONET-04: link protocol-relative //… diperlakukan eksternal, bukan internal', () => {
+		const { container } = render(SliderCarousel, {
+			sliders: [buatSlider({ linkUrl: '//evil.example/x', perumahan: null })],
+			ref: 'uji-ref'
+		});
+
+		const tautan = container.querySelector('a');
+		expect(tautan?.getAttribute('href')).toBe('//evil.example/x');
+		expect(tautan?.getAttribute('target')).toBe('_blank');
+	});
+
 	test('link eksternal (linkUrl terisi) → tab baru + rel noopener', () => {
 		const { container } = render(SliderCarousel, {
 			sliders: [buatSlider({ linkUrl: 'https://example.com/acara' })],
