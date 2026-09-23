@@ -20,10 +20,16 @@ export default defineConfig({
 			// `OMAHE_ADAPTER=node` (env saat build) memilih `adapter-node` untuk
 			// Docker/self-host (`landing/Dockerfile`) — menghasilkan standalone
 			// server `node build`. Default (tanpa env) tetap Vercel.
+			//
+			// `regions: ['sin1']` (Singapura) — default Vercel `iad1` (AS timur)
+			// membuat setiap fetch SSR ke backend `perumahan-api` (Asia) menempuh
+			// AS↔Asia; saat cold start + TLS baru, fetch kontak 1,5 dtk timeout
+			// (log production 2026-09-23, header `x-vercel-id: sin1::iad1`).
+			// Pengunjung (Indonesia) & backend sama-sama dekat Singapura.
 			adapter:
 				process.env.OMAHE_ADAPTER === 'node'
 					? adapterNode()
-					: adapterVercel({ runtime: 'nodejs22.x' }),
+					: adapterVercel({ runtime: 'nodejs22.x', regions: ['sin1'] }),
 
 			alias: {
 				$components: 'src/lib/components'

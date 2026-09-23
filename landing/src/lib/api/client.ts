@@ -436,7 +436,7 @@ export async function getSliders(fetchFn: Fetch): Promise<PublicSlider[]> {
 
 /** Endpoint-nya kecil & kritis lambat hanya jika backend down — jangan
  *  menahan render halaman selama TIMEOUT_MS penuh (8 detik). */
-const KONTAK_TIMEOUT_MS = 1500;
+const KONTAK_TIMEOUT_MS = 2500;
 const KONTAK_CACHE_TTL_MS = 60_000;
 
 let kontakCache: { nilai: KontakOmahe; kedaluwarsa: number } | null = null;

@@ -327,7 +327,7 @@ Omahe). Nomor tersimpan ternormalisasi `62xxx`; `null` = belum diisi.
 Pemakaian Omahe: `getKontak()` (`landing/src/lib/api/client.ts`) dipanggil
 `src/routes/+layout.server.ts` → `page.data.kontak`, dipakai tombol
 WhatsApp/Telepon kartu, sticky CTA, form lead, footer, JSON-LD, `/kontak`.
-Fail-soft per field ke `SITE.*` (`src/lib/config.ts`) — timeout 1,5 detik,
+Fail-soft per field ke `SITE.*` (`src/lib/config.ts`) — timeout 2,5 detik,
 cache in-memory 60 detik. `/kontak` tidak di-prerender lagi (SSR +
 `s-maxage=300`); halaman legal tetap prerender (email = nilai saat build).
 `appTitle` TIDAK dipakai Omahe (itu judul aplikasi admin).
