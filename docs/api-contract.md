@@ -384,3 +384,13 @@ Omahe: komponen `peta-lokasi.svelte` (iframe hanya untuk URL lolos
 `isMapsEmbedUrl`). Di `/perumahan/:slug` peta dari data tampil HANYA kalau
 tidak ada section `location` (anti peta ganda); halaman tipe selalu
 menampilkannya kalau ada.
+
+## 13. Slide milik Omahe di `GET /public/sliders` (MONET-04, `done` 2026-09-23)
+
+Perubahan additive pada §7: `perumahan` kini `{ slug, nama } | null` —
+`null` = slide milik Omahe sendiri (dibuat superadmin). Slide Omahe SELALU
+punya `linkUrl`: URL http(s) (tab baru, tanpa `?ref=`) ATAU path internal
+Omahe diawali `/` seperti `/kpr` (tab sama, `?ref=` ditempel lewat
+`withRef()`). Path `//…` diperlakukan eksternal. Urutan: slide Omahe
+memakai prioritas manual superadmin, slide perumahan prioritas efektif
+MONET-01; maksimal 10 slide.
