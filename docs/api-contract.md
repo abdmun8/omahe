@@ -177,7 +177,15 @@ tidak akan merusak apa pun dan belum menambahkannya juga tidak — TAPI
 `redirectUrl` butuh keputusan arsitektur dulu (lihat GOTCHA), bukan
 sekadar tambah field ke tipe.
 
-## 5. `GET /public/regions` — masih belum ada (gap terbuka per 2026-09-14)
+## 5. `GET /public/regions` — `done` 2026-09-23 (LOKASI-02; gap terbuka 2026-09-14 s/d 2026-09-23)
+
+**Update 2026-09-23 — SELESAI**: diimplementasikan epic `LOKASI-02` repo
+`perumahan`. `[{ kode, nama }]` = kabupaten/kota (`perumahan.region_kode`)
+dari perumahan AKTIF yang punya ≥ 1 unit `tersedia` (basis yang sama
+dengan `GET /public/units`, jadi opsi filter tidak pernah berujung hasil
+kosong), `nama` = "Kabupaten Bogor, Jawa Barat", urut nama. Perumahan
+harus diisi lokasinya di admin (Profil & Landing Page → Lokasi Perumahan)
+supaya muncul. Teks di bawah ini riwayat.
 
 Filter lokasi butuh daftar region yang benar-benar punya perumahan aktif
 (bukan seluruh data Kemendagri — itu puluhan ribu baris dan sebagian besar

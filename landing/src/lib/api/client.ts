@@ -249,15 +249,12 @@ export async function getTipeDetail(
 
 export async function getRegions(fetchFn: Fetch): Promise<RegionOption[]> {
 	if (hasSearchApi()) {
-		// `GET /public/regions` BELUM ADA di backend (api-contract.md §5, gap
-		// terbuka) — 404-nya di sini berarti "fitur ini belum diimplementasikan
-		// backend", BUKAN "resource tidak ditemukan" seperti 404 endpoint lain
-		// (unit/developer/perumahan) yang MEMANG harus jadi halaman 404 asli.
-		// Fail-soft ke array kosong (filter lokasi kosong/nonfungsi) daripada
-		// menjatuhkan SELURUH halaman lewat `error(404, ...)` di `apiGet`.
-		// Ditemukan 2026-09-15 saat verifikasi live: tanpa fallback ini,
-		// homepage & `/cari` 404 TOTAL begitu `OMAHE_API_SEARCH=1` dinyalakan
-		// (keduanya memanggil `getRegions` di load function-nya).
+		// `GET /public/regions` (LOKASI-02 repo `perumahan`, done 2026-09-23 —
+		// sebelumnya gap api-contract.md §5): kabupaten/kota dengan unit
+		// tersedia. Tetap fail-soft ke array kosong (filter lokasi kosong)
+		// daripada menjatuhkan SELURUH homepage/`/cari` lewat `error()` di
+		// `apiGet` saat backend bermasalah — ditemukan 2026-09-15: tanpa
+		// fallback ini, kedua halaman 404 TOTAL waktu endpoint belum ada.
 		try {
 			return await apiGet<RegionOption[]>(fetchFn, '/public/regions');
 		} catch (err) {
