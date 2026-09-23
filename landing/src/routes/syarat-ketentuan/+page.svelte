@@ -1,6 +1,10 @@
 <!-- DRAF — lihat catatan yang sama di `/privasi`. -->
 <script lang="ts">
 	import { SITE } from '$lib/config';
+	import { page } from '$app/state';
+
+	// ADMIN-05 — halaman ini di-prerender: email = nilai saat build (fallback config).
+	const emailOmahe = $derived(page.data.kontak?.email ?? SITE.email);
 </script>
 
 <svelte:head>
@@ -46,8 +50,8 @@
 			<h2 class="font-display text-ink text-lg font-bold">Kontak</h2>
 			<p class="mt-2">
 				Pertanyaan mengenai ketentuan ini: <a
-					href="mailto:{SITE.email}"
-					class="text-primary hover:underline">{SITE.email}</a
+					href="mailto:{emailOmahe}"
+					class="text-primary hover:underline">{emailOmahe}</a
 				>.
 			</p>
 		</section>

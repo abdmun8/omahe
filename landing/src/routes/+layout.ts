@@ -16,7 +16,7 @@ import type { LayoutLoad } from './$types';
  * (`?ref=` muncul di nav header/footer pasca-hidrasi), lihat TASKS.md item
  * "Prerender halaman statis".
  */
-export const load: LayoutLoad = ({ url }) => {
+export const load: LayoutLoad = ({ data, url }) => {
 	let ref: string | null = null;
 	try {
 		ref = readRef(url);
@@ -24,5 +24,8 @@ export const load: LayoutLoad = ({ url }) => {
 		// sedang prerender — HTML awal tanpa ref, diisi ulang pasca-hidrasi.
 		ref = null;
 	}
-	return { ref };
+	// `data` = hasil `+layout.server.ts` (kontak Omahe, ADMIN-05) — WAJIB
+	// diteruskan, kalau tidak `page.data.kontak` jadi undefined di seluruh
+	// halaman dan semua komponen diam-diam mundur ke fallback `SITE.*`.
+	return { ...data, ref };
 };

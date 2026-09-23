@@ -382,3 +382,19 @@ export interface PublicSlider {
 	 */
 	prioritas: number;
 }
+
+// ---------------------------------------------------------------------------
+// ADMIN-05 — kontak publik Omahe (`GET /public/app-settings`)
+// ---------------------------------------------------------------------------
+
+/**
+ * Kontak Omahe SIAP PAKAI — semua field TERISI string. Shape inilah yang
+ * dikembalikan `getKontak()` dan disebarkan ke semua halaman via layout
+ * root (`page.data.kontak`); field yang null di backend sudah diganti
+ * fallback `SITE.*` (lihat `client.ts::getKontak`).
+ */
+export interface KontakOmahe {
+	whatsapp: string;
+	telepon: string;
+	email: string;
+}

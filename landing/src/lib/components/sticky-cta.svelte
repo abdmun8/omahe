@@ -11,6 +11,7 @@
 	sumber='detail'), bukan WA langsung. Partner gratis tetap WhatsApp.
 -->
 <script lang="ts">
+	import { page } from '$app/state';
 	import { ajukanUrl } from '$lib/ref';
 	import { trackCtaAjukan, trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
@@ -24,6 +25,10 @@
 		ref = null,
 		prioritas = 0
 	}: { slug: string; nama: string; ref?: string | null; prioritas?: number } = $props();
+
+	/** Kontak Omahe (ADMIN-05) dari layout root — fallback SITE kalau belum
+	 *  terisi (mis. respons lama/prerender tanpa data server). */
+	const nomorWhatsapp = $derived(page.data.kontak?.whatsapp ?? SITE.whatsapp);
 
 	/** undefined (respons lama tanpa MONET-01) = gratis. */
 	const partnerBerbayar = $derived(prioritas > 0);
@@ -56,7 +61,7 @@
 				variant="whatsapp"
 				size="lg"
 				class="flex-1"
-				href={waUrl(SITE.whatsapp, `Halo, saya tertarik dengan ${nama} yang saya lihat di Omahe.`)}
+				href={waUrl(nomorWhatsapp, `Halo, saya tertarik dengan ${nama} yang saya lihat di Omahe.`)}
 				target="_blank"
 				rel="noopener"
 				onclick={lacakWhatsapp}>WhatsApp</Button

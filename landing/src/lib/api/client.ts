@@ -16,11 +16,13 @@
  */
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
+import { SITE } from '$lib/config';
 import * as fixtures from './fixtures';
 import type {
 	ApiEnvelope,
 	DeveloperDetail,
 	DeveloperSummary,
+	KontakOmahe,
 	LeadInput,
 	PageMeta,
 	Paginated,
@@ -383,5 +385,84 @@ export async function getSliders(fetchFn: Fetch): Promise<PublicSlider[]> {
 			err
 		);
 		return [];
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Kontak Omahe (ADMIN-05)
+// ---------------------------------------------------------------------------
+
+/**
+ * Kontak publik Omahe (`GET /public/app-settings`, epic ADMIN-05 repo
+ * `perumahan`) — dipanggil SEKALI dari layout root (`+layout.server.ts`) dan
+ * disebarkan ke semua halaman via `page.data.kontak`.
+ *
+ * Fail-soft total, pola `getRegions`: kontak itu aksesoris di hampir semua
+ * halaman — endpoint gagal/timeout/shape tak dikenal TIDAK BOLEH menjatuhkan
+ * halaman, cukup kembali ke `SITE.*` (kontak fallback statis di
+ * `$lib/config.ts`). Fungsi ini JANGAN pernah throw.
+ *
+ * Per-field independen: satu field null di backend hanya field itu yang
+ * kembali ke `SITE.*`, field lain tetap dari API.
+ *
+ * Cache in-memory modul 60 detik — hasil sukses maupun fallback-karena-error
+ * sama-sama ter-cache, jadi kegagalan endpoint tidak diulang di setiap request
+ * SSR (request Vercel bisa datang berpaketaan); perubahan nomor di admin
+ * tampil paling lambat 1 menit di server, tanpa redeploy.
+ */
+
+/** Endpoint-nya kecil & kritis lambat hanya jika backend down — jangan
+ *  menahan render halaman selama TIMEOUT_MS penuh (8 detik). */
+const KONTAK_TIMEOUT_MS = 1500;
+const KONTAK_CACHE_TTL_MS = 60_000;
+
+let kontakCache: { nilai: KontakOmahe; kedaluwarsa: number } | null = null;
+
+const kontakFallback = (): KontakOmahe => ({
+	whatsapp: SITE.whatsapp,
+	telepon: SITE.telepon,
+	email: SITE.email
+});
+
+/** null/undefined/bukan string berisi → fallback SITE untuk field itu saja. */
+function ambilAtauFallback(nilai: unknown, fallback: string): string {
+	return typeof nilai === 'string' && nilai.trim() !== '' ? nilai : fallback;
+}
+
+export async function getKontak(fetchFn: Fetch): Promise<KontakOmahe> {
+	// Tanpa API (fixture mode) tidak ada sumber nomor selain SITE — dan
+	// fixture MEMANG kontak Omahe sendiri, bukan data palsu backend.
+	if (!hasApi()) return kontakFallback();
+
+	if (kontakCache && Date.now() < kontakCache.kedaluwarsa) return kontakCache.nilai;
+
+	const nilai = await fetchKontak(fetchFn);
+	kontakCache = { nilai, kedaluwarsa: Date.now() + KONTAK_CACHE_TTL_MS };
+	return nilai;
+}
+
+/** Selalu resolve — semua kegagalan sudah jadi fallback di dalam sini. */
+async function fetchKontak(fetchFn: Fetch): Promise<KontakOmahe> {
+	try {
+		const res = await fetchFn(`${baseUrl()}/public/app-settings`, {
+			headers: { accept: 'application/json' },
+			signal: AbortSignal.timeout(KONTAK_TIMEOUT_MS)
+		});
+		if (!res.ok) throw new Error(`HTTP ${res.status}`);
+		const body = (await res.json()) as {
+			data?: { kontak?: Record<string, unknown> | null } | null;
+		};
+		const k = body.data?.kontak;
+		return {
+			whatsapp: ambilAtauFallback(k?.whatsapp, SITE.whatsapp),
+			telepon: ambilAtauFallback(k?.telepon, SITE.telepon),
+			email: ambilAtauFallback(k?.email, SITE.email)
+		};
+	} catch (err) {
+		console.error(
+			'[omahe:api] GET /public/app-settings gagal — fallback kontak SITE (ADMIN-05)',
+			err
+		);
+		return kontakFallback();
 	}
 }

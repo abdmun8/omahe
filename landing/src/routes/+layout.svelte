@@ -14,21 +14,26 @@
 	// Identitas situs untuk mesin pencari. Wajib lewat amankanJsonLd() sebelum
 	// {@html} — satu jalur escape untuk SEMUA JSON-LD, supaya saat nanti ada
 	// JSON-LD lain yang membawa teks admin, tidak ada yang lupa (src/lib/jsonld.ts).
-	const jsonLdOrgAman = amankanJsonLd({
-		'@context': 'https://schema.org',
-		'@type': 'Organization',
-		name: SITE.nama,
-		slogan: SITE.tagline,
-		description: SITE.deskripsi,
-		url: SITE.url,
-		logo: `${SITE.url}/omahe-logo.jpeg`,
-		contactPoint: {
-			'@type': 'ContactPoint',
-			contactType: 'customer service',
-			telephone: `+${normalisasiNomor(SITE.telepon)}`,
-			email: SITE.email
-		}
-	});
+	// ADMIN-05 — kontak dari API (layout server), fallback config.
+	const telepon = $derived(page.data.kontak?.telepon ?? SITE.telepon);
+	const email = $derived(page.data.kontak?.email ?? SITE.email);
+	const jsonLdOrgAman = $derived(
+		amankanJsonLd({
+			'@context': 'https://schema.org',
+			'@type': 'Organization',
+			name: SITE.nama,
+			slogan: SITE.tagline,
+			description: SITE.deskripsi,
+			url: SITE.url,
+			logo: `${SITE.url}/omahe-logo.jpeg`,
+			contactPoint: {
+				'@type': 'ContactPoint',
+				contactType: 'customer service',
+				telephone: `+${normalisasiNomor(telepon)}`,
+				email
+			}
+		})
+	);
 
 	// Pageview manual di setiap navigasi — afterNavigate JUGA jalan di initial
 	// load, makanya config GA di bawah sengaja `send_page_view: false` (anti

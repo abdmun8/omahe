@@ -59,6 +59,20 @@ export function normalisasiNomor(nomor: string): string {
 	return digit;
 }
 
+/**
+ * ADMIN-05 — nomor untuk DITAMPILKAN (bukan link). Nomor seluler (08…):
+ * `6281112345678` → `0811-1234-5678` (awalan 62 jadi 0, kelompok 4 digit).
+ * Nomor lain (telepon kantor 021… dsb.) cukup dikembalikan ke format lokal
+ * tanpa pengelompokan — panjang kode area bervariasi, jadi tidak ditebak.
+ */
+export function formatNomorTampil(nomor: string): string {
+	const digit = normalisasiNomor(nomor);
+	if (!digit.startsWith('62')) return nomor;
+	const lokal = `0${digit.slice(2)}`;
+	if (!lokal.startsWith('08')) return lokal;
+	return lokal.match(/.{1,4}/g)?.join('-') ?? lokal;
+}
+
 export function waUrl(nomor: string, pesan?: string): string {
 	const teks = pesan ? `?text=${encodeURIComponent(pesan)}` : '';
 	return `https://wa.me/${normalisasiNomor(nomor)}${teks}`;

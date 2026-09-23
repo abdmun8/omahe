@@ -20,6 +20,7 @@
 	(hampir penuh layar di layar kecil, max-w-md mulai sm).
 -->
 <script lang="ts">
+	import { page } from '$app/state';
 	import { Dialog } from 'bits-ui';
 	import X from '@lucide/svelte/icons/x';
 	import type { LeadSumber } from '$lib/api/types';
@@ -187,7 +188,7 @@
 					<Button
 						variant="whatsapp"
 						href={waUrl(
-							SITE.whatsapp,
+							page.data.kontak?.whatsapp ?? SITE.whatsapp,
 							`Halo, saya ingin tanya tentang ${namaPerumahan} yang saya lihat di Omahe.`
 						)}
 						target="_blank"

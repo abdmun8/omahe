@@ -8,8 +8,10 @@
  * yang mengubah `apiGet`/`getPerumahan` dan jalur 404-nya hilang, tes ini
  * yang pertama merah — bukan baru ketahuan pas production 500.
  */
-import { describe, expect, test } from 'bun:test';
-import { getPerumahan, getUnits } from './client';
+import { afterEach, describe, expect, test, setSystemTime } from 'bun:test';
+import { env } from '$env/dynamic/private';
+import { SITE } from '$lib/config';
+import { getKontak, getPerumahan, getUnits } from './client';
 import { UNIT_LISTINGS } from './fixtures';
 
 /**
@@ -67,5 +69,87 @@ describe('client (mode fixture, env kosong)', () => {
 
 	test('fetchDummy benar-benar melempar — tiga tes di atas lolos tanpa network sedikit pun', () => {
 		expect(tolakNetwork).toThrow('Tidak boleh ada panggilan network');
+	});
+});
+
+/**
+ * Test `getKontak` (ADMIN-05). Env di-mutasi langsung seperti di
+ * `client.api.test.ts` (baca `env.*` SAAT PANGGILAN, bukan saat import), dan
+ * `setSystemTime` mengendalikan cache 60 detik yang module-level — tiap tes
+ * jaringan memakai jendela waktu sendiri supaya cache tes sebelumnya pasti
+ * kedaluwarsa, lalu waktu nyata dikembalikan di `afterEach`.
+ */
+const T0 = 1_750_000_000_000;
+
+const apiJson = (body: unknown, status = 200) =>
+	new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+
+const kontakSite = () => ({
+	whatsapp: SITE.whatsapp,
+	telepon: SITE.telepon,
+	email: SITE.email
+});
+
+describe('getKontak (ADMIN-05)', () => {
+	afterEach(() => {
+		delete (env as Record<string, string | undefined>).OMAHE_API_BASE_URL;
+		setSystemTime();
+	});
+
+	test('tanpa base URL → fallback SITE, TANPA network sama sekali', async () => {
+		const kontak = await getKontak(fetchDummy);
+		expect(kontak).toEqual(kontakSite());
+	});
+
+	test('error fetch → fallback SITE tanpa throw, dan fallback-nya ter-cache 60 detik', async () => {
+		env.OMAHE_API_BASE_URL = 'https://api.perumahan.test';
+		setSystemTime(T0);
+
+		const gagal = (() => Promise.reject(new Error('timeout'))) as unknown as typeof fetch;
+		// JANGAN pernah throw — kegagalan kontak tidak boleh menjatuhkan halaman.
+		expect(await getKontak(gagal)).toEqual(kontakSite());
+
+		// Fallback-karena-error cukup 60 detik juga: 30 detik kemudian endpoint
+		// sudah "sehat" pun TIDAK dipanggil ulang — masih dilayani cache.
+		setSystemTime(T0 + 30_000);
+		const sehat = (async () =>
+			apiJson({
+				success: true,
+				data: { kontak: { whatsapp: '628111111111', telepon: '6221111111', email: 'x@y.z' } }
+			})) as unknown as typeof fetch;
+		expect(await getKontak(sehat)).toEqual(kontakSite());
+	});
+
+	test('field null di-merge dengan fallback SITE; cache 60 detik lalu kedaluwarsa', async () => {
+		env.OMAHE_API_BASE_URL = 'https://api.perumahan.test';
+		setSystemTime(T0 + 120_000); // jendela baru — cache tes sebelumnya basi
+
+		let dipanggil = 0;
+		const fetchMock = (async () => {
+			dipanggil += 1;
+			return apiJson({
+				success: true,
+				data: {
+					appTitle: 'Omahe',
+					kontak: { whatsapp: '6281112345678', telepon: null, email: null }
+				}
+			});
+		}) as unknown as typeof fetch;
+
+		const diharapkan = {
+			whatsapp: '6281112345678',
+			telepon: SITE.telepon,
+			email: SITE.email
+		};
+		expect(await getKontak(fetchMock)).toEqual(diharapkan);
+
+		// Masih segar → tidak fetch ulang (dipanggil 1x saja).
+		expect(await getKontak(fetchMock)).toEqual(diharapkan);
+		expect(dipanggil).toBe(1);
+
+		// Lewat 60 detik → cache kedaluwarsa, fetch ulang.
+		setSystemTime(T0 + 120_000 + 61_000);
+		expect(await getKontak(fetchMock)).toEqual(diharapkan);
+		expect(dipanggil).toBe(2);
 	});
 });

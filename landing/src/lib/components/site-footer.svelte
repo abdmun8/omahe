@@ -3,6 +3,9 @@
 	import { withRef } from '$lib/ref';
 	import { page } from '$app/state';
 
+	// ADMIN-05 — email Omahe dari API (layout root), fallback config.
+	const emailOmahe = $derived(page.data.kontak?.email ?? SITE.email);
+
 	const ref = $derived(page.data.ref as string | null);
 	const tahun = new Date().getFullYear();
 </script>
@@ -31,7 +34,7 @@
 			<ul class="text-muted mt-3 space-y-2 text-sm">
 				<li><a href="/privasi" class="hover:text-primary">Kebijakan Privasi</a></li>
 				<li><a href="/syarat-ketentuan" class="hover:text-primary">Syarat &amp; Ketentuan</a></li>
-				<li><a href="mailto:{SITE.email}" class="hover:text-primary">{SITE.email}</a></li>
+				<li><a href="mailto:{emailOmahe}" class="hover:text-primary">{emailOmahe}</a></li>
 			</ul>
 		</div>
 	</div>

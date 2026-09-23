@@ -7,17 +7,19 @@
 
 	Keputusan (2026-09-13): untuk tahap awal, nomor SELALU nomor kontak
 	umum Omahe (bukan per-perumahan/developer/marketing) — `nomor` default
-	ke `SITE.whatsapp`/`SITE.telepon`, dan `konteks` disisipkan ke pesan
-	pembuka supaya lead tetap bisa ditelusuri ke properti mana. Field
-	kontak per-entitas boleh menyusul nanti kalau dibutuhkan; yang berubah
-	cuma prop `nomorWhatsapp`/`nomorTelepon` dari pemanggil, bukan komponen
-	ini.
+	ke kontak Omahe (ADMIN-05, dari API via `page.data.kontak`, fallback
+	`SITE.whatsapp`/`SITE.telepon` kalau belum terisi), dan `konteks`
+	disisipkan ke pesan pembuka supaya lead tetap bisa ditelusuri ke
+	properti mana. Field kontak per-entitas boleh menyusul nanti kalau
+	dibutuhkan; yang berubah cuma prop `nomorWhatsapp`/`nomorTelepon` dari
+	pemanggil, bukan komponen ini.
 
 	MONET-03 (2026-09-18): untuk partner BERBAYAR (`prioritas > 0`), prop
 	`onFormMinat` mengganti tombol WA dengan "Form Minat" (membuka
 	LeadFormDialog) — perilaku partner gratis TIDAK berubah sama sekali.
 -->
 <script lang="ts">
+	import { page } from '$app/state';
 	import { trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
 	import { telUrl, waUrl } from '$lib/utils';
@@ -26,8 +28,8 @@
 	let {
 		konteks,
 		entitas = undefined,
-		nomorWhatsapp = SITE.whatsapp,
-		nomorTelepon = SITE.telepon,
+		nomorWhatsapp = page.data.kontak?.whatsapp ?? SITE.whatsapp,
+		nomorTelepon = page.data.kontak?.telepon ?? SITE.telepon,
 		size = 'sm',
 		onFormMinat = null,
 		class: className = ''

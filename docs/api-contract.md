@@ -303,3 +303,23 @@ menyertakan `prioritas` (efektif penuh di jalur `?full=1`; jalur
 skip-resolve LANDING-05 = own-only, tanpa lookup developer) — dipakai
 halaman detail Omahe untuk men-gate LeadFormDialog MONET-03 di
 sticky-CTA.
+
+## 10. `GET /public/app-settings` — kontak Omahe (ADMIN-05, `done` 2026-09-23, BARU)
+
+Tanpa auth. Diatur principal di admin `perumahan` (Pengaturan → Kontak
+Omahe). Nomor tersimpan ternormalisasi `62xxx`; `null` = belum diisi.
+
+```json
+{ "success": true, "data": {
+  "appTitle": "PROPERTI",
+  "kontak": { "whatsapp": "6281234567890", "telepon": "62215551234", "email": "cs@omahe.co.id" }
+} }
+```
+
+Pemakaian Omahe: `getKontak()` (`landing/src/lib/api/client.ts`) dipanggil
+`src/routes/+layout.server.ts` → `page.data.kontak`, dipakai tombol
+WhatsApp/Telepon kartu, sticky CTA, form lead, footer, JSON-LD, `/kontak`.
+Fail-soft per field ke `SITE.*` (`src/lib/config.ts`) — timeout 1,5 detik,
+cache in-memory 60 detik. `/kontak` tidak di-prerender lagi (SSR +
+`s-maxage=300`); halaman legal tetap prerender (email = nilai saat build).
+`appTitle` TIDAK dipakai Omahe (itu judul aplikasi admin).
