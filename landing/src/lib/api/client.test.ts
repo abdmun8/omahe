@@ -11,7 +11,7 @@
 import { afterEach, describe, expect, test, setSystemTime } from 'bun:test';
 import { env } from '$env/dynamic/private';
 import { SITE } from '$lib/config';
-import { getKontak, getPerumahan, getUnits } from './client';
+import { getKontak, getPerumahan, getTipeDetail, getUnits } from './client';
 import { UNIT_LISTINGS } from './fixtures';
 
 /**
@@ -151,5 +151,25 @@ describe('getKontak (ADMIN-05)', () => {
 		setSystemTime(T0 + 120_000 + 61_000);
 		expect(await getKontak(fetchMock)).toEqual(diharapkan);
 		expect(dipanggil).toBe(2);
+	});
+});
+
+describe('getTipeDetail (UNIT-05, mode fixture)', () => {
+	test('tipe ada → detail + deskripsi Markdown mentah', async () => {
+		const d = await getTipeDetail(fetch, 'cakrawala-hills-bandung', 'tipe-45-96');
+		expect(d.tipe.nama).toBe('Tipe 45/96');
+		expect(d.tipe.deskripsi).toContain('## Spesifikasi');
+		expect(d.perumahan.developer?.slug).toBe('cakrawala-griya-utama');
+	});
+
+	test('tipe tidak ada → 404', async () => {
+		await expect(getTipeDetail(fetch, 'griya-asri-bogor', 'tidak-ada')).rejects.toMatchObject({
+			status: 404
+		});
+	});
+
+	test('kartu fixture membawa tipeSlug yang sama dengan URL detail', () => {
+		const kartu = UNIT_LISTINGS.find((u) => u.tipe === 'Tipe 45/96');
+		expect(kartu?.tipeSlug).toBe('tipe-45-96');
 	});
 });

@@ -81,3 +81,27 @@ export function waUrl(nomor: string, pesan?: string): string {
 export function telUrl(nomor: string): string {
 	return `tel:+${normalisasiNomor(nomor)}`;
 }
+
+/** Bagian lokasi perumahan (LOKASI-01) — semua boleh null. */
+export interface BagianLokasi {
+	alamat?: string | null;
+	kecamatanNama?: string | null;
+	regionNama?: string | null;
+	provinsiNama?: string | null;
+}
+
+/**
+ * LOKASI-01 — gabung lokasi lengkap: "Jl. Raya 1, Kec. Cibinong, Kabupaten
+ * Bogor, Jawa Barat". Bagian kosong dilewati; kecamatan diberi awalan
+ * "Kec." (data Kemendagri hanya berisi nama). null kalau semua kosong.
+ */
+export function formatLokasi(lokasi: BagianLokasi): string | null {
+	const kec = lokasi.kecamatanNama?.trim();
+	const bagian = [
+		lokasi.alamat?.trim(),
+		kec ? (/^kec/i.test(kec) ? kec : `Kec. ${kec}`) : null,
+		lokasi.regionNama?.trim(),
+		lokasi.provinsiNama?.trim()
+	].filter((b): b is string => !!b);
+	return bagian.length > 0 ? bagian.join(', ') : null;
+}

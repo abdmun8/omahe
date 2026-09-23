@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { formatNomorTampil, telUrl, waUrl } from './utils';
+import { formatLokasi, formatNomorTampil, telUrl, waUrl } from './utils';
 
 describe('formatNomorTampil (ADMIN-05)', () => {
 	test('62xxx dari API jadi 0xxx berkelompok 4 digit', () => {
@@ -17,5 +17,28 @@ describe('formatNomorTampil (ADMIN-05)', () => {
 	test('link wa/tel tetap memakai format internasional', () => {
 		expect(waUrl('6281112345678')).toBe('https://wa.me/6281112345678');
 		expect(telUrl('6281112345678')).toBe('tel:+6281112345678');
+	});
+});
+
+describe('formatLokasi (LOKASI-01)', () => {
+	test('lengkap', () => {
+		expect(
+			formatLokasi({
+				alamat: 'Jl. Raya 1',
+				kecamatanNama: 'Cibinong',
+				regionNama: 'Kabupaten Bogor',
+				provinsiNama: 'Jawa Barat'
+			})
+		).toBe('Jl. Raya 1, Kec. Cibinong, Kabupaten Bogor, Jawa Barat');
+	});
+
+	test('sebagian kosong dilewati, tidak dobel "Kec."', () => {
+		expect(formatLokasi({ kecamatanNama: 'Kec. Cibinong', regionNama: 'Kabupaten Bogor' })).toBe(
+			'Kec. Cibinong, Kabupaten Bogor'
+		);
+	});
+
+	test('semua kosong → null', () => {
+		expect(formatLokasi({ alamat: '  ', regionNama: null })).toBeNull();
 	});
 });

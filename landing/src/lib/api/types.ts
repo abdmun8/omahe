@@ -76,6 +76,17 @@ export interface UnitListing {
 	developer: DeveloperRef | null;
 	/** Foto perumahan pertama (presigned). Null = tampilkan placeholder. */
 	fotoUrl: string | null;
+	/**
+	 * UNIT-05 — slug tipe untuk URL `/perumahan/:slug/tipe/:tipeSlug`.
+	 * Optional: backend lama belum mengirimnya → kartu tetap link ke
+	 * `#tipe-unit` di halaman perumahan.
+	 */
+	tipeSlug?: string;
+	/** UNIT-05 — cover galeri khusus tipe; null → pakai `fotoUrl` perumahan. */
+	fotoTipeUrl?: string | null;
+	kamarTidur?: number | null;
+	kamarMandi?: number | null;
+	carport?: number | null;
 }
 
 export interface UnitListingPerumahan {
@@ -91,6 +102,10 @@ export interface UnitListingPerumahan {
 	 * nilai > 0. Prioritas TIDAK pernah meloloskan item dari filter.
 	 */
 	prioritas: number;
+	/** LOKASI-01 — optional (backend lama tidak mengirim). */
+	provinsiNama?: string | null;
+	kecamatanNama?: string | null;
+	alamat?: string | null;
 }
 
 export interface DeveloperRef {
@@ -184,6 +199,10 @@ export interface PerumahanDetail {
 	developer?: DeveloperRef | null;
 	/** Perluasan UNIT-04 (field lokasi `perumahan.regionKode`) — optional, idem. */
 	regionNama?: string | null;
+	/** LOKASI-01 — optional, idem. */
+	provinsiNama?: string | null;
+	kecamatanNama?: string | null;
+	alamat?: string | null;
 	/**
 	 * Prioritas promosi (MONET-01, api-contract.md §4 tambahan 2026-09-18) —
 	 * int >= 0, `0` = gratis. Dipakai men-gate LeadFormDialog (MONET-03):
@@ -192,6 +211,40 @@ export interface PerumahanDetail {
 	 * LANDING-05 = own-only perumahan (tanpa lookup developer).
 	 */
 	prioritas: number;
+}
+
+/**
+ * UNIT-05 — `GET /public/perumahan/:slug/tipe/:tipeSlug`. `deskripsi` =
+ * Markdown MENTAH tulisan admin tenant — WAJIB dirender lewat
+ * `$lib/markdown` (subset aman), jangan `marked`/`{@html}` langsung.
+ */
+export interface TipeDetail {
+	perumahan: {
+		nama: string;
+		slug: string;
+		regionNama: string | null;
+		provinsiNama: string | null;
+		kecamatanNama: string | null;
+		alamat: string | null;
+		developer: DeveloperRef | null;
+	};
+	tipe: {
+		nama: string;
+		slug: string;
+		deskripsi: string | null;
+		kamarTidur: number | null;
+		kamarMandi: number | null;
+		carport: number | null;
+		/** Urutan = urutan admin; indeks 0 = cover. */
+		photos: ProfilePhoto[];
+		/** null kalau tidak ada unit tersedia. */
+		hargaMin: number | null;
+		hargaMax: number | null;
+		luasTanah: number | null;
+		luasBangunan: number | null;
+		/** 0 = "sedang habis" (halaman tetap tampil). */
+		unitTersedia: number;
+	};
 }
 
 // ---------------------------------------------------------------------------

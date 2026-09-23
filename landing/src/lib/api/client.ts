@@ -31,7 +31,8 @@ import type {
 	RegionOption,
 	UnitListing,
 	UnitQuery,
-	PublicMitra
+	PublicMitra,
+	TipeDetail
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -214,6 +215,31 @@ export async function getPerumahan(fetchFn: Fetch, slug: string): Promise<Peruma
 	}
 	const detail = fixtures.perumahanDetail(slug);
 	if (!detail) error(404, 'Perumahan tidak ditemukan.');
+	return detail;
+}
+
+// ---------------------------------------------------------------------------
+// Detail tipe rumah (UNIT-05)
+// ---------------------------------------------------------------------------
+
+/**
+ * `GET /public/perumahan/:slug/tipe/:tipeSlug` — gate `hasApi()` sama
+ * `getPerumahan` (endpoint detail, bukan pencarian). Endpoint ini TIDAK
+ * ikut skip-resolve LANDING-05, jadi tanpa `?full=1`.
+ */
+export async function getTipeDetail(
+	fetchFn: Fetch,
+	perumahanSlug: string,
+	tipeSlug: string
+): Promise<TipeDetail> {
+	if (hasApi()) {
+		return apiGet<TipeDetail>(
+			fetchFn,
+			`/public/perumahan/${encodeURIComponent(perumahanSlug)}/tipe/${encodeURIComponent(tipeSlug)}`
+		);
+	}
+	const detail = fixtures.tipeDetail(perumahanSlug, tipeSlug);
+	if (!detail) error(404, 'Tipe rumah tidak ditemukan.');
 	return detail;
 }
 

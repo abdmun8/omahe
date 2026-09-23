@@ -28,7 +28,8 @@ import type {
 	PublicSlider,
 	RegionOption,
 	UnitListing,
-	PublicMitra
+	PublicMitra,
+	TipeDetail
 } from './types';
 
 export const REGIONS: RegionOption[] = [
@@ -59,7 +60,14 @@ interface FixtureProject {
 		luasBangunan: number;
 		harga: number;
 		tersedia: number;
+		/** UNIT-05 — detail tipe contoh (opsional). */
+		deskripsi?: string;
+		kamarTidur?: number;
+		kamarMandi?: number;
+		carport?: number;
 	}>;
+	/** LOKASI-01 — nama kecamatan contoh. */
+	kecamatanNama?: string;
 }
 
 const PROJECTS: FixtureProject[] = [
@@ -99,11 +107,34 @@ const PROJECTS: FixtureProject[] = [
 		regionKode: '32.73',
 		developerSlug: 'cakrawala-griya-utama',
 		alamat: 'Jl. Setiabudi Atas KM 12, Ledeng, Kota Bandung',
+		kecamatanNama: 'Cidadap',
 		deskripsi:
 			'Cluster berkontur di Bandung utara dengan pemandangan lembah. Setiap unit menghadap taman linier; akses ke kawasan pendidikan Setiabudi 15 menit.',
 		tipe: [
-			{ tipe: 'Tipe 45/96', luasTanah: 96, luasBangunan: 45, harga: 725000000, tersedia: 6 },
-			{ tipe: 'Tipe 72/140', luasTanah: 140, luasBangunan: 72, harga: 1450000000, tersedia: 2 }
+			{
+				tipe: 'Tipe 45/96',
+				luasTanah: 96,
+				luasBangunan: 45,
+				harga: 725000000,
+				tersedia: 6,
+				kamarTidur: 2,
+				kamarMandi: 1,
+				carport: 1,
+				deskripsi:
+					'## Desain\nRumah satu lantai bergaya tropis modern dengan bukaan lebar ke taman belakang dan plafon tinggi supaya sirkulasi udara lancar.\n\n## Spesifikasi\n- **Pondasi**: batu kali & footplat beton\n- **Dinding**: bata merah, plester aci, cat eksterior weathershield\n- **Lantai**: granit 60x60\n- **Atap**: rangka baja ringan, genteng beton\n- **Kusen**: aluminium\n- **Listrik**: 1.300 VA\n- **Air**: PDAM'
+			},
+			{
+				tipe: 'Tipe 72/140',
+				luasTanah: 140,
+				luasBangunan: 72,
+				harga: 1450000000,
+				tersedia: 2,
+				kamarTidur: 3,
+				kamarMandi: 2,
+				carport: 2,
+				deskripsi:
+					'## Desain\nDua lantai dengan ruang keluarga *double height* dan balkon menghadap lembah.\n\n## Spesifikasi\n- **Struktur**: beton bertulang\n- **Lantai**: granit 60x60, parket di kamar utama\n- **Sanitair**: TOTO\n- **Listrik**: 2.200 VA'
+			}
 		]
 	},
 	{
@@ -183,10 +214,17 @@ const developerRef = (slug: string | null) => {
 	return d ? { nama: d.nama, slug: d.slug } : null;
 };
 
+/** Slug tipe — cermin `slugifyTipe` backend (UNIT-05). */
+export const slugTipe = (tipe: string) =>
+	tipe
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+
 /** Semua kartu hasil pencarian — satu per (perumahan, tipe). */
 export const UNIT_LISTINGS: UnitListing[] = PROJECTS.flatMap((p) =>
 	p.tipe.map((t) => ({
-		id: `${p.slug}--${t.tipe.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+		id: `${p.slug}--${slugTipe(t.tipe)}`,
 		tipe: t.tipe,
 		luasTanah: t.luasTanah,
 		luasBangunan: t.luasBangunan,
@@ -198,10 +236,18 @@ export const UNIT_LISTINGS: UnitListing[] = PROJECTS.flatMap((p) =>
 			slug: p.slug,
 			regionKode: p.regionKode,
 			regionNama: regionNama(p.regionKode),
-			prioritas: p.prioritas
+			prioritas: p.prioritas,
+			provinsiNama: null,
+			kecamatanNama: p.kecamatanNama ?? null,
+			alamat: p.alamat
 		},
 		developer: developerRef(p.developerSlug),
-		fotoUrl: null
+		fotoUrl: null,
+		tipeSlug: slugTipe(t.tipe),
+		fotoTipeUrl: null,
+		kamarTidur: t.kamarTidur ?? null,
+		kamarMandi: t.kamarMandi ?? null,
+		carport: t.carport ?? null
 	}))
 );
 
@@ -249,6 +295,9 @@ export function perumahanDetail(slug: string): PerumahanDetail | null {
 		photos: [],
 		developer: developerRef(p.developerSlug),
 		regionNama: regionNama(p.regionKode),
+		provinsiNama: null,
+		kecamatanNama: p.kecamatanNama ?? null,
+		alamat: p.alamat,
 		// MONET-01 — cermin prioritas proyek (Griya Asri Bogor = 50) supaya
 		// gate LeadFormDialog terlihat saat dev pakai fixture.
 		prioritas: p.prioritas,
@@ -307,6 +356,39 @@ export function perumahanDetail(slug: string): PerumahanDetail | null {
 					}
 				]
 			: null
+	};
+}
+
+/** UNIT-05 — detail tipe versi fixture (null = 404). Fixture region sudah
+ *  memuat nama provinsi, jadi `provinsiNama` dibiarkan null. */
+export function tipeDetail(perumahanSlug: string, tipeSlug: string): TipeDetail | null {
+	const p = PROJECTS.find((x) => x.slug === perumahanSlug);
+	const t = p?.tipe.find((x) => slugTipe(x.tipe) === tipeSlug);
+	if (!p || !t) return null;
+	return {
+		perumahan: {
+			nama: p.nama,
+			slug: p.slug,
+			regionNama: regionNama(p.regionKode),
+			provinsiNama: null,
+			kecamatanNama: p.kecamatanNama ?? null,
+			alamat: p.alamat,
+			developer: developerRef(p.developerSlug)
+		},
+		tipe: {
+			nama: t.tipe,
+			slug: slugTipe(t.tipe),
+			deskripsi: t.deskripsi ?? null,
+			kamarTidur: t.kamarTidur ?? null,
+			kamarMandi: t.kamarMandi ?? null,
+			carport: t.carport ?? null,
+			photos: [],
+			hargaMin: t.harga,
+			hargaMax: t.harga,
+			luasTanah: t.luasTanah,
+			luasBangunan: t.luasBangunan,
+			unitTersedia: t.tersedia
+		}
 	};
 }
 
