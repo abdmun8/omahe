@@ -93,18 +93,39 @@ export async function getUnits(fetchFn: Fetch, query: UnitQuery): Promise<Pagina
 			console.error(`[omahe:api] GET ${url} → ${res.status}`);
 			error(502, 'Data sedang tidak bisa dimuat. Coba lagi sebentar lagi.');
 		}
-		const body = (await res.json()) as { data: UnitListing[]; meta: PageMeta };
+		const body = (await res.json()) as { data: RawUnitListing[]; meta: PageMeta };
 		// Trade-off yang disadari: `meta` (termasuk `total`) TIDAK disesuaikan
 		// setelah filter developer — paginasi jadi kurang presisi saat filter
 		// aktif (api-contract.md §1). Perbaikannya butuh facet di backend,
 		// di luar scope ini.
-		const items = developerSlug
-			? body.data.filter((u) => u.developer?.slug === developerSlug)
-			: body.data;
+		const semua = body.data.map(normalisasiUnit);
+		const items = developerSlug ? semua.filter((u) => u.developer?.slug === developerSlug) : semua;
 		return { items, meta: body.meta };
 	}
 
 	return filterFixtureUnits({ ...query, page, pageSize });
+}
+
+/**
+ * Bentuk item MENTAH `GET /public/units`: backend (MONET-01) menaruh
+ * prioritas efektif di level ITEM (`item.prioritas`), BUKAN di
+ * `item.perumahan.prioritas` yang dibaca komponen (badge "Promosi",
+ * gerbang form minat MONET-03, analytics). Ditemukan 2026-09-23 dari laporan
+ * user (prioritas Salihara = 1 tapi badge gold tidak muncul) — fixture
+ * menaruhnya di `perumahan` sehingga selisih kontrak tak terlihat saat dev.
+ */
+type RawUnitListing = Omit<UnitListing, 'perumahan'> & {
+	prioritas?: number;
+	perumahan: Omit<UnitListing['perumahan'], 'prioritas'> & { prioritas?: number };
+};
+
+/** Satukan ke bentuk yang dipakai komponen: `perumahan.prioritas` selalu number. */
+function normalisasiUnit(u: RawUnitListing): UnitListing {
+	const { prioritas, ...rest } = u;
+	return {
+		...rest,
+		perumahan: { ...u.perumahan, prioritas: prioritas ?? u.perumahan.prioritas ?? 0 }
+	};
 }
 
 /** Mirror filter `GET /public/units` di atas fixture — bentuk hasil identik. */

@@ -77,6 +77,37 @@ afterEach(() => {
 });
 
 describe('getUnits (jalur API asli)', () => {
+	test('prioritas di level ITEM (bentuk backend asli) dinormalisasi ke perumahan.prioritas — regresi badge "Promosi"', async () => {
+		// Bentuk respons production 2026-09-23: `prioritas` di item, TIDAK ada
+		// di objek `perumahan`.
+		const mentah = { ...unit('salihara-residence', null, 500000000, 3), prioritas: 1 };
+		const { prioritas: _abaikan, ...perumahanTanpaPrioritas } = mentah.perumahan;
+		const fetchMock = (async () =>
+			envelope([{ ...mentah, perumahan: perumahanTanpaPrioritas }], {
+				total: 1,
+				page: 1,
+				pageSize: 12
+			})) as unknown as typeof fetch;
+
+		const hasil = await getUnits(fetchMock, {});
+		expect(hasil.items[0]?.perumahan.prioritas).toBe(1);
+		expect('prioritas' in (hasil.items[0] ?? {})).toBe(false);
+	});
+
+	test('item tanpa prioritas sama sekali → perumahan.prioritas 0', async () => {
+		const mentah = unit('royal-bamnboe-residence', null, 867000000, 1);
+		const { prioritas: _abaikan, ...perumahanTanpaPrioritas } = mentah.perumahan;
+		const fetchMock = (async () =>
+			envelope([{ ...mentah, perumahan: perumahanTanpaPrioritas }], {
+				total: 1,
+				page: 1,
+				pageSize: 12
+			})) as unknown as typeof fetch;
+
+		const hasil = await getUnits(fetchMock, {});
+		expect(hasil.items[0]?.perumahan.prioritas).toBe(0);
+	});
+
 	test('developerSlug TIDAK dikirim ke backend — filter jalan client-side, meta diteruskan apa adanya', async () => {
 		const dipanggil: string[] = [];
 		const fetchMock = (async (input: RequestInfo | URL) => {

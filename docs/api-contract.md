@@ -394,3 +394,11 @@ Omahe diawali `/` seperti `/kpr` (tab sama, `?ref=` ditempel lewat
 `withRef()`). Path `//…` diperlakukan eksternal. Urutan: slide Omahe
 memakai prioritas manual superadmin, slide perumahan prioritas efektif
 MONET-01; maksimal 10 slide.
+
+**Koreksi 2026-09-23 (MONET-01 di `GET /public/units`)**: backend mengirim
+prioritas efektif di level ITEM (`item.prioritas`), bukan
+`item.perumahan.prioritas` seperti tertulis/diasumsikan sebelumnya. Omahe
+menormalisasinya di `getUnits` (`normalisasiUnit` → `perumahan.prioritas`)
+supaya badge "Promosi", gerbang form minat MONET-03, dan analytics kartu
+berfungsi. Sebelum koreksi ini badge tidak pernah tampil di production
+(fixture menaruh `prioritas` di `perumahan`, jadi tak terlihat saat dev).
