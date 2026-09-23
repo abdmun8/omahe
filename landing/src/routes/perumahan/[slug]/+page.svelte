@@ -9,7 +9,13 @@
 	import { SITE } from '$lib/config';
 	import { amankanJsonLd } from '$lib/jsonld';
 	import { ajukanUrl, withRef } from '$lib/ref';
-	import { formatAngka, formatRentangHarga, formatRupiah, formatRupiahPenuh } from '$lib/utils';
+	import {
+		formatAngka,
+		formatLokasi,
+		formatRentangHarga,
+		formatRupiah,
+		formatRupiahPenuh
+	} from '$lib/utils';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -26,6 +32,8 @@
 	);
 	const totalUnit = $derived(data.tipeUnit.reduce((sum, u) => sum + u.unitTersedia, 0));
 	const fotoUtama = $derived(p.photos.find((f) => f.url !== null)?.url ?? null);
+	/** LOKASI-01 — "alamat, Kec. X, Kabupaten Y, Provinsi Z" (null = kosong). */
+	const lokasi = $derived(formatLokasi(p));
 
 	const urlHalaman = $derived(`${SITE.url}/perumahan/${p.slug}`);
 
@@ -52,7 +60,7 @@
 			url: urlHalaman,
 			...(p.deskripsi ? { description: p.deskripsi } : {}),
 			...(fotoUtama ? { image: fotoUtama } : {}),
-			...(p.regionNama ? { address: p.regionNama } : {}),
+			...(lokasi ? { address: lokasi } : {}),
 			...(hargaMulai !== null
 				? {
 						offers: {
@@ -159,6 +167,9 @@
 					>
 				</p>
 			{/if}
+			{#if lokasi}
+				<p class="text-muted mt-1 text-sm">{lokasi}</p>
+			{/if}
 			<p class="text-muted mt-1 text-xs">Harga mulai</p>
 			<p
 				class="font-display text-primary text-2xl font-extrabold"
@@ -242,11 +253,30 @@
 			{:else}
 				<ul class="mt-4 grid gap-3 sm:grid-cols-2">
 					{#each data.tipeUnit as unit (unit.id)}
+						<!-- UNIT-05 — cover khusus tipe (fallback tanpa foto) + link ke
+						     halaman detail tipe kalau backend sudah mengirim tipeSlug. -->
+						{@const hrefTipe = unit.tipeSlug
+							? withRef(`/perumahan/${p.slug}/tipe/${unit.tipeSlug}`, data.ref)
+							: null}
 						<li
 							class="border-line flex items-center justify-between gap-4 rounded-xl border bg-white p-4"
 						>
-							<div class="min-w-0">
-								<Badge variant="accent">{unit.tipe}</Badge>
+							{#if unit.fotoTipeUrl}
+								<img
+									src={unit.fotoTipeUrl}
+									alt="Foto {unit.tipe}"
+									loading="lazy"
+									class="h-20 w-20 shrink-0 rounded-lg object-cover"
+								/>
+							{/if}
+							<div class="min-w-0 flex-1">
+								{#if hrefTipe}
+									<a href={hrefTipe} class="hover:opacity-80"
+										><Badge variant="accent">{unit.tipe}</Badge></a
+									>
+								{:else}
+									<Badge variant="accent">{unit.tipe}</Badge>
+								{/if}
 								<p
 									class="font-display text-primary mt-2 text-lg font-extrabold"
 									title={formatRupiahPenuh(unit.hargaMin)}
@@ -261,6 +291,22 @@
 									{#if unit.luasBangunan !== null}LB {formatAngka(unit.luasBangunan)} m²{/if}
 									· {formatAngka(unit.unitTersedia)} unit
 								</p>
+								{#if unit.kamarTidur != null || unit.kamarMandi != null}
+									<p class="text-muted mt-0.5 text-xs">
+										{#if unit.kamarTidur != null}{formatAngka(unit.kamarTidur)} KT{/if}
+										{#if unit.kamarTidur != null && unit.kamarMandi != null}
+											·
+										{/if}
+										{#if unit.kamarMandi != null}{formatAngka(unit.kamarMandi)} KM{/if}
+									</p>
+								{/if}
+								{#if hrefTipe}
+									<a
+										href={hrefTipe}
+										class="text-primary mt-1 inline-block text-xs font-semibold hover:underline"
+										>Lihat detail & spesifikasi →</a
+									>
+								{/if}
 							</div>
 							<Button variant="outline" href={ajukanUrl(p.slug, data.ref)} class="shrink-0">
 								Ajukan

@@ -22,7 +22,18 @@
 		source = 'search'
 	}: { unit: UnitListing; ref?: string | null; source?: string } = $props();
 
-	const hrefDetail = $derived(withRef(`/perumahan/${unit.perumahan.slug}#tipe-unit`, ref));
+	// UNIT-05 — kartu langsung ke halaman detail tipe kalau backend sudah
+	// mengirim `tipeSlug`; backend lama → anchor daftar tipe di perumahan.
+	const hrefDetail = $derived(
+		withRef(
+			unit.tipeSlug
+				? `/perumahan/${unit.perumahan.slug}/tipe/${unit.tipeSlug}`
+				: `/perumahan/${unit.perumahan.slug}#tipe-unit`,
+			ref
+		)
+	);
+	/** Cover khusus tipe (UNIT-05) lebih relevan dari foto perumahan. */
+	const fotoKartu = $derived(unit.fotoTipeUrl ?? unit.fotoUrl);
 	const hargaRingkas = $derived(formatRentangHarga(unit.hargaMin, unit.hargaMax));
 	const hargaPenuh = $derived(
 		unit.hargaMin === null ? 'Harga belum tersedia' : formatRupiahPenuh(unit.hargaMin)
@@ -57,10 +68,10 @@
 	class="border-line flex min-w-0 gap-3 rounded-xl border bg-white p-3 transition-shadow hover:shadow-md sm:flex-col sm:gap-0 sm:overflow-hidden sm:p-0"
 >
 	<div class="relative h-28 w-28 shrink-0 sm:h-44 sm:w-full">
-		{#if unit.fotoUrl}
+		{#if fotoKartu}
 			<img
-				src={unit.fotoUrl}
-				alt="Foto {unit.perumahan.nama}"
+				src={fotoKartu}
+				alt="Foto {unit.tipe} di {unit.perumahan.nama}"
 				loading="lazy"
 				class="h-full w-full rounded-lg object-cover sm:rounded-none"
 			/>
@@ -108,6 +119,18 @@
 				<div class="flex gap-1">
 					<dt>LB</dt>
 					<dd class="text-ink font-medium">{formatAngka(unit.luasBangunan)} m²</dd>
+				</div>
+			{/if}
+			{#if unit.kamarTidur != null}
+				<div class="flex gap-1">
+					<dt>KT</dt>
+					<dd class="text-ink font-medium">{formatAngka(unit.kamarTidur)}</dd>
+				</div>
+			{/if}
+			{#if unit.kamarMandi != null}
+				<div class="flex gap-1">
+					<dt>KM</dt>
+					<dd class="text-ink font-medium">{formatAngka(unit.kamarMandi)}</dd>
 				</div>
 			{/if}
 			<div class="flex gap-1">

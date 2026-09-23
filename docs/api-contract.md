@@ -323,3 +323,38 @@ Fail-soft per field ke `SITE.*` (`src/lib/config.ts`) — timeout 1,5 detik,
 cache in-memory 60 detik. `/kontak` tidak di-prerender lagi (SSR +
 `s-maxage=300`); halaman legal tetap prerender (email = nilai saat build).
 `appTitle` TIDAK dipakai Omahe (itu judul aplikasi admin).
+
+## 11. Detail tipe rumah & lokasi lengkap (UNIT-05 + LOKASI-01, `done` 2026-09-23, BARU)
+
+**Endpoint baru** `GET /public/perumahan/:slug/tipe/:tipeSlug` (tanpa auth,
+TIDAK ikut skip-resolve LANDING-05). 404 seragam kalau perumahan nonaktif
+atau tipe tidak dikenal; tipe tanpa unit tersedia tetap 200
+(`unitTersedia: 0`, `hargaMin/Max: null`).
+
+```json
+{ "success": true, "data": {
+  "perumahan": { "nama": "…", "slug": "…", "regionNama": "Kabupaten Bogor",
+    "provinsiNama": "Jawa Barat", "kecamatanNama": "Cibinong", "alamat": "Jl. …",
+    "developer": { "nama": "…", "slug": "…" } },
+  "tipe": { "nama": "Tipe 36/72", "slug": "tipe-36-72", "deskripsi": "## Desain\n…",
+    "kamarTidur": 2, "kamarMandi": 1, "carport": 1,
+    "photos": [{ "key": "…", "url": "https://…presigned" }],
+    "hargaMin": 450000000, "hargaMax": 470000000, "luasTanah": 72, "luasBangunan": 36,
+    "unitTersedia": 2 }
+} }
+```
+
+`deskripsi` = Markdown MENTAH tulisan admin tenant → Omahe WAJIB render lewat
+`landing/src/lib/markdown.ts` (salinan subset aman admin, escape HTML), BUKAN
+`marked`. `slug` tipe = `slugifyTipe(nama)` (lowercase, non-alfanumerik → `-`).
+
+**Field tambahan (additive)**:
+- Item `GET /public/units`: `tipeSlug`, `fotoTipeUrl` (cover galeri tipe,
+  null → pakai `fotoUrl`), `kamarTidur`, `kamarMandi`, `carport`; objek
+  `perumahan` di item: `provinsiNama`, `kecamatanNama`, `alamat`.
+- `GET /public/perumahan/:slug`: `provinsiNama`, `kecamatanNama`, `alamat`
+  (null di jalur skip-resolve tanpa `?full=1`).
+
+Omahe: route `/perumahan/[slug]/tipe/[tipeSlug]`; kartu `/cari` & daftar tipe
+di `/perumahan/:slug` link ke sana (fallback `#tipe-unit` kalau `tipeSlug`
+belum dikirim backend lama). Lokasi ditampilkan via `formatLokasi()`.

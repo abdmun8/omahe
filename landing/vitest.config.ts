@@ -35,7 +35,10 @@ export default defineConfig({
 			// manual di sini supaya specifier di file tes identik dengan yang
 			// dipakai komponen (jangan pakai path relatif menembus direktori).
 			$lib: fileURLToPath(new URL('./src/lib', import.meta.url)),
-			$components: fileURLToPath(new URL('./src/lib/components', import.meta.url))
+			$components: fileURLToPath(new URL('./src/lib/components', import.meta.url)),
+			// ADMIN-05 — komponen kontak membaca `page` dari `$app/state`
+			// (disediakan plugin sveltekit di app); di tes diganti stub.
+			'$app/state': fileURLToPath(new URL('./src/lib/test/app-state-mock.ts', import.meta.url))
 		}
 	},
 	test: {
