@@ -366,3 +366,21 @@ atau tipe tidak dikenal; tipe tanpa unit tersedia tetap 200
 Omahe: route `/perumahan/[slug]/tipe/[tipeSlug]`; kartu `/cari` & daftar tipe
 di `/perumahan/:slug` link ke sana (fallback `#tipe-unit` kalau `tipeSlug`
 belum dikirim backend lama). Lokasi ditampilkan via `formatLokasi()`.
+
+## 12. Peta lokasi dari data perumahan (LOKASI-03, `done` 2026-09-23, BARU)
+
+Field additive `mapsEmbedUrl` (embed Google Maps, divalidasi backend:
+`https://www.google.com/maps/embed…`) dan `directionsUrl` (http/https) di
+`GET /public/perumahan/:slug` (null di jalur skip-resolve) dan di objek
+`perumahan` endpoint detail tipe. Diisi admin SEKALI di kartu Lokasi
+Perumahan.
+
+Section builder `location`: `props.address` kini OPSIONAL. Saat resolve
+publik, field kosong diisi server dari data (alamat terformat, peta, arah);
+field yang diisi di builder tetap menang; section yang tetap tanpa alamat &
+peta tidak dikirim.
+
+Omahe: komponen `peta-lokasi.svelte` (iframe hanya untuk URL lolos
+`isMapsEmbedUrl`). Di `/perumahan/:slug` peta dari data tampil HANYA kalau
+tidak ada section `location` (anti peta ganda); halaman tipe selalu
+menampilkannya kalau ada.
