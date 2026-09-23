@@ -214,6 +214,10 @@ const developerRef = (slug: string | null) => {
 	return d ? { nama: d.nama, slug: d.slug } : null;
 };
 
+/** LOKASI-03 — URL embed contoh (format Share → Embed a map Google Maps). */
+const PETA_CONTOH =
+	'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d31660.0!2d112.72!3d-7.36!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sid!2sid!4v1700000000000';
+
 /** Slug tipe — cermin `slugifyTipe` backend (UNIT-05). */
 export const slugTipe = (tipe: string) =>
 	tipe
@@ -298,6 +302,9 @@ export function perumahanDetail(slug: string): PerumahanDetail | null {
 		provinsiNama: null,
 		kecamatanNama: p.kecamatanNama ?? null,
 		alamat: p.alamat,
+		// LOKASI-03 — peta contoh hanya untuk satu proyek mode legacy.
+		mapsEmbedUrl: p.slug === 'sentosa-park-sidoarjo' ? PETA_CONTOH : null,
+		directionsUrl: null,
 		// MONET-01 — cermin prioritas proyek (Griya Asri Bogor = 50) supaya
 		// gate LeadFormDialog terlihat saat dev pakai fixture.
 		prioritas: p.prioritas,
@@ -373,7 +380,9 @@ export function tipeDetail(perumahanSlug: string, tipeSlug: string): TipeDetail 
 			provinsiNama: null,
 			kecamatanNama: p.kecamatanNama ?? null,
 			alamat: p.alamat,
-			developer: developerRef(p.developerSlug)
+			developer: developerRef(p.developerSlug),
+			mapsEmbedUrl: p.slug === 'sentosa-park-sidoarjo' ? PETA_CONTOH : null,
+			directionsUrl: null
 		},
 		tipe: {
 			nama: t.tipe,

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { formatLokasi, formatNomorTampil, telUrl, waUrl } from './utils';
+import { formatLokasi, formatNomorTampil, isHttpUrl, isMapsEmbedUrl, telUrl, waUrl } from './utils';
 
 describe('formatNomorTampil (ADMIN-05)', () => {
 	test('62xxx dari API jadi 0xxx berkelompok 4 digit', () => {
@@ -40,5 +40,22 @@ describe('formatLokasi (LOKASI-01)', () => {
 
 	test('semua kosong → null', () => {
 		expect(formatLokasi({ alamat: '  ', regionNama: null })).toBeNull();
+	});
+});
+
+describe('isMapsEmbedUrl / isHttpUrl (LOKASI-03)', () => {
+	test('hanya embed Google Maps https', () => {
+		expect(isMapsEmbedUrl('https://www.google.com/maps/embed?pb=!1m18')).toBe(true);
+		expect(isMapsEmbedUrl('https://www.google.com/maps/embed/v1/place?q=x')).toBe(true);
+		expect(isMapsEmbedUrl('http://www.google.com/maps/embed?pb=1')).toBe(false);
+		expect(isMapsEmbedUrl('https://www.google.com/maps/embed.evil.com')).toBe(false);
+		expect(isMapsEmbedUrl('https://evil.com/maps/embed')).toBe(false);
+		expect(isMapsEmbedUrl('javascript:alert(1)')).toBe(false);
+		expect(isMapsEmbedUrl(null)).toBe(false);
+	});
+
+	test('petunjuk arah hanya http(s)', () => {
+		expect(isHttpUrl('https://maps.app.goo.gl/abc')).toBe(true);
+		expect(isHttpUrl('javascript:alert(1)')).toBe(false);
 	});
 });

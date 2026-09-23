@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
+	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import StickyCta from '$lib/components/sticky-cta.svelte';
 	import Badge from '$lib/components/ui/badge.svelte';
@@ -237,6 +238,17 @@
 			</p>
 		{/if}
 	</section>
+
+	<!-- LOKASI-03 — peta dari data perumahan (tidak ada builder di halaman ini). -->
+	{#if p.mapsEmbedUrl}
+		<div class="mt-10 max-w-3xl">
+			<PetaLokasi
+				address={lokasi}
+				mapsEmbedUrl={p.mapsEmbedUrl}
+				directionsUrl={p.directionsUrl ?? null}
+			/>
+		</div>
+	{/if}
 
 	<div class="mt-10">
 		<a

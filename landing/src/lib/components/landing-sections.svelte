@@ -12,6 +12,7 @@
 	- Target CTA selalu `/ajukan/:slug` lewat `ajukanUrl()` (bawa `?ref=`).
 -->
 <script lang="ts">
+	import PetaLokasi from './peta-lokasi.svelte';
 	import type { LandingSection } from '$lib/api/types';
 	import { trackCtaAjukan } from '$lib/analytics';
 	import { ajukanUrl } from '$lib/ref';
@@ -155,31 +156,13 @@
 			</ul>
 		</section>
 	{:else if section.type === 'location'}
-		<section>
-			<h2 class="font-display text-ink text-xl font-bold">{section.props.heading ?? 'Lokasi'}</h2>
-			<p class="text-muted mt-2 text-sm">{section.props.address}</p>
-			{#if section.props.mapsEmbedUrl}
-				<!-- Host sudah divalidasi `www.google.com` di backend (LANDING-02). -->
-				<iframe
-					src={section.props.mapsEmbedUrl}
-					title="Peta lokasi"
-					loading="lazy"
-					referrerpolicy="no-referrer-when-downgrade"
-					class="border-line mt-3 h-64 w-full rounded-lg border"
-				></iframe>
-			{/if}
-			{#if section.props.directionsUrl}
-				<Button
-					variant="outline"
-					class="mt-3"
-					href={section.props.directionsUrl}
-					target="_blank"
-					rel="noopener nofollow"
-				>
-					Buka Petunjuk Arah
-				</Button>
-			{/if}
-		</section>
+		<!-- LOKASI-03 — field kosong sudah diisi server dari data perumahan. -->
+		<PetaLokasi
+			heading={section.props.heading ?? 'Lokasi'}
+			address={section.props.address ?? null}
+			mapsEmbedUrl={section.props.mapsEmbedUrl ?? null}
+			directionsUrl={section.props.directionsUrl ?? null}
+		/>
 	{:else if section.type === 'testimonials'}
 		<section>
 			<h2 class="font-display text-ink text-xl font-bold">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import LandingSections from '$lib/components/landing-sections.svelte';
 	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
+	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import StickyCta from '$lib/components/sticky-cta.svelte';
 	import Badge from '$lib/components/ui/badge.svelte';
@@ -34,6 +35,13 @@
 	const fotoUtama = $derived(p.photos.find((f) => f.url !== null)?.url ?? null);
 	/** LOKASI-01 — "alamat, Kec. X, Kabupaten Y, Provinsi Z" (null = kosong). */
 	const lokasi = $derived(formatLokasi(p));
+	/**
+	 * LOKASI-03 — peta dari DATA perumahan tampil HANYA kalau builder tidak
+	 * punya section Lokasi (section itu sudah diisi server dari data yang
+	 * sama) — anti peta ganda, pola sama hero.
+	 */
+	const punyaSectionLokasi = $derived(p.sections?.some((s) => s.type === 'location') ?? false);
+	const tampilPetaData = $derived(!punyaSectionLokasi && !!p.mapsEmbedUrl);
 
 	const urlHalaman = $derived(`${SITE.url}/perumahan/${p.slug}`);
 
@@ -233,6 +241,14 @@
 					</div>
 				</section>
 			{/if}
+		{/if}
+
+		{#if tampilPetaData}
+			<PetaLokasi
+				address={lokasi}
+				mapsEmbedUrl={p.mapsEmbedUrl}
+				directionsUrl={p.directionsUrl ?? null}
+			/>
 		{/if}
 
 		<!--

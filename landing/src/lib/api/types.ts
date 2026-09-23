@@ -203,6 +203,9 @@ export interface PerumahanDetail {
 	provinsiNama?: string | null;
 	kecamatanNama?: string | null;
 	alamat?: string | null;
+	/** LOKASI-03 — peta dari DATA perumahan (embed Google Maps) — optional. */
+	mapsEmbedUrl?: string | null;
+	directionsUrl?: string | null;
 	/**
 	 * Prioritas promosi (MONET-01, api-contract.md §4 tambahan 2026-09-18) —
 	 * int >= 0, `0` = gratis. Dipakai men-gate LeadFormDialog (MONET-03):
@@ -227,6 +230,9 @@ export interface TipeDetail {
 		kecamatanNama: string | null;
 		alamat: string | null;
 		developer: DeveloperRef | null;
+		/** LOKASI-03 — optional (backend lama tidak mengirim). */
+		mapsEmbedUrl?: string | null;
+		directionsUrl?: string | null;
 	};
 	tipe: {
 		nama: string;
@@ -293,7 +299,8 @@ export interface FacilitiesProps {
 
 export interface LocationProps {
 	heading?: string;
-	address: string;
+	/** LOKASI-03 — opsional di builder; server mengisi dari data perumahan. */
+	address?: string;
 	/** Sudah divalidasi host `www.google.com` di server. */
 	mapsEmbedUrl?: string;
 	directionsUrl?: string;

@@ -105,3 +105,34 @@ export function formatLokasi(lokasi: BagianLokasi): string | null {
 	].filter((b): b is string => !!b);
 	return bagian.length > 0 ? bagian.join(', ') : null;
 }
+
+/**
+ * LOKASI-03 — defense-in-depth untuk URL peta dari data tenant sebelum
+ * dijadikan `<iframe src>`: backend sudah memvalidasi (host persis
+ * `www.google.com`, path `/maps/embed…`), tapi Omahe tidak menyerahkan
+ * iframe ke nilai yang tidak lolos aturan yang sama.
+ */
+export function isMapsEmbedUrl(url: string | null | undefined): url is string {
+	if (!url) return false;
+	try {
+		const u = new URL(url);
+		return (
+			u.protocol === 'https:' &&
+			u.hostname === 'www.google.com' &&
+			(u.pathname === '/maps/embed' || u.pathname.startsWith('/maps/embed/'))
+		);
+	} catch {
+		return false;
+	}
+}
+
+/** LOKASI-03 — link petunjuk arah hanya http(s) (bukan javascript: dll). */
+export function isHttpUrl(url: string | null | undefined): url is string {
+	if (!url) return false;
+	try {
+		const u = new URL(url);
+		return u.protocol === 'https:' || u.protocol === 'http:';
+	} catch {
+		return false;
+	}
+}
