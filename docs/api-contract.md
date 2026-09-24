@@ -438,3 +438,19 @@ Backend menjamin salah satunya terisi. `judul` null = slide gambar saja (teks
 sudah di dalam gambar): Omahe TIDAK merender teks/scrim penuh (hanya gradasi
 tipis di bawah untuk titik indikator); `alt` = `altText ?? judul`; label
 aksesibel & analytics memakai `judul ?? altText`.
+
+## 17. Atribut pemasaran & gate lead per instance (PEMASARAN-01, `done` 2026-09-24, BARU)
+
+Additive — Omahe belum wajib memakainya:
+
+- Field baru di item `GET /public/perumahan` dan di `GET
+  /public/perumahan/:slug`: `kategori` (`komersil`|`subsidi`|null),
+  `statusPemasaran` (`pra_launch`|`pembangunan`|`tersedia`|`siap_huni`|
+  `sold_out`|null), `badge` (string|null, ≤40), `highlights` (string[], ≤5).
+  Diisi admin perumahan di Profil → kartu "Info Pemasaran".
+- Filter baru `GET /public/perumahan?kategori=komersil|subsidi`.
+- `POST /public/leads`: gate partner berbayar (MONET-03) kini bisa
+  dimatikan per instance backend (env `LEAD_BUTUH_PRIORITAS=false`, dipakai
+  instance klien terpisah seperti Widya Pratama). Instance Omahe tetap
+  default (`true`). **Perbaikan**: panjang maks `ref` kini 64 (dulu 50 →
+  lead Omahe yang membawa `?ref=` QR asli, 64 hex, ditolak 400).
