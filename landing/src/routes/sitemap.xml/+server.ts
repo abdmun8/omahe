@@ -1,4 +1,4 @@
-import { getAllProjectSlugs, getDevelopers, getPromoList } from '$lib/api';
+import { getAllUnitListings, getDevelopers, getPromoList } from '$lib/api';
 import { artikelTayang } from '$lib/artikel';
 import { SITE } from '$lib/config';
 import { bacaArtikel, hariIniWib } from '$lib/server/artikel';
@@ -17,8 +17,8 @@ const STATIS = [
 ];
 
 export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
-	const [slugProyek, developers, artikel, promo] = await Promise.all([
-		getAllProjectSlugs(fetch),
+	const [unit, developers, artikel, promo] = await Promise.all([
+		getAllUnitListings(fetch),
 		getDevelopers(fetch),
 		// Artikel dihitung sinkron dari konten repo — bukan fetch API.
 		Promise.resolve(artikelTayang(bacaArtikel(), hariIniWib())),
@@ -32,6 +32,17 @@ export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
 	// Datetime) sesuai spec sitemaps.org.
 	const lastmod = new Date().toISOString();
 
+	const slugProyek = [...new Set(unit.map((u) => u.perumahan.slug))];
+	// UNIT-05 — halaman detail tipe rumah (hanya tipe dengan unit tersedia;
+	// item tanpa `tipeSlug` = backend lama, dilewati).
+	const urlTipe = [
+		...new Set(
+			unit
+				.filter((u) => u.tipeSlug)
+				.map((u) => `${SITE.url}/perumahan/${u.perumahan.slug}/tipe/${u.tipeSlug}`)
+		)
+	];
+
 	// ARTIKEL PUNYA TANGGAL NYATA dari frontmatter — dipakai per-URL,
 	// beda dari halaman API di bawah. Hanya yang sudah tayang.
 	const urlArtikel = artikel.map((a) => ({
@@ -44,7 +55,8 @@ export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
 		...urlArtikel,
 		...promo.map((p) => ({ loc: `${SITE.url}/promo/${p.slug}`, lastmod })),
 		...developers.map((d) => ({ loc: `${SITE.url}/developer/${d.slug}`, lastmod })),
-		...slugProyek.map((slug) => ({ loc: `${SITE.url}/perumahan/${slug}`, lastmod }))
+		...slugProyek.map((slug) => ({ loc: `${SITE.url}/perumahan/${slug}`, lastmod })),
+		...urlTipe.map((loc) => ({ loc, lastmod }))
 	];
 
 	setHeaders({

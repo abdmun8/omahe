@@ -293,9 +293,27 @@ export async function getRegions(fetchFn: Fetch): Promise<RegionOption[]> {
 }
 
 /** Dipakai `/sitemap.xml` — daftar slug proyek untuk halaman detail. */
+/**
+ * Semua grup unit tersedia (untuk sitemap). Menelusuri SEMUA halaman
+ * `/public/units` — dulu hanya halaman 1 (48 grup), sehingga perumahan di
+ * luar 48 grup pertama hilang diam-diam dari sitemap. Dibatasi
+ * `MAX_HALAMAN` sebagai pengaman.
+ */
+export async function getAllUnitListings(fetchFn: Fetch): Promise<UnitListing[]> {
+	if (!hasSearchApi()) return fixtures.UNIT_LISTINGS;
+	const MAX_HALAMAN = 20;
+	const semua: UnitListing[] = [];
+	for (let page = 1; page <= MAX_HALAMAN; page++) {
+		const { items, meta } = await getUnits(fetchFn, { pageSize: 48, page });
+		semua.push(...items);
+		if (items.length === 0 || page * meta.pageSize >= meta.total) break;
+	}
+	return semua;
+}
+
 export async function getAllProjectSlugs(fetchFn: Fetch): Promise<string[]> {
 	if (hasSearchApi()) {
-		const { items } = await getUnits(fetchFn, { pageSize: 48, page: 1 });
+		const items = await getAllUnitListings(fetchFn);
 		return [...new Set(items.map((u) => u.perumahan.slug))];
 	}
 	return fixtures.projectSlugs();
