@@ -506,6 +506,18 @@ export const SLIDERS: PublicSlider[] = [
 		linkUrl: '/kpr',
 		perumahan: null,
 		prioritas: 0
+	},
+	{
+		// MONET-06 — slide gambar saja: teks sudah di dalam gambar, judul null,
+		// deskripsi gambar untuk pembaca layar.
+		id: '00000000-0000-4000-8000-000000000105',
+		judul: null,
+		altText: 'Brosur promo Omahe: DP ringan untuk rumah pertama',
+		subjudul: null,
+		gambarUrl: 'https://picsum.photos/seed/omahe-brosur/1600/900',
+		linkUrl: '/promo',
+		perumahan: null,
+		prioritas: 100
 	}
 ];
 

@@ -116,6 +116,19 @@ describe.skipIf(typeof document === 'undefined')('SliderCarousel', () => {
 		expect(tautan?.getAttribute('target')).toBeNull();
 	});
 
+	test('MONET-06: slide tanpa judul → tanpa teks overlay, alt = deskripsi gambar', () => {
+		const { container } = render(SliderCarousel, {
+			sliders: [
+				buatSlider({ judul: null, altText: 'Brosur promo DP 0%', subjudul: 'tidak tampil' })
+			],
+			ref: null
+		});
+
+		expect(container.querySelector('img')?.getAttribute('alt')).toBe('Brosur promo DP 0%');
+		expect(container.textContent).not.toContain('tidak tampil');
+		expect(container.querySelector('p.font-display')).toBeNull();
+	});
+
 	test('MONET-04: slide Omahe (perumahan null) link internal /kpr → tab sama + ?ref=', () => {
 		const { container } = render(SliderCarousel, {
 			sliders: [buatSlider({ linkUrl: '/kpr', perumahan: null })],

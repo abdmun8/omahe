@@ -430,3 +430,11 @@ fail-soft per field ke `SITE.tagline`/`SITE.heroJudul`/`SITE.heroSubjudul`
 di `config.ts`) → `page.data.teks`. Dipakai hero homepage, meta og, footer,
 JSON-LD `slogan`. Halaman prerender (Tentang, RSS) tetap memakai `SITE`
 (nilai saat build).
+
+## 16. Slide tanpa judul di `GET /public/sliders` (MONET-06, `done` 2026-09-24)
+
+`judul` kini `string | null` dan ada field baru `altText` (deskripsi gambar).
+Backend menjamin salah satunya terisi. `judul` null = slide gambar saja (teks
+sudah di dalam gambar): Omahe TIDAK merender teks/scrim penuh (hanya gradasi
+tipis di bawah untuk titik indikator); `alt` = `altText ?? judul`; label
+aksesibel & analytics memakai `judul ?? altText`.

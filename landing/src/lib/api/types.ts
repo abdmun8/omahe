@@ -421,7 +421,10 @@ export interface PublicMitra {
  */
 export interface PublicSlider {
 	id: string;
-	judul: string;
+	/** MONET-06 — null = slide gambar saja (teks sudah di dalam gambar). */
+	judul: string | null;
+	/** MONET-06 — deskripsi gambar (alt); selalu ada kalau `judul` null. */
+	altText?: string | null;
 	subjudul: string | null;
 	/**
 	 * SELALU string — item yang gagal presign gambarnya di-skip di server

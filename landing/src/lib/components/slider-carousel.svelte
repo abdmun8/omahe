@@ -46,7 +46,7 @@
 		if (!slider) return;
 		trackEvent('slider_view', {
 			perumahan: slider.perumahan?.nama ?? 'Omahe',
-			judul: slider.judul,
+			judul: teksSlide(slider),
 			posisi: aktif + 1
 		});
 	});
@@ -147,6 +147,14 @@
 		};
 	}
 
+	/**
+	 * MONET-06 — teks aksesibel slide: judul, atau deskripsi gambar untuk
+	 * slide tanpa judul (teks sudah di dalam gambar).
+	 */
+	function teksSlide(slider: PublicSlider): string {
+		return slider.judul ?? slider.altText ?? 'Slide promo';
+	}
+
 	/** Path internal Omahe: diawali `/` tapi bukan `//` (protocol-relative). */
 	function linkInternal(url: string | null): url is string {
 		return !!url && url.startsWith('/') && !url.startsWith('//');
@@ -163,7 +171,7 @@
 	function lacakKlikSlide(slider: PublicSlider) {
 		trackEvent('slider_click', {
 			perumahan: slider.perumahan?.nama ?? 'Omahe',
-			judul: slider.judul,
+			judul: teksSlide(slider),
 			link: linkEksternal(slider) ? 'eksternal' : 'internal'
 		});
 	}
@@ -202,30 +210,40 @@
 						>
 							<img
 								src={slider.gambarUrl}
-								alt={slider.judul}
+								alt={slider.altText ?? slider.judul ?? teksSlide(slider)}
 								loading={i === 0 ? 'eager' : 'lazy'}
 								fetchpriority={i === 0 ? 'high' : undefined}
 								class="h-[180px] w-full object-cover sm:h-[220px] md:h-[280px] lg:h-[320px]"
 							/>
-							<!-- Scrim gradien bawah: jaga kontras teks AA di atas gambar apa pun. -->
-							<div
-								class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent"
-								aria-hidden="true"
-							></div>
-							<div class="absolute inset-x-0 bottom-0 p-4 pb-8 sm:p-6 sm:pb-9">
-								<p
-									class="font-display flex items-center gap-1.5 text-lg font-extrabold text-white sm:text-2xl"
-								>
-									{slider.judul}
-									{#if linkEksternal(slider)}
-										<!-- Penanda link eksternal — ikon dekoratif, judul sudah cukup. -->
-										<ArrowUpRight class="h-4 w-4 shrink-0 sm:h-6 sm:w-6" aria-hidden="true" />
+							{#if slider.judul}
+								<!-- Scrim gradien bawah: jaga kontras teks AA di atas gambar apa pun. -->
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent"
+									aria-hidden="true"
+								></div>
+								<div class="absolute inset-x-0 bottom-0 p-4 pb-8 sm:p-6 sm:pb-9">
+									<p
+										class="font-display flex items-center gap-1.5 text-lg font-extrabold text-white sm:text-2xl"
+									>
+										{slider.judul}
+										{#if linkEksternal(slider)}
+											<!-- Penanda link eksternal — ikon dekoratif, judul sudah cukup. -->
+											<ArrowUpRight class="h-4 w-4 shrink-0 sm:h-6 sm:w-6" aria-hidden="true" />
+										{/if}
+									</p>
+									{#if slider.subjudul}
+										<p class="mt-1 text-xs text-white/90 sm:text-sm">{slider.subjudul}</p>
 									{/if}
-								</p>
-								{#if slider.subjudul}
-									<p class="mt-1 text-xs text-white/90 sm:text-sm">{slider.subjudul}</p>
-								{/if}
-							</div>
+								</div>
+							{:else}
+								<!-- MONET-06 — slide gambar saja: tanpa teks & tanpa scrim penuh;
+								     gradasi tipis di tepi bawah hanya supaya titik indikator
+								     tetap terlihat di atas gambar terang. -->
+								<div
+									class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/35 to-transparent"
+									aria-hidden="true"
+								></div>
+							{/if}
 						</a>
 					</div>
 				{/each}
@@ -259,7 +277,7 @@
 						class={`h-1.5 rounded-full transition-all ${
 							i === aktif ? 'w-5 bg-white' : 'w-1.5 bg-white/60 hover:bg-white/80'
 						}`}
-						aria-label="Ke slide {i + 1}: {slider.judul}"
+						aria-label="Ke slide {i + 1}: {teksSlide(slider)}"
 						aria-current={i === aktif ? 'true' : undefined}
 						onclick={() => keSlide(i)}
 					></button>
@@ -268,7 +286,7 @@
 
 			<!-- Pengumuman slide aktif untuk screen reader (visual: sr-only). -->
 			<p class="sr-only" aria-live="polite">
-				Slide {aktif + 1} dari {sliders.length}: {sliders[aktif]?.judul}
+				Slide {aktif + 1} dari {sliders.length}: {sliders[aktif] ? teksSlide(sliders[aktif]) : ''}
 			</p>
 		{/if}
 	</div>
