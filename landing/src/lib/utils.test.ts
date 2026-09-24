@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test';
-import { formatLokasi, formatNomorTampil, isHttpUrl, isMapsEmbedUrl, telUrl, waUrl } from './utils';
+import {
+	formatLokasi,
+	formatNomorTampil,
+	formatPeriodePromo,
+	isHttpUrl,
+	isMapsEmbedUrl,
+	telUrl,
+	waUrl
+} from './utils';
 
 describe('formatNomorTampil (ADMIN-05)', () => {
 	test('62xxx dari API jadi 0xxx berkelompok 4 digit', () => {
@@ -57,5 +65,15 @@ describe('isMapsEmbedUrl / isHttpUrl (LOKASI-03)', () => {
 	test('petunjuk arah hanya http(s)', () => {
 		expect(isHttpUrl('https://maps.app.goo.gl/abc')).toBe(true);
 		expect(isHttpUrl('javascript:alert(1)')).toBe(false);
+	});
+});
+
+describe('formatPeriodePromo (PROMO-02)', () => {
+	test('dengan dan tanpa tanggal berakhir, zona WIB', () => {
+		// 31 Okt 16:59:59 UTC = 31 Okt 23:59:59 WIB — tetap "31 Okt".
+		expect(formatPeriodePromo('2026-09-30T17:00:00.000Z', '2026-10-31T16:59:59.999Z')).toBe(
+			'1 Okt 2026 – 31 Okt 2026'
+		);
+		expect(formatPeriodePromo('2026-09-30T17:00:00.000Z', null)).toBe('Mulai 1 Okt 2026');
 	});
 });

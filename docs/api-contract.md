@@ -402,3 +402,18 @@ menormalisasinya di `getUnits` (`normalisasiUnit` → `perumahan.prioritas`)
 supaya badge "Promosi", gerbang form minat MONET-03, dan analytics kartu
 berfungsi. Sebelum koreksi ini badge tidak pernah tampil di production
 (fixture menaruh `prioritas` di `perumahan`, jadi tak terlihat saat dev).
+
+## 14. Halaman Promo Omahe (PROMO-02, `done` 2026-09-24, BARU)
+
+`GET /public/promo` → `[{ slug, judul, ringkasan, bannerUrl, berlakuDari,
+berlakuSampai }]` — hanya promo TAYANG (status `terbit` + dalam periode,
+query-time), urut `berlakuDari` DESC. `GET /public/promo/:slug` → + `konten`
+(Markdown mentah — render lewat `landing/src/lib/markdown.ts`), `ctaLabel` +
+`ctaUrl` (berpasangan; http(s) atau path internal `/…`), `perumahan: [{ nama,
+slug, fotoUrl, regionNama }]` (hanya yang aktif). Draft / di luar periode /
+tidak ada → 404. Dikelola superadmin di admin `perumahan` (Konten Omahe →
+Promo Omahe); slug immutable.
+
+Omahe: `getPromoList` (fail-soft `[]`) & `getPromo` (404 diteruskan), route
+`/promo` & `/promo/[slug]` (SSR + `cacheKonten`), masuk `sitemap.xml`, tautan
+"Promo" di footer. Slide milik Omahe bisa menautkan `/promo/<slug>`.

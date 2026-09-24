@@ -26,6 +26,8 @@
 				{#each NAV as item (item.href)}
 					<li><a href={withRef(item.href, ref)} class="hover:text-primary">{item.label}</a></li>
 				{/each}
+				<!-- PROMO-02 — di footer (bukan nav utama): daftar promo bisa kosong. -->
+				<li><a href={withRef('/promo', ref)} class="hover:text-primary">Promo</a></li>
 			</ul>
 		</div>
 

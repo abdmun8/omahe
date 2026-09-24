@@ -136,3 +136,18 @@ export function isHttpUrl(url: string | null | undefined): url is string {
 		return false;
 	}
 }
+
+/**
+ * PROMO-02 — periode promo untuk ditampilkan (zona WIB):
+ * "1 Okt 2026 – 31 Okt 2026", atau "Mulai 1 Okt 2026" kalau tanpa batas.
+ */
+export function formatPeriodePromo(dari: string, sampai: string | null): string {
+	const fmt = (iso: string) =>
+		new Date(iso).toLocaleDateString('id-ID', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric',
+			timeZone: 'Asia/Jakarta'
+		});
+	return sampai ? `${fmt(dari)} – ${fmt(sampai)}` : `Mulai ${fmt(dari)}`;
+}

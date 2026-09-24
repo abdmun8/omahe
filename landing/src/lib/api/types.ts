@@ -462,3 +462,35 @@ export interface KontakOmahe {
 	telepon: string;
 	email: string;
 }
+
+// ---------------------------------------------------------------------------
+// PROMO-02 — Halaman Promo Omahe (`GET /public/promo[/:slug]`, api-contract §14)
+// ---------------------------------------------------------------------------
+
+export interface PromoSummary {
+	slug: string;
+	judul: string;
+	ringkasan: string | null;
+	/** Presigned; null = presign gagal → placeholder. */
+	bannerUrl: string | null;
+	berlakuDari: string;
+	/** null = tanpa batas waktu. */
+	berlakuSampai: string | null;
+}
+
+export interface PromoPerumahan {
+	nama: string;
+	slug: string;
+	fotoUrl: string | null;
+	regionNama: string | null;
+}
+
+export interface PromoDetail extends PromoSummary {
+	/** Markdown mentah (ditulis superadmin) — render lewat `$lib/markdown`. */
+	konten: string | null;
+	/** Berpasangan: keduanya null atau keduanya terisi. `ctaUrl` = http(s)
+	 *  eksternal ATAU path internal Omahe `/…` (lewat `withRef`). */
+	ctaLabel: string | null;
+	ctaUrl: string | null;
+	perumahan: PromoPerumahan[];
+}

@@ -32,6 +32,8 @@ import type {
 	UnitListing,
 	UnitQuery,
 	PublicMitra,
+	PromoDetail,
+	PromoSummary,
 	TipeDetail
 } from './types';
 
@@ -430,6 +432,39 @@ export async function getSliders(fetchFn: Fetch): Promise<PublicSlider[]> {
 		);
 		return [];
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Halaman Promo Omahe (PROMO-02)
+// ---------------------------------------------------------------------------
+
+/**
+ * `GET /public/promo` — promo yang sedang tayang. Fail-soft ke `[]` (pola
+ * slider/regions): kegagalan backend menyembunyikan daftar, tidak
+ * menjatuhkan halaman `/promo` atau sitemap.
+ */
+export async function getPromoList(fetchFn: Fetch): Promise<PromoSummary[]> {
+	if (!hasApi())
+		return fixtures.PROMO.map(
+			({ konten: _k, ctaLabel: _l, ctaUrl: _u, perumahan: _p, ...ringkas }) => ringkas
+		);
+	try {
+		const data = await apiGet<PromoSummary[]>(fetchFn, '/public/promo');
+		return Array.isArray(data) ? data : [];
+	} catch (err) {
+		console.error('[omahe:api] GET /public/promo gagal — fallback ke []', err);
+		return [];
+	}
+}
+
+/** `GET /public/promo/:slug` — 404 (draft/di luar periode/tidak ada) diteruskan. */
+export async function getPromo(fetchFn: Fetch, slug: string): Promise<PromoDetail> {
+	if (hasApi()) {
+		return apiGet<PromoDetail>(fetchFn, `/public/promo/${encodeURIComponent(slug)}`);
+	}
+	const promo = fixtures.PROMO.find((p) => p.slug === slug);
+	if (!promo) error(404, 'Promo tidak ditemukan.');
+	return promo;
 }
 
 // ---------------------------------------------------------------------------

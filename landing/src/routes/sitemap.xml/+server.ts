@@ -1,17 +1,29 @@
-import { getAllProjectSlugs, getDevelopers } from '$lib/api';
+import { getAllProjectSlugs, getDevelopers, getPromoList } from '$lib/api';
 import { artikelTayang } from '$lib/artikel';
 import { SITE } from '$lib/config';
 import { bacaArtikel, hariIniWib } from '$lib/server/artikel';
 import type { RequestHandler } from './$types';
 
-const STATIS = ['', '/cari', '/developer', '/artikel', '/mitra', '/kpr', '/tentang', '/kontak'];
+const STATIS = [
+	'',
+	'/cari',
+	'/developer',
+	'/artikel',
+	'/promo',
+	'/mitra',
+	'/kpr',
+	'/tentang',
+	'/kontak'
+];
 
 export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
-	const [slugProyek, developers, artikel] = await Promise.all([
+	const [slugProyek, developers, artikel, promo] = await Promise.all([
 		getAllProjectSlugs(fetch),
 		getDevelopers(fetch),
 		// Artikel dihitung sinkron dari konten repo — bukan fetch API.
-		Promise.resolve(artikelTayang(bacaArtikel(), hariIniWib()))
+		Promise.resolve(artikelTayang(bacaArtikel(), hariIniWib())),
+		// PROMO-02 — fail-soft ke [] (getPromoList), sitemap tetap jalan.
+		getPromoList(fetch)
 	]);
 
 	// Satu timestamp untuk semua URL non-artikel di response ini: data dari
@@ -22,11 +34,15 @@ export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
 
 	// ARTIKEL PUNYA TANGGAL NYATA dari frontmatter — dipakai per-URL,
 	// beda dari halaman API di bawah. Hanya yang sudah tayang.
-	const urlArtikel = artikel.map((a) => ({ loc: `${SITE.url}/artikel/${a.slug}`, lastmod: a.tanggal }));
+	const urlArtikel = artikel.map((a) => ({
+		loc: `${SITE.url}/artikel/${a.slug}`,
+		lastmod: a.tanggal
+	}));
 
 	const urls = [
 		...STATIS.map((path) => ({ loc: `${SITE.url}${path}`, lastmod })),
 		...urlArtikel,
+		...promo.map((p) => ({ loc: `${SITE.url}/promo/${p.slug}`, lastmod })),
 		...developers.map((d) => ({ loc: `${SITE.url}/developer/${d.slug}`, lastmod })),
 		...slugProyek.map((slug) => ({ loc: `${SITE.url}/perumahan/${slug}`, lastmod }))
 	];
@@ -40,10 +56,7 @@ export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
 		`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
-	.map(
-		({ loc, lastmod: lm }) =>
-			`\t<url><loc>${loc}</loc><lastmod>${lm}</lastmod></url>`
-	)
+	.map(({ loc, lastmod: lm }) => `\t<url><loc>${loc}</loc><lastmod>${lm}</lastmod></url>`)
 	.join('\n')}
 </urlset>`
 	);

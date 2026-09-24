@@ -29,6 +29,7 @@ import type {
 	RegionOption,
 	UnitListing,
 	PublicMitra,
+	PromoDetail,
 	TipeDetail
 } from './types';
 
@@ -505,5 +506,36 @@ export const SLIDERS: PublicSlider[] = [
 		linkUrl: '/kpr',
 		perumahan: null,
 		prioritas: 0
+	}
+];
+
+/** PROMO-02 — satu promo contoh milik Omahe (mode fixture). */
+export const PROMO: PromoDetail[] = [
+	{
+		slug: 'promo-kpr-oktober',
+		judul: 'Promo KPR Oktober: DP Mulai 0%',
+		ringkasan:
+			'Cicilan ringan untuk rumah pertama — pilih proyek yang ikut promo dan hitung simulasinya.',
+		bannerUrl: 'https://picsum.photos/seed/omahe-promo-kpr/1600/900',
+		berlakuDari: '2026-10-01T00:00:00.000Z',
+		berlakuSampai: '2026-10-31T16:59:59.999Z',
+		konten:
+			'## Keuntungan\n- DP mulai **0%** untuk unit tertentu\n- Gratis biaya KPR di bank rekanan\n\n## Syarat & ketentuan\n1. Berlaku untuk pengajuan selama periode promo\n2. Persetujuan KPR mengikuti kebijakan bank',
+		ctaLabel: 'Hitung Cicilan KPR',
+		ctaUrl: '/kpr',
+		perumahan: [
+			{
+				nama: 'Griya Asri Bogor',
+				slug: 'griya-asri-bogor',
+				fotoUrl: null,
+				regionNama: 'Kab. Bogor, Jawa Barat'
+			},
+			{
+				nama: 'Sentosa Park Sidoarjo',
+				slug: 'sentosa-park-sidoarjo',
+				fotoUrl: null,
+				regionNama: 'Kab. Sidoarjo, Jawa Timur'
+			}
+		]
 	}
 ];
