@@ -1,6 +1,6 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
-import type { KontakOmahe } from '$lib/api/types';
+import type { KontakOmahe, TeksOmahe } from '$lib/api/types';
 
 declare global {
 	namespace App {
@@ -14,6 +14,8 @@ declare global {
 			 * `SITE.*` (mis. jalur prerender/hidrasi awal).
 			 */
 			kontak?: KontakOmahe;
+			/** ADMIN-06 — teks hero homepage (layout server, fallback `SITE`). */
+			teks?: TeksOmahe;
 			/** Passthrough `?ref=` (layout universal, `src/lib/ref.ts`). */
 			ref?: string | null;
 		}

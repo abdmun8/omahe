@@ -11,7 +11,7 @@
 import { afterEach, describe, expect, test, setSystemTime } from 'bun:test';
 import { env } from '$env/dynamic/private';
 import { SITE } from '$lib/config';
-import { getKontak, getPerumahan, getTipeDetail, getUnits } from './client';
+import { getKontak, getPerumahan, getSiteSettings, getTipeDetail, getUnits } from './client';
 import { UNIT_LISTINGS } from './fixtures';
 
 /**
@@ -171,5 +171,40 @@ describe('getTipeDetail (UNIT-05, mode fixture)', () => {
 	test('kartu fixture membawa tipeSlug yang sama dengan URL detail', () => {
 		const kartu = UNIT_LISTINGS.find((u) => u.tipe === 'Tipe 45/96');
 		expect(kartu?.tipeSlug).toBe('tipe-45-96');
+	});
+});
+
+describe('getSiteSettings — teks hero (ADMIN-06)', () => {
+	afterEach(() => {
+		delete (env as Record<string, string | undefined>).OMAHE_API_BASE_URL;
+		setSystemTime();
+	});
+
+	test('field teks terisi dipakai; null per field → fallback SITE', async () => {
+		env.OMAHE_API_BASE_URL = 'https://api.perumahan.test';
+		// Jendela waktu sendiri supaya cache modul (60 dtk) tes lain kedaluwarsa.
+		setSystemTime(T0 + 10 * 60_000);
+		const fetchMock = (async () =>
+			apiJson({
+				success: true,
+				data: {
+					kontak: { whatsapp: null, telepon: null, email: null },
+					omahe: { tagline: 'Rumahmu mulai di sini', heroJudul: null, heroSubjudul: '  ' }
+				}
+			})) as unknown as typeof fetch;
+
+		const { teks } = await getSiteSettings(fetchMock);
+		expect(teks.tagline).toBe('Rumahmu mulai di sini');
+		expect(teks.heroJudul).toBe(SITE.heroJudul);
+		expect(teks.heroSubjudul).toBe(SITE.heroSubjudul);
+	});
+
+	test('tanpa base URL → semua teks bawaan SITE', async () => {
+		const { teks } = await getSiteSettings(fetchDummy);
+		expect(teks).toEqual({
+			tagline: SITE.tagline,
+			heroJudul: SITE.heroJudul,
+			heroSubjudul: SITE.heroSubjudul
+		});
 	});
 });

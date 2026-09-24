@@ -22,7 +22,7 @@
 			'@context': 'https://schema.org',
 			'@type': 'Organization',
 			name: SITE.nama,
-			slogan: SITE.tagline,
+			slogan: page.data.teks?.tagline ?? SITE.tagline,
 			description: SITE.deskripsi,
 			url: SITE.url,
 			logo: `${SITE.url}/omahe-logo.jpeg`,

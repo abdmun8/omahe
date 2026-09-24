@@ -34,6 +34,7 @@ import type {
 	PublicMitra,
 	PromoDetail,
 	PromoSummary,
+	TeksOmahe,
 	TipeDetail
 } from './types';
 
@@ -495,7 +496,13 @@ export async function getPromo(fetchFn: Fetch, slug: string): Promise<PromoDetai
 const KONTAK_TIMEOUT_MS = 2500;
 const KONTAK_CACHE_TTL_MS = 60_000;
 
-let kontakCache: { nilai: KontakOmahe; kedaluwarsa: number } | null = null;
+/** ADMIN-05 + ADMIN-06 — hasil satu fetch `/public/app-settings`. */
+interface SiteSettings {
+	kontak: KontakOmahe;
+	teks: TeksOmahe;
+}
+
+let siteCache: { nilai: SiteSettings; kedaluwarsa: number } | null = null;
 
 const kontakFallback = (): KontakOmahe => ({
 	whatsapp: SITE.whatsapp,
@@ -503,25 +510,40 @@ const kontakFallback = (): KontakOmahe => ({
 	email: SITE.email
 });
 
+/** ADMIN-06 — teks hero bawaan (`config.ts`) saat admin belum mengisi. */
+const teksFallback = (): TeksOmahe => ({
+	tagline: SITE.tagline,
+	heroJudul: SITE.heroJudul,
+	heroSubjudul: SITE.heroSubjudul
+});
+
 /** null/undefined/bukan string berisi → fallback SITE untuk field itu saja. */
 function ambilAtauFallback(nilai: unknown, fallback: string): string {
 	return typeof nilai === 'string' && nilai.trim() !== '' ? nilai : fallback;
 }
 
-export async function getKontak(fetchFn: Fetch): Promise<KontakOmahe> {
-	// Tanpa API (fixture mode) tidak ada sumber nomor selain SITE — dan
-	// fixture MEMANG kontak Omahe sendiri, bukan data palsu backend.
-	if (!hasApi()) return kontakFallback();
+/**
+ * Kontak + teks hero Omahe dari admin (satu fetch, cache 60 dtk, timeout
+ * pendek, fail-soft per field ke `SITE`). JANGAN pernah throw.
+ */
+export async function getSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
+	// Tanpa API (fixture mode) tidak ada sumber selain SITE.
+	if (!hasApi()) return { kontak: kontakFallback(), teks: teksFallback() };
 
-	if (kontakCache && Date.now() < kontakCache.kedaluwarsa) return kontakCache.nilai;
+	if (siteCache && Date.now() < siteCache.kedaluwarsa) return siteCache.nilai;
 
-	const nilai = await fetchKontak(fetchFn);
-	kontakCache = { nilai, kedaluwarsa: Date.now() + KONTAK_CACHE_TTL_MS };
+	const nilai = await fetchSiteSettings(fetchFn);
+	siteCache = { nilai, kedaluwarsa: Date.now() + KONTAK_CACHE_TTL_MS };
 	return nilai;
 }
 
+/** Kompatibel ADMIN-05 — kontak saja. */
+export async function getKontak(fetchFn: Fetch): Promise<KontakOmahe> {
+	return (await getSiteSettings(fetchFn)).kontak;
+}
+
 /** Selalu resolve — semua kegagalan sudah jadi fallback di dalam sini. */
-async function fetchKontak(fetchFn: Fetch): Promise<KontakOmahe> {
+async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 	try {
 		const res = await fetchFn(`${baseUrl()}/public/app-settings`, {
 			headers: { accept: 'application/json' },
@@ -529,19 +551,30 @@ async function fetchKontak(fetchFn: Fetch): Promise<KontakOmahe> {
 		});
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const body = (await res.json()) as {
-			data?: { kontak?: Record<string, unknown> | null } | null;
+			data?: {
+				kontak?: Record<string, unknown> | null;
+				omahe?: Record<string, unknown> | null;
+			} | null;
 		};
 		const k = body.data?.kontak;
+		const o = body.data?.omahe;
 		return {
-			whatsapp: ambilAtauFallback(k?.whatsapp, SITE.whatsapp),
-			telepon: ambilAtauFallback(k?.telepon, SITE.telepon),
-			email: ambilAtauFallback(k?.email, SITE.email)
+			kontak: {
+				whatsapp: ambilAtauFallback(k?.whatsapp, SITE.whatsapp),
+				telepon: ambilAtauFallback(k?.telepon, SITE.telepon),
+				email: ambilAtauFallback(k?.email, SITE.email)
+			},
+			teks: {
+				tagline: ambilAtauFallback(o?.tagline, SITE.tagline),
+				heroJudul: ambilAtauFallback(o?.heroJudul, SITE.heroJudul),
+				heroSubjudul: ambilAtauFallback(o?.heroSubjudul, SITE.heroSubjudul)
+			}
 		};
 	} catch (err) {
 		console.error(
-			'[omahe:api] GET /public/app-settings gagal — fallback kontak SITE (ADMIN-05)',
+			'[omahe:api] GET /public/app-settings gagal — fallback kontak & teks SITE (ADMIN-05/06)',
 			err
 		);
-		return kontakFallback();
+		return { kontak: kontakFallback(), teks: teksFallback() };
 	}
 }

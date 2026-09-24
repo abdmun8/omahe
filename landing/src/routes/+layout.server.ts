@@ -8,9 +8,11 @@
  * 60 detik milik `getKontak` membuat request berpaketaan tidak mengulang
  * fetch; perubahan nomor di admin tampil tanpa redeploy.
  */
-import { getKontak } from '$lib/api';
+import { getSiteSettings } from '$lib/api';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ fetch }) => {
-	return { kontak: await getKontak(fetch) };
+	// ADMIN-06 — teks hero ikut di fetch yang sama (fail-soft ke SITE).
+	const { kontak, teks } = await getSiteSettings(fetch);
+	return { kontak, teks };
 };

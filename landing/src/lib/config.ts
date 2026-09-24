@@ -2,6 +2,14 @@
 export const SITE = {
 	nama: 'Omahe',
 	tagline: 'Where your story begins',
+	/**
+	 * ADMIN-06 — teks hero homepage BAWAAN. Superadmin bisa menimpanya di
+	 * admin (Pengaturan → Teks Homepage Omahe); nilai efektif ada di
+	 * `page.data.teks` (layout server). Tagline di atas juga bisa ditimpa.
+	 */
+	heroJudul: 'Temukan hunian yang dirancang untuk memenuhi kebutuhan hidup Anda.',
+	heroSubjudul:
+		'Pilih dari berbagai proyek properti terpercaya, bandingkan setiap detailnya — dan temukan rumah yang tepat untuk memulai cerita baru.',
 	deskripsi:
 		'Temukan hunian yang dirancang untuk memenuhi kebutuhan hidup Anda. Pilih dari berbagai proyek properti terpercaya, bandingkan setiap detailnya, dan temukan rumah yang tepat untuk memulai cerita baru.',
 	/** Versi ringkas (≤160 char) untuk meta/og description — SERP memotong di sekitar situ. */

@@ -9,12 +9,21 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	// ADMIN-06 — teks hero dari admin (layout server), fallback bawaan `SITE`.
+	const teks = $derived(
+		data.teks ?? {
+			tagline: SITE.tagline,
+			heroJudul: SITE.heroJudul,
+			heroSubjudul: SITE.heroSubjudul
+		}
+	);
 </script>
 
 <svelte:head>
 	<title>Omahe — Temukan Rumah Baru dari Pengembang Terpercaya</title>
 	<meta name="description" content={SITE.deskripsiSingkat} />
-	<meta property="og:title" content="Omahe — {SITE.tagline}" />
+	<meta property="og:title" content="Omahe — {teks.tagline}" />
 	<meta property="og:description" content={SITE.deskripsiSingkat} />
 	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
@@ -23,7 +32,10 @@
      sama dengan hero. `getSliders` fail-soft ke [] (api-contract.md §7):
      kosong → section ini hilang total, bukan skeleton/spinner menetap. -->
 {#if data.sliders.length > 0}
-	<section aria-label="Event & kegiatan" class="mx-auto max-w-6xl px-0 pt-0 pb-0 lg:pt-4 lg:pb-4 sm:px-4 sm:pt-4 sm:pb-4">
+	<section
+		aria-label="Event & kegiatan"
+		class="mx-auto max-w-6xl px-0 pt-0 pb-0 sm:px-4 sm:pt-4 sm:pb-4 lg:pt-4 lg:pb-4"
+	>
 		<SliderCarousel sliders={data.sliders} ref={data.ref} />
 	</section>
 {/if}
@@ -34,14 +46,13 @@
 <section class="bg-primary">
 	<div class="mx-auto max-w-6xl px-4 py-8 sm:py-20">
 		<p class="font-display text-accent-light text-sm font-semibold tracking-wide uppercase">
-			{SITE.tagline}
+			{teks.tagline}
 		</p>
 		<h1 class="font-display mt-3 max-w-2xl text-2xl font-extrabold text-white sm:text-3xl">
-			Temukan hunian yang dirancang untuk memenuhi kebutuhan hidup Anda.
+			{teks.heroJudul}
 		</h1>
 		<p class="mt-4 max-w-xl text-sm text-white/80 sm:text-base">
-			Pilih dari berbagai proyek properti terpercaya, bandingkan setiap detailnya — dan temukan
-			rumah yang tepat untuk memulai cerita baru.
+			{teks.heroSubjudul}
 		</p>
 
 		<!-- `kompak`: di mobile form cuma satu baris + link "Filter lanjutan";

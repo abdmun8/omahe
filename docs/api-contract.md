@@ -417,3 +417,16 @@ Promo Omahe); slug immutable.
 Omahe: `getPromoList` (fail-soft `[]`) & `getPromo` (404 diteruskan), route
 `/promo` & `/promo/[slug]` (SSR + `cacheKonten`), masuk `sitemap.xml`, tautan
 "Promo" di footer. Slide milik Omahe bisa menautkan `/promo/<slug>`.
+
+## 15. Teks hero homepage di `GET /public/app-settings` (ADMIN-06, `done` 2026-09-24)
+
+Additive pada §10: `omahe: { tagline, heroJudul, heroSubjudul }` (null =
+teks bawaan) dan `produk: { heroLabel, heroJudul, heroSubjudul }` (dipakai
+landing produk app.omahe.co.id, bukan Omahe). Diatur superadmin di admin
+`perumahan` → Pengaturan → Teks Homepage Omahe.
+
+Omahe: `getSiteSettings()` (satu fetch dengan kontak §10, cache 60 dtk,
+fail-soft per field ke `SITE.tagline`/`SITE.heroJudul`/`SITE.heroSubjudul`
+di `config.ts`) → `page.data.teks`. Dipakai hero homepage, meta og, footer,
+JSON-LD `slogan`. Halaman prerender (Tentang, RSS) tetap memakai `SITE`
+(nilai saat build).

@@ -5,6 +5,8 @@
 
 	// ADMIN-05 — email Omahe dari API (layout root), fallback config.
 	const emailOmahe = $derived(page.data.kontak?.email ?? SITE.email);
+	// ADMIN-06 — tagline dari admin, fallback config.
+	const tagline = $derived(page.data.teks?.tagline ?? SITE.tagline);
 
 	const ref = $derived(page.data.ref as string | null);
 	const tahun = new Date().getFullYear();
@@ -16,7 +18,7 @@
 			<span class="font-display text-primary text-xl font-extrabold">
 				Omahe<span class="text-accent">.</span>
 			</span>
-			<p class="font-display text-accent-dark mt-1 text-sm">{SITE.tagline}</p>
+			<p class="font-display text-accent-dark mt-1 text-sm">{tagline}</p>
 			<p class="text-muted mt-3 max-w-sm text-sm leading-relaxed">{SITE.deskripsi}</p>
 		</div>
 

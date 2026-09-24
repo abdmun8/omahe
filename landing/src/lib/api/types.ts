@@ -457,6 +457,13 @@ export interface PublicSlider {
  * root (`page.data.kontak`); field yang null di backend sudah diganti
  * fallback `SITE.*` (lihat `client.ts::getKontak`).
  */
+/** ADMIN-06 — teks hero homepage Omahe (sudah di-fallback ke `SITE`). */
+export interface TeksOmahe {
+	tagline: string;
+	heroJudul: string;
+	heroSubjudul: string;
+}
+
 export interface KontakOmahe {
 	whatsapp: string;
 	telepon: string;
