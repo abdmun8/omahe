@@ -51,7 +51,9 @@
 	 * sumber='detail'), bukan WA langsung. Partner gratis tetap WA.
 	 * `undefined` (respons lama tanpa MONET-01) = gratis.
 	 */
-	const partnerBerbayar = $derived(p.prioritas > 0);
+	// AGEN-PROPERTI-01 — perumahan milik agen properti yang tampil juga
+	// memakai form minat (lead ke agen), tanpa syarat prioritas berbayar.
+	const partnerBerbayar = $derived(p.prioritas > 0 || !!p.agen);
 	let formMinatTerbuka = $state(false);
 	/** Opsi select tipe minat — dari daftar tipe unit di halaman ini. */
 	const opsiTipe = $derived([...new Set(data.tipeUnit.map((u) => u.tipe))]);
@@ -173,6 +175,21 @@
 						href={withRef(`/developer/${p.developer.slug}`, data.ref)}
 						class="text-primary font-semibold hover:underline">{p.developer.nama}</a
 					>
+				</p>
+			{/if}
+			{#if p.agen}
+				<!-- AGEN-PROPERTI-01 — agen properti pemilik (tampil di Omahe). -->
+				<p class="text-muted mt-1 flex items-center gap-2 text-sm">
+					{#if p.agen.logoUrl}
+						<img src={p.agen.logoUrl} alt="" class="h-5 w-5 rounded object-contain" />
+					{/if}
+					<span>
+						Dipasarkan oleh
+						<a
+							href={withRef(`/agen/${p.agen.slug}`, data.ref)}
+							class="text-primary font-semibold hover:underline">{p.agen.nama}</a
+						>
+					</span>
 				</p>
 			{/if}
 			{#if lokasi}
@@ -335,7 +352,13 @@
 	</div>
 </div>
 
-<StickyCta slug={p.slug} nama={p.nama} ref={data.ref} prioritas={p.prioritas} />
+<StickyCta
+	slug={p.slug}
+	nama={p.nama}
+	ref={data.ref}
+	prioritas={p.prioritas}
+	formMinat={partnerBerbayar}
+/>
 
 {#if partnerBerbayar}
 	<!-- Dialog desktop/CTA kolom ringkasan — sticky-cta punya instance-nya

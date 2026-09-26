@@ -23,15 +23,24 @@
 		slug,
 		nama,
 		ref = null,
-		prioritas = 0
-	}: { slug: string; nama: string; ref?: string | null; prioritas?: number } = $props();
+		prioritas = 0,
+		formMinat
+	}: {
+		slug: string;
+		nama: string;
+		ref?: string | null;
+		prioritas?: number;
+		/** AGEN-PROPERTI-01 — paksa CTA form minat (mis. perumahan milik agen
+		 *  properti); tidak diisi = aturan lama (`prioritas > 0`). */
+		formMinat?: boolean;
+	} = $props();
 
 	/** Kontak Omahe (ADMIN-05) dari layout root — fallback SITE kalau belum
 	 *  terisi (mis. respons lama/prerender tanpa data server). */
 	const nomorWhatsapp = $derived(page.data.kontak?.whatsapp ?? SITE.whatsapp);
 
 	/** undefined (respons lama tanpa MONET-01) = gratis. */
-	const partnerBerbayar = $derived(prioritas > 0);
+	const partnerBerbayar = $derived(formMinat ?? prioritas > 0);
 	let formMinatTerbuka = $state(false);
 
 	// Iterasi 2 GA4: CTA "Ajukan" + klik WA dilaporkan tanpa PII — nama

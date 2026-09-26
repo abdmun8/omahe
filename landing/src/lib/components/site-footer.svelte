@@ -30,6 +30,7 @@
 				{/each}
 				<!-- PROMO-02 — di footer (bukan nav utama): daftar promo bisa kosong. -->
 				<li><a href={withRef('/promo', ref)} class="hover:text-primary">Promo</a></li>
+				<li><a href={withRef('/agen', ref)} class="hover:text-primary">Agen Properti</a></li>
 			</ul>
 		</div>
 

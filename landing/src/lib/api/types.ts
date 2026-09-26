@@ -214,6 +214,34 @@ export interface PerumahanDetail {
 	 * LANDING-05 = own-only perumahan (tanpa lookup developer).
 	 */
 	prioritas: number;
+	/**
+	 * AGEN-PROPERTI-01 — agen properti pemilik yang tampil di Omahe
+	 * ("Dipasarkan oleh"); null/absen = perumahan biasa atau agen
+	 * disembunyikan superadmin. Terisi → CTA kontak = form minat (lead ke
+	 * agen), tanpa syarat prioritas berbayar.
+	 */
+	agen?: AgenRef | null;
+}
+
+/** AGEN-PROPERTI-01 — ringkasan agen di detail perumahan. */
+export interface AgenRef {
+	nama: string;
+	slug: string;
+	logoUrl: string | null;
+}
+
+/** AGEN-PROPERTI-01 — `GET /public/agen` (hanya agen aktif & tampil). */
+export interface AgenSummary extends AgenRef {
+	deskripsi: string | null;
+	jumlahPerumahan: number;
+	/** Prioritas berbayar aktif (urutan direktori). */
+	prioritas: number;
+}
+
+/** AGEN-PROPERTI-01 — `/agen/:slug`: profil + perumahan yang dipasarkan
+ *  (bentuk kartu sama dengan proyek developer). */
+export interface AgenDetail extends AgenSummary {
+	perumahan: DeveloperProject[];
 }
 
 /**

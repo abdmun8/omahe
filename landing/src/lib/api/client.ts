@@ -22,6 +22,8 @@ import type {
 	ApiEnvelope,
 	DeveloperDetail,
 	DeveloperSummary,
+	AgenDetail,
+	AgenSummary,
 	KontakOmahe,
 	LeadInput,
 	PageMeta,
@@ -216,6 +218,52 @@ export async function getDeveloper(fetchFn: Fetch, slug: string): Promise<Develo
 	const detail = fixtures.developerDetail(slug);
 	if (!detail) error(404, 'Developer tidak ditemukan.');
 	return detail;
+}
+
+// ---------------------------------------------------------------------------
+// AGEN-PROPERTI-01 — direktori agen properti
+// ---------------------------------------------------------------------------
+
+interface AgenDetailRaw extends AgenSummary {
+	perumahan: Array<{
+		nama: string;
+		slug: string;
+		fotoUrl: string | null;
+		regionNama: string | null;
+	}>;
+}
+
+/** Agen aktif & tampil di Omahe. Fixture/API gagal → [] (halaman tetap jalan). */
+export async function getAgenList(fetchFn: Fetch): Promise<AgenSummary[]> {
+	if (!hasSearchApi()) return [];
+	try {
+		return await apiGet<AgenSummary[]>(fetchFn, '/public/agen');
+	} catch (err) {
+		console.error('[omahe:api] daftar agen gagal', err);
+		return [];
+	}
+}
+
+export async function getAgen(fetchFn: Fetch, slug: string): Promise<AgenDetail> {
+	if (!hasSearchApi()) error(404, 'Agen tidak ditemukan.');
+	const raw = await apiGet<AgenDetailRaw>(fetchFn, `/public/agen/${encodeURIComponent(slug)}`);
+	// Stats per perumahan dari `/public/units` (pola getDeveloper) — kartu
+	// proyek yang sama dengan halaman developer.
+	const perumahan = await Promise.all(
+		raw.perumahan.map(async (p) => {
+			const { items } = await getUnits(fetchFn, { perumahanSlug: p.slug, page: 1, pageSize: 48 });
+			const harga = items.map((u) => u.hargaMin).filter((h): h is number => h !== null);
+			return {
+				nama: p.nama,
+				slug: p.slug,
+				fotoUrl: p.fotoUrl,
+				regionNama: p.regionNama,
+				hargaMulai: harga.length > 0 ? Math.min(...harga) : null,
+				unitTersedia: items.reduce((sum, u) => sum + u.unitTersedia, 0)
+			};
+		})
+	);
+	return { ...raw, perumahan };
 }
 
 // ---------------------------------------------------------------------------
