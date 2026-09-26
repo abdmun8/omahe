@@ -36,7 +36,7 @@
 		aria-label="Event & kegiatan"
 		class="mx-auto max-w-6xl px-0 pt-0 pb-0 sm:px-4 sm:pt-4 sm:pb-4 lg:pt-4 lg:pb-4"
 	>
-		<SliderCarousel sliders={data.sliders} ref={data.ref} />
+		<SliderCarousel sliders={data.sliders} ref={data.ref} delayDetik={data.sliderDelayDetik} />
 	</section>
 {/if}
 

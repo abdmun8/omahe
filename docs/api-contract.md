@@ -471,3 +471,19 @@ endpoint yang sama dengan `?situs=<kode>`:
 - Kode tak dikenal / situs nonaktif → **404** "Situs tidak ditemukan.".
 - `GET /public/perumahan` & `/public/units` per situs menyusul di
   `AGEN-PROPERTI-01`.
+
+## 19. Agen properti & slider (AGEN-PROPERTI-01 + perbaikan slider, `done` 2026-09-26)
+
+- `GET /public/perumahan/:slug` menambah `agen: { nama, slug, logoUrl } |
+  null` — agen properti pemilik yang tampil di Omahe. Terisi → Omahe
+  menampilkan "Dipasarkan oleh" dan CTA **Form Minat** (lead diterima tanpa
+  syarat prioritas berbayar).
+- `GET /public/agen` (agen aktif & tampil, urut prioritas berbayar) dan
+  `GET /public/agen/:slug` (profil + `perumahan[]` bentuk item direktori).
+- `?situs=<kode agen>` di `/public/perumahan`, `/public/units`,
+  `/public/perumahan/:slug` → hanya perumahan milik agen (detail lain 404).
+- `GET /public/sliders` — urutan baru: slide milik situs lebih dulu menurut
+  **Urutan** (1 = pertama; 0/kosong = paling akhir), lalu slide perumahan
+  menurut prioritas berbayar (besar = depan).
+- `GET /public/app-settings` menambah `sliderDelayDetik` (jeda carousel,
+  2–30, bawaan 3) — per situs (`?situs=`). Carousel Omahe berputar terus.

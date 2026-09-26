@@ -566,6 +566,18 @@ const KONTAK_CACHE_TTL_MS = 60_000;
 interface SiteSettings {
 	kontak: KontakOmahe;
 	teks: TeksOmahe;
+	/** Jeda perpindahan slide carousel homepage (detik; bawaan 3). */
+	sliderDelayDetik: number;
+}
+
+/** Jeda slide bawaan & batas aman (detik) — sinkron backend app-setting. */
+export const SLIDER_DELAY_DEFAULT = 3;
+
+/** Angka 2–30 dari API; selain itu bawaan. */
+export function normalisasiSliderDelay(v: unknown): number {
+	return typeof v === 'number' && Number.isInteger(v) && v >= 2 && v <= 30
+		? v
+		: SLIDER_DELAY_DEFAULT;
 }
 
 let siteCache: { nilai: SiteSettings; kedaluwarsa: number } | null = null;
@@ -594,7 +606,12 @@ function ambilAtauFallback(nilai: unknown, fallback: string): string {
  */
 export async function getSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 	// Tanpa API (fixture mode) tidak ada sumber selain SITE.
-	if (!hasApi()) return { kontak: kontakFallback(), teks: teksFallback() };
+	if (!hasApi())
+		return {
+			kontak: kontakFallback(),
+			teks: teksFallback(),
+			sliderDelayDetik: SLIDER_DELAY_DEFAULT
+		};
 
 	if (siteCache && Date.now() < siteCache.kedaluwarsa) return siteCache.nilai;
 
@@ -620,6 +637,7 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 			data?: {
 				kontak?: Record<string, unknown> | null;
 				omahe?: Record<string, unknown> | null;
+				sliderDelayDetik?: unknown;
 			} | null;
 		};
 		const k = body.data?.kontak;
@@ -634,13 +652,18 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 				tagline: ambilAtauFallback(o?.tagline, SITE.tagline),
 				heroJudul: ambilAtauFallback(o?.heroJudul, SITE.heroJudul),
 				heroSubjudul: ambilAtauFallback(o?.heroSubjudul, SITE.heroSubjudul)
-			}
+			},
+			sliderDelayDetik: normalisasiSliderDelay(body.data?.sliderDelayDetik)
 		};
 	} catch (err) {
 		console.error(
 			'[omahe:api] GET /public/app-settings gagal — fallback kontak & teks SITE (ADMIN-05/06)',
 			err
 		);
-		return { kontak: kontakFallback(), teks: teksFallback() };
+		return {
+			kontak: kontakFallback(),
+			teks: teksFallback(),
+			sliderDelayDetik: SLIDER_DELAY_DEFAULT
+		};
 	}
 }

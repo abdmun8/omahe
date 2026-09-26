@@ -7,10 +7,12 @@
 	"Event & kegiatan" hilang total, bukan skeleton/spinner menetap).
 
 	Interaksi & a11y:
-	- Autoplay ±6 detik; pause SEMENTARA saat hover/focus di dalam carousel,
-	  mati PERMANEN begitu pengguna mengambil alih (swipe / prev / next /
-	  dot). `prefers-reduced-motion: reduce` → tanpa autoplay, dan transisi
-	  slide ikut dimatikan lewat `motion-reduce:transition-none`.
+	- Autoplay berputar terus (loop) tiap `delayDetik` (bawaan 3, diatur
+	  superadmin di Pengaturan → Slider Homepage); pause SEMENTARA saat
+	  hover/focus di dalam carousel; interaksi pengguna (swipe / prev / next /
+	  dot) mengulang hitungan jeda dari awal (tidak mematikan autoplay).
+	  `prefers-reduced-motion: reduce` → tanpa autoplay, dan transisi slide
+	  ikut dimatikan lewat `motion-reduce:transition-none`.
 	- Swipe sentuh dasar via Pointer Events — touch punya implicit pointer
 	  capture, jadi handler cukup dipasang di viewport (tanpa
 	  setPointerCapture eksplisit yang justru merusak klik link di mouse).
@@ -26,13 +28,17 @@
 	import { trackEvent } from '$lib/analytics';
 	import { withRef } from '$lib/ref';
 
-	let { sliders, ref = null }: { sliders: PublicSlider[]; ref?: string | null } = $props();
+	let {
+		sliders,
+		ref = null,
+		delayDetik = 3
+	}: { sliders: PublicSlider[]; ref?: string | null; delayDetik?: number } = $props();
 
 	let aktif = $state(0);
 	/** Hover/focus berada di dalam carousel — autoplay pause sementara. */
 	let tertunda = $state(false);
-	/** Pengguna sudah mengambil alih (swipe/tombol) — autoplay mati permanen. */
-	let matiPermanen = $state(false);
+	/** Naik tiap interaksi pengguna — memulai ulang hitungan jeda autoplay. */
+	let putaranInteraksi = $state(0);
 	/** `prefers-reduced-motion` — hanya relevan di browser (SSR: false). */
 	let gerakDikurangi = $state(false);
 
@@ -66,10 +72,13 @@
 	// Autoplay. Dependensi effect = semua kondisi mati/pause; pembacaan
 	// `aktif` di dalam callback interval sengaja tidak di-track.
 	$effect(() => {
-		if (gerakDikurangi || tertunda || matiPermanen || sliders.length <= 1) return;
+		// Dibaca supaya interaksi pengguna memulai ulang interval.
+		void putaranInteraksi;
+		if (gerakDikurangi || tertunda || sliders.length <= 1) return;
+		const jedaMs = Math.max(2, delayDetik) * 1000;
 		const timer = setInterval(() => {
 			aktif = (aktif + 1) % sliders.length;
-		}, 6000);
+		}, jedaMs);
 		return () => clearInterval(timer);
 	});
 
@@ -115,14 +124,14 @@
 
 	// --- Navigasi ----------------------------------------------------------
 
-	/** Langsar relatif; pengguna mengambil alih → autoplay mati permanen. */
+	/** Langsar relatif; interaksi pengguna memulai ulang jeda autoplay. */
 	function arah(delta: number) {
-		matiPermanen = true;
+		putaranInteraksi += 1;
 		aktif = (aktif + delta + sliders.length) % sliders.length;
 	}
 
 	function keSlide(i: number) {
-		matiPermanen = true;
+		putaranInteraksi += 1;
 		aktif = i;
 	}
 

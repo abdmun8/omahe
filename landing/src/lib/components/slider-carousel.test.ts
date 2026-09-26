@@ -14,7 +14,7 @@
  * `aktif`, bukan per re-render) dan `slider_click` (klik slide, jenis
  * internal/eksternal). Autoplay TIDAK perlu dimatikan di test: jsdom tidak
  * punya `matchMedia` (komponen pakai optional-call, lihat komentarnya) tapi
- * interval 6 detik tidak pernah sampai tick selama tes berjalan, dan ikut
+ * jeda bawaan 3 detik tidak pernah sampai tick selama tes berjalan, dan ikut
  * ter-clear saat unmount (cleanup afterEach). Navigasi klik link internal
  * memunculkan noise "Not implemented: navigation" dari jsdom — kosmetik,
  * sama seperti tes komponen lain yang mengklik anchor ber-href.
@@ -72,6 +72,32 @@ describe.skipIf(typeof document === 'undefined')('SliderCarousel', () => {
 		// Satu-satunya yang tertinggal adalah komentar anchor hydration
 		// Svelte (`<!-- -->`) — tanpa elemen, section benar-benar hilang.
 		expect(container.querySelector('*')).toBeNull();
+	});
+
+	test('autoplay memakai delayDetik dan berputar terus (loop), juga setelah interaksi', async () => {
+		vi.useFakeTimers();
+		try {
+			render(SliderCarousel, {
+				sliders: [
+					buatSlider(),
+					buatSlider({ id: 'slider-2', judul: 'Seminar KPR', subjudul: null })
+				],
+				delayDetik: 2
+			});
+			expect(screen.getByText(/Slide 1 dari 2/)).toBeInTheDocument();
+			await vi.advanceTimersByTimeAsync(2000);
+			expect(screen.getByText(/Slide 2 dari 2/)).toBeInTheDocument();
+			await vi.advanceTimersByTimeAsync(2000);
+			// Loop kembali ke slide pertama.
+			expect(screen.getByText(/Slide 1 dari 2/)).toBeInTheDocument();
+			// Interaksi (dot) tidak mematikan autoplay — hanya memulai ulang jeda.
+			await fireEvent.click(screen.getByRole('button', { name: /slide 2/i }));
+			expect(screen.getByText(/Slide 2 dari 2/)).toBeInTheDocument();
+			await vi.advanceTimersByTimeAsync(2000);
+			expect(screen.getByText(/Slide 1 dari 2/)).toBeInTheDocument();
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	test('slide pertama aktif + judul ter-render; hanya slide pertama eager', () => {
