@@ -454,3 +454,20 @@ Additive — Omahe belum wajib memakainya:
   instance klien terpisah seperti Widya Pratama). Instance Omahe tetap
   default (`true`). **Perbaikan**: panjang maks `ref` kini 64 (dulu 50 →
   lead Omahe yang membawa `?ref=` QR asli, 64 hex, ditolak 400).
+
+## 18. Situs per pemilik — `?situs=` (SITUS-01, `done` 2026-09-26)
+
+Omahe **tidak perlu berubah**: tanpa parameter = situs `omahe` (perilaku
+lama, tanpa query tambahan). Situs agen properti (mis. Widya) memanggil
+endpoint yang sama dengan `?situs=<kode>`:
+
+- `GET /public/app-settings?situs=` → `kontak` & `omahe` (tagline, judul,
+  subjudul hero) milik situs itu; `appTitle`, `warnaUtama`, `produk`,
+  `instance` tetap tingkat aplikasi.
+- `GET /public/sliders?situs=`, `GET /public/promo[/:slug]?situs=` → konten
+  situs itu saja.
+- `POST /public/leads` body `situs` (opsional) → lead tercatat untuk situs
+  asal.
+- Kode tak dikenal / situs nonaktif → **404** "Situs tidak ditemukan.".
+- `GET /public/perumahan` & `/public/units` per situs menyusul di
+  `AGEN-PROPERTI-01`.
