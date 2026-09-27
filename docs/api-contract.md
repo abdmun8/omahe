@@ -617,3 +617,10 @@ dibandingkan case-insensitive). Respons `data`:
 - Diverifikasi E2E 2026-09-27 (backend lokal + MinIO): `/api/musik` 200
   `ada: true`, `/api/musik/file` 302 → 200 `audio/mpeg`. Perilaku klik
   pertama belum diuji di browser sungguhan.
+
+## 25. Durasi slide banner berbayar (MONET-07, backend `done` 2026-09-27 — belum di-push/deploy)
+
+- `GET /public/sliders` item + `durasiDetik: number | null` — detik tayang
+  slide banner berbayar per putaran (kelipatan 3, 3–30). null = slide
+  gratis → carousel memakai jeda global (`sliderDelayDetik`). Omahe:
+  `jedaSlideMs()` + `setTimeout` per slide di `slider-carousel.svelte`.

@@ -486,6 +486,11 @@ export interface PublicSlider {
 	 * server-side — slider bukan kartu listing, JANGAN dirender sebagai badge.
 	 */
 	prioritas: number;
+	/**
+	 * MONET-07 — detik tayang slide ini per putaran (banner berbayar,
+	 * kelipatan 3). null/absen = pakai jeda global carousel.
+	 */
+	durasiDetik?: number | null;
 }
 
 // ---------------------------------------------------------------------------

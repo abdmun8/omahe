@@ -21,6 +21,7 @@
 	  dot & prev/next = tombol asli ber-label.
 -->
 <script lang="ts">
+	import { jedaSlideMs } from '$lib/slider';
 	import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -69,17 +70,21 @@
 		return () => mq.removeEventListener('change', ubah);
 	});
 
-	// Autoplay. Dependensi effect = semua kondisi mati/pause; pembacaan
-	// `aktif` di dalam callback interval sengaja tidak di-track.
+	// Autoplay. Dependensi effect = semua kondisi mati/pause + `aktif`
+	// (durasi bisa beda per slide).
 	$effect(() => {
 		// Dibaca supaya interaksi pengguna memulai ulang interval.
 		void putaranInteraksi;
 		if (gerakDikurangi || tertunda || sliders.length <= 1) return;
-		const jedaMs = Math.max(2, delayDetik) * 1000;
-		const timer = setInterval(() => {
-			aktif = (aktif + 1) % sliders.length;
-		}, jedaMs);
-		return () => clearInterval(timer);
+		// MONET-07 — tiap slide punya durasi sendiri (banner berbayar), jadi
+		// timeout per slide (effect jalan ulang setiap `aktif` berubah).
+		const timer = setTimeout(
+			() => {
+				aktif = (aktif + 1) % sliders.length;
+			},
+			jedaSlideMs(sliders[aktif], delayDetik)
+		);
+		return () => clearTimeout(timer);
 	});
 
 	// --- Swipe dasar -------------------------------------------------------
