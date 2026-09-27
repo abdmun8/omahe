@@ -601,3 +601,19 @@ dibandingkan case-insensitive). Respons `data`:
 - Diverifikasi E2E 2026-09-27 (Omahe dev → backend lokal + DB dev): tab
   agen HTTP 200 menampilkan agen + link verifikasi; minat tercatat; pesan
   404/400/429 tampil apa adanya. Data uji dibersihkan.
+
+## 24. Musik latar Omahe (ADMIN-07, backend `done` 2026-09-27 — belum di-push/deploy)
+
+- `GET /public/app-settings` kini membawa `musik: { url, judul } | null`
+  (situs Omahe saja; null bila tidak ada/nonaktif). `url` = presigned
+  (kedaluwarsa, default 24 jam).
+- Omahe TIDAK memakai `musik` dari data layout (halaman prerender akan
+  membekukan URL yang kedaluwarsa & status aktif): mini-player
+  `musik-latar.svelte` (layout root) cek `GET /api/musik` → `{ ada, judul }`
+  di browser, lalu memutar `/api/musik/file` (302 ke presigned URL
+  terbaru). Musik mulai di klik/tap/tombol pertama pengunjung, berlanjut
+  antar halaman, tombol putar/hentikan selalu terlihat, pilihan "mati"
+  diingat (`localStorage` `omahe-musik`).
+- Diverifikasi E2E 2026-09-27 (backend lokal + MinIO): `/api/musik` 200
+  `ada: true`, `/api/musik/file` 302 → 200 `audio/mpeg`. Perilaku klik
+  pertama belum diuji di browser sungguhan.

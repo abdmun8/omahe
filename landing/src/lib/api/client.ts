@@ -15,6 +15,7 @@
  * masing-masing mendarat.
  */
 import { env } from '$env/dynamic/private';
+import { musikValid } from '$lib/musik';
 import { error } from '@sveltejs/kit';
 import { SITE } from '$lib/config';
 import * as fixtures from './fixtures';
@@ -653,6 +654,8 @@ interface SiteSettings {
 	teks: TeksOmahe;
 	/** Jeda perpindahan slide carousel homepage (detik; bawaan 3). */
 	sliderDelayDetik: number;
+	/** ADMIN-07 — musik latar (null = tidak ada / nonaktif). */
+	musik: { url: string; judul: string } | null;
 }
 
 /** Jeda slide bawaan & batas aman (detik) — sinkron backend app-setting. */
@@ -695,7 +698,8 @@ export async function getSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 		return {
 			kontak: kontakFallback(),
 			teks: teksFallback(),
-			sliderDelayDetik: SLIDER_DELAY_DEFAULT
+			sliderDelayDetik: SLIDER_DELAY_DEFAULT,
+			musik: null
 		};
 
 	if (siteCache && Date.now() < siteCache.kedaluwarsa) return siteCache.nilai;
@@ -723,6 +727,7 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 				kontak?: Record<string, unknown> | null;
 				omahe?: Record<string, unknown> | null;
 				sliderDelayDetik?: unknown;
+				musik?: unknown;
 			} | null;
 		};
 		const k = body.data?.kontak;
@@ -738,7 +743,8 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 				heroJudul: ambilAtauFallback(o?.heroJudul, SITE.heroJudul),
 				heroSubjudul: ambilAtauFallback(o?.heroSubjudul, SITE.heroSubjudul)
 			},
-			sliderDelayDetik: normalisasiSliderDelay(body.data?.sliderDelayDetik)
+			sliderDelayDetik: normalisasiSliderDelay(body.data?.sliderDelayDetik),
+			musik: musikValid(body.data?.musik)
 		};
 	} catch (err) {
 		console.error(
@@ -748,7 +754,8 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 		return {
 			kontak: kontakFallback(),
 			teks: teksFallback(),
-			sliderDelayDetik: SLIDER_DELAY_DEFAULT
+			sliderDelayDetik: SLIDER_DELAY_DEFAULT,
+			musik: null
 		};
 	}
 }

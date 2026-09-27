@@ -8,6 +8,7 @@
 	import { normalisasiNomor } from '$lib/utils';
 	import SiteFooter from '$lib/components/site-footer.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
+	import MusikLatar from '$lib/components/musik-latar.svelte';
 
 	let { children } = $props();
 
@@ -99,4 +100,7 @@
 		{@render children()}
 	</main>
 	<SiteFooter />
+	<!-- ADMIN-07 — musik latar: komponen sendiri yang cek /api/musik
+	     (tidak tampil apa pun bila superadmin tidak mengaktifkan). -->
+	<MusikLatar />
 </div>
