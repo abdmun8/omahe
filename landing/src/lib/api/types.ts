@@ -558,3 +558,25 @@ export interface VerifikasiAgen {
 	status: 'aktif' | 'tidak_aktif';
 	berlakuSampai: string | null;
 }
+
+// ---------------------------------------------------------------------------
+// AGEN-OMAHE-03 — agen Omahe yang memasarkan perumahan (`GET /public/agen-omahe/perumahan/:slug?ref=`, api-contract §21)
+// ---------------------------------------------------------------------------
+
+/**
+ * Satu agen Omahe dengan pilihan aktif untuk perumahan ini (membership &
+ * kantor aktif), urut prioritas berbayar lalu yang lebih dulu memilih.
+ * Datang lewat `?ref=` milik salah satu agen → backend hanya mengembalikan
+ * agen itu (atribusi tidak dibajak agen lain).
+ */
+export interface AgenPemasar {
+	nama: string;
+	kantorNama: string;
+	/** Presigned; null → inisial. */
+	fotoUrl: string | null;
+	/** Kode ID card → `/verifikasi/:kodeAgen`. */
+	kodeAgen: string;
+	/** Kode `?ref=` pilihan agen (`AO-…`) — dikirim form minat agen supaya
+	 *  lead tercatat untuk agen ini. */
+	kodeRef: string;
+}

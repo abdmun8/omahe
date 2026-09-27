@@ -38,7 +38,8 @@ import type {
 	PromoSummary,
 	TeksOmahe,
 	TipeDetail,
-	VerifikasiAgen
+	VerifikasiAgen,
+	AgenPemasar
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -726,5 +727,40 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 			teks: teksFallback(),
 			sliderDelayDetik: SLIDER_DELAY_DEFAULT
 		};
+	}
+}
+
+// Agen Omahe pemasar perumahan (AGEN-OMAHE-03) ------------------------------------
+
+/**
+ * Agen Omahe yang memasarkan satu perumahan (api-contract §21). `ref`
+ * diteruskan apa adanya: kalau milik salah satu agen, backend hanya
+ * mengembalikan agen itu. Blok ini PELENGKAP halaman detail — gagal apa pun
+ * → `[]` (blok tidak tampil), halaman tidak ikut jatuh. Fixture HANYA dev
+ * (pola `getMitra`): agen fiktif tidak boleh tampil di produksi.
+ */
+export async function getAgenPemasar(
+	fetchFn: Fetch,
+	slug: string,
+	ref: string | null
+): Promise<AgenPemasar[]> {
+	if (!hasSearchApi()) {
+		// Guard `PROD === true` pola `getVerifikasiAgen`: cabang fixture
+		// ter-tree-shake di build produksi, tetap teruji di `bun test`.
+		if (import.meta.env.PROD === true) return [];
+		const semua = fixtures.AGEN_PEMASAR[slug] ?? [];
+		const milikRef = ref ? semua.filter((a) => a.kodeRef === ref.toUpperCase()) : [];
+		return milikRef.length > 0 ? milikRef : semua;
+	}
+	try {
+		const q = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+		const data = await apiGet<AgenPemasar[]>(
+			fetchFn,
+			`/public/agen-omahe/perumahan/${encodeURIComponent(slug)}${q}`
+		);
+		return Array.isArray(data) ? data : [];
+	} catch (err) {
+		console.error('[omahe:api] GET agen pemasar gagal — fallback ke [] (blok tidak tampil)', err);
+		return [];
 	}
 }

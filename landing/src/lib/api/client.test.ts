@@ -241,3 +241,24 @@ describe('getVerifikasiAgen (AGEN-OMAHE-01, mode fixture)', () => {
 			});
 	});
 });
+
+// AGEN-OMAHE-03 — agen pemasar di detail perumahan (mode fixture).
+describe('getAgenPemasar (AGEN-OMAHE-03, mode fixture)', () => {
+	test('tanpa ref → semua agen perumahan itu, urutan fixture', async () => {
+		const { getAgenPemasar } = await import('./client');
+		const agen = await getAgenPemasar(fetchDummy, 'griya-asri-bogor', null);
+		expect(agen.map((a) => a.nama)).toEqual(['Widya Pratama', 'Dimas Nugraha']);
+	});
+
+	test('ref milik salah satu agen → hanya agen itu (atribusi tidak dibajak)', async () => {
+		const { getAgenPemasar } = await import('./client');
+		const agen = await getAgenPemasar(fetchDummy, 'griya-asri-bogor', 'ao-m7rq3hza');
+		expect(agen.map((a) => a.nama)).toEqual(['Dimas Nugraha']);
+	});
+
+	test('ref lain (QR kerjasama) diabaikan; perumahan tanpa agen → []', async () => {
+		const { getAgenPemasar } = await import('./client');
+		expect(await getAgenPemasar(fetchDummy, 'griya-asri-bogor', 'abc123')).toHaveLength(2);
+		expect(await getAgenPemasar(fetchDummy, 'villa-kenanga-residence', null)).toEqual([]);
+	});
+});

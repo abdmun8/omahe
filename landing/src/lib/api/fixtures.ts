@@ -31,7 +31,8 @@ import type {
 	PublicMitra,
 	PromoDetail,
 	TipeDetail,
-	VerifikasiAgen
+	VerifikasiAgen,
+	AgenPemasar
 } from './types';
 
 export const REGIONS: RegionOption[] = [
@@ -603,4 +604,29 @@ export const VERIFIKASI_AGEN: Record<string, VerifikasiAgen> = {
 		status: 'tidak_aktif',
 		berlakuSampai: '2026-08-31T00:00:00.000Z'
 	}
+};
+
+/**
+ * Agen Omahe pemasar per slug perumahan (AGEN-OMAHE-03, api-contract §21).
+ * DEV-SAJA (pola MITRA/VERIFIKASI_AGEN) — produksi tanpa API → blok agen
+ * tidak tampil, JANGAN pernah agen fiktif. Kode ID card = kode fixture
+ * verifikasi supaya link "terverifikasi" bisa dicoba di dev.
+ */
+export const AGEN_PEMASAR: Record<string, AgenPemasar[]> = {
+	'griya-asri-bogor': [
+		{
+			nama: 'Widya Pratama',
+			kantorNama: 'Omahe Bogor',
+			fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+			kodeAgen: 'OMH-7KQ2MX',
+			kodeRef: 'AO-K2269F4X'
+		},
+		{
+			nama: 'Dimas Nugraha',
+			kantorNama: 'Omahe Bogor',
+			fotoUrl: null,
+			kodeAgen: 'OMH-9PDWRT',
+			kodeRef: 'AO-M7RQ3HZA'
+		}
+	]
 };

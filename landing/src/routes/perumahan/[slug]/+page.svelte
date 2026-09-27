@@ -1,4 +1,5 @@
 <script lang="ts">
+	import AgenPemasar from '$lib/components/agen-pemasar.svelte';
 	import LandingSections from '$lib/components/landing-sections.svelte';
 	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
@@ -224,6 +225,9 @@
 
 	<!-- Konten -->
 	<div class="mt-8 space-y-10">
+		<!-- AGEN-OMAHE-03 — agen Omahe yang memasarkan (form minat per agen). -->
+		<AgenPemasar agen={data.agen} perumahanSlug={p.slug} namaPerumahan={p.nama} {opsiTipe} />
+
 		{#if pakaiBuilder}
 			<LandingSections
 				sections={p.sections!.filter((s) => s.type !== 'hero')}

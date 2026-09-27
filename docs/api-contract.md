@@ -521,7 +521,7 @@ endpoint yang sama dengan `?situs=<kode>`:
 - `GET /public/app-settings` menambah `sliderDelayDetik` (jeda carousel,
   2–30, bawaan 3) — per situs (`?situs=`). Carousel Omahe berputar terus.
 
-## 20. `GET /public/agen-omahe/verifikasi/:kode` (AGEN-OMAHE-01, backend iterasi-1 SELESAI tapi BELUM di-commit/deploy — 2026-09-26)
+## 20. `GET /public/agen-omahe/verifikasi/:kode` (AGEN-OMAHE-01, `done` & ter-push 2026-09-27)
 
 Verifikasi publik ID card agen Omahe — QR pada ID card membuka
 `www.omahe.co.id/verifikasi/:kode` (base URL diatur backend lewat
@@ -553,3 +553,24 @@ dibandingkan case-insensitive). Respons `data`:
   terlihat palsu). Nyala otomatis begitu backend di-deploy — HANYA butuh
   `OMAHE_API_SEARCH=1` yang sudah on. Halaman TIDAK masuk sitemap &
   `noindex` (URL per-kode, bukan konten organik).
+
+## 21. Agen Omahe pemasar & `ref` agen (AGEN-OMAHE-02/03, backend `done` 2026-09-27 — belum di-push/deploy)
+
+- `GET /public/agen-omahe/perumahan/:slug?ref=` →
+  `[{ nama, kantorNama, fotoUrl | null, kodeAgen, kodeRef }]`. Agen dengan
+  pilihan aktif + anggota/kantor/membership aktif untuk perumahan itu
+  (perumahan aktif & bukan milik agen properti), urut prioritas berbayar
+  (kedaluwarsa → 0) lalu yang lebih dulu memilih. `ref` = `kodeRef` salah
+  satu agen → HANYA agen itu; ref lain diabaikan. Omahe: `getAgenPemasar`
+  (fixture dev-saja, fail-soft `[]`) → blok `agen-pemasar.svelte` di
+  `/perumahan/:slug`.
+- **Kode `ref` agen** berbentuk `AO-XXXXXXXX` (lolos `REF_PATTERN` Omahe
+  apa adanya — passthrough tidak berubah). Booking `/ajukan/:slug?ref=AO-…`
+  diatribusi ke agen (komisi flat `perumahan.komisi_agen_omahe` di-snapshot
+  saat bayar pertama/DP); lead `POST /public/leads` dengan `ref` agen lolos
+  gate partner berbayar dan tercatat untuk agen itu (WA ke agen).
+- Form minat per agen: `LeadFormDialog` dengan `ref={kodeRef}` +
+  `namaAgen` (deskripsi dialog "agen X akan menghubungi Anda").
+- Diverifikasi E2E 2026-09-27: Omahe dev → backend lokal + DB dev (dua agen
+  tampil, `?ref` agen B → hanya B + CTA ajukan membawa ref B, link
+  verifikasi), data uji dibersihkan.

@@ -36,6 +36,7 @@
 		ref = null,
 		tipeMinatAwal = '',
 		opsiTipe = null,
+		namaAgen = null,
 		open = $bindable(false)
 	}: {
 		/** Slug perumahan tujuan lead — wajib di kontrak API §8. */
@@ -50,6 +51,9 @@
 		tipeMinatAwal?: string;
 		/** Daftar tipe → dirender sebagai select; null/kosong → teks bebas. */
 		opsiTipe?: string[] | null;
+		/** AGEN-OMAHE-03 — form minat agen Omahe: lead dikirim ke agen ini
+		 *  (`ref` = kode pilihan agen), bukan ke tim perumahan. */
+		namaAgen?: string | null;
 		open?: boolean;
 	} = $props();
 
@@ -166,7 +170,11 @@
 						Form Minat — {namaPerumahan}
 					</Dialog.Title>
 					<Dialog.Description class="text-muted mt-1 text-sm">
-						Tinggalkan kontak Anda, tim {namaPerumahan} akan menghubungi Anda.
+						{#if namaAgen}
+							Tinggalkan kontak Anda, agen {namaAgen} akan menghubungi Anda.
+						{:else}
+							Tinggalkan kontak Anda, tim {namaPerumahan} akan menghubungi Anda.
+						{/if}
 					</Dialog.Description>
 				</div>
 				<Dialog.Close
