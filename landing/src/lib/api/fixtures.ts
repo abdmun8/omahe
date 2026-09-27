@@ -32,7 +32,8 @@ import type {
 	PromoDetail,
 	TipeDetail,
 	VerifikasiAgen,
-	AgenPemasar
+	AgenPemasar,
+	AgenDirektori
 } from './types';
 
 export const REGIONS: RegionOption[] = [
@@ -630,3 +631,25 @@ export const AGEN_PEMASAR: Record<string, AgenPemasar[]> = {
 		}
 	]
 };
+
+/** Direktori agen Omahe (AGEN-OMAHE-04) — DEV-SAJA, pola AGEN_PEMASAR. */
+export const DIREKTORI_AGEN: AgenDirektori[] = [
+	{
+		nama: 'Dimas Nugraha',
+		kantorNama: 'Omahe Bogor',
+		fotoUrl: null,
+		kodeAgen: 'OMH-9PDWRT'
+	},
+	{
+		nama: 'Widya Pratama',
+		kantorNama: 'Omahe Bogor',
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+		kodeAgen: 'OMH-7KQ2MX'
+	},
+	{
+		nama: 'Sari Anggraini',
+		kantorNama: 'Omahe Depok',
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-sari/240/240',
+		kodeAgen: 'OMH-4TNB8E'
+	}
+];

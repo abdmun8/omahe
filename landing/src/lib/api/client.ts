@@ -39,7 +39,9 @@ import type {
 	TeksOmahe,
 	TipeDetail,
 	VerifikasiAgen,
-	AgenPemasar
+	AgenPemasar,
+	AgenDirektori,
+	AgenMinatInput
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -388,6 +390,33 @@ export class ApiError extends Error {
 // ---------------------------------------------------------------------------
 
 /**
+ * Pesan ramah dari body error backend `perumahan` — bentuknya
+ * `{ error, code, issues? }` (middleware `globalErrorHandler`), BUKAN
+ * `{ message }`. 400 validasi: pesan issue pertama (mis. "Nomor WhatsApp
+ * tidak valid."), selain itu `error` (mis. 429 rate limit). 5xx / body
+ * aneh → null (pemanggil memakai pesan generik; detail internal tidak
+ * pernah diteruskan).
+ */
+export async function pesanErrorBackend(res: Response): Promise<string | null> {
+	if (res.status >= 500) return null;
+	try {
+		const body = (await res.json()) as {
+			error?: unknown;
+			message?: unknown;
+			issues?: Array<{ message?: unknown }>;
+		};
+		const issue = Array.isArray(body.issues) ? body.issues[0]?.message : undefined;
+		for (const kandidat of [issue, body.error, body.message]) {
+			if (typeof kandidat === 'string' && kandidat && kandidat !== 'Validation failed')
+				return kandidat;
+		}
+	} catch {
+		// body bukan JSON — pakai pesan generik.
+	}
+	return null;
+}
+
+/**
  * Submit lead form publik `POST /public/leads` — HANYA untuk perumahan
  * partner berbayar (prioritas > 0); selain itu backend 404 seragam.
  *
@@ -423,13 +452,7 @@ export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<void
 	// ramah, 404 PESAN SERAGAM (jangan dipakai membedakan status komersial
 	// di UI). Yang tidak berpesan → generik; error internal backend tidak
 	// pernah diteruskan mentah-mentah.
-	let serverMessage: string | null = null;
-	try {
-		const body = (await res.json()) as { message?: unknown };
-		if (typeof body.message === 'string' && body.message) serverMessage = body.message;
-	} catch {
-		// body bukan JSON — pakai pesan generik di bawah.
-	}
+	const serverMessage = await pesanErrorBackend(res);
 	console.error(`[omahe:api] POST /public/leads → ${res.status}`);
 	throw new ApiError(res.status, serverMessage ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');
 }
@@ -763,4 +786,50 @@ export async function getAgenPemasar(
 		console.error('[omahe:api] GET agen pemasar gagal — fallback ke [] (blok tidak tampil)', err);
 		return [];
 	}
+}
+
+// Direktori agen Omahe + minat umum (AGEN-OMAHE-04) -------------------------------
+
+/**
+ * Agen Omahe aktif untuk tab "Agen Omahe" di `/mitra` (api-contract §23).
+ * Pola `getAgenPemasar`: fixture HANYA non-produksi, gagal → `[]`
+ * (tab menampilkan empty-state, halaman tidak jatuh).
+ */
+export async function getDirektoriAgen(fetchFn: Fetch): Promise<AgenDirektori[]> {
+	if (!hasSearchApi()) {
+		if (import.meta.env.PROD === true) return [];
+		return fixtures.DIREKTORI_AGEN;
+	}
+	try {
+		const data = await apiGet<AgenDirektori[]>(fetchFn, '/public/agen-omahe');
+		return Array.isArray(data) ? data : [];
+	} catch (err) {
+		console.error('[omahe:api] GET /public/agen-omahe gagal — fallback ke [] (empty-state)', err);
+		return [];
+	}
+}
+
+/**
+ * Kirim minat umum ke agen (`POST /public/agen-omahe/:kode/minat`). Pola
+ * `createLead`: pesan backend (400/404/429) diteruskan lewat `ApiError`.
+ * Mode fixture → no-op sukses (dev).
+ */
+export async function kirimMinatAgen(fetchFn: Fetch, input: AgenMinatInput): Promise<void> {
+	if (!hasSearchApi()) return;
+	const { kodeAgen, ...body } = input;
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/agen-omahe/${encodeURIComponent(kodeAgen)}/minat`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			body: JSON.stringify(body),
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	if (res.ok) return;
+	const serverMessage = await pesanErrorBackend(res);
+	console.error(`[omahe:api] POST minat agen → ${res.status}`);
+	throw new ApiError(res.status, serverMessage ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');
 }

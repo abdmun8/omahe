@@ -37,6 +37,7 @@
 		tipeMinatAwal = '',
 		opsiTipe = null,
 		namaAgen = null,
+		kodeAgen = null,
 		open = $bindable(false)
 	}: {
 		/** Slug perumahan tujuan lead — wajib di kontrak API §8. */
@@ -54,6 +55,9 @@
 		/** AGEN-OMAHE-03 — form minat agen Omahe: lead dikirim ke agen ini
 		 *  (`ref` = kode pilihan agen), bukan ke tim perumahan. */
 		namaAgen?: string | null;
+		/** AGEN-OMAHE-04 — mode minat UMUM ke agen (tab Agen Omahe di /mitra,
+		 *  tanpa perumahan): POST ke `/api/agen-minat`, field tipe disembunyikan. */
+		kodeAgen?: string | null;
 		open?: boolean;
 	} = $props();
 
@@ -108,20 +112,32 @@
 		proses = true;
 		pesanError = null;
 		try {
-			const res = await fetch('/api/lead', {
-				method: 'POST',
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					perumahanSlug,
-					nama: nama.trim(),
-					telepon: telepon.trim(),
-					tipeMinat: tipeMinat.trim() || undefined,
-					pesan: pesan.trim() || undefined,
-					sumber,
-					ref: ref ?? undefined,
-					website // honeypot dikirim APA ADANYA — server yang menangani.
-				})
-			});
+			const res = kodeAgen
+				? await fetch('/api/agen-minat', {
+						method: 'POST',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify({
+							kodeAgen,
+							nama: nama.trim(),
+							telepon: telepon.trim(),
+							pesan: pesan.trim() || undefined,
+							website
+						})
+					})
+				: await fetch('/api/lead', {
+						method: 'POST',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify({
+							perumahanSlug,
+							nama: nama.trim(),
+							telepon: telepon.trim(),
+							tipeMinat: tipeMinat.trim() || undefined,
+							pesan: pesan.trim() || undefined,
+							sumber,
+							ref: ref ?? undefined,
+							website // honeypot dikirim APA ADANYA — server yang menangani.
+						})
+					});
 			if (!res.ok) {
 				// Pesan backend lebih tahu (429 rate limit sudah ramah, 400 punya
 				// detail field) — tampilkan apa adanya (api-contract.md §8).
@@ -167,7 +183,7 @@
 			<div class="flex items-start justify-between gap-4">
 				<div>
 					<Dialog.Title class="font-display text-ink text-lg font-extrabold">
-						Form Minat — {namaPerumahan}
+						{kodeAgen && namaAgen ? `Hubungi ${namaAgen}` : `Form Minat — ${namaPerumahan}`}
 					</Dialog.Title>
 					<Dialog.Description class="text-muted mt-1 text-sm">
 						{#if namaAgen}
@@ -188,7 +204,11 @@
 			{#if sukses}
 				<div role="status" class="flex flex-col gap-4">
 					<p class="text-ink text-sm leading-relaxed">
-						Terima kasih, tim {namaPerumahan} akan menghubungi Anda.
+						{#if namaAgen}
+							Terima kasih, agen {namaAgen} akan menghubungi Anda.
+						{:else}
+							Terima kasih, tim {namaPerumahan} akan menghubungi Anda.
+						{/if}
 					</p>
 					<!-- Sekunder OPSIONAL ke nomor umum Omahe (bukan WA partner) —
 					     konteks nama properti masuk pesan pembuka, pola
@@ -250,31 +270,31 @@
 						/>
 					</div>
 
-					<div>
-						<label for="{uid}-tipe" class="text-ink mb-1 block text-sm font-medium">
-							Tipe yang diminati <span class="text-muted font-normal">(opsional)</span>
-						</label>
-						{#if opsiTipe && opsiTipe.length > 0}
-							<!-- Pemanggil mengirim daftar tipe (mis. halaman detail yang
+					{#if !kodeAgen}<div>
+							<label for="{uid}-tipe" class="text-ink mb-1 block text-sm font-medium">
+								Tipe yang diminati <span class="text-muted font-normal">(opsional)</span>
+							</label>
+							{#if opsiTipe && opsiTipe.length > 0}
+								<!-- Pemanggil mengirim daftar tipe (mis. halaman detail yang
 							     punya daftar tipe unit) → select; teks bebas kalau tidak. -->
-							<select id="{uid}-tipe" name="tipeMinat" bind:value={tipeMinat} class={kelasField}>
-								<option value="">Belum tahu</option>
-								{#each opsiTipe as tipe (tipe)}
-									<option value={tipe}>{tipe}</option>
-								{/each}
-							</select>
-						{:else}
-							<input
-								id="{uid}-tipe"
-								name="tipeMinat"
-								type="text"
-								maxlength="50"
-								placeholder="mis. Tipe 36/72"
-								bind:value={tipeMinat}
-								class={kelasField}
-							/>
-						{/if}
-					</div>
+								<select id="{uid}-tipe" name="tipeMinat" bind:value={tipeMinat} class={kelasField}>
+									<option value="">Belum tahu</option>
+									{#each opsiTipe as tipe (tipe)}
+										<option value={tipe}>{tipe}</option>
+									{/each}
+								</select>
+							{:else}
+								<input
+									id="{uid}-tipe"
+									name="tipeMinat"
+									type="text"
+									maxlength="50"
+									placeholder="mis. Tipe 36/72"
+									bind:value={tipeMinat}
+									class={kelasField}
+								/>
+							{/if}
+						</div>{/if}
 
 					<div>
 						<label for="{uid}-pesan" class="text-ink mb-1 block text-sm font-medium">

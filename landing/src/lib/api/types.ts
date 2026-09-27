@@ -584,3 +584,22 @@ export interface AgenPemasar {
 	 *  lead tercatat untuk agen ini. */
 	kodeRef: string;
 }
+
+/** AGEN-OMAHE-04 — agen di tab "Agen Omahe" halaman Mitra (`GET /public/agen-omahe`, api-contract §23). */
+export interface AgenDirektori {
+	nama: string;
+	kantorNama: string;
+	fotoUrl: string | null;
+	/** Kode ID card → `/verifikasi/:kodeAgen` & tujuan form minat. */
+	kodeAgen: string;
+}
+
+/** Body minat umum ke agen (proxy `/api/agen-minat`). */
+export interface AgenMinatInput {
+	kodeAgen: string;
+	nama: string;
+	telepon: string;
+	pesan?: string;
+	/** Honeypot — dikirim apa adanya. */
+	website?: string;
+}

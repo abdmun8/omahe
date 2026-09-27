@@ -4,6 +4,7 @@
 	halaman ini jujur "belum ada mitra" (fixture hanya dev).
 -->
 <script lang="ts">
+	import AgenOmaheCard from '$lib/components/agen-omahe-card.svelte';
 	import MitraCard from '$lib/components/mitra-card.svelte';
 	import type { PageData } from './$types';
 
@@ -37,15 +38,44 @@
 			<a
 				href={k.nilai ? `/mitra?kategori=${k.nilai}` : '/mitra'}
 				class={`inline-flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors ${
-					(data.kategori ?? null) === k.nilai
+					!data.tabAgen && (data.kategori ?? null) === k.nilai
 						? 'bg-primary text-white'
 						: 'bg-surface text-muted hover:text-primary'
 				}`}>{k.label}</a
 			>
 		{/each}
+		<!-- AGEN-OMAHE-04 — tab agen internal Omahe (bukan kategori mitra). -->
+		<a
+			href="/mitra?tab=agen"
+			class={`inline-flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors ${
+				data.tabAgen ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-primary'
+			}`}>Agen Omahe</a
+		>
 	</nav>
 
-	{#if data.mitra.length === 0}
+	{#if data.tabAgen}
+		<p class="text-muted mt-4 max-w-2xl text-sm leading-relaxed">
+			Agen resmi Omahe dengan keanggotaan aktif — identitasnya bisa dicek lewat tautan verifikasi.
+			Tinggalkan kontak Anda, agen akan membantu mencarikan rumah yang pas.
+		</p>
+		{#if data.agen.length === 0}
+			<div class="bg-surface mt-6 rounded-2xl p-8 text-center">
+				<p class="text-ink font-semibold">Belum ada agen yang ditampilkan</p>
+				<p class="text-muted mx-auto mt-1 max-w-md text-sm leading-relaxed">
+					Ingin menjadi agen Omahe? Lihat caranya di
+					<a href="/gabung/agen" class="text-primary font-medium hover:underline"
+						>halaman gabung agen</a
+					>.
+				</p>
+			</div>
+		{:else}
+			<ul class="mt-6 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+				{#each data.agen as a (a.kodeAgen)}
+					<li><AgenOmaheCard agen={a} /></li>
+				{/each}
+			</ul>
+		{/if}
+	{:else if data.mitra.length === 0}
 		<div class="bg-surface mt-8 rounded-2xl p-8 text-center">
 			<p class="text-ink font-semibold">Belum ada mitra yang ditampilkan</p>
 			<p class="text-muted mx-auto mt-1 max-w-md text-sm leading-relaxed">

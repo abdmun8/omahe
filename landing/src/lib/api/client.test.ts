@@ -262,3 +262,55 @@ describe('getAgenPemasar (AGEN-OMAHE-03, mode fixture)', () => {
 		expect(await getAgenPemasar(fetchDummy, 'villa-kenanga-residence', null)).toEqual([]);
 	});
 });
+
+// AGEN-OMAHE-04 — direktori agen (mode fixture).
+describe('getDirektoriAgen (AGEN-OMAHE-04, mode fixture)', () => {
+	test('fixture dev: agen tanpa nomor HP, urut kantor', async () => {
+		const { getDirektoriAgen } = await import('./client');
+		const agen = await getDirektoriAgen(fetchDummy);
+		expect(agen.length).toBeGreaterThan(0);
+		for (const a of agen) {
+			expect(a.kodeAgen).toMatch(/^OMH-/);
+			expect('telepon' in a).toBe(false);
+		}
+	});
+
+	test('kirimMinatAgen mode fixture → no-op sukses tanpa fetch', async () => {
+		const { kirimMinatAgen } = await import('./client');
+		await expect(
+			kirimMinatAgen(fetchDummy, { kodeAgen: 'OMH-7KQ2MX', nama: 'Budi', telepon: '0812' })
+		).resolves.toBeUndefined();
+	});
+});
+
+// Bentuk error backend `{ error, code, issues }` — pesan ramah harus sampai UI.
+describe('pesanErrorBackend', () => {
+	const res = (status: number, body: unknown) =>
+		new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+
+	test('429 → pesan `error` backend (rate limit ramah)', async () => {
+		const { pesanErrorBackend } = await import('./client');
+		expect(
+			await pesanErrorBackend(res(429, { error: 'Terlalu banyak permintaan.', code: 429 }))
+		).toBe('Terlalu banyak permintaan.');
+	});
+
+	test('400 validasi → pesan issue pertama, bukan "Validation failed"', async () => {
+		const { pesanErrorBackend } = await import('./client');
+		expect(
+			await pesanErrorBackend(
+				res(400, {
+					error: 'Validation failed',
+					code: 400,
+					issues: [{ message: 'Nomor WhatsApp tidak valid.' }]
+				})
+			)
+		).toBe('Nomor WhatsApp tidak valid.');
+	});
+
+	test('5xx / bukan JSON → null (pesan generik di pemanggil)', async () => {
+		const { pesanErrorBackend } = await import('./client');
+		expect(await pesanErrorBackend(res(500, { error: 'stack trace' }))).toBeNull();
+		expect(await pesanErrorBackend(new Response('oops', { status: 404 }))).toBeNull();
+	});
+});

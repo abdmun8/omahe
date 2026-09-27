@@ -1,4 +1,4 @@
-import { getMitra } from '$lib/api';
+import { getDirektoriAgen, getMitra } from '$lib/api';
 import { kategoriChips } from '$lib/mitra';
 import type { PageServerLoad } from './$types';
 
@@ -13,7 +13,13 @@ import type { PageServerLoad } from './$types';
  * di data diabaikan (kembali ke daftar penuh), bukan 404 — pola lama.
  */
 export const load: PageServerLoad = async ({ fetch, url }) => {
-	const semua = await getMitra(fetch);
+	// AGEN-OMAHE-04 — tab "Agen Omahe" (`?tab=agen`): direktori agen, chip
+	// kategori tetap tampil (satu fetch mitra tetap dibutuhkan untuk chip).
+	const tabAgen = url.searchParams.get('tab') === 'agen';
+	const [semua, agen] = await Promise.all([
+		getMitra(fetch),
+		tabAgen ? getDirektoriAgen(fetch) : Promise.resolve([])
+	]);
 	const chips = kategoriChips(semua);
 	const q = url.searchParams.get('kategori');
 	// Null/undefined = "Semua"; hanya nilai yang BENAR-BENAR ada di data yang
@@ -21,7 +27,9 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 	const kategori = q !== null && chips.some((c) => c.nilai === q) ? q : undefined;
 	return {
 		mitra: kategori ? semua.filter((m) => m.kategori === kategori) : semua,
-		kategori,
-		chips
+		kategori: tabAgen ? undefined : kategori,
+		chips,
+		tabAgen,
+		agen
 	};
 };

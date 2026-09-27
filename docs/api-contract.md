@@ -582,3 +582,22 @@ dibandingkan case-insensitive). Respons `data`:
   berkategori nonaktif tidak dikirim. Omahe: `labelKategoriDari()` +
   `kategoriChips()` urut `kategoriUrutan` (fallback humanize & urutan
   kemunculan untuk respons lama/fixture — field opsional di tipe).
+
+## 23. Direktori agen Omahe & minat umum (AGEN-OMAHE-04, backend `done` 2026-09-27 — belum di-push/deploy)
+
+- `GET /public/agen-omahe` → `[{ nama, kantorNama, fotoUrl | null,
+  kodeAgen }]` — anggota & kantor aktif + membership aktif, urut kantor
+  lalu nama. Tanpa nomor HP. Omahe: `getDirektoriAgen` (fixture dev-saja,
+  fail-soft `[]`) → tab **Agen Omahe** di `/mitra?tab=agen`.
+- `POST /public/agen-omahe/:kodeAgen/minat { nama, telepon, pesan?,
+  website }` → `{ ok: true }`; 400 validasi, 404 agen tidak aktif, 429
+  >3/24 jam per (telepon, agen). Omahe: proxy `/api/agen-minat` +
+  `LeadFormDialog` mode `kodeAgen`.
+- **Bentuk error backend** `perumahan` = `{ error, code, issues? }` (bukan
+  `{ message }`) — `pesanErrorBackend()` mengambil pesan issue pertama /
+  `error`. Sebelum 2026-09-27 `createLead` membaca `message` sehingga pesan
+  rate limit & validasi lead tidak pernah sampai ke pengunjung (selalu
+  pesan generik) — kini diperbaiki untuk lead maupun minat agen.
+- Diverifikasi E2E 2026-09-27 (Omahe dev → backend lokal + DB dev): tab
+  agen HTTP 200 menampilkan agen + link verifikasi; minat tercatat; pesan
+  404/400/429 tampil apa adanya. Data uji dibersihkan.
