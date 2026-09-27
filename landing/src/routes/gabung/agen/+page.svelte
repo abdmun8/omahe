@@ -2,7 +2,7 @@
 	Gabung — Agen Omahe (omahe#3). Keuntungan member sesuai model AGEN-00
 	(repo `perumahan`, 2026-09-26): membership tahunan + token per
 	perumahan + komisi flat per booking sukses. PENDAFTARAN MASIH MANUAL —
-	kantor & anggota dibuat/disetujui superadmin (AGEN-OMAHE-01 `todo`),
+	kantor & anggota dibuat/disetujui superadmin (AGEN-OMAHE-01),
 	jadi CTA-nya hubungi tim Omahe, BUKAN form mandiri. Punya perumahan
 	sendiri → arahkan ke /gabung/perumahan (alur agen properti, AUTH-05).
 -->

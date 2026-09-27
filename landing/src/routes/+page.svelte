@@ -19,6 +19,25 @@
 			heroSubjudul: SITE.heroSubjudul
 		}
 	);
+
+	// Kartu banner "Tumbuh bersama Omahe" (omahe#3) — ringkasan tiga audiens /gabung.
+	const GABUNG = [
+		{
+			slug: 'agen',
+			judul: 'Agen Omahe',
+			isi: 'Membership, komisi penjualan, dan banyak perumahan untuk dipasarkan.'
+		},
+		{
+			slug: 'mitra',
+			judul: 'Mitra Profesional',
+			isi: 'KJPP, notaris, asuransi, pemborong, arsitek — tampil di direktori Omahe.'
+		},
+		{
+			slug: 'perumahan',
+			judul: 'Developer & Perumahan',
+			isi: 'Jaringan marketing tersebar dan alur booking yang terkelola.'
+		}
+	] as const;
 </script>
 
 <svelte:head>
@@ -155,7 +174,7 @@
 	</div>
 
 	<ul class="mt-6 grid list-none gap-4 sm:grid-cols-3">
-		{#each [{ slug: 'agen', judul: 'Agen Omahe', isi: 'Membership, komisi penjualan, dan banyak perumahan untuk dipasarkan.' }, { slug: 'mitra', judul: 'Mitra Profesional', isi: 'KJPP, notaris, asuransi, pemborong, arsitek — tampil di direktori Omahe.' }, { slug: 'perumahan', judul: 'Developer & Perumahan', isi: 'Jaringan marketing tersebar dan alur booking yang terkelola.' }] as a (a.slug)}
+		{#each GABUNG as a (a.slug)}
 			<li>
 				<a
 					href={withRef(`/gabung/${a.slug}`, data.ref)}
