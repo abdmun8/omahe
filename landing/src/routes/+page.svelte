@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SITE } from '$lib/config';
+	import { trackGabungClick } from '$lib/analytics';
 	import { withRef } from '$lib/ref';
 	import DeveloperCard from '$lib/components/developer-card.svelte';
 	import SearchForm from '$lib/components/search-form.svelte';
@@ -131,4 +132,41 @@
 		</div>
 		<Button variant="primary" size="lg" href="/kpr" class="shrink-0">Buka Simulasi KPR</Button>
 	</div>
+</section>
+
+<!-- Banner rekrutmen jaringan (omahe#3) — B2B-lite di HALAMAN B2C: tetap
+     satu section ringkas di bawah, tidak menggeser konten pembeli. Tanpa
+     bg-surface: footer ber-warna surface dan ber-`mt-16`, section surface
+     tepat sebelumnya bikin strip putih di antaranya. -->
+<section class="mx-auto max-w-6xl px-4 py-12">
+	<div class="flex items-end justify-between gap-4">
+		<div>
+			<h2 class="font-display text-ink text-2xl font-bold">Tumbuh bersama Omahe</h2>
+			<p class="text-muted mt-1 text-sm">Jual rumah, tawarkan jasa, atau pasarkan proyek Anda.</p>
+		</div>
+		<Button
+			variant="ghost"
+			href={withRef('/gabung', data.ref)}
+			class="shrink-0"
+			onclick={() => trackGabungClick('hub')}
+		>
+			Lihat semua
+		</Button>
+	</div>
+
+	<ul class="mt-6 grid list-none gap-4 sm:grid-cols-3">
+		{#each [{ slug: 'agen', judul: 'Agen Omahe', isi: 'Membership, komisi penjualan, dan banyak perumahan untuk dipasarkan.' }, { slug: 'mitra', judul: 'Mitra Profesional', isi: 'KJPP, notaris, asuransi, pemborong, arsitek — tampil di direktori Omahe.' }, { slug: 'perumahan', judul: 'Developer & Perumahan', isi: 'Jaringan marketing tersebar dan alur booking yang terkelola.' }] as a (a.slug)}
+			<li>
+				<a
+					href={withRef(`/gabung/${a.slug}`, data.ref)}
+					class="border-line flex h-full flex-col rounded-2xl border bg-white p-5 transition-shadow hover:shadow-md"
+					onclick={() => trackGabungClick(a.slug)}
+				>
+					<h3 class="font-display text-ink text-base font-bold">{a.judul}</h3>
+					<p class="text-muted mt-1.5 text-sm leading-relaxed">{a.isi}</p>
+					<span class="text-primary mt-3 text-sm font-medium">Lihat detail &rarr;</span>
+				</a>
+			</li>
+		{/each}
+	</ul>
 </section>

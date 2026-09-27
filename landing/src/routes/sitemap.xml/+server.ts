@@ -12,6 +12,10 @@ const STATIS = [
 	'/artikel',
 	'/promo',
 	'/mitra',
+	'/gabung',
+	'/gabung/agen',
+	'/gabung/mitra',
+	'/gabung/perumahan',
 	'/kpr',
 	'/tentang',
 	'/kontak'

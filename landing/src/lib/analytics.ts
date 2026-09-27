@@ -7,6 +7,7 @@
  *   - phone_click      — contact-buttons.svelte
  *   - lead_form_open   — lead-form-dialog.svelte (dialog dibuka)
  *   - lead_form_submit — lead-form-dialog.svelte (submit sukses)
+ *   - gabung_click     — banner homepage + halaman /gabung* (omahe#3)
  * (iterasi 2: kartu/slider/CTA lain menyusul dengan pola yang sama)
  *
  * ATURAN KERAS (Google ToS — PII dilarang di GA): JANGAN pernah mengirim
@@ -56,6 +57,16 @@ export function trackEvent(nama: string, params?: Record<string, ParamGA>): void
  */
 export function trackCtaAjukan(perumahan: string, adaRef: boolean): void {
 	trackEvent('cta_ajukan', { perumahan, ada_ref: adaRef });
+}
+
+/**
+ * Event klik CTA rekrutmen jaringan (omahe#3) — dipasang di banner homepage,
+ * kartu audiens /gabung, dan CTA daftar di sub-halaman. `audiens` =
+ * 'agen' | 'mitra' | 'perumahan' (slug route, bukan label bebas) supaya
+ * laporan GA tidak pecah oleh variasi ejaan. Non-PII.
+ */
+export function trackGabungClick(audiens: string): void {
+	trackEvent('gabung_click', { audiens });
 }
 
 /**

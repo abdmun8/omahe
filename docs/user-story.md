@@ -56,8 +56,9 @@ Mari diskusikan, mana yang lebih baik kita pakai? saya tidak prefer nextjs karen
 - **Dark mode**: tidak perlu untuk sekarang — light-only (konsisten dengan referensi mybeyond/brighton/rumah123, semua light-only).
 - **Font**: heading — Plus Jakarta Sans (bold, modern, cocok angka harga besar); body — Inter (readable). Pairing umum fintech/property, gampang diganti kalau perlu.
 
-## Scope B2C vs B2B (2026-09-13)
-- **Keputusan**: Omahe murni marketplace **konsumen (B2C)** — cari & lihat rumah untuk dibeli. Halaman rekrutmen developer/agen/mitra baru (jual sistem hadirapp, B2B) TETAP scope terpisah — sudah ada epic `SITE-01-landing-principal.md` (`todo`) di repo `perumahan` untuk itu, tidak digabung ke Omahe. Bisa disambung lewat link CTA dari Omahe ke sana nanti kalau perlu, bukan dibangun di dalam Omahe.
+## Scope B2C vs B2B (2026-09-13, direvisi 2026-09-26)
+- **Keputusan awal**: Omahe murni marketplace **konsumen (B2C)** — cari & lihat rumah untuk dibeli. Halaman rekrutmen developer/agen/mitra baru (jual sistem hadirapp, B2B) TETAP scope terpisah — sudah ada epic `SITE-01-landing-principal.md` (`todo`) di repo `perumahan` untuk itu, tidak digabung ke Omahe.
+- **Revisi 2026-09-26 (omahe#3)**: halaman **"Gabung Jaringan Omahe"** (`/gabung` + sub-per-audiens) MASUK scope Omahe — ini rekrutmen untuk jaringan Omahe SENDIRI (agen Omahe bermembership, mitra profesional direktori `/mitra`, developer/perumahan penghuni marketplace), bukan penjualan sistem hadirapp. Bentuknya halaman marketing + tautan: form pendaftaran TIDAK dibangun ulang, CTA mengarah ke form mandiri AUTH-05 app `perumahan` (`/daftar/perumahan`, `/daftar/perusahaan` — `done`) lewat `src/lib/app-url.ts`; agen Omahe (pendaftarannya belum ada — AGEN-OMAHE-01 `todo`) diarahkan hubungi tim Omahe. Banner rekrutmen ditaruh SATU section di bawah homepage supaya halaman B2C tidak bergeser fokus.
 
 ## Domain & URL (2026-09-13, direvisi setelah entitas developer ditambah)
 - Domain final: **`www.omahe.co.id`** — diganti dari rencana awal `omahe.id` pada
@@ -82,6 +83,10 @@ Mari diskusikan, mana yang lebih baik kita pakai? saya tidak prefer nextjs karen
 | `/perumahan/:slug` | Detail satu proyek perumahan (Omahe-rendered, dipindah dari `/developer/:slug`) — hero, galeri, fasilitas, lokasi, testimoni, FAQ (reuse konten `sections` dari `LANDING-02`) + daftar tipe unit + baris "Dikembangkan oleh" + CTA "Ajukan" → `/ajukan/:slug?ref=...` (passthrough `ref`, lihat `LANDING-05`) | `GET /public/perumahan/:slug` + `GET /public/units?perumahanSlug=` |
 | `/kpr` | Simulasi cicilan KPR — kalkulator mandiri client-side (flat/anuitas), tanpa backend | — |
 | `/tentang`, `/kontak` | Corporate info Omahe — statis | — |
+| `/gabung` | Hub rekrutmen jaringan Omahe — 3 kartu audiens (prerender, statis) | — |
+| `/gabung/agen` | Keuntungan member agen Omahe (membership, komisi, banyak perumahan, referral nasabah) + CTA hubungi tim Omahe (kontak ADMIN-05) | statis + `page.data.kontak` |
+| `/gabung/mitra` | Keuntungan mitra profesional + CTA ke form AUTH-05 `/daftar/perusahaan` (app `perumahan`) | statis + `page.data.kontak` |
+| `/gabung/perumahan` | Keuntungan developer/perumahan + CTA ke form AUTH-05 `/daftar/perumahan` (app `perumahan`) | statis + `page.data.kontak` |
 | `/privasi`, `/syarat-ketentuan` | Legal Omahe sendiri (beda dari `/legal/:kind` milik app `perumahan` yang khusus proses booking) | statis |
 
 Detail unit sebagai halaman tersendiri (`/unit/:id`) **ditunda** — cukup anchor/section di `/perumahan/:slug` untuk MVP, karena foto & deskripsi cuma ada di level perumahan (bukan per-unit), jadi halaman detail unit sendiri isinya akan tipis. Bisa dipecah nanti kalau ada kebutuhan deep-link dari hasil pencarian ke unit spesifik.

@@ -412,6 +412,8 @@ export function projectSlugs(): string[] {
  * (halaman /mitra empty-state sampai backend live; JANGAN tampilkan data
  * fiktif di produksi — nomor WA di bawah bukan nomor sungguhan). Urutan
  * fixture = urutan server. Satu `logoUrl: null` utk jalur fallback inisial.
+ * Dua kategori DI LUAR enum v1 (asuransi, pemborong) sengaja ikut —
+ * menguji chip & badge dinamis (omahe#3) di dev.
  */
 export const MITRA: PublicMitra[] = [
 	{
@@ -453,6 +455,27 @@ export const MITRA: PublicMitra[] = [
 		telepon: null,
 		logoUrl: 'https://picsum.photos/seed/omahe-notaris-ratna/400/400',
 		urutan: 4
+	},
+	// Dua entri di luar enum v1 — menguji chip/badge kategori dinamis (omahe#3).
+	{
+		id: '00000000-0000-4000-8000-000000000205',
+		nama: 'Asuransi Properti Amanah',
+		kategori: 'asuransi',
+		wilayahLayanan: 'Nasional',
+		whatsapp: '6281100000205',
+		telepon: null,
+		logoUrl: 'https://picsum.photos/seed/omahe-asuransi-amanah/400/400',
+		urutan: 5
+	},
+	{
+		id: '00000000-0000-4000-8000-000000000206',
+		nama: 'CV Bangu Rumah Sejahtera',
+		kategori: 'pemborong',
+		wilayahLayanan: 'Jabodetabek',
+		whatsapp: '6281100000206',
+		telepon: '62211234506',
+		logoUrl: null,
+		urutan: 6
 	}
 ];
 

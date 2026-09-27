@@ -8,12 +8,6 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-
-	const KATEGORI = [
-		{ nilai: null, label: 'Semua' },
-		{ nilai: 'kjpp', label: 'KJPP' },
-		{ nilai: 'notaris', label: 'Notaris' }
-	] as const;
 </script>
 
 <svelte:head>
@@ -33,13 +27,13 @@
 	<header class="max-w-2xl">
 		<h1 class="font-display text-ink text-2xl font-extrabold sm:text-3xl">Mitra Profesional</h1>
 		<p class="text-muted mt-2 leading-relaxed">
-			Kantor Jasa Penilai Publik (KJPP) dan Notaris/PPAT dalam satu direktori — dari penilaian
-			harga hingga akad jual beli, didampingi profesional yang tepat.
+			Kantor Jasa Penilai Publik (KJPP) dan Notaris/PPAT dalam satu direktori — dari penilaian harga
+			hingga akad jual beli, didampingi profesional yang tepat.
 		</p>
 	</header>
 
 	<nav class="mt-6 flex gap-2 overflow-x-auto pb-1" aria-label="Filter kategori mitra">
-		{#each KATEGORI as k (k.label)}
+		{#each data.chips as k (k.label)}
 			<a
 				href={k.nilai ? `/mitra?kategori=${k.nilai}` : '/mitra'}
 				class={`inline-flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors ${
@@ -55,10 +49,10 @@
 		<div class="bg-surface mt-8 rounded-2xl p-8 text-center">
 			<p class="text-ink font-semibold">Belum ada mitra yang ditampilkan</p>
 			<p class="text-muted mx-auto mt-1 max-w-md text-sm leading-relaxed">
-				Direktori mitra profesional sedang disiapkan. Kalau Anda KJPP atau Notaris yang ingin
-				bergabung, hubungi kami di
-				<a href="mailto:halo@omahe.co.id" class="text-primary font-medium hover:underline"
-					>halo@omahe.co.id</a
+				Direktori mitra profesional sedang disiapkan. Kalau Anda KJPP, notaris, asuransi, pemborong,
+				atau profesional properti lain yang ingin bergabung, lihat caranya di
+				<a href="/gabung/mitra" class="text-primary font-medium hover:underline"
+					>halaman gabung mitra</a
 				>.
 			</p>
 		</div>

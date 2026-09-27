@@ -31,6 +31,10 @@
 				<!-- PROMO-02 — di footer (bukan nav utama): daftar promo bisa kosong. -->
 				<li><a href={withRef('/promo', ref)} class="hover:text-primary">Promo</a></li>
 				<li><a href={withRef('/agen', ref)} class="hover:text-primary">Agen Properti</a></li>
+				<!-- omahe#3 — rekrutmen jaringan: nav utama tetap 7 item (muat tanpa
+				     overflow, terverifikasi MITRA-01), pintu masuknya footer + banner
+				     homepage + empty-state /mitra. -->
+				<li><a href={withRef('/gabung', ref)} class="hover:text-primary">Gabung</a></li>
 			</ul>
 		</div>
 

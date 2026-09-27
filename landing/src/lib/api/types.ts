@@ -432,7 +432,13 @@ export interface RegionOption {
 export interface PublicMitra {
 	id: string;
 	nama: string;
-	kategori: 'kjpp' | 'notaris';
+	/**
+	 * v1 backend: enum `kjpp` | `notaris` (MITRA-01). Sengaja TIDAK di-union
+	 * di sini — kategori tambahan (asuransi, pemborong, arsitek, …) dari
+	 * MITRA-02 harus tampil otomatis di Omahe tanpa redeploy; labelnya
+	 * diurus `labelKategoriMitra` (omahe#3).
+	 */
+	kategori: string;
 	wilayahLayanan: string;
 	whatsapp: string;
 	telepon: string | null;

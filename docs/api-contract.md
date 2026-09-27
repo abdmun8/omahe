@@ -33,7 +33,7 @@ ditandai eksplisit per-section.
 | `GET /public/perumahan` (list) | UNIT-04 | **sudah ada** (`done` 2026-09-14), BARU — tidak ada di versi dokumen sebelumnya; `+prioritas` MONET-01 | belum ada halaman Omahe yang eksplisit memakainya |
 | `GET /public/sliders` | MONET-02 | **sudah ada** (`done` 2026-09-18), BARU — lihat §7 | `/` (carousel) |
 | `POST /public/leads` | MONET-03 | **sudah ada** (`done` 2026-09-18), BARU — lihat §8 | dialog LeadForm kartu/detail partner berbayar |
-| `GET /public/mitra` | MITRA-01 | **belum ada** (epic `todo` 2026-09-21) — lihat §9 | `/mitra` (direktori KJPP & Notaris) |
+| `GET /public/mitra` | MITRA-01 | **sudah ada** (`done` 2026-09-22, epic di repo `perumahan`) — lihat §9 | `/mitra` (direktori mitra profesional; kategori dinamis omahe#3) |
 | `GET /public/regions` | — (belum dibahas) | belum ada — `/public/wilayah/{level}` ADA di `perumahan` tapi TIDAK difilter ke region yang punya perumahan aktif (lihat §5, gap masih terbuka) | opsi filter lokasi |
 
 Semua endpoint di atas SEKARANG BISA dipakai — peralihan dari
@@ -311,6 +311,39 @@ menyertakan `prioritas` (efektif penuh di jalur `?full=1`; jalur
 skip-resolve LANDING-05 = own-only, tanpa lookup developer) — dipakai
 halaman detail Omahe untuk men-gate LeadFormDialog MONET-03 di
 sticky-CTA.
+
+## 9. `GET /public/mitra` — direktori Mitra Profesional (MITRA-01, `done` 2026-09-22)
+
+Direktori mitra profesional properti untuk halaman `/mitra` Omahe —
+murni berbayar (hanya baris `aktif=true`), urutan `urutan` ASC →
+`nama` ASC diurus SERVER (Omahe tidak mengurutkan ulang). TANPA auth,
+TANPA paginasi (direktori kecil). Filter `?kategori=<string>` opsional.
+Item:
+
+```jsonc
+{
+  "id": "uuid",
+  "nama": "KJPT Bumi Nilai",
+  "kategori": "kjpp",        // v1 enum: 'kjpp' | 'notaris' — lihat catatan di bawah
+  "wilayahLayanan": "Jabodetabek & Bandung",
+  "whatsapp": "6281100000201", // ternormalisasi 62xxx; tombol WA ke nomor MITRA
+  "telepon": null,              // nullable
+  "logoUrl": null,              // presign fail-soft → null, item TETAP tampil (inisial)
+  "urutan": 1
+}
+```
+
+Privacy: `logoKey` mentah tidak keluar. Kontak mitra TIDAK memakai
+passthrough `?ref=` — di luar rantai komisi perumahan.
+
+**Amendemen omahe#3 (2026-09-26) — kategori dinamis**: Omahe kini
+memperlakukan `kategori` sebagai **string bebas** (tipe `PublicMitra`
+di-widen, chip filter & badge kartu di-derive dari data via
+`src/lib/mitra.ts`, label tak dikenal di-humanize) — kategori baru dari
+backend tampil otomatis TANPA redeploy Omahe. Pelebaran kategori di
+sisi backend = epic **MITRA-02** repo `perumahan` (**`done` 2026-09-26**:
+enum → varchar(40) slug, PATCH kategori, `?kategori=` menerima nilai
+apa pun).
 
 ## 10. `GET /public/app-settings` — kontak Omahe (ADMIN-05, `done` 2026-09-23, BARU)
 

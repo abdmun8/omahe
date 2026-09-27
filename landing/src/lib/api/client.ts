@@ -441,15 +441,17 @@ export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<void
  * Urutan & filter `aktif` diurus server (`urutan` ASC → `nama` ASC).
  *
  * Env-gated pola `getSliders`; fail-soft ke `[]` pola `getRegions`:
- * endpoint `GET /public/mitra` belum ada di backend (MITRA-01 `todo`) —
- * di mode API asli halaman `/mitra` menampilkan empty-state sampai
- * backend live. JANGAN fail-soft ke fixture di sini: fixture memuat
- * nomor WA fiktif, tidak boleh tampil di produksi.
+ * epic MITRA-01 di backend `done` 2026-09-22 — kalau instance tujuan
+ * belum dideploy/migrasi, halaman `/mitra` tetap jalan dengan empty-state
+ * sampai endpoint live. JANGAN fail-soft ke fixture di sini: fixture
+ * memuat nomor WA fiktif, tidak boleh tampil di produksi.
+ *
+ * `kategori` string bebas (omahe#3): halaman /mitra kini memanggil TANPA
+ * filter lalu menyaring sendiri server-side supaya chip kategori bisa
+ * diderive dari data yang sama (satu fetch); param tetap dipertahankan
+ * untuk pemanggil lain.
  */
-export async function getMitra(
-	fetchFn: Fetch,
-	kategori?: 'kjpp' | 'notaris'
-): Promise<PublicMitra[]> {
+export async function getMitra(fetchFn: Fetch, kategori?: string): Promise<PublicMitra[]> {
 	if (!hasSearchApi()) {
 		// Fixture HANYAH di dev — nomor WA di fixture FIKTIF dan pernah bocor
 		// ke produksi saat env OMAHE_API_SEARCH lupa di-set (2026-09-22);
@@ -462,10 +464,7 @@ export async function getMitra(
 		const data = await apiGet<PublicMitra[]>(fetchFn, `/public/mitra${params}`);
 		return Array.isArray(data) ? data : [];
 	} catch (err) {
-		console.error(
-			'[omahe:api] GET /public/mitra gagal — fallback ke [] (empty-state, MITRA-01 belum live)',
-			err
-		);
+		console.error('[omahe:api] GET /public/mitra gagal — fallback ke [] (empty-state)', err);
 		return [];
 	}
 }

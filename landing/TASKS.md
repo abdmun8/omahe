@@ -502,6 +502,41 @@ Direktori KJPP & Notaris berbayar. Backend: epic `MITRA-01` di repo
       65 component (+5 mitra-card)/build kedua adapter hijau; /mitra
       mobile 375px tanpa overflow. (2026-09-21, pi, review Abdul)
 
+## Gabung Jaringan Omahe (GitHub issue #3, 2026-09-26 — lanjutan brainstorm terputus)
+
+Dari `todo.txt` (brainstorm sesi terputus 2026-09-26): banner rekrutmen +
+halaman keuntungan per audiens (agen / mitra / developer-perumahan) +
+chip kategori `/mitra` dinamis. Pendaftaran TIDAK dibangun ulang — CTA ke
+form mandiri AUTH-05 app `perumahan` (`/daftar/perumahan`,
+`/daftar/perusahaan`, `done`); agen Omahe (membership, AGEN-OMAHE-01
+`todo` di repo `perumahan`) sementara diarahkan hubungi tim Omahe.
+
+- [x] **Halaman `/gabung` + 3 sub-audiens + banner homepage + chip dinamis**
+      — `src/lib/app-url.ts` (`daftarPerumahanUrl`/`daftarPerusahaanUrl`,
+      tanpa `?ref=` — di luar rantai komisi), route `/gabung` (hub,
+      prerender) + `/gabung/{agen,mitra,perumahan}` (SSR + `cacheKonten`
+      pola `/kontak` — menampilkan kontak ADMIN-05), banner "Tumbuh bersama
+      Omahe" di homepage (satu section bawah, B2C tidak bergeser), footer
+      +link "Gabung" (nav utama TETAP 7 item — muat tanpa overflow),
+      `/mitra`: chip kategori diderive dari data (`src/lib/mitra.ts`,
+      label tak dikenal di-humanize — kategori backend baru tampil tanpa
+      redeploy; filter tetap server-side satu fetch), badge kartu ikut
+      dinamis, empty-state menaut `/gabung/mitra`, sitemap +4 rute, GA
+      event `gabung_click` (param `audiens` slug route, non-PII), fixture
+      +2 kategori di luar enum v1 (asuransi, pemborong) untuk menguji
+      jalur dinamis di dev.
+
+      **Hasil**: semua rute 200 di smoke dev (fixture mode); chip
+      `asuransi`/`pemborong` muncul otomatis & filter per-kategori benar
+      (kartu lain 0); tautan lintas-app ke `/daftar/*` terverifikasi;
+      hub ter-prerender (`.vercel/output/static/gabung.html`). check 0
+      error / 89 unit + 73 component pass / build hijau. Docs ikut:
+      api-contract §9 DITULIS (sebelumnya hanya dirujuk tapi tidak pernah
+      ada — gap MITRA-01) + amendemen kategori dinamis; user-story §Scope
+      direvisi; CLAUDE.md site map + catatan lintas-repo. Epic backend
+      `MITRA-02` (kategori terbuka) dibuat `todo` di repo `perumahan`.
+      (2026-09-26, pi, review Abdul)
+
 ## Aturan untuk implementor (pi/GLM)
 
 - Baca `../CLAUDE.md`, `README.md`, dan file yang relevan dengan tugasnya
