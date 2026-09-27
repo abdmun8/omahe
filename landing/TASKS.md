@@ -537,6 +537,31 @@ form mandiri AUTH-05 app `perumahan` (`/daftar/perumahan`,
       `MITRA-02` (kategori terbuka) dibuat `todo` di repo `perumahan`.
       (2026-09-26, pi, review Abdul)
 
+- [x] **`/verifikasi/:kode`** — halaman verifikasi ID card agen Omahe
+      (AGEN-OMAHE-01; backend iterasi-1 SUDAH hijau tapi belum di-commit
+      di repo `perumahan`, endpoint `GET /public/agen-omahe/verifikasi/:kode`).
+      Dibangun fixture-first pola MITRA-01 (nyala otomatis begitu backend
+      deploy); kontrak shape: api-contract §20.
+
+      **Hasil**: route `/verifikasi/[kode]` (SSR, cache edge 60 dtk — lebih
+      segar dari konten lain, hasil verifikasi basi menyesatkan) tiga state:
+      ✓ terverifikasi (nama/kantor/foto-inisial/kode/berlaku-sampai), ✗ tidak
+      aktif, ? tidak dapat memverifikasi (DIBEDAKAN dari "kode tidak
+      dikenali" — API down tidak membuat agen terlihat palsu).
+      `getVerifikasiAgen` TIDAK lewat `apiGet` (404 backend = state,
+      bukan `error(404)` Kit) + pre-validate pola kode `OMH-`
+      (tanpa karakter ambigu, konsisten generator backend) supaya input
+      aneh tidak di-fetch. Guard fixture `PROD === true` (bukan `.DEV`
+      pola getMitra): di build produksi cabang fixture TER-TREE-SHAKE
+      (diverifikasi di output .vercel — jalur fixture statis tak terjangkau),
+      di `bun test` fixture tetap teruji. noindex + tidak masuk sitemap.
+      check 0 error / 92 unit pass / build hijau; smoke dev: tiga state
+      terverifikasi per-URL fixture. Bug ketemu saat smoke: kode fixture
+      awal `OMH-EXPIRE` mengandung huruf I (karakter ambigu yang
+      dikecualikan pola) → tertolak lokal sebelum cek fixture, state
+      "tidak aktif" tak pernah muncul — diganti `OMH-TESTEX`; pola kini
+      dikunci komentar di fixture. (2026-09-26, pi, review Abdul)
+
 ## Aturan untuk implementor (pi/GLM)
 
 - Baca `../CLAUDE.md`, `README.md`, dan file yang relevan dengan tugasnya

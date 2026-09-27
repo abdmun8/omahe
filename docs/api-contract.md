@@ -520,3 +520,36 @@ endpoint yang sama dengan `?situs=<kode>`:
   menurut prioritas berbayar (besar = depan).
 - `GET /public/app-settings` menambah `sliderDelayDetik` (jeda carousel,
   2–30, bawaan 3) — per situs (`?situs=`). Carousel Omahe berputar terus.
+
+## 20. `GET /public/agen-omahe/verifikasi/:kode` (AGEN-OMAHE-01, backend iterasi-1 SELESAI tapi BELUM di-commit/deploy — 2026-09-26)
+
+Verifikasi publik ID card agen Omahe — QR pada ID card membuka
+`www.omahe.co.id/verifikasi/:kode` (base URL diatur backend lewat
+`SITUS_PUBLIK_URL`). TANPA auth. `:kode` = `kode_agen` (format
+`OMH-XXXXXX`, huruf/angka tanpa karakter ambigu 0/O/1/I/L, ≤20;
+dibandingkan case-insensitive). Respons `data`:
+
+```jsonc
+{
+  "nama": "Widya Pratama",
+  "kodeAgen": "OMH-7KQ2MX",
+  "kantorNama": "Omahe Bogor",
+  "fotoUrl": null,          // presigned; fail-soft null → Omahe render inisial
+  "status": "aktif",        // 'aktif' | 'tidak_aktif'
+  "berlakuSampai": "2027-09-26T00:00:00.000Z"  // null = belum pernah member
+}
+```
+
+- `status` dihitung server: anggota aktif + kantor aktif + membership belum
+  habis → `aktif`; selain itu `tidak_aktif`. TANPA nomor HP/data pribadi
+  lain (keputusan epic AGEN-OMAHE-01 #5).
+- Kode tak dikenal → **404** — Omahe merendernya sebagai STATE halaman
+  "kode tidak dikenali" (bukan `error(404)` Kit; QR salah ketik tetap
+  mendapat penjelasan).
+- Sisi Omahe SUDAH dibangun fixture-first (pola MITRA-01, 2026-09-26):
+  `client.ts::getVerifikasiAgen` fail-soft + halaman `/verifikasi/[kode]`
+  tiga state (terverifikasi / tidak aktif / tidak dapat memverifikasi —
+  dibedakan dari "kode tidak dikenali" supaya API down tidak membuat agen
+  terlihat palsu). Nyala otomatis begitu backend di-deploy — HANYA butuh
+  `OMAHE_API_SEARCH=1` yang sudah on. Halaman TIDAK masuk sitemap &
+  `noindex` (URL per-kode, bukan konten organik).

@@ -538,3 +538,23 @@ export interface PromoDetail extends PromoSummary {
 	ctaUrl: string | null;
 	perumahan: PromoPerumahan[];
 }
+
+// ---------------------------------------------------------------------------
+// AGEN-OMAHE-01 — verifikasi ID card agen (`GET /public/agen-omahe/verifikasi/:kode`, api-contract §20)
+// ---------------------------------------------------------------------------
+
+/**
+ * Hasil verifikasi publik ID card agen Omahe — TANPA nomor HP/data pribadi
+ * lain (keputusan epic). `status` dihitung server dari anggota+kantor aktif
+ * DAN membership belum habis; `berlakuSampai` = ISO string, null = belum
+ * pernah bermembership.
+ */
+export interface VerifikasiAgen {
+	nama: string;
+	kodeAgen: string;
+	kantorNama: string;
+	/** Presigned; null = presign gagal/belum upload → inisial placeholder. */
+	fotoUrl: string | null;
+	status: 'aktif' | 'tidak_aktif';
+	berlakuSampai: string | null;
+}

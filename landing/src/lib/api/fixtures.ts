@@ -30,7 +30,8 @@ import type {
 	UnitListing,
 	PublicMitra,
 	PromoDetail,
-	TipeDetail
+	TipeDetail,
+	VerifikasiAgen
 } from './types';
 
 export const REGIONS: RegionOption[] = [
@@ -574,3 +575,32 @@ export const PROMO: PromoDetail[] = [
 		]
 	}
 ];
+
+/**
+ * Verifikasi agen Omahe (AGEN-OMAHE-01, api-contract §20). Fixture
+ * DEV-SAJA pola MITRA: endpoint backend sudah ditulis (iterasi-1, belum
+ * di-commit/deploy saat halaman ini dibuat) — produksi tanpa API /
+ * API gagal jujur "tidak dapat memverifikasi", JANGAN pernah tampil
+ * data fiktif. Dua entri = dua state UI (aktif & tidak aktif). Kode
+ * fixture wajib lolos pola `OMH-` tanpa karakter ambigu (0/O/1/I/L)
+ * — pernah pakai `OMH-EXPIRE` dan tertolak pola (ada huruf I),
+ * ketemu lewat smoke test.
+ */
+export const VERIFIKASI_AGEN: Record<string, VerifikasiAgen> = {
+	'OMH-7KQ2MX': {
+		nama: 'Widya Pratama',
+		kodeAgen: 'OMH-7KQ2MX',
+		kantorNama: 'Omahe Bogor',
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+		status: 'aktif',
+		berlakuSampai: '2027-09-26T00:00:00.000Z'
+	},
+	'OMH-TESTEX': {
+		nama: 'Rangga Saputra',
+		kodeAgen: 'OMH-TESTEX',
+		kantorNama: 'Omahe Depok',
+		fotoUrl: null,
+		status: 'tidak_aktif',
+		berlakuSampai: '2026-08-31T00:00:00.000Z'
+	}
+};

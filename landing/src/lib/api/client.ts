@@ -37,7 +37,8 @@ import type {
 	PromoDetail,
 	PromoSummary,
 	TeksOmahe,
-	TipeDetail
+	TipeDetail,
+	VerifikasiAgen
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -466,6 +467,67 @@ export async function getMitra(fetchFn: Fetch, kategori?: string): Promise<Publi
 	} catch (err) {
 		console.error('[omahe:api] GET /public/mitra gagal — fallback ke [] (empty-state)', err);
 		return [];
+	}
+}
+
+// Verifikasi ID card agen Omahe (AGEN-OMAHE-01) ---------------------------------
+
+/** Hasil verifikasi: ketemu, atau tidak — dan kalau tidak, apakah karena
+ *  layanan backend sedang bermasalah (UI harus jujur "tidak dapat
+ *  memverifikasi", BUKAN pura-pura "kode tidak dikenali"). */
+export type HasilVerifikasi =
+	{ ketemu: true; data: VerifikasiAgen } | { ketemu: false; layananError: boolean };
+
+/** Bentuk kode agen backend: `OMH-` + 6 karakter tanpa ambigu (≤20 total). */
+const KODE_AGEN_PATTERN = /^OMH-[A-HJ-KM-NP-Z2-9]{1,16}$/;
+
+/**
+ * Verifikasi publik ID card agen (api-contract §20). Sengaja TIDAK lewat
+ * `apiGet`: 404 dari backend = "kode tidak dikenali" yang harus jadi STATE
+ * halaman (bukan `error(404)` Kit — QR salah ketik tetap pantas dapat
+ * penjelasan di halaman verifikasi, bukan halaman 404 situs).
+ *
+ * Pola `getMitra`: fixture HANYA dev; mode API asli fail-soft `ketemu:false`
+ * (dengan `layananError` sesuai kondisi) — verifikasi tidak pernah
+ * menjatuhkan halaman. Kode tak sesuai pola tidak di-fetch sama sekali.
+ */
+export async function getVerifikasiAgen(fetchFn: Fetch, kodeRaw: string): Promise<HasilVerifikasi> {
+	const kode = kodeRaw.trim().toUpperCase();
+	if (!KODE_AGEN_PATTERN.test(kode)) return { ketemu: false, layananError: false };
+
+	if (!hasSearchApi()) {
+		// Fixture HANYAH di non-produksi — profil agen di bawah FIKTIF; produksi
+		// tanpa API jujur "tidak dapat memverifikasi" (bukan agen palsu).
+		// Guard `PROD !== true` (bukan `.DEV` pola getMitra): di build produksi
+		// Vite menggantinya jadi `false` statis sehingga cabang fixture
+		// TER-TREE-SHAKE total (diverifikasi di output .vercel), sementara di
+		// `bun test` (tidak ada DEV/PROD) fixture tetap teruji.
+		if (import.meta.env.PROD === true) return { ketemu: false, layananError: true };
+		const data = fixtures.VERIFIKASI_AGEN[kode];
+		return data ? { ketemu: true, data } : { ketemu: false, layananError: false };
+	}
+
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/agen-omahe/verifikasi/${encodeURIComponent(kode)}`, {
+			headers: { accept: 'application/json' },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch (err) {
+		console.error('[omahe:api] GET verifikasi agen gagal — fail-soft', err);
+		return { ketemu: false, layananError: true };
+	}
+	if (res.status === 404) return { ketemu: false, layananError: false };
+	if (!res.ok) {
+		console.error(`[omahe:api] GET verifikasi agen → ${res.status}`);
+		return { ketemu: false, layananError: true };
+	}
+	try {
+		const body = (await res.json()) as ApiEnvelope<VerifikasiAgen>;
+		return body.data ? { ketemu: true, data: body.data } : { ketemu: false, layananError: true };
+	} catch (err) {
+		console.error('[omahe:api] GET verifikasi agen — body bukan JSON', err);
+		return { ketemu: false, layananError: true };
 	}
 }
 

@@ -18,6 +18,8 @@ Diverifikasi live 2026-09-15: seed data nyata ke Postgres dev `perumahan` (devel
 
 Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dari repo `perumahan` (termasuk asumsi yang masih perlu dikonfirmasi): `docs/api-contract.md`.
 
+**Catatan lintas-repo 2026-09-26 (sesi pi, dilanjutkan & diselesaikan sesi pi berikutnya)**: (1) `AGEN-OMAHE-01` di repo `perumahan` kini **`done` & ter-commit** — backend (kantor/anggota/config/pembayaran + verifikasi publik `GET /public/agen-omahe/verifikasi/:kode`) DAN FE admin (superadmin/kepala/anggota); typecheck + 2200 test backend + 601 test FE hijau. `AGEN-OMAHE-02` (token pilih perumahan) & `AGEN-OMAHE-03` (komisi) masih `todo`. (2) Fitur omahe#3 "Gabung Jaringan" (`/gabung` + banner + chip kategori `/mitra` dinamis) selesai sisi Omahe — backend `MITRA-02` (kategori mitra terbuka, varchar slug) juga sudah `done` & ter-commit. (3) Halaman Omahe `/verifikasi/:kode` fixture-first — nyala otomatis begitu backend deploy (api-contract §20). Ketiganya tersimpan dalam 2 commit omahe + 3 commit perumahan di bawah ini, semua diverifikasi ulang sebelum commit.
+
 ## Arsitektur
 
 Landing/marketplace ini **terpisah** dari aplikasi admin yang sudah ada dan berjalan di repo `~/projects/perumahan`:

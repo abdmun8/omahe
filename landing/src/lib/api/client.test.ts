@@ -208,3 +208,36 @@ describe('getSiteSettings — teks hero (ADMIN-06)', () => {
 		});
 	});
 });
+
+// AGEN-OMAHE-01 — verifikasi ID card agen (mode fixture, env kosong). Sisi
+// backend epic masih WIP saat halaman ini dibangun: jalur fail-soft harus
+// terkunci dari sekarang supaya nyala otomatis begitu endpoint live (pola
+// MITRA-01). Semua tes memakai fetchDummy — tidak boleh ada network.
+describe('getVerifikasiAgen (AGEN-OMAHE-01, mode fixture)', () => {
+	test('kode terdaftar di fixture → ketemu + data profil publik saja', async () => {
+		const { getVerifikasiAgen } = await import('./client');
+		const hasil = await getVerifikasiAgen(fetchDummy, 'omh-7kq2mx');
+		expect(hasil.ketemu).toBe(true);
+		if (hasil.ketemu) {
+			expect(hasil.data.nama).toBe('Widya Pratama');
+			expect(hasil.data.kantorNama).toBe('Omahe Bogor');
+			expect(hasil.data.status).toBe('aktif');
+		}
+	});
+
+	test('kode rapi tapi tidak terdaftar → tidak ketemu, BUKAN layananError (bukan crash 404 Kit)', async () => {
+		const { getVerifikasiAgen } = await import('./client');
+		// Karakter tanpa ambigu semua (O/I/L dikecualikan generator kode).
+		const hasil = await getVerifikasiAgen(fetchDummy, 'OMH-WXYZ99');
+		expect(hasil).toEqual({ ketemu: false, layananError: false });
+	});
+
+	test('kode tak sesuai pola OMH- → ditolak lokal tanpa fetch sama sekali', async () => {
+		const { getVerifikasiAgen } = await import('./client');
+		for (const salah of ['', 'budi', 'OMH-', '../etc/passwd', 'OMH-abc def'])
+			expect(await getVerifikasiAgen(fetchDummy, salah)).toEqual({
+				ketemu: false,
+				layananError: false
+			});
+	});
+});
