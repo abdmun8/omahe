@@ -40,19 +40,28 @@ export interface KategoriChip {
 	label: string;
 }
 
+/** Label kategori satu mitra: label master dari API (MITRA-03), fallback
+ *  humanize untuk respons lama/fixture. */
+export function labelKategoriDari(m: Pick<PublicMitra, 'kategori' | 'kategoriLabel'>): string {
+	return m.kategoriLabel?.trim() || labelKategoriMitra(m.kategori);
+}
+
 /**
  * Daftar chip kategori dari data mitra: "Semua" dulu, lalu kategori unik
- * dalam URUTAN KEMUNCULAN PERTAMA — list dari server sudah urut
- * `urutan ASC → nama ASC` (api-contract.md §9), jadi kategori milik mitra
- * paling atas muncul duluan; jangan diurutkan abjad di sini.
+ * urut `kategoriUrutan` master (MITRA-03, diatur superadmin). Tanpa urutan
+ * (respons lama) → urutan kemunculan pertama (list server sudah urut
+ * `urutan ASC → nama ASC`, api-contract.md §9); sort stabil menjaga itu.
  */
 export function kategoriChips(dari: PublicMitra[]): KategoriChip[] {
-	const urutan: string[] = [];
+	const unik: PublicMitra[] = [];
 	for (const m of dari) {
-		if (!urutan.includes(m.kategori)) urutan.push(m.kategori);
+		if (!unik.some((u) => u.kategori === m.kategori)) unik.push(m);
 	}
+	const urut = [...unik].sort(
+		(a, b) => (a.kategoriUrutan ?? Infinity) - (b.kategoriUrutan ?? Infinity)
+	);
 	return [
 		{ nilai: null, label: 'Semua' },
-		...urutan.map((k) => ({ nilai: k, label: labelKategoriMitra(k) }))
+		...urut.map((m) => ({ nilai: m.kategori, label: labelKategoriDari(m) }))
 	];
 }

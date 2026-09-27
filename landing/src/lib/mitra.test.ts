@@ -5,7 +5,12 @@
  */
 import { describe, expect, test } from 'bun:test';
 import type { PublicMitra } from '$lib/api/types';
-import { KATEGORI_MITRA_LABEL, kategoriChips, labelKategoriMitra } from './mitra';
+import {
+	KATEGORI_MITRA_LABEL,
+	kategoriChips,
+	labelKategoriDari,
+	labelKategoriMitra
+} from './mitra';
 
 const mitra = (kategori: string, nama = 'Mitra Uji'): PublicMitra => ({
 	id: nama,
@@ -63,5 +68,35 @@ describe('KATEGORI_MITRA_LABEL', () => {
 		for (const kunci of Object.keys(KATEGORI_MITRA_LABEL)) {
 			expect(kunci).toMatch(/^[a-z0-9-]+$/);
 		}
+	});
+});
+
+describe('MITRA-03 label & urutan master', () => {
+	const m = (kategori: string, kategoriLabel?: string, kategoriUrutan?: number): PublicMitra => ({
+		...mitra(kategori),
+		kategoriLabel,
+		kategoriUrutan
+	});
+
+	test('chip urut kategoriUrutan master, label dari master', () => {
+		const chips = kategoriChips([
+			m('notaris', 'Notaris', 20),
+			m('asuransi', 'Asuransi Properti', 5),
+			m('kjpp', 'KJPP (Appraisal)', 10),
+			m('notaris', 'Notaris', 20)
+		]);
+		expect(chips).toEqual([
+			{ nilai: null, label: 'Semua' },
+			{ nilai: 'asuransi', label: 'Asuransi Properti' },
+			{ nilai: 'kjpp', label: 'KJPP (Appraisal)' },
+			{ nilai: 'notaris', label: 'Notaris' }
+		]);
+	});
+
+	test('tanpa label master → fallback humanize', () => {
+		expect(labelKategoriDari({ kategori: 'konsultan-pajak' })).toBe('Konsultan Pajak');
+		expect(labelKategoriDari({ kategori: 'kjpp', kategoriLabel: 'KJPP (Appraisal)' })).toBe(
+			'KJPP (Appraisal)'
+		);
 	});
 });

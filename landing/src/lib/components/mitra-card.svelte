@@ -9,13 +9,13 @@
 <script lang="ts">
 	import Badge from './ui/badge.svelte';
 	import type { PublicMitra } from '$lib/api/types';
-	import { labelKategoriMitra } from '$lib/mitra';
+	import { labelKategoriDari } from '$lib/mitra';
 
 	let { mitra }: { mitra: PublicMitra } = $props();
 
 	// omahe#3 — label kategori dinamis: kategori baru dari backend (MITRA-02)
 	// otomatis dapat label manis, bukan hardcode KJPP/Notaris.
-	const labelKategori = $derived(labelKategoriMitra(mitra.kategori));
+	const labelKategori = $derived(labelKategoriDari(mitra));
 	/** Inisial fallback: huruf pertama dua kata pertama nama (kapital). */
 	const inisial = $derived(
 		mitra.nama

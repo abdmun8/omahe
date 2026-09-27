@@ -574,3 +574,11 @@ dibandingkan case-insensitive). Respons `data`:
 - Diverifikasi E2E 2026-09-27: Omahe dev → backend lokal + DB dev (dua agen
   tampil, `?ref` agen B → hanya B + CTA ajukan membawa ref B, link
   verifikasi), data uji dibersihkan.
+
+## 22. Master kategori mitra (MITRA-03, backend `done` 2026-09-27 — belum di-push/deploy)
+
+- `GET /public/mitra` item kini membawa `kategoriLabel` (label tampil dari
+  master, diatur superadmin) + `kategoriUrutan` (urutan chip). Mitra
+  berkategori nonaktif tidak dikirim. Omahe: `labelKategoriDari()` +
+  `kategoriChips()` urut `kategoriUrutan` (fallback humanize & urutan
+  kemunculan untuk respons lama/fixture — field opsional di tipe).

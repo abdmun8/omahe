@@ -439,6 +439,10 @@ export interface PublicMitra {
 	 * diurus `labelKategoriMitra` (omahe#3).
 	 */
 	kategori: string;
+	/** MITRA-03 — label tampil & urutan chip dari master kategori (backend
+	 *  sebelum MITRA-03 tidak mengirim → fallback `labelKategoriMitra`). */
+	kategoriLabel?: string;
+	kategoriUrutan?: number;
 	wilayahLayanan: string;
 	whatsapp: string;
 	telepon: string | null;
