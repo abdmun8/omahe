@@ -7,7 +7,7 @@ import { ApiError, kirimMinatAgen } from '$lib/api';
 import type { AgenMinatInput } from '$lib/api/types';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const KODE_AGEN = /^OMH-[A-Z0-9]{1,16}$/i;
+const KODE_AGEN = /^OMHA?-[A-Z0-9]{1,16}$/i;
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
 	let input: AgenMinatInput;

@@ -1,5 +1,6 @@
 import { cacheKonten } from '$lib/cache';
 import { getVerifikasiAgen } from '$lib/api';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -9,6 +10,11 @@ import type { PageServerLoad } from './$types';
  * hasil verifikasi yang basi terlalu lama menyesatkan pembeli).
  */
 export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
+	const hasil = await getVerifikasiAgen(fetch, params.kode ?? '');
+	// AGEN-OMAHE-05 — QR lama (`OMH-XXXXXX`) → URL kode kanonik `OMHA-A0001`.
+	if (hasil.ketemu && hasil.data.kodeAgen !== params.kode) {
+		redirect(301, `/verifikasi/${encodeURIComponent(hasil.data.kodeAgen)}`);
+	}
 	cacheKonten(setHeaders, 60);
-	return { hasil: await getVerifikasiAgen(fetch, params.kode ?? '') };
+	return { hasil };
 };

@@ -608,3 +608,19 @@ export interface AgenMinatInput {
 	/** Honeypot — dikirim apa adanya. */
 	website?: string;
 }
+
+/**
+ * AGEN-OMAHE-05 — kartu nama digital agen (`GET /public/agen-omahe/kartu/:kode`,
+ * api-contract §26). `whatsapp` HANYA terisi saat agen aktif.
+ */
+export interface KartuNamaAgen {
+	nama: string;
+	/** Kode kanonik — kode lama di URL diarahkan ke sini. */
+	kodeAgen: string;
+	kantorNama: string;
+	fotoUrl: string | null;
+	status: 'aktif' | 'tidak_aktif';
+	berlakuSampai: string | null;
+	whatsapp: string | null;
+	perumahan: Array<{ nama: string; slug: string; kodeRef: string }>;
+}

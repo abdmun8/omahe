@@ -50,6 +50,8 @@
 		>
 	{/if}
 	<h2 class="font-display text-ink mt-3 text-base font-bold">{agen.nama}</h2>
+	<!-- AGEN-OMAHE-05 — kode agen publik (sama dengan ID card). -->
+	<p class="text-accent-dark font-mono text-xs font-semibold">{agen.kodeAgen}</p>
 	<p class="text-muted text-sm">{agen.kantorNama}</p>
 	<a
 		href={`/verifikasi/${encodeURIComponent(agen.kodeAgen)}`}

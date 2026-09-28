@@ -24,6 +24,8 @@ Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dar
 
 **Update 2026-09-27 (batch kedua) — di repo `perumahan` + Omahe, semua `done`**: `MITRA-03` (master kategori mitra dikelola superadmin → chip/badge `/mitra` pakai label & urutan master, api-contract §22; akun login mitra + panel tagihan), `AGEN-OMAHE-04` (tab **Agen Omahe** di `/mitra?tab=agen` + form minat ke agen, §23), `ADMIN-07` (musik latar: mini-player di layout root lewat `/api/musik` & `/api/musik/file` — JANGAN pakai URL presigned di data layout karena halaman prerender membekukannya, §24), `TAGIHAN-01` (tagihan terpadu + invoice/perjanjian PDF — sisi admin saja), `MONET-07` (banner berbayar per 3 dtk per 30 hari; carousel memakai `durasiDetik` per slide, §25). Temuan penting: body error backend `perumahan` = `{ error, code, issues }` (bukan `{ message }`) — pakai `pesanErrorBackend()` (§23).
 
+**Update 2026-09-28 — `AGEN-OMAHE-05` `done`**: kode agen `OMHA-A0001` (alias kode lama → 301), kartu nama digital `/agen-omahe/:kode` (+ vCard), kode tampil di tab Agen Omahe; ID card PDF/PNG di panel agen (admin). api-contract §26.
+
 ## Arsitektur
 
 Landing/marketplace ini **terpisah** dari aplikasi admin yang sudah ada dan berjalan di repo `~/projects/perumahan`:

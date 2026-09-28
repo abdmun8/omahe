@@ -42,7 +42,8 @@ import type {
 	VerifikasiAgen,
 	AgenPemasar,
 	AgenDirektori,
-	AgenMinatInput
+	AgenMinatInput,
+	KartuNamaAgen
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -503,8 +504,11 @@ export async function getMitra(fetchFn: Fetch, kategori?: string): Promise<Publi
 export type HasilVerifikasi =
 	{ ketemu: true; data: VerifikasiAgen } | { ketemu: false; layananError: boolean };
 
-/** Bentuk kode agen backend: `OMH-` + 6 karakter tanpa ambigu (≤20 total). */
-const KODE_AGEN_PATTERN = /^OMH-[A-HJ-KM-NP-Z2-9]{1,16}$/;
+/**
+ * Bentuk kode agen backend: `OMHA-A0001` (berurutan, AGEN-OMAHE-05) ATAU
+ * kode acak lama `OMH-XXXXXX` (alias QR/ID card yang sudah tercetak).
+ */
+export const KODE_AGEN_PATTERN = /^(OMHA-[A-Z]\d{4}|OMH-[A-HJ-KM-NP-Z2-9]{1,16})$/;
 
 /**
  * Verifikasi publik ID card agen (api-contract §20). Sengaja TIDAK lewat
@@ -839,4 +843,24 @@ export async function kirimMinatAgen(fetchFn: Fetch, input: AgenMinatInput): Pro
 	const serverMessage = await pesanErrorBackend(res);
 	console.error(`[omahe:api] POST minat agen → ${res.status}`);
 	throw new ApiError(res.status, serverMessage ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');
+}
+
+// Kartu nama digital agen (AGEN-OMAHE-05) ------------------------------------------
+
+/**
+ * Kartu nama digital agen (api-contract §26). Kode berpola salah → `null`
+ * (halaman 404 tanpa fetch); kode tak dikenal → 404 Kit dari `apiGet`;
+ * gangguan backend → 502 Kit. Fixture HANYA non-produksi (nomor WA fiktif).
+ */
+export async function getKartuNamaAgen(
+	fetchFn: Fetch,
+	kodeRaw: string
+): Promise<KartuNamaAgen | null> {
+	const kode = kodeRaw.trim().toUpperCase();
+	if (!KODE_AGEN_PATTERN.test(kode)) return null;
+	if (!hasSearchApi()) {
+		if (import.meta.env.PROD === true) return null;
+		return fixtures.KARTU_NAMA_AGEN[kode] ?? null;
+	}
+	return apiGet<KartuNamaAgen>(fetchFn, `/public/agen-omahe/kartu/${encodeURIComponent(kode)}`);
 }

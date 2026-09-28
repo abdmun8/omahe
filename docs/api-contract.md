@@ -624,3 +624,20 @@ dibandingkan case-insensitive). Respons `data`:
   slide banner berbayar per putaran (kelipatan 3, 3–30). null = slide
   gratis → carousel memakai jeda global (`sliderDelayDetik`). Omahe:
   `jedaSlideMs()` + `setTimeout` per slide di `slider-carousel.svelte`.
+
+## 26. Kode agen berurutan, alias & kartu nama digital (AGEN-OMAHE-05, backend `done` 2026-09-28 — belum di-push/deploy)
+
+- Kode agen kini `OMHA-A0001` … `OMHA-A9999`, lalu `OMHA-B0001` (seri
+  global). Kode acak lama `OMH-XXXXXX` tetap diterima backend sebagai
+  alias; respons membawa kode kanonik. Omahe: `KODE_AGEN_PATTERN` menerima
+  keduanya; `/verifikasi/:kodeLama` & `/agen-omahe/:kodeLama` → 301 ke kode
+  kanonik.
+- `GET /public/agen-omahe/kartu/:kode` → `{ nama, kodeAgen, kantorNama,
+  fotoUrl, status, berlakuSampai, whatsapp | null, perumahan[{ nama, slug,
+  kodeRef }] }` — `whatsapp` & perumahan hanya saat aktif. Omahe: halaman
+  `/agen-omahe/:kode` (noindex; tombol WA, "Simpan Kontak" →
+  `/agen-omahe/:kode/vcard` vCard 3.0; link perumahan membawa `?ref=`
+  kode pilihan agen).
+- Kode agen tampil di kartu tab Agen Omahe `/mitra?tab=agen`.
+- Endpoint publik agen dibatasi 600 permintaan/menit per IP di backend.
+- Diverifikasi E2E 2026-09-28 (Omahe dev → backend lokal + DB dev).

@@ -33,7 +33,8 @@ import type {
 	TipeDetail,
 	VerifikasiAgen,
 	AgenPemasar,
-	AgenDirektori
+	AgenDirektori,
+	KartuNamaAgen
 } from './types';
 
 export const REGIONS: RegionOption[] = [
@@ -638,18 +639,45 @@ export const DIREKTORI_AGEN: AgenDirektori[] = [
 		nama: 'Dimas Nugraha',
 		kantorNama: 'Omahe Bogor',
 		fotoUrl: null,
-		kodeAgen: 'OMH-9PDWRT'
+		kodeAgen: 'OMHA-A0002'
 	},
 	{
 		nama: 'Widya Pratama',
 		kantorNama: 'Omahe Bogor',
 		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
-		kodeAgen: 'OMH-7KQ2MX'
+		kodeAgen: 'OMHA-A0001'
 	},
 	{
 		nama: 'Sari Anggraini',
 		kantorNama: 'Omahe Depok',
 		fotoUrl: 'https://picsum.photos/seed/omahe-agen-sari/240/240',
-		kodeAgen: 'OMH-4TNB8E'
+		kodeAgen: 'OMHA-A0003'
 	}
 ];
+
+/**
+ * Kartu nama digital agen (AGEN-OMAHE-05, api-contract §26) — DEV-SAJA.
+ * Nomor WA FIKTIF (tidak boleh tampil di produksi; guard di client).
+ */
+export const KARTU_NAMA_AGEN: Record<string, KartuNamaAgen> = {
+	'OMHA-A0001': {
+		nama: 'Widya Pratama',
+		kodeAgen: 'OMHA-A0001',
+		kantorNama: 'Omahe Bogor',
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+		status: 'aktif',
+		berlakuSampai: '2027-09-26T00:00:00.000Z',
+		whatsapp: '6281100000901',
+		perumahan: [{ nama: 'Griya Asri Bogor', slug: 'griya-asri-bogor', kodeRef: 'AO-K2269F4X' }]
+	},
+	'OMHA-A0009': {
+		nama: 'Rangga Saputra',
+		kodeAgen: 'OMHA-A0009',
+		kantorNama: 'Omahe Depok',
+		fotoUrl: null,
+		status: 'tidak_aktif',
+		berlakuSampai: '2026-08-31T00:00:00.000Z',
+		whatsapp: null,
+		perumahan: []
+	}
+};
