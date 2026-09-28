@@ -28,6 +28,8 @@ Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dar
 
 **Epic baru 2026-09-28 (kedua, repo `perumahan`)**: `MITRA-04` (**`done`**) menyentuh Omahe — tab kategori `/mitra` diambil dari master kategori aktif (`GET /public/mitra/kategori`, `getKategoriMitra` fail-soft `null`, api-contract §28) sehingga kategori tanpa mitra tetap tampil (empty-state + CTA `/gabung/mitra`), fallback ke chip turunan data bila endpoint gagal. `AGEN-OMAHE-06`, `EMAIL-01`, `AUTH-06` (login Google), `NOTIF-01` (lonceng + Web Push, kanal email/web dulu, WA cadangan) murni sisi admin/backend. `AUTH-07` (login/verifikasi WA customer-initiated — pengguna mengirim `LOGIN <kode>` via wa.me; OTP keluar cadangan ber-env default mati) `in_progress`: penerima webhook selesai, menunggu user setup gateway.
 
+**Batch 2026-09-28 kedua selesai di `perumahan`** (AGEN-OMAHE-06, MITRA-04, EMAIL-01, AUTH-06 login Google, NOTIF-01) — sisi Omahe hanya MITRA-04 (`/mitra` chip dari master). AUTH-07 & daftar via Google menunggu setup webhook WA oleh user.
+
 **Serah-terima (2026-09-28, bisa pindah mesin)**: status lengkap, urutan kerja berikutnya, aturan kerja user, pelajaran CI (mock.module bocor antar file test, lint backend) & gotcha lingkungan dev ada di `~/projects/perumahan/CLAUDE.md` §"Status terkini & kelanjutan". Khusus Omahe: `landing/.env` lokal menunjuk API PRODUKSI — uji lokal pakai `OMAHE_API_BASE_URL=http://localhost:3000` atau kosong (fixture); slider homepage kini rasio tetap 16:7 (unggahan 1600×700).
 
 ## Arsitektur
