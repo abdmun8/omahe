@@ -964,33 +964,41 @@ async function balasanBayar(res: Response): Promise<DetailBayar> {
 }
 
 /**
- * `GET /public/bayar/:token/invoice.pdf` — TANPA Turnstile (token = kunci).
- * Mengembalikan `Response` mentah (body TIDAK di-buffer) supaya proxy
- * tinggal me-stream-kan; caller yang men-set header final.
+ * `GET /public/bayar/:token/{invoice,kwitansi}.pdf` — TANPA Turnstile
+ * (token = kunci). Kwitansi hanya untuk tagihan lunas (backend 409 selain
+ * itu); tagihan batal → 409 untuk keduanya. Mengembalikan `Response`
+ * mentah (body TIDAK di-buffer) supaya proxy tinggal me-stream-kan; caller
+ * yang men-set header final.
  */
-export async function unduhInvoiceBayar(fetchFn: Fetch, token: string): Promise<Response> {
+export async function unduhDokumenBayar(
+	fetchFn: Fetch,
+	token: string,
+	jenis: 'invoice' | 'kwitansi'
+): Promise<Response> {
 	if (!hasApi()) {
 		if (import.meta.env.PROD === true) throw new ApiError(503, PESAN_BAYAR_TAK_TERSEDIA);
-		tagihanFixtureBayar(token); // token tak dikenal → 404 juga di fixture.
+		const d = tagihanFixtureBayar(token); // token tak dikenal → 404 juga di fixture.
+		if (jenis === 'kwitansi' && d.status !== 'lunas')
+			throw new ApiError(409, 'Kwitansi hanya tersedia untuk tagihan lunas.');
 		return new Response(pdfInvoiceContoh(), {
 			status: 200,
 			headers: {
 				'content-type': 'application/pdf',
-				'content-disposition': 'attachment; filename="invoice-contoh.pdf"'
+				'content-disposition': `attachment; filename="${jenis}-contoh.pdf"`
 			}
 		});
 	}
 	let res: Response;
 	try {
-		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/invoice.pdf`, {
+		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/${jenis}.pdf`, {
 			headers: { accept: 'application/pdf' },
-			signal: AbortSignal.timeout(TIMEOUT_MS)
+			signal: AbortSignal.timeout(Math.max(TIMEOUT_MS, 20_000))
 		});
 	} catch {
 		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
 	}
 	if (res.ok) return res;
 	const pesan = await pesanErrorBackend(res);
-	console.error(`[omahe:api] GET /public/bayar/:token/invoice.pdf → ${res.status}`);
-	throw new ApiError(res.status, pesan ?? 'Invoice tidak dapat diunduh.');
+	console.error(`[omahe:api] GET /public/bayar/:token/${jenis}.pdf → ${res.status}`);
+	throw new ApiError(res.status, pesan ?? 'Dokumen tidak dapat diunduh.');
 }

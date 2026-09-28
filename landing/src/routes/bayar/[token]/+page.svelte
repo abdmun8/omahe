@@ -503,7 +503,8 @@
 						role="status"
 						class="mt-5 rounded-xl bg-green-50 px-4 py-4 text-sm leading-relaxed text-green-800"
 					>
-						Tagihan ini sudah <strong>lunas</strong>. Terima kasih!
+						Tagihan ini sudah <strong>lunas</strong>. Terima kasih! Kwitansi (bukti pembayaran sah)
+						bisa diunduh di bawah.
 					</div>
 				{:else if d.status === 'menunggu_verifikasi'}
 					<div
@@ -574,14 +575,27 @@
 				<!-- Umpan balik tombol salin (screen reader). -->
 				<p role="status" aria-live="polite" class="sr-only">{pesanSalin}</p>
 
-				<Button
-					variant="outline"
-					href="/bayar/{encodeURIComponent(data.token)}/invoice.pdf"
-					download
-					class="mt-6 w-full"
-				>
-					<Download class="h-4 w-4" aria-hidden="true" /> Unduh Invoice (PDF)
-				</Button>
+				<!-- Tagihan batal: backend menolak dokumen (409) — tombol disembunyikan. -->
+				{#if d.status !== 'batal'}
+					<Button
+						variant="outline"
+						href="/bayar/{encodeURIComponent(data.token)}/invoice.pdf"
+						download
+						class="mt-6 w-full"
+					>
+						<Download class="h-4 w-4" aria-hidden="true" /> Unduh Invoice (PDF)
+					</Button>
+				{/if}
+				{#if d.bisaKwitansi}
+					<Button
+						variant="primary"
+						href="/bayar/{encodeURIComponent(data.token)}/kwitansi.pdf"
+						download
+						class="mt-3 w-full"
+					>
+						<Download class="h-4 w-4" aria-hidden="true" /> Unduh Kwitansi (PDF)
+					</Button>
+				{/if}
 			</div>
 		</div>
 	{/if}

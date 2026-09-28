@@ -667,6 +667,9 @@ export interface DetailBayar {
 	catatanTolak: string | null;
 	/** Form unggah bukti HANYA tampil kalau true (server-side gate). */
 	bisaUnggah: boolean;
+	/** Kwitansi PDF bisa diunduh (hanya tagihan lunas). Opsional — backend
+	 *  sebelum iterasi kwitansi belum mengirimnya (anggap false). */
+	bisaKwitansi?: boolean;
 	penerbitNama: string | null;
 	rekening: { bank: string | null; nomor: string | null; atasNama: string | null };
 }

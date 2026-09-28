@@ -656,6 +656,10 @@ dibandingkan case-insensitive). Respons `data`:
   + `turnstile` → envelope `DetailBayar` (status jadi
   `menunggu_verifikasi`); 409 bila tagihan tidak sedang menunggu
   pembayaran.
+- `GET /public/bayar/:token/kwitansi.pdf` → kwitansi (bukti bayar sah)
+  HANYA untuk tagihan `lunas` (409 selain itu); `DetailBayar.bisaKwitansi`
+  menandai tombolnya. Tagihan `batal`: `lihat` tetap menampilkan status
+  batal, invoice & kwitansi → 409 (Omahe menyembunyikan tombol invoice).
 - `GET /public/bayar/:token/invoice.pdf` → `application/pdf`
   (content-disposition berisi nama file dengan nomor invoice) — TANPA
   Turnstile, token = kunci.

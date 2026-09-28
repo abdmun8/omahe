@@ -139,7 +139,7 @@ export function rekeningSalin(nomor: string): string {
 // ---------------------------------------------------------------------------
 
 /**
- * PDF 1 halaman MINIMAL untuk `unduhInvoiceBayar` mode fixture (dev tanpa
+ * PDF 1 halaman MINIMAL untuk `unduhDokumenBayar` mode fixture (dev tanpa
  * backend) supaya tombol "Unduh Invoice" tetap bisa dicoba. Dibangun manual
  * lengkap dengan tabel xref (offset dihitung runtime) supaya pembuka PDF
  * tidak perlu "repair". Produksi tidak pernah memanggil ini — jalur API
