@@ -6,9 +6,15 @@
 <script lang="ts">
 	import AgenOmaheCard from '$lib/components/agen-omahe-card.svelte';
 	import MitraCard from '$lib/components/mitra-card.svelte';
+	import Button from '$lib/components/ui/button.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	// MITRA-04 — label kategori terpilih untuk empty-state per-kategori.
+	const labelKategoriTerpilih = $derived(
+		data.chips.find((c) => c.nilai === data.kategori)?.label ?? ''
+	);
 </script>
 
 <svelte:head>
@@ -75,6 +81,19 @@
 				{/each}
 			</ul>
 		{/if}
+	{:else if data.mitra.length === 0 && data.kategori}
+		<!-- MITRA-04 — kategori master aktif tapi belum punya mitra: tab tetap
+		     tampil, berisi ajakan bergabung (bukan "direktori disiapkan"). -->
+		<div class="bg-surface mt-8 rounded-2xl p-8 text-center">
+			<p class="text-ink font-semibold">Belum ada mitra di kategori ini</p>
+			<p class="text-muted mx-auto mt-1 max-w-md text-sm leading-relaxed">
+				{labelKategoriTerpilih
+					? `Kategori “${labelKategoriTerpilih}” masih menunggu profesional pertamanya.`
+					: 'Kategori ini masih menunggu profesional pertamanya.'}
+				Kalau Anda profesional properti, isi formulirnya dan tim kami akan menghubungi Anda.
+			</p>
+			<Button href="/gabung/mitra" class="mt-5">Gabung sebagai mitra</Button>
+		</div>
 	{:else if data.mitra.length === 0}
 		<div class="bg-surface mt-8 rounded-2xl p-8 text-center">
 			<p class="text-ink font-semibold">Belum ada mitra yang ditampilkan</p>

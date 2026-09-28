@@ -4,7 +4,7 @@
  * kategori tak dikenal dirender manis, tidak dibuang.
  */
 import { describe, expect, test } from 'bun:test';
-import type { PublicMitra } from '$lib/api/types';
+import type { KategoriMitraMaster, PublicMitra } from '$lib/api/types';
 import {
 	KATEGORI_MITRA_LABEL,
 	kategoriChips,
@@ -98,5 +98,52 @@ describe('MITRA-03 label & urutan master', () => {
 		expect(labelKategoriDari({ kategori: 'kjpp', kategoriLabel: 'KJPP (Appraisal)' })).toBe(
 			'KJPP (Appraisal)'
 		);
+	});
+});
+
+describe('MITRA-04 kategoriChips dari master', () => {
+	const master = (slug: string, label: string, urutan: number): KategoriMitraMaster => ({
+		slug,
+		label,
+		urutan
+	});
+
+	test('kategori master TANPA mitra tetap jadi chip, urut master dipertahankan', () => {
+		const chips = kategoriChips(
+			[mitra('kjpp', 'A'), mitra('notaris', 'B')],
+			[
+				master('kjpp', 'KJPP (Appraisal)', 10),
+				master('notaris', 'Notaris', 20),
+				master('konsultan-pajak', 'Konsultan Pajak', 50)
+			]
+		);
+		expect(chips).toEqual([
+			{ nilai: null, label: 'Semua' },
+			{ nilai: 'kjpp', label: 'KJPP (Appraisal)' },
+			{ nilai: 'notaris', label: 'Notaris' },
+			{ nilai: 'konsultan-pajak', label: 'Konsultan Pajak' }
+		]);
+	});
+
+	test('kategori milik mitra yang TIDAK ada di master (nonaktif) tidak jadi chip', () => {
+		const chips = kategoriChips([mitra('arsitek', 'A')], [master('kjpp', 'KJPP', 10)]);
+		expect(chips).toEqual([
+			{ nilai: null, label: 'Semua' },
+			{ nilai: 'kjpp', label: 'KJPP' }
+		]);
+	});
+
+	test('master null/undefined → perilaku lama (turunan data)', () => {
+		const dari = [mitra('kjpp', 'A'), mitra('notaris', 'B')];
+		expect(kategoriChips(dari, null)).toEqual(kategoriChips(dari));
+		expect(kategoriChips(dari, undefined)).toEqual(kategoriChips(dari));
+	});
+
+	test('master kosong → hanya "Semua"; label master kosong → humanize slug', () => {
+		expect(kategoriChips([mitra('kjpp')], [])).toEqual([{ nilai: null, label: 'Semua' }]);
+		expect(kategoriChips([], [master('konsultan-pajak', '  ', 1)])).toEqual([
+			{ nilai: null, label: 'Semua' },
+			{ nilai: 'konsultan-pajak', label: 'Konsultan Pajak' }
+		]);
 	});
 });

@@ -9,7 +9,7 @@
  * berasumsi kategori tertentu — nilai tak dikenal dirender "manis"
  * (kapitalisasi kata), bukan dibuang.
  */
-import type { PublicMitra } from '$lib/api/types';
+import type { KategoriMitraMaster, PublicMitra } from '$lib/api/types';
 
 /** Label tampil untuk kategori yang diketahui. */
 export const KATEGORI_MITRA_LABEL: Record<string, string> = {
@@ -47,12 +47,31 @@ export function labelKategoriDari(m: Pick<PublicMitra, 'kategori' | 'kategoriLab
 }
 
 /**
- * Daftar chip kategori dari data mitra: "Semua" dulu, lalu kategori unik
- * urut `kategoriUrutan` master (MITRA-03, diatur superadmin). Tanpa urutan
+ * Daftar chip kategori: "Semua" dulu, lalu kategori unik urut
+ * `kategoriUrutan` master (MITRA-03, diatur superadmin). Tanpa urutan
  * (respons lama) → urutan kemunculan pertama (list server sudah urut
  * `urutan ASC → nama ASC`, api-contract.md §9); sort stabil menjaga itu.
+ *
+ * MITRA-04 — bila `master` tersedia (endpoint `GET /public/mitra/kategori`),
+ * chip SELURUHNYA dari master (urut master): kategori tanpa mitra tetap
+ * tampil sebagai tab; kategori milik mitra yang TIDAK ada di master
+ * (mis. nonaktif) TIDAK dijadikan chip. `master` null/undefined →
+ * perilaku lama (turunan data) — fallback saat endpoint gagal.
  */
-export function kategoriChips(dari: PublicMitra[]): KategoriChip[] {
+export function kategoriChips(
+	dari: PublicMitra[],
+	master?: KategoriMitraMaster[] | null
+): KategoriChip[] {
+	if (master) {
+		return [
+			{ nilai: null, label: 'Semua' },
+			...master.map((k) => ({
+				nilai: k.slug,
+				// Label master diutamakan; kosong (aneh) → humanize slug.
+				label: k.label.trim() || labelKategoriMitra(k.slug)
+			}))
+		];
+	}
 	const unik: PublicMitra[] = [];
 	for (const m of dari) {
 		if (!unik.some((u) => u.kategori === m.kategori)) unik.push(m);

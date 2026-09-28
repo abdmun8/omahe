@@ -686,3 +686,19 @@ dibandingkan case-insensitive). Respons `data`:
   (header privasi, 400 tanpa Turnstile, rincian, 404, invoice PDF, unggah,
   409 unggah ulang, 400 > 4 MB) + alur browser (Turnstile test key →
   rincian → unggah → menunggu verifikasi).
+
+## 28. Kategori master publik `/public/mitra/kategori` (MITRA-04, backend `done` 2026-09-28 — belum di-push/deploy)
+
+- `GET /public/mitra/kategori` (tanpa auth, `requireFitur('mitra')`) →
+  `[{ slug, label, urutan }]` — hanya kategori master **aktif**, urut
+  `urutan ASC, label ASC`. Field `aktif` tidak keluar. Tujuan MITRA-04:
+  chip/tab `/mitra` Omahe dari MASTER supaya kategori aktif yang belum
+  punya mitra tetap tampil sebagai tab (empty-state + CTA `/gabung/mitra`),
+  dan kategori nonaktif hilang dari tab.
+- Omahe: `getKategoriMitra` (fixture dev-saja; gagal/tanpa API → `null`,
+  BUKAN throw) → `kategoriChips(mitra, master?)` — master tersedia → chip
+  seluruhnya dari master (kategori milik mitra yang tidak ada di master
+  TIDAK jadi chip); `null` → fallback chip turunan data (perilaku lama,
+  acceptance test MITRA-04). `+page.server.ts` mengambil master paralel
+  dengan `getMitra`; `?kategori=` valid bila ada di chip (kategori master
+  tanpa mitra pun sah).

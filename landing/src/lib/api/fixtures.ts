@@ -29,6 +29,7 @@ import type {
 	RegionOption,
 	UnitListing,
 	PublicMitra,
+	KategoriMitraMaster,
 	PromoDetail,
 	TipeDetail,
 	VerifikasiAgen,
@@ -482,6 +483,21 @@ export const MITRA: PublicMitra[] = [
 		logoUrl: null,
 		urutan: 6
 	}
+];
+
+/**
+ * MITRA-04 — master kategori (`GET /public/mitra/kategori`, api-contract
+ * §28) untuk chip/tab `/mitra`. DEV-SAJA pola MITRA. Urutan fixture =
+ * urutan server (`urutan`, lalu `label`). `konsultan-pajak` SENGAJA tidak
+ * punya satu pun mitra di `MITRA` — menguji tab kategori kosong +
+ * empty-state CTA gabung saat dev pakai fixture.
+ */
+export const KATEGORI_MITRA_MASTER: KategoriMitraMaster[] = [
+	{ slug: 'kjpp', label: 'KJPP (Appraisal)', urutan: 10 },
+	{ slug: 'notaris', label: 'Notaris', urutan: 20 },
+	{ slug: 'asuransi', label: 'Asuransi Properti', urutan: 30 },
+	{ slug: 'pemborong', label: 'Pemborong', urutan: 40 },
+	{ slug: 'konsultan-pajak', label: 'Konsultan Pajak', urutan: 50 }
 ];
 
 /**

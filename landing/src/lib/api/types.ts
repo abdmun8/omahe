@@ -452,6 +452,18 @@ export interface PublicMitra {
 }
 
 /**
+ * MITRA-04 — master kategori mitra (`GET /public/mitra/kategori`,
+ * api-contract.md §28): chip/tab `/mitra` dari master (bukan turunan data)
+ * supaya kategori tanpa mitra tetap tampil. Hanya kategori aktif, urut
+ * `urutan` lalu `label` — JANGAN diurutkan ulang di klien.
+ */
+export interface KategoriMitraMaster {
+	slug: string;
+	label: string;
+	urutan: number;
+}
+
+/**
  * Satu slide carousel homepage. Response `GET /public/sliders` berupa
  * `ApiEnvelope<PublicSlider[]>` (tanpa paginasi, maks 10) — urutan sudah
  * benar di server (prioritas efektif DESC → FIFO), JANGAN diurutkan ulang

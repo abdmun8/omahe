@@ -36,6 +36,7 @@ import type {
 	UnitListing,
 	UnitQuery,
 	PublicMitra,
+	KategoriMitraMaster,
 	PromoDetail,
 	PromoSummary,
 	TeksOmahe,
@@ -495,6 +496,32 @@ export async function getMitra(fetchFn: Fetch, kategori?: string): Promise<Publi
 	} catch (err) {
 		console.error('[omahe:api] GET /public/mitra gagal — fallback ke [] (empty-state)', err);
 		return [];
+	}
+}
+
+/**
+ * MITRA-04 — master kategori mitra (`GET /public/mitra/kategori`,
+ * api-contract.md §28) untuk chip/tab `/mitra` dari master (bukan turunan
+ * data) supaya kategori TANPA mitra tetap tampil.
+ *
+ * Fail-soft `null` (BUKAN `[]`, BUKAN throw): `null` = master tidak
+ * tersedia → pemanggil fallback ke chip turunan data (perilaku lama),
+ * halaman tidak pernah jatuh. `[]` dari API dibedakan (master memang
+ * kosong). Fixture HANYA non-produksi (guard `PROD === true` pola
+ * `getVerifikasiAgen`): label master fixture aman (tanpa kontak), tapi
+ * produksi tanpa API harus jujur pakai chip dari data, bukan fixture.
+ */
+export async function getKategoriMitra(fetchFn: Fetch): Promise<KategoriMitraMaster[] | null> {
+	if (!hasSearchApi()) {
+		if (import.meta.env.PROD === true) return null;
+		return fixtures.KATEGORI_MITRA_MASTER;
+	}
+	try {
+		const data = await apiGet<KategoriMitraMaster[]>(fetchFn, '/public/mitra/kategori');
+		return Array.isArray(data) ? data : null;
+	} catch (err) {
+		console.error('[omahe:api] GET /public/mitra/kategori gagal — fallback chip dari data', err);
+		return null;
 	}
 }
 

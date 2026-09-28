@@ -285,6 +285,23 @@ describe('getDirektoriAgen (AGEN-OMAHE-04, mode fixture)', () => {
 	});
 });
 
+// MITRA-04 — master kategori (mode fixture).
+describe('getKategoriMitra (MITRA-04, mode fixture)', () => {
+	test('fixture dev: master terurut & memuat kategori TANPA mitra di fixture MITRA', async () => {
+		const { getKategoriMitra } = await import('./client');
+		const { MITRA, KATEGORI_MITRA_MASTER } = await import('./fixtures');
+		const master = await getKategoriMitra(fetchDummy);
+		expect(master).toEqual(KATEGORI_MITRA_MASTER);
+		// Urutan fixture = urutan server — jangan diacak di klien.
+		const urutan = master!.map((k) => k.urutan);
+		expect(urutan).toEqual([...urutan].sort((a, b) => a - b));
+		// Minimal satu kategori master tanpa mitra — menjaga jalur tab kosong
+		// (empty-state + CTA gabung) tetap teruji di dev fixture.
+		const punyaMitra = new Set(MITRA.map((m) => m.kategori));
+		expect(master!.some((k) => !punyaMitra.has(k.slug))).toBe(true);
+	});
+});
+
 // Bentuk error backend `{ error, code, issues }` — pesan ramah harus sampai UI.
 describe('pesanErrorBackend', () => {
 	const res = (status: number, body: unknown) =>

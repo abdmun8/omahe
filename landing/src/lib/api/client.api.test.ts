@@ -308,3 +308,43 @@ describe('getRegions (jalur API asli) — fail-soft saat backend belum implement
 		expect(hasil).toEqual([{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' }]);
 	});
 });
+
+// MITRA-04 — master kategori: `null` = master tidak tersedia → pemanggil
+// fallback ke chip turunan data (perilaku lama), halaman tidak pernah jatuh.
+describe('getKategoriMitra (jalur API asli, MITRA-04)', () => {
+	test('sukses → master diteruskan (termasuk kategori tanpa mitra) tanpa diurutkan ulang', async () => {
+		const fetchMock = (async () =>
+			envelope([
+				{ slug: 'kjpp', label: 'KJPP (Appraisal)', urutan: 10 },
+				{ slug: 'konsultan-pajak', label: 'Konsultan Pajak', urutan: 50 }
+			])) as unknown as typeof fetch;
+
+		const { getKategoriMitra } = await import('./client');
+		expect(await getKategoriMitra(fetchMock)).toEqual([
+			{ slug: 'kjpp', label: 'KJPP (Appraisal)', urutan: 10 },
+			{ slug: 'konsultan-pajak', label: 'Konsultan Pajak', urutan: 50 }
+		]);
+	});
+
+	test('gagal / body bukan array → null (fallback chip dari data), BUKAN throw', async () => {
+		const { getKategoriMitra } = await import('./client');
+		const gagal = (async () =>
+			new Response('internal', { status: 500 })) as unknown as typeof fetch;
+		expect(await getKategoriMitra(gagal)).toBeNull();
+
+		const lempar = (async () => {
+			throw new Error('network down');
+		}) as unknown as typeof fetch;
+		expect(await getKategoriMitra(lempar)).toBeNull();
+
+		// Envelope tanpa array (shape tak dikenal) → null, bukan diteruskan.
+		const aneh = (async () => envelope({ oops: true })) as unknown as typeof fetch;
+		expect(await getKategoriMitra(aneh)).toBeNull();
+	});
+
+	test('master kosong dari API → [] (dibedakan dari null: tidak ada fallback)', async () => {
+		const fetchMock = (async () => envelope([])) as unknown as typeof fetch;
+		const { getKategoriMitra } = await import('./client');
+		expect(await getKategoriMitra(fetchMock)).toEqual([]);
+	});
+});
