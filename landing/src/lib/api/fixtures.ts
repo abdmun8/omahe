@@ -34,7 +34,8 @@ import type {
 	VerifikasiAgen,
 	AgenPemasar,
 	AgenDirektori,
-	KartuNamaAgen
+	KartuNamaAgen,
+	DetailBayar
 } from './types';
 
 export const REGIONS: RegionOption[] = [
@@ -679,5 +680,36 @@ export const KARTU_NAMA_AGEN: Record<string, KartuNamaAgen> = {
 		berlakuSampai: '2026-08-31T00:00:00.000Z',
 		whatsapp: null,
 		perumahan: []
+	}
+};
+
+/**
+ * Tagihan link bayar publik (TAGIHAN-02, api-contract §27) — DEV-SAJA.
+ * Satu token contoh supaya `/bayar/:token` bisa dicoba tanpa backend;
+ * token WAJIB lolos `TOKEN_BAYAR_PATTERN` (31 karakter alfanumerik).
+ * `bisaUnggah` mode fixture diubah `client.ts` menjadi false setelah
+ * "unggah" (simulasi status menunggu verifikasi). Produksi tanpa API →
+ * 503 (guard di `client.ts`), JANGAN pernah tagihan fiktif tampil.
+ */
+export const TOKEN_BAYAR_CONTOH = 'contohTokenBayarOmahe1234567890';
+
+export const TAGIHAN_BAYAR: Record<string, DetailBayar> = {
+	[TOKEN_BAYAR_CONTOH]: {
+		nomor: 'INV-OMH-2026-0929',
+		pihakNama: 'PT Contoh Sukses Sejahtera',
+		layanan: 'banner',
+		items: [{ deskripsi: 'Iklan banner beranda — 30 hari', jumlah: 1, hargaSatuan: 1_500_000 }],
+		subtotal: 1_500_000,
+		ppnPersen: 11,
+		ppn: 165_000,
+		total: 1_665_000,
+		kodeUnik: 321,
+		nominalTransfer: 1_665_321,
+		jatuhTempo: '2026-12-31T16:59:59.000Z',
+		status: 'belum_bayar',
+		catatanTolak: null,
+		bisaUnggah: true,
+		penerbitNama: 'Omahe',
+		rekening: { bank: 'BCA', nomor: '1234567890', atasNama: 'PT Omahe Digital Nusantara' }
 	}
 };

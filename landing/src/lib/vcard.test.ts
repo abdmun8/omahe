@@ -10,7 +10,9 @@ describe('AGEN-OMAHE-05 vCard', () => {
 			whatsapp: '6281100000901',
 			url: 'https://www.omahe.co.id/agen-omahe/OMHA-A0001'
 		});
-		expect(v).toContain('FN:Widya\; Pratama');
+		// vCard 3.0: `;` di nilai teks WAJIB di-escape jadi `\;` (begitu juga
+		// `,` — dicek di baris ORG). Nama “Widya; Pratama” sengaja memakai `;`.
+		expect(v).toContain('FN:Widya\\; Pratama');
 		expect(v).toContain('ORG:Omahe;Omahe Bogor\\, Jawa Barat');
 		expect(v).toContain('TEL;TYPE=CELL:+6281100000901');
 		expect(v.endsWith('END:VCARD\r\n')).toBe(true);

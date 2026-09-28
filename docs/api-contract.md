@@ -641,3 +641,44 @@ dibandingkan case-insensitive). Respons `data`:
 - Kode agen tampil di kartu tab Agen Omahe `/mitra?tab=agen`.
 - Endpoint publik agen dibatasi 600 permintaan/menit per IP di backend.
 - Diverifikasi E2E 2026-09-28 (Omahe dev → backend lokal + DB dev).
+
+## 27. Link bayar publik `/public/bayar/:token` (TAGIHAN-02, backend `done` 2026-09-28 — belum di-push/deploy)
+
+- Tanpa auth — token acak `^[A-Za-z0-9_-]{20,64}$` adalah SATU-SATUNYA kunci
+  tagihan. Rate limit 300 permintaan/menit/IP; token tak sesuai pola /
+  tidak dikenal → 404 seragam (anti enumeration).
+- `POST /public/bayar/:token/lihat` JSON `{ turnstile }` → envelope
+  `DetailBayar` (nomor, pihakNama, layanan, items[{deskripsi,jumlah,
+  hargaSatuan}], subtotal, ppnPersen, ppn, total, kodeUnik, nominalTransfer
+  = total+kodeUnik, jatuhTempo, status, catatanTolak, bisaUnggah,
+  penerbitNama, rekening{bank,nomor,atasNama}).
+- `POST /public/bayar/:token/bukti` multipart `file` (JPG/PNG/PDF ≤ 5 MB)
+  + `turnstile` → envelope `DetailBayar` (status jadi
+  `menunggu_verifikasi`); 409 bila tagihan tidak sedang menunggu
+  pembayaran.
+- `GET /public/bayar/:token/invoice.pdf` → `application/pdf`
+  (content-disposition berisi nama file dengan nomor invoice) — TANPA
+  Turnstile, token = kunci.
+- Error body standar `{ error, code, issues }`: Turnstile invalid/tidak
+  ada → 403, `siteverify` Cloudflare gagal → 503, token tak dikenal →
+  404, rate limit → 429. Tanpa `TURNSTILE_SECRET_KEY` di backend:
+  lolos hanya di non-produksi (503 di produksi).
+- Omahe: halaman `/bayar/:token` + proxy `/api/bayar/:token/lihat|bukti`
+  (validasi tipe/ukuran file DI PROXY sebelum diteruskan — batas Omahe
+  **4 MB**, lebih ketat dari backend karena body request Vercel dibatasi
+  ±4,5 MB; token salah
+  pola → 404 tanpa memanggil backend) + `/bayar/:token/invoice.pdf`
+  (stream, `Cache-Control: no-store`). Rincian TIDAK di-SSR — Turnstile
+  dulu (`PUBLIC_TURNSTILE_SITE_KEY`; dev kosong → test key Cloudflare).
+- Keamanan sisi Omahe: halaman `noindex,nofollow` (meta robots +
+  `X-Robots-Tag`), `Referrer-Policy: no-referrer`, `Cache-Control:
+  no-store`, TIDAK di-prerender. Token Turnstile SEKALI PAKAI — dipakai
+  `lihat`, widget di-reset dan token baru diminta sebelum `bukti`.
+  Widget Turnstile berada di luar blok fase (tetap ter-mount setelah
+  rincian tampil) supaya bisa di-reset untuk unggah. Nominal transfer
+  ditampilkan menonjol + pesan tegas transfer PERSIS (termasuk kode unik)
+  agar pencocokan di antrean superadmin mudah.
+- Diverifikasi live 2026-09-28 (backend dev + Omahe dev): 8 cek proxy
+  (header privasi, 400 tanpa Turnstile, rincian, 404, invoice PDF, unggah,
+  409 unggah ulang, 400 > 4 MB) + alur browser (Turnstile test key →
+  rincian → unggah → menunggu verifikasi).

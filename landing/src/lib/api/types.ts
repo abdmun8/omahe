@@ -624,3 +624,49 @@ export interface KartuNamaAgen {
 	whatsapp: string | null;
 	perumahan: Array<{ nama: string; slug: string; kodeRef: string }>;
 }
+
+// ---------------------------------------------------------------------------
+// TAGIHAN-02 — link bayar publik (`/public/bayar/:token/*`, api-contract §27)
+// ---------------------------------------------------------------------------
+
+/** Layanan yang ditagihkan lewat link bayar (mirror enum backend). */
+export type LayananBayar =
+	| 'banner'
+	| 'direktori_mitra'
+	| 'agen_properti'
+	| 'keanggotaan_agen'
+	| 'lainnya'
+	| 'token_agen'
+	| 'prioritas_agen'
+	| 'prioritas_perumahan';
+
+export type StatusBayar = 'belum_bayar' | 'menunggu_verifikasi' | 'lunas' | 'ditolak' | 'batal';
+
+/**
+ * Rincian tagihan dari `POST /public/bayar/:token/lihat` maupun `…/bukti`
+ * (response bentuknya SAMA). `nominalTransfer` = `total + kodeUnik` —
+ * angka yang HARUS ditransfer PERSIS agar pembayaran dikenali otomatis.
+ */
+export interface DetailBayar {
+	nomor: string;
+	pihakNama: string;
+	layanan: LayananBayar;
+	items: Array<{ deskripsi: string; jumlah: number; hargaSatuan: number }>;
+	subtotal: number;
+	ppnPersen: number;
+	ppn: number;
+	total: number;
+	/** 0 = tagihan lama (tanpa kode unik). */
+	kodeUnik: number;
+	/** total + kodeUnik — yang HARUS ditransfer persis. */
+	nominalTransfer: number;
+	/** ISO (UTC). */
+	jatuhTempo: string;
+	status: StatusBayar;
+	/** Terisi saat status `ditolak` — alasan penolakan untuk ditampilkan. */
+	catatanTolak: string | null;
+	/** Form unggah bukti HANYA tampil kalau true (server-side gate). */
+	bisaUnggah: boolean;
+	penerbitNama: string | null;
+	rekening: { bank: string | null; nomor: string | null; atasNama: string | null };
+}

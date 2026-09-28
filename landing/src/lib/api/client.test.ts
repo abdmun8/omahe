@@ -266,11 +266,13 @@ describe('getAgenPemasar (AGEN-OMAHE-03, mode fixture)', () => {
 // AGEN-OMAHE-04 — direktori agen (mode fixture).
 describe('getDirektoriAgen (AGEN-OMAHE-04, mode fixture)', () => {
 	test('fixture dev: agen tanpa nomor HP, urut kantor', async () => {
-		const { getDirektoriAgen } = await import('./client');
+		const { getDirektoriAgen, KODE_AGEN_PATTERN } = await import('./client');
 		const agen = await getDirektoriAgen(fetchDummy);
 		expect(agen.length).toBeGreaterThan(0);
 		for (const a of agen) {
-			expect(a.kodeAgen).toMatch(/^OMH-/);
+			// AGEN-OMAHE-05: kode fixture kini `OMHA-A…` (kode lama `OMH-…`
+			// tetap sah — ikut pola kanonik client, bukan hardcode satu era.
+			expect(a.kodeAgen).toMatch(KODE_AGEN_PATTERN);
 			expect('telepon' in a).toBe(false);
 		}
 	});

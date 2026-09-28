@@ -18,6 +18,7 @@ import { env } from '$env/dynamic/private';
 import { musikValid } from '$lib/musik';
 import { error } from '@sveltejs/kit';
 import { SITE } from '$lib/config';
+import { TOKEN_BAYAR_PATTERN, pdfInvoiceContoh } from '$lib/bayar';
 import * as fixtures from './fixtures';
 import type {
 	ApiEnvelope,
@@ -43,7 +44,8 @@ import type {
 	AgenPemasar,
 	AgenDirektori,
 	AgenMinatInput,
-	KartuNamaAgen
+	KartuNamaAgen,
+	DetailBayar
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -863,4 +865,132 @@ export async function getKartuNamaAgen(
 		return fixtures.KARTU_NAMA_AGEN[kode] ?? null;
 	}
 	return apiGet<KartuNamaAgen>(fetchFn, `/public/agen-omahe/kartu/${encodeURIComponent(kode)}`);
+}
+
+// Link bayar publik (TAGIHAN-02) ----------------------------------------------
+
+/**
+ * Link bayar publik `/public/bayar/:token/*` (api-contract §27) — TIDAK
+ * lewat `apiGet`: error di sini BUKAN `error()` Kit melainkan `ApiError`
+ * yang statusnya diteruskan proxy `/api/bayar/:token/*` apa adanya ke
+ * browser (403 Turnstile invalid, 404 token tak dikenal, 409 tagihan tidak
+ * sedang menunggu pembayaran, 429 rate limit, 503 siteverify bermasalah).
+ *
+ * Gate `hasApi()` (bukan `hasSearchApi()`) — endpoint ini terbit sendiri
+ * di TAGIHAN-02, tidak terikat saklar pencarian. Fixture HANYA non-produksi
+ * (guard `PROD === true` pola `getVerifikasiAgen`: ter-tree-shake di build
+ * produksi, tetap teruji di `bun test`); produksi tanpa API → 503 jujur.
+ */
+const PESAN_BAYAR_TAK_TERSEDIA = 'Layanan pembayaran belum tersedia. Coba lagi sebentar lagi.';
+
+/** Token pasti salah format → 404 TANPA memanggil backend (backend pun
+ *  membalas 404 seragam; ini menghemat rate limit 300/menit). */
+function tagihanFixtureBayar(token: string): DetailBayar {
+	if (!TOKEN_BAYAR_PATTERN.test(token))
+		throw new ApiError(404, 'Link bayar tidak ditemukan atau sudah diganti.');
+	const d = fixtures.TAGIHAN_BAYAR[token];
+	if (!d) throw new ApiError(404, 'Link bayar tidak ditemukan atau sudah diganti.');
+	return d;
+}
+
+/** `POST /public/bayar/:token/lihat { turnstile }` → rincian tagihan. */
+export async function lihatTagihanBayar(
+	fetchFn: Fetch,
+	token: string,
+	turnstile: string
+): Promise<DetailBayar> {
+	if (!hasApi()) {
+		if (import.meta.env.PROD === true) throw new ApiError(503, PESAN_BAYAR_TAK_TERSEDIA);
+		return tagihanFixtureBayar(token);
+	}
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/lihat`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			body: JSON.stringify({ turnstile }),
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	return balasanBayar(res);
+}
+
+/**
+ * `POST /public/bayar/:token/bukti` multipart `file` + `turnstile`.
+ * Validasi tipe/ukuran SUDAH di proxy Omahe (mirror backend) sebelum
+ * sampai sini; 409 (bukan “menunggu pembayaran”) diteruskan apa adanya.
+ */
+export async function kirimBuktiBayar(
+	fetchFn: Fetch,
+	token: string,
+	file: File,
+	turnstile: string
+): Promise<DetailBayar> {
+	if (!hasApi()) {
+		if (import.meta.env.PROD === true) throw new ApiError(503, PESAN_BAYAR_TAK_TERSEDIA);
+		// Simulasi sukses dev: status pindah ke menunggu verifikasi.
+		return { ...tagihanFixtureBayar(token), status: 'menunggu_verifikasi', bisaUnggah: false };
+	}
+	const form = new FormData();
+	form.append('file', file);
+	form.append('turnstile', turnstile);
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/bukti`, {
+			method: 'POST',
+			headers: { accept: 'application/json' },
+			body: form,
+			// Unggah beberapa MB + simpan ke storage — timeout umum (8 dtk) terlalu ketat.
+			signal: AbortSignal.timeout(Math.max(TIMEOUT_MS, 30_000))
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	return balasanBayar(res);
+}
+
+/** Envelope sukses → data; selain itu `ApiError` status + pesan backend. */
+async function balasanBayar(res: Response): Promise<DetailBayar> {
+	if (res.ok) {
+		const body = (await res.json()) as ApiEnvelope<DetailBayar>;
+		if (!body?.data) throw new ApiError(502, PESAN_BAYAR_TAK_TERSEDIA);
+		return body.data;
+	}
+	const pesan = await pesanErrorBackend(res);
+	console.error(`[omahe:api] POST /public/bayar/:token → ${res.status}`);
+	throw new ApiError(res.status, pesan ?? PESAN_BAYAR_TAK_TERSEDIA);
+}
+
+/**
+ * `GET /public/bayar/:token/invoice.pdf` — TANPA Turnstile (token = kunci).
+ * Mengembalikan `Response` mentah (body TIDAK di-buffer) supaya proxy
+ * tinggal me-stream-kan; caller yang men-set header final.
+ */
+export async function unduhInvoiceBayar(fetchFn: Fetch, token: string): Promise<Response> {
+	if (!hasApi()) {
+		if (import.meta.env.PROD === true) throw new ApiError(503, PESAN_BAYAR_TAK_TERSEDIA);
+		tagihanFixtureBayar(token); // token tak dikenal → 404 juga di fixture.
+		return new Response(pdfInvoiceContoh(), {
+			status: 200,
+			headers: {
+				'content-type': 'application/pdf',
+				'content-disposition': 'attachment; filename="invoice-contoh.pdf"'
+			}
+		});
+	}
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/invoice.pdf`, {
+			headers: { accept: 'application/pdf' },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	if (res.ok) return res;
+	const pesan = await pesanErrorBackend(res);
+	console.error(`[omahe:api] GET /public/bayar/:token/invoice.pdf → ${res.status}`);
+	throw new ApiError(res.status, pesan ?? 'Invoice tidak dapat diunduh.');
 }
