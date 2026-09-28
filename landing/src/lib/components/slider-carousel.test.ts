@@ -53,7 +53,7 @@ function buatSlider(override: Partial<PublicSlider> = {}): PublicSlider {
 		id: 'slider-1',
 		judul: 'Open House Griya Asri',
 		subjudul: 'Sabtu–Minggu',
-		gambarUrl: 'https://picsum.photos/seed/uji-1/1600/900',
+		gambarUrl: 'https://picsum.photos/seed/uji-1/1600/700',
 		linkUrl: null,
 		perumahan: { slug: 'griya-asri-bogor', nama: 'Griya Asri Bogor' },
 		prioritas: 0,

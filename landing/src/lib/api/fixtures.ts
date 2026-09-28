@@ -500,7 +500,7 @@ export const SLIDERS: PublicSlider[] = [
 		id: '00000000-0000-4000-8000-000000000101',
 		judul: 'Open House Griya Asri Bogor',
 		subjudul: 'Sabtu–Minggu, 26–27 September · doorprize 1 unit canopy',
-		gambarUrl: 'https://picsum.photos/seed/omahe-open-house/1600/900',
+		gambarUrl: 'https://picsum.photos/seed/omahe-open-house/1600/700',
 		linkUrl: null,
 		perumahan: { slug: 'griya-asri-bogor', nama: 'Griya Asri Bogor' },
 		prioritas: 50
@@ -509,7 +509,7 @@ export const SLIDERS: PublicSlider[] = [
 		id: '00000000-0000-4000-8000-000000000102',
 		judul: 'Seminar Pertama Beli Rumah',
 		subjudul: null,
-		gambarUrl: 'https://picsum.photos/seed/omahe-seminar-kpr/1600/900',
+		gambarUrl: 'https://picsum.photos/seed/omahe-seminar-kpr/1600/700',
 		// Eksternal → komponen wajib buka tab baru dengan rel=noopener.
 		linkUrl: 'https://example.com/seminar-pertama-beli-rumah',
 		perumahan: { slug: 'villa-kenanga-residence', nama: 'Villa Kenanga Residence' },
@@ -519,7 +519,7 @@ export const SLIDERS: PublicSlider[] = [
 		id: '00000000-0000-4000-8000-000000000103',
 		judul: 'Groundbreaking Cakrawala Hills',
 		subjudul: 'Fase 2 resmi dimulai — unit awal harga pra-rilis',
-		gambarUrl: 'https://picsum.photos/seed/omahe-groundbreaking/1600/900',
+		gambarUrl: 'https://picsum.photos/seed/omahe-groundbreaking/1600/700',
 		linkUrl: null,
 		perumahan: { slug: 'cakrawala-hills-bandung', nama: 'Cakrawala Hills Bandung' },
 		prioritas: 0
@@ -530,7 +530,7 @@ export const SLIDERS: PublicSlider[] = [
 		id: '00000000-0000-4000-8000-000000000104',
 		judul: 'Hitung Cicilan KPR Anda',
 		subjudul: 'Simulasi KPR gratis — bandingkan tenor & bunga dalam hitungan detik',
-		gambarUrl: 'https://picsum.photos/seed/omahe-kpr/1600/900',
+		gambarUrl: 'https://picsum.photos/seed/omahe-kpr/1600/700',
 		linkUrl: '/kpr',
 		perumahan: null,
 		prioritas: 0
@@ -542,7 +542,7 @@ export const SLIDERS: PublicSlider[] = [
 		judul: null,
 		altText: 'Brosur promo Omahe: DP ringan untuk rumah pertama',
 		subjudul: null,
-		gambarUrl: 'https://picsum.photos/seed/omahe-brosur/1600/900',
+		gambarUrl: 'https://picsum.photos/seed/omahe-brosur/1600/700',
 		linkUrl: '/promo',
 		perumahan: null,
 		prioritas: 100

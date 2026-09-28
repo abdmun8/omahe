@@ -216,6 +216,9 @@
 			>
 				{#each sliders as slider, i (slider.id)}
 					<div class="relative w-full shrink-0">
+						<!-- Rasio tetap 16:7 = ukuran anjuran unggahan 1600×700 di semua
+							lebar layar (dulu tinggi dipatok per breakpoint → desktop
+							memotong atas-bawah gambar). -->
 						<a
 							{...tautanSlide(slider)}
 							class="block"
@@ -227,7 +230,9 @@
 								alt={slider.altText ?? slider.judul ?? teksSlide(slider)}
 								loading={i === 0 ? 'eager' : 'lazy'}
 								fetchpriority={i === 0 ? 'high' : undefined}
-								class="h-[180px] w-full object-cover sm:h-[220px] md:h-[280px] lg:h-[320px]"
+								width="1600"
+								height="700"
+								class="aspect-[16/7] h-auto w-full object-cover"
 							/>
 							{#if slider.judul}
 								<!-- Scrim gradien bawah: jaga kontras teks AA di atas gambar apa pun. -->
