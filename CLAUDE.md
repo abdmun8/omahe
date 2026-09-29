@@ -32,6 +32,8 @@ Brainstorm produk lengkap: `docs/user-story.md`. Kontrak API yang dibutuhkan dar
 
 **Serah-terima (2026-09-28, bisa pindah mesin)**: status lengkap, urutan kerja berikutnya, aturan kerja user, pelajaran CI (mock.module bocor antar file test, lint backend) & gotcha lingkungan dev ada di `~/projects/perumahan/CLAUDE.md` §"Status terkini & kelanjutan". Khusus Omahe: `landing/.env` lokal menunjuk API PRODUKSI — uji lokal pakai `OMAHE_API_BASE_URL=http://localhost:3000` atau kosong (fixture); slider homepage kini rasio tetap 16:7 (unggahan 1600×700).
 
+**Update 2026-09-29 — `INFRA-03` (repo `perumahan`, sebagian)**: backup harian `perumahan_db` terenkripsi `age` (systemd timer 02:00 WIB) + uji restore bulanan otomatis (lolos 13 dtk) + runbook pemulihan + audit secret/HTTPS jalan di `hadirapp01`. Sisa menunggu akun/kredensial user: off-site Cloudflare R2, replikasi MinIO, heartbeat/monitor eksternal/Sentry. Epic tanpa sisa kerja ditutup (`INFRA-01`, `PAYMENT-01`, `AGEN-00`).
+
 ## Arsitektur
 
 Landing/marketplace ini **terpisah** dari aplikasi admin yang sudah ada dan berjalan di repo `~/projects/perumahan`:
