@@ -29,6 +29,7 @@ import type {
 	RegionOption,
 	UnitListing,
 	PublicMitra,
+	MitraDetail,
 	KategoriMitraMaster,
 	PromoDetail,
 	TipeDetail,
@@ -420,70 +421,110 @@ export function projectSlugs(): string[] {
  * fixture = urutan server. Satu `logoUrl: null` utk jalur fallback inisial.
  * Dua kategori DI LUAR enum v1 (asuransi, pemborong) sengaja ikut —
  * menguji chip & badge dinamis (omahe#3) di dev.
+ *
+ * PROFIL-01 — tiap entri kini membawa `slug` + sampul `fotoUrl` (3:2) +
+ * `deskripsi` Markdown untuk halaman `/mitra/:slug`; dua entri bersampul
+ * & ber-deskripsi supaya jalur kartu lama (tanpa foto) dan bagian Tentang
+ * yang disembunyikan ikut teruji saat dev pakai fixture.
  */
-export const MITRA: PublicMitra[] = [
+interface FixtureMitra extends PublicMitra {
+	deskripsi: string | null;
+}
+
+const MITRA_PROFIL: FixtureMitra[] = [
 	{
 		id: '00000000-0000-4000-8000-000000000201',
 		nama: 'KJPT Bumi Nilai',
+		slug: 'kjpt-bumi-nilai',
 		kategori: 'kjpp',
 		wilayahLayanan: 'Jabodetabek & Bandung',
 		whatsapp: '6281100000201',
 		telepon: '62211234501',
 		logoUrl: 'https://picsum.photos/seed/omahe-kjpp-bumi/400/400',
-		urutan: 1
+		fotoUrl: 'https://picsum.photos/seed/omahe-kjpp-bumi-sampul/1200/800',
+		urutan: 1,
+		deskripsi:
+			'## Tentang Kami\nKJPT Bumi Nilai adalah kantor jasa penilai publik yang berpengalaman menilai properti residensial dan komersial sejak 2014.\n\n## Pengalaman\n- **2.000+ laporan penilaian** terbit untuk kebutuhan KPR, pajak, dan litigasi\n- Rekanan penilaian jaminan untuk 5 bank nasional\n- Spesialis cluster & ruko di Jabodetabek\n\n## Wilayah Layanan\nJabodetabek & Bandung — survei lokasi selesai maksimal 3 hari kerja.'
 	},
 	{
 		id: '00000000-0000-4000-8000-000000000202',
 		nama: 'KJPP Graha Penilaian',
+		slug: 'kjpp-graha-penilaian',
 		kategori: 'kjpp',
 		wilayahLayanan: 'Jawa Timur (Surabaya, Malang, Sidoarjo)',
 		whatsapp: '6281100000202',
 		telepon: null,
 		logoUrl: null,
-		urutan: 2
+		fotoUrl: null,
+		urutan: 2,
+		deskripsi: null
 	},
 	{
 		id: '00000000-0000-4000-8000-000000000203',
 		nama: 'Notaris & PPAT Andi Wijaya, S.H., M.Kn.',
+		slug: 'notaris-andi-wijaya',
 		kategori: 'notaris',
 		wilayahLayanan: 'Jakarta & Tangerang Selatan',
 		whatsapp: '6281100000203',
 		telepon: '62211234503',
 		logoUrl: 'https://picsum.photos/seed/omahe-notaris-andi/400/400',
-		urutan: 3
+		fotoUrl: 'https://picsum.photos/seed/omahe-notaris-andi-sampul/1200/800',
+		urutan: 3,
+		deskripsi:
+			'## Profil\nNotaris & PPAT di Jakarta sejak 2008, fokus pada **jual beli properti residensial** dan pembiayaan KPR.\n\n## Layanan\n- Akad jual beli (AJB) & balik nama\n- Perjanjian pengikatan jual beli (PPJB)\n- Waris & hibah properti\n\nUntuk wilayah Jakarta dan Tangerang Selatan, pelayanan bisa di kantor maupun **datang ke lokasi** Anda.'
 	},
 	{
 		id: '00000000-0000-4000-8000-000000000204',
 		nama: 'Notaris Ratna Kencana, S.H.',
+		slug: 'notaris-ratna-kencana',
 		kategori: 'notaris',
 		wilayahLayanan: 'Bogor, Depok & sekitarnya',
 		whatsapp: '6281100000204',
 		telepon: null,
 		logoUrl: 'https://picsum.photos/seed/omahe-notaris-ratna/400/400',
-		urutan: 4
+		fotoUrl: null,
+		urutan: 4,
+		deskripsi: null
 	},
 	// Dua entri di luar enum v1 — menguji chip/badge kategori dinamis (omahe#3).
 	{
 		id: '00000000-0000-4000-8000-000000000205',
 		nama: 'Asuransi Properti Amanah',
+		slug: 'asuransi-properti-amanah',
 		kategori: 'asuransi',
 		wilayahLayanan: 'Nasional',
 		whatsapp: '6281100000205',
 		telepon: null,
 		logoUrl: 'https://picsum.photos/seed/omahe-asuransi-amanah/400/400',
-		urutan: 5
+		fotoUrl: null,
+		urutan: 5,
+		deskripsi: null
 	},
 	{
 		id: '00000000-0000-4000-8000-000000000206',
 		nama: 'CV Bangu Rumah Sejahtera',
+		slug: 'cv-bangu-rumah-sejahtera',
 		kategori: 'pemborong',
 		wilayahLayanan: 'Jabodetabek',
 		whatsapp: '6281100000206',
 		telepon: '62211234506',
 		logoUrl: null,
-		urutan: 6
+		fotoUrl: null,
+		urutan: 6,
+		deskripsi: null
 	}
 ];
+
+/** Bentuk list (GET /public/mitra) — ringkas, tanpa deskripsi (epic keputusan 2). */
+export const MITRA: PublicMitra[] = MITRA_PROFIL.map(({ deskripsi: _d, ...ringkas }) => ringkas);
+
+/** PROFIL-01 — detail `/mitra/:slug` versi fixture (null = 404). */
+export function mitraDetail(slug: string): MitraDetail | null {
+	const m = MITRA_PROFIL.find((x) => x.slug === slug);
+	if (!m) return null;
+	const { id: _id, urutan: _urutan, ...detail } = m;
+	return detail;
+}
 
 /**
  * MITRA-04 — master kategori (`GET /public/mitra/kategori`, api-contract
@@ -611,7 +652,9 @@ export const VERIFIKASI_AGEN: Record<string, VerifikasiAgen> = {
 		nama: 'Widya Pratama',
 		kodeAgen: 'OMH-7KQ2MX',
 		kantorNama: 'Omahe Bogor',
-		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+		// PROFIL-01 — foto agen kini lanskap 3:2 (1200×800); avatar bulat di
+		// halaman verifikasi memotong via object-cover.
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/1200/800',
 		status: 'aktif',
 		berlakuSampai: '2027-09-26T00:00:00.000Z'
 	},
@@ -636,7 +679,7 @@ export const AGEN_PEMASAR: Record<string, AgenPemasar[]> = {
 		{
 			nama: 'Widya Pratama',
 			kantorNama: 'Omahe Bogor',
-			fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+			fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/1200/800',
 			kodeAgen: 'OMH-7KQ2MX',
 			kodeRef: 'AO-K2269F4X'
 		},
@@ -650,7 +693,9 @@ export const AGEN_PEMASAR: Record<string, AgenPemasar[]> = {
 	]
 };
 
-/** Direktori agen Omahe (AGEN-OMAHE-04) — DEV-SAJA, pola AGEN_PEMASAR. */
+/** Direktori agen Omahe (AGEN-OMAHE-04) — DEV-SAJA, pola AGEN_PEMASAR.
+ *  PROFIL-01 — foto 3:2 lanskap; satu entri TANPA foto menjaga jalur
+ *  placeholder gradasi + inisial di kartu. */
 export const DIREKTORI_AGEN: AgenDirektori[] = [
 	{
 		nama: 'Dimas Nugraha',
@@ -661,13 +706,13 @@ export const DIREKTORI_AGEN: AgenDirektori[] = [
 	{
 		nama: 'Widya Pratama',
 		kantorNama: 'Omahe Bogor',
-		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/1200/800',
 		kodeAgen: 'OMHA-A0001'
 	},
 	{
 		nama: 'Sari Anggraini',
 		kantorNama: 'Omahe Depok',
-		fotoUrl: 'https://picsum.photos/seed/omahe-agen-sari/240/240',
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-sari/1200/800',
 		kodeAgen: 'OMHA-A0003'
 	}
 ];
@@ -681,7 +726,10 @@ export const KARTU_NAMA_AGEN: Record<string, KartuNamaAgen> = {
 		nama: 'Widya Pratama',
 		kodeAgen: 'OMHA-A0001',
 		kantorNama: 'Omahe Bogor',
-		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/240/240',
+		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/1200/800',
+		// PROFIL-01 — “Tentang & Pengalaman”, Markdown mentah.
+		deskripsi:
+			'## Tentang Saya\nAgen Omahe berbasis di Bogor sejak 2021, fokus membantu **pembeli rumah pertama** memahami alur KPR dari simulasi hingga akad.\n\n## Pengalaman\n- 120+ unit terjual di kawasan Bogor & Ciawi\n- Sertifikasi agen properti (AREA) 2022\n- Mantan staf marketing developer — paham sisi pengembang juga\n\n## Area Layanan\nBogor, Ciawi, dan sekitarnya.',
 		status: 'aktif',
 		berlakuSampai: '2027-09-26T00:00:00.000Z',
 		whatsapp: '6281100000901',
@@ -692,6 +740,7 @@ export const KARTU_NAMA_AGEN: Record<string, KartuNamaAgen> = {
 		kodeAgen: 'OMHA-A0009',
 		kantorNama: 'Omahe Depok',
 		fotoUrl: null,
+		deskripsi: null,
 		status: 'tidak_aktif',
 		berlakuSampai: '2026-08-31T00:00:00.000Z',
 		whatsapp: null,

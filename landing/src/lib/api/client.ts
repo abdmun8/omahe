@@ -36,6 +36,7 @@ import type {
 	UnitListing,
 	UnitQuery,
 	PublicMitra,
+	MitraDetail,
 	KategoriMitraMaster,
 	PromoDetail,
 	PromoSummary,
@@ -497,6 +498,37 @@ export async function getMitra(fetchFn: Fetch, kategori?: string): Promise<Publi
 		console.error('[omahe:api] GET /public/mitra gagal — fallback ke [] (empty-state)', err);
 		return [];
 	}
+}
+
+/**
+ * Slug mitra bentuknya normalisasi backend (lowercase, run non-alfanumerik
+ * → '-', trim '-'; kosong → 'mitra') — slug `kategori` cadangan ditolak
+ * backend karena bentrok route. Pola ini penjaga LOKAL: URL aneh tidak
+ * layak satu round-trip ke backend (pola `KODE_AGEN_PATTERN`).
+ */
+const SLUG_MITRA_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/**
+ * PROFIL-01 — `GET /public/mitra/:slug` (api-contract.md §29): profil satu
+ * mitra yang tampil publik (aktif + masa aktif + kategori aktif); selain
+ * itu backend membalas 404 SERAGAM → diteruskan `error(404)` Kit lewat
+ * `apiGet` (mitra nonaktif tidak dibedakan dari tidak ada — privacy).
+ *
+ * Slug dinormalisasi lokal (trim + lowercase); halaman me-redirect ke slug
+ * kanonik bila beda. Fixture HANYA non-produksi (guard `PROD === true`,
+ * pola `getKartuNamaAgen`): detail memuat nomor WA FIKTIF — produksi tanpa
+ * API jujur 404, bukan kontak palsu.
+ */
+export async function getMitraDetail(fetchFn: Fetch, slugRaw: string): Promise<MitraDetail> {
+	const slug = slugRaw.trim().toLowerCase();
+	if (!SLUG_MITRA_PATTERN.test(slug)) error(404, 'Mitra tidak ditemukan.');
+	if (!hasSearchApi()) {
+		if (import.meta.env.PROD === true) error(404, 'Mitra tidak ditemukan.');
+		const detail = fixtures.mitraDetail(slug);
+		if (!detail) error(404, 'Mitra tidak ditemukan.');
+		return detail;
+	}
+	return apiGet<MitraDetail>(fetchFn, `/public/mitra/${encodeURIComponent(slug)}`);
 }
 
 /**

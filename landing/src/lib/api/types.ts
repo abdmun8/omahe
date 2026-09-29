@@ -433,6 +433,12 @@ export interface PublicMitra {
 	id: string;
 	nama: string;
 	/**
+	 * PROFIL-01 — slug unik untuk halaman detail `/mitra/:slug` (dibuat
+	 * otomatis dari nama & di-backfill untuk mitra lama; bisa diubah
+	 * superadmin. Nama berubah TIDAK mengubah slug — URL stabil).
+	 */
+	slug: string;
+	/**
 	 * v1 backend: enum `kjpp` | `notaris` (MITRA-01). Sengaja TIDAK di-union
 	 * di sini — kategori tambahan (asuransi, pemborong, arsitek, …) dari
 	 * MITRA-02 harus tampil otomatis di Omahe tanpa redeploy; labelnya
@@ -448,7 +454,35 @@ export interface PublicMitra {
 	telepon: string | null;
 	/** nullable — gagal presign/belum upload; kartu render inisial placeholder. */
 	logoUrl: string | null;
+	/**
+	 * PROFIL-01 — foto sampul lanskap 3:2 (≤1200×800) opsional: terisi →
+	 * kartu bersampul (foto di atas + logo menumpang); null → tampilan
+	 * lama (logo/inisial saja).
+	 */
+	fotoUrl: string | null;
 	urutan: number;
+}
+
+/**
+ * PROFIL-01 — `GET /public/mitra/:slug` (api-contract.md §29): profil satu
+ * mitra yang tampil publik (aktif + masa aktif + kategori aktif — selain
+ * itu backend 404 seragam). Bentuknya ringkas seperti kartu + `deskripsi`.
+ */
+export interface MitraDetail {
+	nama: string;
+	slug: string;
+	kategori: string;
+	/** Label master (MITRA-03); opsional → fallback `labelKategoriMitra`. */
+	kategoriLabel?: string;
+	wilayahLayanan: string;
+	whatsapp: string;
+	telepon: string | null;
+	logoUrl: string | null;
+	/** Sampul 3:2; null → placeholder di halaman detail. */
+	fotoUrl: string | null;
+	/** Markdown mentah tulisan superadmin/pemilik — WAJIB dirender lewat
+	 *  `$lib/markdown` (pola UNIT-05), BUKAN `marked`/`{@html}` langsung. */
+	deskripsi: string | null;
 }
 
 /**
@@ -630,7 +664,14 @@ export interface KartuNamaAgen {
 	/** Kode kanonik — kode lama di URL diarahkan ke sini. */
 	kodeAgen: string;
 	kantorNama: string;
+	/** Foto lanskap 3:2 (PROFIL-01) — hero kartu nama; null → placeholder. */
 	fotoUrl: string | null;
+	/**
+	 * PROFIL-01 — “Tentang & Pengalaman”: Markdown mentah (pengalaman,
+	 * keahlian, area layanan); null/kosong → bagian disembunyikan. Dirender
+	 * lewat `$lib/markdown`, BUKAN `marked`.
+	 */
+	deskripsi: string | null;
 	status: 'aktif' | 'tidak_aktif';
 	berlakuSampai: string | null;
 	whatsapp: string | null;

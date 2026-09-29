@@ -20,7 +20,9 @@ const mitra = (kategori: string, nama = 'Mitra Uji'): PublicMitra => ({
 	whatsapp: '6281100000000',
 	telepon: null,
 	logoUrl: null,
-	urutan: 1
+	urutan: 1,
+	slug: 'uji-mitra',
+	fotoUrl: null
 });
 
 describe('labelKategoriMitra', () => {

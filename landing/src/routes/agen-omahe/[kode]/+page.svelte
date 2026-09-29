@@ -1,15 +1,18 @@
 <!--
 	Kartu nama digital agen Omahe (AGEN-OMAHE-05, api-contract §26) — link
-	yang dibagikan agen sendiri ke calon pembeli. Aktif: foto, nama, kode,
-	kantor, WhatsApp, simpan kontak (vCard), perumahan yang dipasarkan (link
-	membawa `?ref=` KODE AGEN supaya booking/lead tercatat untuk agen ini).
-	Tidak aktif: identitas + status saja, tanpa kontak.
+	yang dibagikan agen sendiri ke calon pembeli. Aktif: hero foto lanskap
+	3:2 (PROFIL-01; gradasi + inisial bila belum ada foto), nama, kode,
+	kantor, WhatsApp, simpan kontak (vCard), "Tentang & Pengalaman"
+	(Markdown aman), perumahan yang dipasarkan (link membawa `?ref=` KODE
+	AGEN supaya booking/lead tercatat untuk agen ini). Tidak aktif:
+	identitas + status saja, tanpa kontak.
 -->
 <script lang="ts">
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import Button from '$lib/components/ui/button.svelte';
 	import { SITE } from '$lib/config';
 	import { trackEvent } from '$lib/analytics';
+	import { renderMarkdown } from '$lib/markdown';
 	import { waUrl } from '$lib/utils';
 	import type { PageData } from './$types';
 
@@ -35,6 +38,9 @@
 				})
 			: null
 	);
+	/** PROFIL-01 — “Tentang & Pengalaman”, Markdown aman (`$lib/markdown`,
+	 *  bukan `marked`); kosong/null → bagian disembunyikan total. */
+	const deskripsiHtml = $derived(k.deskripsi?.trim() ? renderMarkdown(k.deskripsi) : null);
 </script>
 
 <svelte:head>
@@ -53,22 +59,26 @@
 			<p class="font-display text-sm font-semibold tracking-wide uppercase">Agen Omahe</p>
 			<p class="text-xs opacity-80">{SITE.tagline}</p>
 		</div>
+		<!-- PROFIL-01 — hero foto lanskap 3:2 (menggantikan avatar bulat lama);
+		     tanpa foto → gradasi hijau + inisial. `width/height` pas rasio (CLS). -->
+		{#if k.fotoUrl}
+			<img
+				src={k.fotoUrl}
+				alt={`Foto ${k.nama}`}
+				width="1200"
+				height="800"
+				class="aspect-[3/2] w-full object-cover"
+			/>
+		{:else}
+			<div
+				class="from-primary-light to-primary-dark flex aspect-[3/2] w-full items-center justify-center bg-gradient-to-br"
+				aria-hidden="true"
+			>
+				<span class="font-display text-5xl font-bold text-white/90">{inisial}</span>
+			</div>
+		{/if}
 		<div class="flex flex-col items-center px-6 py-6 text-center">
-			{#if k.fotoUrl}
-				<img
-					src={k.fotoUrl}
-					alt={`Foto ${k.nama}`}
-					class="h-28 w-28 rounded-full object-cover"
-					width="112"
-					height="112"
-				/>
-			{:else}
-				<span
-					class="bg-surface text-primary font-display flex h-28 w-28 items-center justify-center rounded-full text-3xl font-bold"
-					aria-hidden="true">{inisial}</span
-				>
-			{/if}
-			<h1 class="font-display text-ink mt-4 text-xl font-extrabold">{k.nama}</h1>
+			<h1 class="font-display text-ink mt-2 text-xl font-extrabold">{k.nama}</h1>
 			<p class="text-accent-dark mt-1 font-mono text-sm font-semibold">{k.kodeAgen}</p>
 			<p class="text-muted text-sm">{k.kantorNama}</p>
 
@@ -108,6 +118,17 @@
 				</p>
 			{/if}
 		</div>
+
+		<!-- PROFIL-01 — Tentang & Pengalaman; hanya saat deskripsi terisi
+		     (profil profesional publik — tampil juga saat agen nonaktif). -->
+		{#if deskripsiHtml}
+			<div class="border-line border-t px-6 py-5 text-left">
+				<h2 class="font-display text-ink text-sm font-bold">Tentang &amp; Pengalaman</h2>
+				<!-- Aman: renderMarkdown meng-escape seluruh HTML mentah lebih dulu
+				     dan hanya mengizinkan link http/https/mailto/tel. -->
+				<div class="prose-artikel prose-ringkas mt-3 text-sm">{@html deskripsiHtml}</div>
+			</div>
+		{/if}
 
 		{#if aktif && k.perumahan.length > 0}
 			<div class="border-line border-t px-6 py-5">

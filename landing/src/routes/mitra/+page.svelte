@@ -106,7 +106,7 @@
 			</p>
 		</div>
 	{:else}
-		<ul class="mt-6 grid list-none gap-4 sm:grid-cols-2">
+		<ul class="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.mitra as mitra (mitra.id)}
 				<li><MitraCard {mitra} /></li>
 			{/each}

@@ -702,3 +702,25 @@ dibandingkan case-insensitive). Respons `data`:
   acceptance test MITRA-04). `+page.server.ts` mengambil master paralel
   dengan `getMitra`; `?kategori=` valid bila ada di chip (kategori master
   tanpa mitra pun sah).
+
+## 29. Profil agen & mitra — foto 3:2 & deskripsi Markdown (PROFIL-01, backend `done` 2026-09-29 — belum di-push/deploy)
+
+- `GET /public/agen-omahe` (direktori) item: `fotoUrl` = foto LANSKAP 3:2
+  (≤1200×800, dipotong otomatis saat unggah), null → kartu memakai blok
+  gradasi hijau + inisial.
+- `GET /public/agen-omahe/kartu/:kode` + `deskripsi: string | null` —
+  Markdown mentah (≤3.000 karakter) → bagian "Tentang & Pengalaman" di
+  `/agen-omahe/:kode` (tetap noindex).
+- `GET /public/mitra` item + `slug` (unik, otomatis dari nama; `kategori`
+  dicadangkan) & `fotoUrl` (sampul 3:2, null → gradasi hijau); `logoUrl`
+  tetap (lingkaran menumpang di sudut sampul).
+- BARU `GET /public/mitra/:slug` → `{ nama, slug, kategori, kategoriLabel,
+  wilayahLayanan, whatsapp, telepon, logoUrl, fotoUrl, deskripsi }`; 404
+  seragam bila mitra tidak tampil (nonaktif / masa aktif lewat — ADMIN-08 /
+  kategori nonaktif). `/kategori` didaftarkan sebelum `/:slug`.
+- Omahe: halaman baru `/mitra/:slug` (indexable, canonical, meta
+  description dari `cuplikanDeskripsi` teks polos ±155 char, masuk
+  sitemap), slug non-kanonik → 301. Markdown WAJIB lewat `$lib/markdown`
+  (`renderMarkdown` meng-escape HTML mentah) + gaya `prose-artikel
+  prose-ringkas` (judul Markdown kecil di dalam kartu). Diverifikasi visual
+  desktop & mobile (mode fixture).

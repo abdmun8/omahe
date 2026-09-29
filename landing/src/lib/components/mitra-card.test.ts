@@ -21,7 +21,9 @@ const MITRA_DASAR: PublicMitra = {
 	whatsapp: '6281100000201',
 	telepon: '62211234501',
 	logoUrl: 'https://picsum.photos/seed/uji/400/400',
-	urutan: 1
+	urutan: 1,
+	slug: 'uji-mitra',
+	fotoUrl: null
 };
 
 describe.skipIf(typeof document === 'undefined')('MitraCard', () => {

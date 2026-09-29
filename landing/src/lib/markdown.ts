@@ -103,3 +103,48 @@ export function renderMarkdown(source: string): string {
 	closeList();
 	return out.join('\n');
 }
+
+/**
+ * Cuplikan teks POLOS dari sumber Markdown (PROFIL-01) — untuk meta
+ * description & pratinjau, ±155 karakter. Markup yang dipahami renderer
+ * dibersihkan (heading/list/emphasis/code/link → label; HR & tag HTML
+ * mentah dibuang) sehingga hasilnya benar-benar polos — aman langsung
+ * dipakai sebagai atribut tanpa perlu escape tambahan.
+ *
+ * Pemotongan di batas kata terakhir sebelum `maks`, diakhiri `…`.
+ */
+export function cuplikanDeskripsi(source: string, maks = 155): string {
+	const polos = source
+		.split(/\r?\n/)
+		.map((baris) => baris.trim())
+		// Baris kosong & HR tidak menyumbang teks cuplikan.
+		.filter((baris) => baris !== '' && !/^(-{3,}|\*{3,})$/.test(baris))
+		.map((baris) =>
+			baris
+				// Penanda heading & list DI AWAL baris saja (tanda `-` di tengah
+				// kata, mis. "Jakarta-Bandung", tidak disentuh).
+				.replace(/^#{1,6}\s+/, '')
+				.replace(/^[-*]\s+/, '')
+				.replace(/^\d+[.)]\s+/, '')
+				// Link → label saja (dipangkas sebelum emphasis supaya label
+				// ber-emphasis tetap bersih).
+				.replace(/\[([^\]]+)\]\([^)\s]*\)/g, '$1')
+				// Tag HTML mentah dibuang — cuplikan bukan tempat markup.
+				.replace(/<[^>]*>/g, '')
+				.replace(/\*\*([^*]+)\*\*/g, '$1')
+				.replace(/\*([^*]+)\*/g, '$1')
+				.replace(/`([^`]+)`/g, '$1')
+		)
+		.join(' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+
+	if (polos.length <= maks) return polos;
+	const potong = polos.slice(0, maks);
+	const batasKata = potong.lastIndexOf(' ');
+	// Batas kata terlalu awal (mis. satu "kata" sangat panjang) → potong
+	// keras supaya cuplikan tidak menyusut drastis.
+	const pakaiBatas = batasKata > maks * 0.6;
+	const inti = (pakaiBatas ? potong.slice(0, batasKata) : potong).replace(/[\s,.;:!?]+$/, '');
+	return `${inti}…`;
+}

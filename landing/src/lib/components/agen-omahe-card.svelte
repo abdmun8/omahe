@@ -1,7 +1,9 @@
 <!--
-	Kartu agen di tab "Agen Omahe" halaman Mitra (AGEN-OMAHE-04): foto besar
-	(inisial kalau belum ada), nama, kantor, tanda terverifikasi → halaman
-	verifikasi ID card, dan "Hubungi" = form minat ke agen (lead tercatat
+	Kartu agen di tab "Agen Omahe" halaman Mitra (AGEN-OMAHE-04): foto
+	LANSKAP 3:2 di atas kartu (PROFIL-01 — tanpa foto → blok gradasi hijau
+	dengan inisial besar), lalu nama, kode, kantor, tanda terverifikasi →
+	halaman verifikasi ID card, "Lihat Profil" → kartu nama digital
+	`/agen-omahe/:kode`, dan "Hubungi" = form minat ke agen (lead tercatat
 	untuk agen, WA ke agen). Nomor HP agen sengaja tidak ditampilkan.
 -->
 <script lang="ts">
@@ -31,35 +33,52 @@
 	}
 </script>
 
-<article
-	class="border-line flex h-full flex-col items-center rounded-2xl border bg-white p-5 text-center"
->
+<article class="border-line flex h-full flex-col overflow-hidden rounded-2xl border bg-white">
+	<!-- PROFIL-01 — foto lanskap 3:2; `width/height` pas rasio untuk CLS. -->
 	{#if agen.fotoUrl}
 		<img
 			src={agen.fotoUrl}
 			alt={`Foto ${agen.nama}`}
-			class="h-24 w-24 rounded-full object-cover"
+			width="1200"
+			height="800"
 			loading="lazy"
-			width="96"
-			height="96"
+			decoding="async"
+			class="aspect-[3/2] w-full object-cover"
 		/>
 	{:else}
-		<span
-			class="bg-surface text-primary font-display flex h-24 w-24 items-center justify-center rounded-full text-2xl font-bold"
-			aria-hidden="true">{inisial}</span
+		<div
+			class="from-primary-light to-primary-dark flex aspect-[3/2] w-full items-center justify-center bg-gradient-to-br"
+			aria-hidden="true"
 		>
+			<span class="font-display text-4xl font-bold text-white/90">{inisial}</span>
+		</div>
 	{/if}
-	<h2 class="font-display text-ink mt-3 text-base font-bold">{agen.nama}</h2>
-	<!-- AGEN-OMAHE-05 — kode agen publik (sama dengan ID card). -->
-	<p class="text-accent-dark font-mono text-xs font-semibold">{agen.kodeAgen}</p>
-	<p class="text-muted text-sm">{agen.kantorNama}</p>
-	<a
-		href={`/verifikasi/${encodeURIComponent(agen.kodeAgen)}`}
-		class="text-primary mt-1 inline-flex items-center gap-1 text-xs font-medium hover:underline"
-	>
-		<BadgeCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen terverifikasi
-	</a>
-	<Button variant="outline" size="sm" class="mt-4 w-full" onclick={hubungi}>Hubungi Agen</Button>
+
+	<div class="flex flex-1 flex-col items-center p-5 text-center">
+		<h2 class="font-display text-ink text-base font-bold">{agen.nama}</h2>
+		<!-- AGEN-OMAHE-05 — kode agen publik (sama dengan ID card). -->
+		<p class="text-accent-dark font-mono text-xs font-semibold">{agen.kodeAgen}</p>
+		<p class="text-muted text-sm">{agen.kantorNama}</p>
+		<a
+			href={`/verifikasi/${encodeURIComponent(agen.kodeAgen)}`}
+			class="text-primary mt-1 inline-flex items-center gap-1 text-xs font-medium hover:underline"
+		>
+			<BadgeCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen terverifikasi
+		</a>
+
+		<div class="mt-auto flex w-full flex-col gap-2 pt-4">
+			<Button variant="primary" size="sm" class="w-full" onclick={hubungi}>Hubungi Agen</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				class="w-full"
+				href={`/agen-omahe/${encodeURIComponent(agen.kodeAgen)}`}
+				onclick={() => trackEvent('agen_direktori_profil', { agen: agen.kodeAgen })}
+			>
+				Lihat Profil
+			</Button>
+		</div>
+	</div>
 </article>
 
 <LeadFormDialog
