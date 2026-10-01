@@ -7,7 +7,8 @@
 	untuk agen, WA ke agen). Nomor HP agen sengaja tidak ditampilkan.
 -->
 <script lang="ts">
-	import BadgeCheck from '@lucide/svelte/icons/badge-check';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import BadgeProfesional from './badge-profesional.svelte';
 	import type { AgenDirektori } from '$lib/api/types';
 	import { trackEvent } from '$lib/analytics';
 	import LeadFormDialog from './lead-form-dialog.svelte';
@@ -55,7 +56,9 @@
 	{/if}
 
 	<div class="flex flex-1 flex-col items-center p-5 text-center">
-		<h2 class="font-display text-ink text-base font-bold">{agen.nama}</h2>
+		<h2 class="font-display text-ink text-base font-bold">
+			{agen.nama}{#if agen.profesional}<BadgeProfesional class="ml-1" />{/if}
+		</h2>
 		<!-- AGEN-OMAHE-05 — kode agen publik (sama dengan ID card). -->
 		<p class="text-accent-dark font-mono text-xs font-semibold">{agen.kodeAgen}</p>
 		<p class="text-muted text-sm">{agen.kantorNama}</p>
@@ -63,7 +66,7 @@
 			href={`/verifikasi/${encodeURIComponent(agen.kodeAgen)}`}
 			class="text-primary mt-1 inline-flex items-center gap-1 text-xs font-medium hover:underline"
 		>
-			<BadgeCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen terverifikasi
+			<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen resmi Omahe
 		</a>
 
 		<div class="mt-auto flex w-full flex-col gap-2 pt-4">

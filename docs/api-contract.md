@@ -724,3 +724,21 @@ dibandingkan case-insensitive). Respons `data`:
   (`renderMarkdown` meng-escape HTML mentah) + gaya `prose-artikel
   prose-ringkas` (judul Markdown kecil di dalam kartu). Diverifikasi visual
   desktop & mobile (mode fixture).
+
+## 30. Centang biru "Agen Profesional Terverifikasi" (AGEN-OMAHE-07, 2026-10-01)
+
+- Field BARU (opsional — backend lama tidak mengirim, Omahe aman):
+  - `GET /public/agen-omahe` (direktori) & `GET /public/agen-omahe/perumahan/:slug`
+    (agen pemasar): `profesional: boolean`.
+  - `GET /public/agen-omahe/kartu/:kode`: `profesional: boolean` +
+    `profesionalSejak: string | null` (ISO).
+- `profesional` sudah memperhitungkan membership aktif di backend (keputusan
+  user: badge hanya selama membership aktif) — Omahe TIDAK menghitung ulang.
+  Catatan internal/siapa yang memverifikasi tidak pernah dikirim.
+- Omahe: komponen `badge-profesional.svelte` (lencana biru `#1D9BF0` setelah
+  nama; hover = title, ketuk = popover `position: fixed` dijepit di layar —
+  lolos `overflow-hidden` kartu; tautan "Apa artinya?" →
+  `/gabung/agen#profesional`). Kartu nama juga menampilkan "Agen Profesional
+  Terverifikasi Omahe · sejak <bulan tahun>".
+- Tanda lama "Agen terverifikasi" (ID card resmi) diganti ikon perisai
+  "Agen resmi Omahe" supaya tidak tertukar dengan centang biru.

@@ -634,6 +634,8 @@ export interface AgenPemasar {
 	/** Kode `?ref=` pilihan agen (`AO-…`) — dikirim form minat agen supaya
 	 *  lead tercatat untuk agen ini. */
 	kodeRef: string;
+	/** AGEN-OMAHE-07 — centang biru (terverifikasi profesional & membership aktif). Opsional: backend lama tidak mengirim. */
+	profesional?: boolean;
 }
 
 /** AGEN-OMAHE-04 — agen di tab "Agen Omahe" halaman Mitra (`GET /public/agen-omahe`, api-contract §23). */
@@ -643,6 +645,8 @@ export interface AgenDirektori {
 	fotoUrl: string | null;
 	/** Kode ID card → `/verifikasi/:kodeAgen` & tujuan form minat. */
 	kodeAgen: string;
+	/** AGEN-OMAHE-07 — centang biru (opsional, backend lama tidak mengirim). */
+	profesional?: boolean;
 }
 
 /** Body minat umum ke agen (proxy `/api/agen-minat`). */
@@ -676,6 +680,9 @@ export interface KartuNamaAgen {
 	berlakuSampai: string | null;
 	whatsapp: string | null;
 	perumahan: Array<{ nama: string; slug: string; kodeRef: string }>;
+	/** AGEN-OMAHE-07 — centang biru + sejak kapan (ISO). Opsional. */
+	profesional?: boolean;
+	profesionalSejak?: string | null;
 }
 
 // ---------------------------------------------------------------------------

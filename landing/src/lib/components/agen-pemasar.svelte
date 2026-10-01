@@ -9,7 +9,8 @@
 	merender apa adanya. List kosong → tidak merender apa pun.
 -->
 <script lang="ts">
-	import BadgeCheck from '@lucide/svelte/icons/badge-check';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import BadgeProfesional from './badge-profesional.svelte';
 	import type { AgenPemasar } from '$lib/api/types';
 	import { trackEvent } from '$lib/analytics';
 	import LeadFormDialog from './lead-form-dialog.svelte';
@@ -75,13 +76,17 @@
 						>
 					{/if}
 					<div class="min-w-0 flex-1">
-						<p class="text-ink truncate font-semibold">{a.nama}</p>
+						<p class="text-ink flex items-center gap-1 font-semibold">
+							<span class="truncate">{a.nama}</span>{#if a.profesional}<BadgeProfesional
+									class="shrink-0"
+								/>{/if}
+						</p>
 						<p class="text-muted truncate text-sm">{a.kantorNama}</p>
 						<a
 							href={`/verifikasi/${encodeURIComponent(a.kodeAgen)}`}
 							class="text-primary mt-0.5 inline-flex items-center gap-1 text-xs font-medium hover:underline"
 						>
-							<BadgeCheck class="h-3.5 w-3.5" aria-hidden="true" /> Terverifikasi · {a.kodeAgen}
+							<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen resmi · {a.kodeAgen}
 						</a>
 					</div>
 					<Button variant="outline" size="sm" class="shrink-0" onclick={() => hubungi(a)}>

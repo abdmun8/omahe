@@ -7,6 +7,7 @@
 	sendiri → arahkan ke /gabung/perumahan (alur agen properti, AUTH-05).
 -->
 <script lang="ts">
+	import BadgeProfesional from '$lib/components/badge-profesional.svelte';
 	import { SITE } from '$lib/config';
 	import { trackGabungClick } from '$lib/analytics';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
@@ -62,6 +63,22 @@
 			</li>
 		{/each}
 	</ul>
+
+	<!-- AGEN-OMAHE-07 — penjelasan centang biru (tujuan tautan "Apa artinya?"). -->
+	<section
+		id="profesional"
+		class="border-line mt-8 scroll-mt-24 rounded-2xl border bg-white p-6 sm:p-8"
+	>
+		<h2 class="font-display text-ink flex items-center gap-2 text-lg font-bold">
+			Centang biru <BadgeProfesional /> Agen Profesional
+		</h2>
+		<p class="text-muted mt-2 text-sm leading-relaxed">
+			Centang biru menandakan agen Omahe yang kompetensi &amp; pengalamannya sudah diverifikasi
+			langsung oleh tim Omahe. Tanda ini hanya tampil selama keanggotaan agen aktif, dan bisa
+			dicabut bila agen tidak lagi memenuhi standar kami. Setiap agen Omahe tetap merupakan
+			<span class="text-ink font-medium">agen resmi</span> — keaslian ID card bisa dicek lewat kodenya.
+		</p>
+	</section>
 
 	<section class="bg-surface mt-8 rounded-2xl p-6 sm:p-8">
 		<h2 class="font-display text-ink text-lg font-bold">Cara bergabung</h2>

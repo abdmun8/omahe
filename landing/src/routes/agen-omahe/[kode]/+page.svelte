@@ -8,7 +8,8 @@
 	identitas + status saja, tanpa kontak.
 -->
 <script lang="ts">
-	import BadgeCheck from '@lucide/svelte/icons/badge-check';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import BadgeProfesional from '$lib/components/badge-profesional.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import { SITE } from '$lib/config';
 	import { trackEvent } from '$lib/analytics';
@@ -27,6 +28,16 @@
 			.slice(0, 2)
 			.map((kata) => kata[0]?.toUpperCase())
 			.join('') || 'A'
+	);
+	// AGEN-OMAHE-07 — "sejak <bulan tahun>" untuk centang biru.
+	const profesionalSejak = $derived(
+		k.profesional && k.profesionalSejak
+			? new Date(k.profesionalSejak).toLocaleDateString('id-ID', {
+					month: 'long',
+					year: 'numeric',
+					timeZone: 'Asia/Jakarta'
+				})
+			: null
 	);
 	const berlaku = $derived(
 		k.berlakuSampai
@@ -78,7 +89,16 @@
 			</div>
 		{/if}
 		<div class="flex flex-col items-center px-6 py-6 text-center">
-			<h1 class="font-display text-ink mt-2 text-xl font-extrabold">{k.nama}</h1>
+			<h1 class="font-display text-ink mt-2 text-xl font-extrabold">
+				{k.nama}{#if k.profesional}<BadgeProfesional class="ml-1" />{/if}
+			</h1>
+			{#if k.profesional}
+				<p class="mt-1 text-xs font-medium text-[#1D9BF0]">
+					Agen Profesional Terverifikasi Omahe{profesionalSejak
+						? ` · sejak ${profesionalSejak}`
+						: ''}
+				</p>
+			{/if}
 			<p class="text-accent-dark mt-1 font-mono text-sm font-semibold">{k.kodeAgen}</p>
 			<p class="text-muted text-sm">{k.kantorNama}</p>
 
@@ -87,7 +107,7 @@
 					href={`/verifikasi/${encodeURIComponent(k.kodeAgen)}`}
 					class="text-primary mt-2 inline-flex items-center gap-1 text-xs font-medium hover:underline"
 				>
-					<BadgeCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen terverifikasi{berlaku
+					<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen resmi Omahe{berlaku
 						? ` · berlaku s/d ${berlaku}`
 						: ''}
 				</a>

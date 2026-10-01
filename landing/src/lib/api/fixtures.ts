@@ -681,7 +681,9 @@ export const AGEN_PEMASAR: Record<string, AgenPemasar[]> = {
 			kantorNama: 'Omahe Bogor',
 			fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/1200/800',
 			kodeAgen: 'OMH-7KQ2MX',
-			kodeRef: 'AO-K2269F4X'
+			kodeRef: 'AO-K2269F4X',
+			// AGEN-OMAHE-07 — satu agen bercentang biru, satu tanpa (dua jalur UI).
+			profesional: true
 		},
 		{
 			nama: 'Dimas Nugraha',
@@ -707,7 +709,8 @@ export const DIREKTORI_AGEN: AgenDirektori[] = [
 		nama: 'Widya Pratama',
 		kantorNama: 'Omahe Bogor',
 		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/1200/800',
-		kodeAgen: 'OMHA-A0001'
+		kodeAgen: 'OMHA-A0001',
+		profesional: true
 	},
 	{
 		nama: 'Sari Anggraini',
@@ -733,7 +736,9 @@ export const KARTU_NAMA_AGEN: Record<string, KartuNamaAgen> = {
 		status: 'aktif',
 		berlakuSampai: '2027-09-26T00:00:00.000Z',
 		whatsapp: '6281100000901',
-		perumahan: [{ nama: 'Griya Asri Bogor', slug: 'griya-asri-bogor', kodeRef: 'AO-K2269F4X' }]
+		perumahan: [{ nama: 'Griya Asri Bogor', slug: 'griya-asri-bogor', kodeRef: 'AO-K2269F4X' }],
+		profesional: true,
+		profesionalSejak: '2026-09-30T00:00:00.000Z'
 	},
 	'OMHA-A0009': {
 		nama: 'Rangga Saputra',
