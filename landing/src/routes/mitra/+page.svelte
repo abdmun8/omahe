@@ -40,7 +40,8 @@
 	</header>
 
 	<nav class="mt-6 flex gap-2 overflow-x-auto pb-1" aria-label="Filter kategori mitra">
-		{#each data.chips as k (k.label)}
+		<!-- Urutan tab (user 2026-10-01): Semua → Agen Omahe → kategori mitra (urut master). -->
+		{#each data.chips as k, i (k.label)}
 			<a
 				href={k.nilai ? `/mitra?kategori=${k.nilai}` : '/mitra'}
 				class={`inline-flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors ${
@@ -49,14 +50,16 @@
 						: 'bg-surface text-muted hover:text-primary'
 				}`}>{k.label}</a
 			>
+			{#if i === 0}
+				<!-- AGEN-OMAHE-04 — tab agen internal Omahe (bukan kategori mitra). -->
+				<a
+					href="/mitra?tab=agen"
+					class={`inline-flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors ${
+						data.tabAgen ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-primary'
+					}`}>Agen Omahe</a
+				>
+			{/if}
 		{/each}
-		<!-- AGEN-OMAHE-04 — tab agen internal Omahe (bukan kategori mitra). -->
-		<a
-			href="/mitra?tab=agen"
-			class={`inline-flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors ${
-				data.tabAgen ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-primary'
-			}`}>Agen Omahe</a
-		>
 	</nav>
 
 	{#if data.tabAgen}
@@ -106,7 +109,7 @@
 			</p>
 		</div>
 	{:else}
-		<ul class="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<ul class="mt-6 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 			<!-- Tab "Semua": Agen Omahe dulu (keputusan user 2026-10-01), lalu mitra
 			     urut kategori master (diurutkan di load). Tab kategori → agen kosong. -->
 			{#each data.agen as a (a.kodeAgen)}

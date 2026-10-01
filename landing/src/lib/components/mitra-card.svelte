@@ -128,7 +128,7 @@
 		<a href={urlProfil} class="text-primary mt-1.5 text-xs font-semibold hover:underline">
 			Lihat profil →
 		</a>
-		<div class="mt-auto flex gap-2 pt-4">
+		<div class="mt-auto flex flex-wrap gap-2 pt-4">
 			{@render kontak(true)}
 		</div>
 	</div>
