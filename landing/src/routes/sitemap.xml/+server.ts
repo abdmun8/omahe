@@ -18,7 +18,10 @@ const STATIS = [
 	'/gabung/perumahan',
 	'/kpr',
 	'/tentang',
-	'/kontak'
+	'/kontak',
+	// Dokumen legal dipublikasikan 2026-10-01 (bukan draf lagi) — boleh diindeks.
+	'/privasi',
+	'/syarat-ketentuan'
 ];
 
 export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
