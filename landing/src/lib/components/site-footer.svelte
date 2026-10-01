@@ -43,6 +43,7 @@
 			<ul class="text-muted mt-3 space-y-2 text-sm">
 				<li><a href="/privasi" class="hover:text-primary">Kebijakan Privasi</a></li>
 				<li><a href="/syarat-ketentuan" class="hover:text-primary">Syarat &amp; Ketentuan</a></li>
+				<li><a href="/hapus-akun" class="hover:text-primary">Hapus Akun</a></li>
 				<li><a href="mailto:{emailOmahe}" class="hover:text-primary">{emailOmahe}</a></li>
 			</ul>
 		</div>

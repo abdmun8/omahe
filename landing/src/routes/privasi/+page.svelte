@@ -128,6 +128,8 @@
 				memperbaiki data yang keliru, meminta penghapusan, menarik persetujuan, serta mengajukan
 				keberatan atas pemrosesan tertentu. Kirim permintaan ke email di bawah; kami akan
 				menanggapinya dalam waktu yang wajar dan dapat meminta verifikasi identitas lebih dulu.
+				Pemilik akun aplikasi/panel Omahe dapat menghapus akunnya sendiri — caranya ada di halaman
+				<a href="/hapus-akun" class="text-primary hover:underline">Hapus Akun</a>.
 			</p>
 		</section>
 
