@@ -10,6 +10,32 @@
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
 			rel="stylesheet"
 		/>
+		<!--
+			Preloader gambar (2026-10-01): setiap <img> menampilkan shimmer
+			(CSS `img:not([data-gambar-siap])` di app.css) sampai selesai dimuat.
+			Listener dipasang SEDINI mungkin (sebelum gambar SSR selesai) & fase
+			capture — event load/error tidak bubble. Berlaku juga untuk gambar
+			hasil navigasi client. Opt-out: atribut `data-tanpa-preloader`.
+		-->
+		<script>
+			(function () {
+				function siap(e) {
+					var t = e.target;
+					if (t && t.tagName === 'IMG') t.setAttribute('data-gambar-siap', '');
+				}
+				document.addEventListener('load', siap, true);
+				document.addEventListener('error', siap, true);
+				// Gambar dari cache yang selesai sebelum listener / sebelum hidrasi.
+				function tandaiSelesai() {
+					var imgs = document.images;
+					for (var i = 0; i < imgs.length; i++) {
+						if (imgs[i].complete) imgs[i].setAttribute('data-gambar-siap', '');
+					}
+				}
+				document.addEventListener('DOMContentLoaded', tandaiSelesai);
+				window.addEventListener('load', tandaiSelesai);
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover" class="text-ink bg-white antialiased">

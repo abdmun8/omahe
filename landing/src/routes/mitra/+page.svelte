@@ -94,7 +94,7 @@
 			</p>
 			<Button href="/gabung/mitra" class="mt-5">Gabung sebagai mitra</Button>
 		</div>
-	{:else if data.mitra.length === 0}
+	{:else if data.mitra.length === 0 && data.agen.length === 0}
 		<div class="bg-surface mt-8 rounded-2xl p-8 text-center">
 			<p class="text-ink font-semibold">Belum ada mitra yang ditampilkan</p>
 			<p class="text-muted mx-auto mt-1 max-w-md text-sm leading-relaxed">
@@ -107,6 +107,11 @@
 		</div>
 	{:else}
 		<ul class="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<!-- Tab "Semua": Agen Omahe dulu (keputusan user 2026-10-01), lalu mitra
+			     urut kategori master (diurutkan di load). Tab kategori → agen kosong. -->
+			{#each data.agen as a (a.kodeAgen)}
+				<li><AgenOmaheCard agen={a} /></li>
+			{/each}
 			{#each data.mitra as mitra (mitra.id)}
 				<li><MitraCard {mitra} /></li>
 			{/each}

@@ -9,7 +9,8 @@ import {
 	KATEGORI_MITRA_LABEL,
 	kategoriChips,
 	labelKategoriDari,
-	labelKategoriMitra
+	labelKategoriMitra,
+	urutkanMitraPerKategori
 } from './mitra';
 
 const mitra = (kategori: string, nama = 'Mitra Uji'): PublicMitra => ({
@@ -147,5 +148,37 @@ describe('MITRA-04 kategoriChips dari master', () => {
 			{ nilai: null, label: 'Semua' },
 			{ nilai: 'konsultan-pajak', label: 'Konsultan Pajak' }
 		]);
+	});
+});
+
+describe('urutkanMitraPerKategori (tab Semua)', () => {
+	const m = (id: string, kategori: string) =>
+		({ id, nama: id, slug: id, kategori }) as unknown as PublicMitra;
+	const chips = [
+		{ nilai: null, label: 'Semua' },
+		{ nilai: 'kjpp', label: 'KJPP' },
+		{ nilai: 'notaris', label: 'Notaris' },
+		{ nilai: 'asuransi', label: 'Asuransi' }
+	];
+
+	test('mengikuti urutan chip kategori, stabil di dalam kategori, tak dikenal di akhir', () => {
+		const hasil = urutkanMitraPerKategori(
+			[
+				m('n1', 'notaris'),
+				m('x1', 'lain'),
+				m('a1', 'asuransi'),
+				m('k1', 'kjpp'),
+				m('n2', 'notaris'),
+				m('k2', 'kjpp')
+			],
+			chips
+		);
+		expect(hasil.map((r) => r.id)).toEqual(['k1', 'k2', 'n1', 'n2', 'a1', 'x1']);
+	});
+
+	test('tidak mengubah array masukan', () => {
+		const masuk = [m('n1', 'notaris'), m('k1', 'kjpp')];
+		urutkanMitraPerKategori(masuk, chips);
+		expect(masuk.map((r) => r.id)).toEqual(['n1', 'k1']);
 	});
 });

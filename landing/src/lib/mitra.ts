@@ -84,3 +84,23 @@ export function kategoriChips(
 		...urut.map((m) => ({ nilai: m.kategori, label: labelKategoriDari(m) }))
 	];
 }
+
+/**
+ * Tab "Semua" — mitra diurutkan mengikuti urutan chip kategori (= urutan
+ * master yang diatur superadmin; keputusan user 2026-10-01: Agen Omahe
+ * dulu, lalu mitra per kategori). Urutan di dalam satu kategori tetap
+ * urutan server (sort stabil). Kategori yang tidak ada di chip (mis.
+ * nonaktif di master) ditaruh di akhir.
+ */
+export function urutkanMitraPerKategori(
+	mitra: PublicMitra[],
+	chips: KategoriChip[]
+): PublicMitra[] {
+	const posisi = new Map<string, number>();
+	chips.forEach((c, i) => {
+		if (c.nilai !== null) posisi.set(c.nilai, i);
+	});
+	return [...mitra].sort(
+		(a, b) => (posisi.get(a.kategori) ?? Infinity) - (posisi.get(b.kategori) ?? Infinity)
+	);
+}
