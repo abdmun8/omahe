@@ -6,6 +6,7 @@
 	import { page } from '$app/state';
 	import { NAV } from '$lib/config';
 	import { withRef } from '$lib/ref';
+	import { loginUrl } from '$lib/app-url';
 	import { cn } from '$lib/utils';
 
 	let terbuka = $state(false);
@@ -17,6 +18,9 @@
 		page.url.pathname;
 		terbuka = false;
 	});
+
+	// Panel/akun di app `perumahan` (PUBLIC_BOOKING_BASE_URL); null → disembunyikan.
+	const urlMasuk = loginUrl();
 
 	const aktif = (href: string) =>
 		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
@@ -35,12 +39,19 @@
 				<a
 					href={withRef(item.href, ref)}
 					class={cn(
-						'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+						'rounded-lg px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors lg:px-3',
 						aktif(item.href) ? 'bg-surface text-primary' : 'text-muted hover:text-primary'
 					)}
 					aria-current={aktif(item.href) ? 'page' : undefined}>{item.label}</a
 				>
 			{/each}
+			{#if urlMasuk}
+				<a
+					href={urlMasuk}
+					class="border-primary text-primary hover:bg-primary ml-2 rounded-lg border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors hover:text-white"
+					>Masuk</a
+				>
+			{/if}
 		</nav>
 
 		<button
@@ -80,6 +91,15 @@
 						>
 					</li>
 				{/each}
+				{#if urlMasuk}
+					<li class="pt-2 pb-1">
+						<a
+							href={urlMasuk}
+							class="border-primary text-primary block rounded-lg border px-3 py-3 text-center text-base font-semibold"
+							>Masuk</a
+						>
+					</li>
+				{/if}
 			</ul>
 		</nav>
 	{/if}

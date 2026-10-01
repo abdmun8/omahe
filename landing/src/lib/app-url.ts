@@ -27,3 +27,14 @@ export function daftarPerumahanUrl(): string {
 export function daftarPerusahaanUrl(): string {
 	return `${base()}/daftar/perusahaan`;
 }
+
+/**
+ * Halaman masuk panel (`/login` app `perumahan`) — sekaligus pintu
+ * pendaftaran (AUTH-08 "Masuk atau Daftar"). `null` bila
+ * `PUBLIC_BOOKING_BASE_URL` belum di-set: tombol disembunyikan, jangan
+ * menaut ke `/login` milik Omahe sendiri (tidak ada).
+ */
+export function loginUrl(): string | null {
+	const b = base();
+	return b ? `${b}/login` : null;
+}
