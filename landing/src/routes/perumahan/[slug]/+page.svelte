@@ -1,4 +1,5 @@
 <script lang="ts">
+	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
 	import AgenPemasar from '$lib/components/agen-pemasar.svelte';
 	import LandingSections from '$lib/components/landing-sections.svelte';
 	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
@@ -107,6 +108,10 @@
 			]
 		})
 	);
+	// Lightbox galeri (2026-10-02) — klik foto → modal + layar penuh.
+	const galeriUrls = $derived(p.photos.map((f) => f.url).filter((u): u is string => !!u));
+	let galeriIndeks = $state(0);
+	let galeriTerbuka = $state(false);
 </script>
 
 <svelte:head>
@@ -244,17 +249,33 @@
 			{/if}
 
 			{#if p.photos.length > 0}
+				<GaleriLightbox
+					urls={galeriUrls}
+					bind:indeks={galeriIndeks}
+					bind:terbuka={galeriTerbuka}
+					judul="Foto {p.nama}"
+				/>
 				<section>
 					<h2 class="font-display text-ink text-xl font-bold">Galeri</h2>
 					<div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
 						{#each p.photos as foto (foto.key)}
 							{#if foto.url}
-								<img
-									src={foto.url}
-									alt=""
-									loading="lazy"
-									class="h-32 w-full rounded-lg object-cover sm:h-40"
-								/>
+								<button
+									type="button"
+									class="block cursor-zoom-in overflow-hidden rounded-lg"
+									aria-label="Perbesar foto"
+									onclick={() => {
+										galeriIndeks = galeriUrls.indexOf(foto.url!);
+										galeriTerbuka = true;
+									}}
+								>
+									<img
+										src={foto.url}
+										alt=""
+										loading="lazy"
+										class="h-32 w-full rounded-lg object-cover transition-transform hover:scale-105 sm:h-40"
+									/>
+								</button>
 							{:else}
 								<PhotoPlaceholder class="h-32 w-full rounded-lg sm:h-40" />
 							{/if}

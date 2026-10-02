@@ -18,6 +18,18 @@
 	import { ajukanUrl } from '$lib/ref';
 	import Button from './ui/button.svelte';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
+	import GaleriLightbox from './galeri-lightbox.svelte';
+
+	// Lightbox galeri section builder (2026-10-02) — satu modal dipakai
+	// bergantian oleh semua section galeri di halaman ini.
+	let lightboxUrls = $state<string[]>([]);
+	let lightboxIndeks = $state(0);
+	let lightboxTerbuka = $state(false);
+	function bukaLightbox(urls: (string | null)[], url: string) {
+		lightboxUrls = urls.filter((u): u is string => !!u);
+		lightboxIndeks = Math.max(0, lightboxUrls.indexOf(url));
+		lightboxTerbuka = true;
+	}
 
 	let {
 		sections,
@@ -83,14 +95,22 @@
 				{#each section.props.imageKeys as key, i (key)}
 					{@const url = section.props.imageUrls[i]}
 					{#if url}
-						<img
-							src={url}
-							alt=""
-							loading="lazy"
-							class="h-32 rounded-lg object-cover sm:h-40 {section.props.layout === 'carousel'
+						<button
+							type="button"
+							class="block cursor-zoom-in overflow-hidden rounded-lg {section.props.layout ===
+							'carousel'
 								? 'w-56 shrink-0 snap-start'
 								: 'w-full'}"
-						/>
+							aria-label="Perbesar foto"
+							onclick={() => bukaLightbox(section.props.imageUrls, url)}
+						>
+							<img
+								src={url}
+								alt=""
+								loading="lazy"
+								class="h-32 w-full rounded-lg object-cover sm:h-40"
+							/>
+						</button>
 					{:else}
 						<PhotoPlaceholder
 							class="h-32 rounded-lg sm:h-40 {section.props.layout === 'carousel'
@@ -271,3 +291,5 @@
 		</section>
 	{/if}
 {/each}
+
+<GaleriLightbox urls={lightboxUrls} bind:indeks={lightboxIndeks} bind:terbuka={lightboxTerbuka} />

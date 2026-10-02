@@ -1,4 +1,5 @@
 <script lang="ts">
+	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
@@ -26,6 +27,9 @@
 	/** Foto yang bisa ditampilkan (presign gagal = dilewati), urutan admin. */
 	const foto = $derived(t.photos.filter((f) => f.url !== null));
 	let fotoAktif = $state(0);
+	// Lightbox (2026-10-02) — klik foto utama → modal + layar penuh.
+	let lightboxTerbuka = $state(false);
+	const fotoUrls = $derived(foto.map((f) => f.url as string));
 	const fotoUtama = $derived(foto[fotoAktif]?.url ?? foto[0]?.url ?? null);
 
 	const lokasi = $derived(formatLokasi(p));
@@ -132,10 +136,23 @@
 		<div>
 			<div class="relative overflow-hidden rounded-2xl">
 				{#if fotoUtama}
-					<img
-						src={fotoUtama}
-						alt="Foto {t.nama} di {p.nama}"
-						class="h-64 w-full object-cover sm:h-96"
+					<button
+						type="button"
+						class="block w-full cursor-zoom-in"
+						aria-label="Perbesar foto"
+						onclick={() => (lightboxTerbuka = true)}
+					>
+						<img
+							src={fotoUtama}
+							alt="Foto {t.nama} di {p.nama}"
+							class="h-64 w-full object-cover sm:h-96"
+						/>
+					</button>
+					<GaleriLightbox
+						urls={fotoUrls}
+						bind:indeks={fotoAktif}
+						bind:terbuka={lightboxTerbuka}
+						judul="Foto {t.nama}"
 					/>
 				{:else}
 					<PhotoPlaceholder class="h-64 w-full sm:h-96" />
