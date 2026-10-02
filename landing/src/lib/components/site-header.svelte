@@ -48,7 +48,7 @@
 			{#if urlMasuk}
 				<a
 					href={urlMasuk}
-					class="border-primary text-primary hover:bg-primary ml-2 rounded-lg border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors hover:text-white"
+					class="bg-primary hover:bg-primary-dark ml-2 rounded-lg px-4 py-2 text-sm font-semibold whitespace-nowrap text-white shadow-sm transition-colors"
 					>Masuk</a
 				>
 			{/if}
@@ -95,7 +95,7 @@
 					<li class="pt-2 pb-1">
 						<a
 							href={urlMasuk}
-							class="border-primary text-primary block rounded-lg border px-3 py-3 text-center text-base font-semibold"
+							class="bg-primary hover:bg-primary-dark block rounded-lg px-3 py-3 text-center text-base font-semibold text-white"
 							>Masuk</a
 						>
 					</li>

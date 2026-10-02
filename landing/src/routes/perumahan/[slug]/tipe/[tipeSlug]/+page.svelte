@@ -1,5 +1,6 @@
 <script lang="ts">
 	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
+	import Maximize from '@lucide/svelte/icons/maximize';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
@@ -147,6 +148,15 @@
 							alt="Foto {t.nama} di {p.nama}"
 							class="h-64 w-full object-cover sm:h-96"
 						/>
+					</button>
+					<!-- Penanda yang terlihat: foto utama bisa dibuka penuh. -->
+					<button
+						type="button"
+						class="bg-ink/70 hover:bg-ink/85 absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold text-white"
+						onclick={() => (lightboxTerbuka = true)}
+					>
+						<Maximize class="h-4 w-4" aria-hidden="true" />
+						Lihat foto penuh{foto.length > 1 ? ` (${foto.length})` : ''}
 					</button>
 					<GaleriLightbox
 						urls={fotoUrls}
