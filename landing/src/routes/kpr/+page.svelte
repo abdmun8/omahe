@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { amortisasi, DEFAULT_INPUT, hitungKpr, type InputKpr } from '$lib/kpr';
+	import { onMount } from 'svelte';
+	import { amortisasi, DEFAULT_INPUT, hitungKpr, hargaDariQuery, type InputKpr } from '$lib/kpr';
 import { trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
 	import { formatAngka, formatRupiahPenuh } from '$lib/utils';
@@ -10,6 +11,16 @@ import { trackEvent } from '$lib/analytics';
 
 	const hasil = $derived(hitungKpr(input));
 	const rincian = $derived(tampilRincian ? amortisasi(input, 12) : []);
+
+	// AGEN-OMAHE-08 — prefill harga dari `?harga=` (link share simulasi agen,
+	// `${situs}/kpr?harga=…&ref=…`). Klien-saja (onMount): halaman ini
+	// di-prerender build-time TANPA query string — membacanya saat build
+	// akan gagal. `?ref=` sudah diteruskan layout root (nav header/footer);
+	// halaman ini tidak punya CTA booking yang perlu membawa ref.
+	onMount(() => {
+		const harga = hargaDariQuery(new URLSearchParams(window.location.search).get('harga'));
+		if (harga !== null) input.harga = harga;
+	});
 
 	const kelasInput = 'h-12 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink';
 	const kelasLabel = 'block text-sm font-medium text-ink';

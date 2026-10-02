@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { amortisasi, hitungKpr } from './kpr';
+import { amortisasi, hargaDariQuery, hitungKpr } from './kpr';
 
 describe('hitungKpr', () => {
 	test('anuitas cocok dengan rumus PMT standar', () => {
@@ -61,6 +61,33 @@ describe('hitungKpr', () => {
 		expect(Number.isFinite(hasil.cicilanBulanan)).toBe(true);
 		expect(hasil.tenorBulan).toBe(1);
 		expect(hasil.uangMuka).toBe(0);
+	});
+});
+
+describe('hargaDariQuery (AGEN-OMAHE-08 — prefill ?harga= dari link share agen)', () => {
+	test('angka bulat positif wajar diterima apa adanya', () => {
+		expect(hargaDariQuery('500000000')).toBe(500_000_000);
+		expect(hargaDariQuery(' 350000000 ')).toBe(350_000_000);
+		expect(hargaDariQuery('1')).toBe(1);
+		expect(hargaDariQuery(String(100_000_000_000))).toBe(100_000_000_000);
+	});
+
+	test('null / kosong / teks → null (kalkulator tetap default)', () => {
+		expect(hargaDariQuery(null)).toBeNull();
+		expect(hargaDariQuery('')).toBeNull();
+		expect(hargaDariQuery('   ')).toBeNull();
+		expect(hargaDariQuery('lima ratus juta')).toBeNull();
+		expect(hargaDariQuery('500jt')).toBeNull();
+	});
+
+	test('angka tidak wajar ditolak, bukan dijepit', () => {
+		expect(hargaDariQuery('0')).toBeNull();
+		expect(hargaDariQuery('-500000000')).toBeNull();
+		expect(hargaDariQuery('500000000.5')).toBeNull();
+		expect(hargaDariQuery('1.5e11')).toBeNull(); // notasi ilmiah valid Number tapi > batas
+		expect(hargaDariQuery('100000000001')).toBeNull(); // > 100 miliar
+		expect(hargaDariQuery('Infinity')).toBeNull();
+		expect(hargaDariQuery('NaN')).toBeNull();
 	});
 });
 

@@ -115,3 +115,24 @@ export function amortisasi(input: InputKpr, maksBaris = 360): BarisAmortisasi[] 
 function clamp(nilai: number, min: number, maks: number) {
 	return Math.min(maks, Math.max(min, nilai));
 }
+
+// AGEN-OMAHE-08 — prefill harga dari link share agen --------------------------
+
+/** Batas wajar harga rumah untuk prefill (100 miliar) — nilai lebih besar
+ * dianggap rusak/salah ketik dan dibuang, bukan dijepit. */
+export const HARGA_PREFILL_MAKS = 100_000_000_000;
+
+/**
+ * Parse nilai `?harga=` mentah dari query string (AGEN-OMAHE-08: link
+ * simulasi agen `${situs}/kpr?harga=…&ref=…`). Hanya angka bulat > 0 dan
+ * ≤ 100 miliar yang diterima; selain itu (kosong, desimal, negatif, nol,
+ * teks, di luar batas) → null → kalkulator tetap pakai default. Halaman
+ * `/kpr` di-prerender tanpa query string — fungsi ini hanya dipanggil di
+ * klien (onMount), bukan saat build.
+ */
+export function hargaDariQuery(raw: string | null): number | null {
+	if (raw === null || raw.trim() === '') return null;
+	const n = Number(raw);
+	if (!Number.isInteger(n) || n <= 0 || n > HARGA_PREFILL_MAKS) return null;
+	return n;
+}
