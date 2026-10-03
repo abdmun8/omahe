@@ -48,6 +48,12 @@ di-enrich sisi Omahe via `GET /public/units?perumahanSlug=...` per proyek
 
 ## 1. `GET /public/units` (UNIT-04, `done` 2026-09-14)
 
+> **Update UNIT-07 (2026-10-03)** — param `sort`: `rekomendasi` (default,
+> partner berbayar di atas), `harga_asc`, `harga_desc` (berdasarkan
+> `hargaMin`, harga null selalu di akhir), `terbaru` (unit terbaru di grup),
+> `unit_terbanyak`. Nilai tak dikenal = `rekomendasi` (bukan 400). Omahe
+> `/cari` punya pilihan "Urutkan"; `rekomendasi` tidak dikirim ke backend.
+
 Query AKTUAL: `regionKode` (kode kabupaten exact ATAU kode provinsi
 prefix-match — mis. `32` mencakup semua kabupaten `32.xx`), `hargaMin`,
 `hargaMax` (overlap-check, unit tanpa harga TIDAK PERNAH ter-exclude oleh

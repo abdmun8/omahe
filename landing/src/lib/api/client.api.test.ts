@@ -370,3 +370,29 @@ describe('createLead — nomor tujuan WA (LEAD-02)', () => {
 		expect(await createLead(kosong, input)).toEqual({ whatsapp: null });
 	});
 });
+
+describe('getUnits — urutan (UNIT-07)', () => {
+	const kosong = () => envelope([], { total: 0, page: 1, pageSize: 12 });
+
+	test('sort selain rekomendasi diteruskan ke backend', async () => {
+		const urls: string[] = [];
+		const f = (async (url: string) => {
+			urls.push(url);
+			return kosong();
+		}) as unknown as typeof fetch;
+		await getUnits(f, { sort: 'harga_asc' });
+		expect(new URL(urls[0]).searchParams.get('sort')).toBe('harga_asc');
+	});
+
+	test('rekomendasi / nilai aneh TIDAK dikirim (URL & cache sama seperti dulu)', async () => {
+		const urls: string[] = [];
+		const f = (async (url: string) => {
+			urls.push(url);
+			return kosong();
+		}) as unknown as typeof fetch;
+		await getUnits(f, { sort: 'rekomendasi' });
+		await getUnits(f, { sort: 'acak' });
+		await getUnits(f, {});
+		for (const u of urls) expect(new URL(u).searchParams.has('sort')).toBe(false);
+	});
+});

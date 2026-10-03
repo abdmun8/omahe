@@ -20,6 +20,7 @@ import { error } from '@sveltejs/kit';
 import { SITE } from '$lib/config';
 import { TOKEN_BAYAR_PATTERN, pdfInvoiceContoh } from '$lib/bayar';
 import * as fixtures from './fixtures';
+import { parseUrutan, urutkanUnitFixture } from '$lib/urutan-unit';
 import type {
 	ApiEnvelope,
 	DeveloperDetail,
@@ -95,9 +96,17 @@ export async function getUnits(fetchFn: Fetch, query: UnitQuery): Promise<Pagina
 		// tetap dikirim, backend mengabaikannya diam-diam dan filter developer
 		// tidak beneran bekerja. Keluarkan dari query backend, lalu filter
 		// client-side di bawah.
-		const { developerSlug, ...backendQuery } = query;
+		const { developerSlug, sort, ...backendQuery } = query;
 		const params = new URLSearchParams();
-		for (const [key, value] of Object.entries({ ...backendQuery, page, pageSize })) {
+		// UNIT-07 — `rekomendasi` = default backend: tidak dikirim (URL & cache
+		// sama dengan sebelum ada fitur urutan).
+		const urutan = parseUrutan(sort);
+		for (const [key, value] of Object.entries({
+			...backendQuery,
+			sort: urutan === 'rekomendasi' ? undefined : urutan,
+			page,
+			pageSize
+		})) {
 			if (value !== undefined && value !== '') params.set(key, String(value));
 		}
 		const url = `${baseUrl()}/public/units?${params}`;
@@ -146,7 +155,7 @@ function normalisasiUnit(u: RawUnitListing): UnitListing {
 
 /** Mirror filter `GET /public/units` di atas fixture — bentuk hasil identik. */
 function filterFixtureUnits(query: UnitQuery & { page: number; pageSize: number }) {
-	const matched = fixtures.UNIT_LISTINGS.filter((u) => {
+	const cocok = fixtures.UNIT_LISTINGS.filter((u) => {
 		if (query.regionKode && u.perumahan.regionKode !== query.regionKode) return false;
 		if (query.perumahanSlug && u.perumahan.slug !== query.perumahanSlug) return false;
 		if (query.developerSlug && u.developer?.slug !== query.developerSlug) return false;
@@ -156,7 +165,8 @@ function filterFixtureUnits(query: UnitQuery & { page: number; pageSize: number 
 		if (query.hargaMin !== undefined && (u.hargaMax ?? 0) < query.hargaMin) return false;
 		if (query.hargaMax !== undefined && (u.hargaMin ?? 0) > query.hargaMax) return false;
 		return true;
-	}).sort((a, b) => (a.hargaMin ?? 0) - (b.hargaMin ?? 0));
+	});
+	const matched = urutkanUnitFixture(cocok, parseUrutan(query.sort));
 
 	const offset = (query.page - 1) * query.pageSize;
 	return {

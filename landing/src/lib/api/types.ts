@@ -121,6 +121,9 @@ export interface UnitQuery {
 	tipe?: string;
 	perumahanSlug?: string;
 	developerSlug?: string;
+	/** UNIT-07 — urutan (`$lib/urutan-unit`); `rekomendasi`/absen = default
+	 *  backend dan tidak dikirim. */
+	sort?: string;
 	page?: number;
 	pageSize?: number;
 }

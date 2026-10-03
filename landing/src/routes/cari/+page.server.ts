@@ -1,6 +1,7 @@
 import { getRegions, getUnits } from '$lib/api';
 import type { UnitQuery } from '$lib/api/types';
 import { cacheKonten } from '$lib/cache';
+import { parseUrutan } from '$lib/urutan-unit';
 import type { PageServerLoad } from './$types';
 
 /** Angka dari query string; nilai tidak valid diabaikan, bukan bikin error —
@@ -18,6 +19,8 @@ export const load: PageServerLoad = async ({ url, fetch, setHeaders }) => {
 		developerSlug: url.searchParams.get('developerSlug') || undefined,
 		hargaMin: angka(url.searchParams.get('hargaMin')),
 		hargaMax: angka(url.searchParams.get('hargaMax')),
+		// UNIT-07 — urutan (nilai aneh = rekomendasi).
+		sort: parseUrutan(url.searchParams.get('sort')),
 		page: angka(url.searchParams.get('page')) || 1
 	};
 
