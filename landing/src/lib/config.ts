@@ -50,3 +50,12 @@ export const NAV = [
  * lewat form + WhatsApp dulu. Ubah ke `true` untuk menampilkannya lagi.
  */
 export const TAMPILKAN_TELEPON = false;
+
+/** LANDING-07 — batas harga seksi "Harga Terjangkau" homepage (harga mulai
+ *  ≤ nilai ini). Di sini (bukan `$lib/api`) supaya komponen klien boleh
+ *  meng-import-nya. */
+export const HARGA_TERJANGKAU = 300_000_000;
+
+/** LANDING-07 — seksi "Baru di Omahe" tampil otomatis setelah perumahan
+ *  aktif sebanyak ini (keputusan user 2026-10-03). */
+export const AMBANG_PERUMAHAN_BARU = 25;

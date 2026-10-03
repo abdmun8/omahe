@@ -1,5 +1,13 @@
-import { getDevelopers, getFeaturedUnits, getRegions, getSliders } from '$lib/api';
+import {
+	getDevelopers,
+	getFeaturedUnits,
+	getPerumahanTerbaru,
+	getRegions,
+	getSliders,
+	getUnitTerjangkau
+} from '$lib/api';
 import { cacheKonten } from '$lib/cache';
+import { AMBANG_PERUMAHAN_BARU } from '$lib/config';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -19,15 +27,32 @@ async function failSoft<T>(label: string, task: Promise<T[]>): Promise<T[]> {
 }
 
 export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
-	const [unitUnggulan, developers, regions, sliders] = await Promise.all([
+	const [unitUnggulan, unitTerjangkau, terbaru, developers, regions, sliders] = await Promise.all([
 		failSoft('unit unggulan', getFeaturedUnits(fetch, 6)),
+		// LANDING-07 — seksi "Harga Terjangkau" & "Baru di Omahe" (fail-soft).
+		failSoft('unit terjangkau', getUnitTerjangkau(fetch, 6)),
+		getPerumahanTerbaru(fetch, 4).catch((err) => {
+			console.error('[omahe:home] perumahan terbaru gagal dimuat — bagian disembunyikan', err);
+			return { items: [], total: 0 };
+		}),
 		failSoft('developer', getDevelopers(fetch)),
 		getRegions(fetch),
 		getSliders(fetch)
 	]);
+	// "Baru di Omahe" baru tampil kalau perumahan aktif sudah cukup banyak
+	// (keputusan user: ≥ 25) — sebelum itu isinya hampir sama dengan
+	// rekomendasi.
+	const perumahanBaru = terbaru.total >= AMBANG_PERUMAHAN_BARU ? terbaru.items : [];
 
 	// Kalau data inti gagal, cache edge dipersingkat supaya halaman kosong
 	// tidak tersaji 5 menit penuh setelah backend pulih.
 	cacheKonten(setHeaders, unitUnggulan.length === 0 && developers.length === 0 ? 30 : 300);
-	return { unitUnggulan, developers: developers.slice(0, 3), regions, sliders };
+	return {
+		unitUnggulan,
+		unitTerjangkau,
+		perumahanBaru,
+		developers: developers.slice(0, 3),
+		regions,
+		sliders
+	};
 };

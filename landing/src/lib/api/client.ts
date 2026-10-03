@@ -21,6 +21,7 @@ import { SITE } from '$lib/config';
 import { TOKEN_BAYAR_PATTERN, pdfInvoiceContoh } from '$lib/bayar';
 import * as fixtures from './fixtures';
 import { parseUrutan, urutkanUnitFixture } from '$lib/urutan-unit';
+import { HARGA_TERJANGKAU } from '$lib/config';
 import type {
 	ApiEnvelope,
 	DeveloperDetail,
@@ -49,7 +50,8 @@ import type {
 	AgenDirektori,
 	AgenMinatInput,
 	KartuNamaAgen,
-	DetailBayar
+	DetailBayar,
+	PerumahanDirektori
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -175,10 +177,64 @@ function filterFixtureUnits(query: UnitQuery & { page: number; pageSize: number 
 	};
 }
 
-/** Kartu unggulan homepage — termurah per lokasi, tanpa filter. */
+/** Kartu "Rekomendasi Hari Ini" homepage — urutan default backend
+ *  (partner berbayar dulu, sisanya rotasi harian — LANDING-07). */
 export async function getFeaturedUnits(fetchFn: Fetch, limit = 6): Promise<UnitListing[]> {
 	const { items } = await getUnits(fetchFn, { pageSize: limit, page: 1 });
 	return items;
+}
+
+/** LANDING-07 — tipe dengan harga mulai ≤ `HARGA_TERJANGKAU`, termurah dulu. */
+export async function getUnitTerjangkau(fetchFn: Fetch, limit = 6): Promise<UnitListing[]> {
+	const { items } = await getUnits(fetchFn, {
+		hargaMax: HARGA_TERJANGKAU,
+		sort: 'harga_asc',
+		pageSize: limit,
+		page: 1
+	});
+	return items;
+}
+
+/**
+ * LANDING-07 — 4 perumahan yang paling baru bergabung + jumlah perumahan
+ * aktif (`GET /public/perumahan?sort=terbaru`). Mode fixture → kosong
+ * (seksi tersembunyi).
+ */
+export async function getPerumahanTerbaru(
+	fetchFn: Fetch,
+	limit = 4
+): Promise<{ items: PerumahanDirektori[]; total: number }> {
+	if (!hasSearchApi()) return { items: [], total: 0 };
+	const url = `${baseUrl()}/public/perumahan?sort=terbaru&page=1&pageSize=${limit}`;
+	const res = await fetchFn(url, {
+		headers: { accept: 'application/json' },
+		signal: AbortSignal.timeout(TIMEOUT_MS)
+	});
+	if (!res.ok) throw new Error(`GET ${url} → ${res.status}`);
+	const body = (await res.json()) as { data: PerumahanDirektori[]; meta: PageMeta };
+	return { items: body.data, total: body.meta.total };
+}
+
+/**
+ * ANALITIK-01 — teruskan beacon kunjungan halaman perumahan ke backend
+ * (`POST /public/kunjungan`). Fail-soft total: statistik internal tidak
+ * boleh mengganggu pengunjung. Mode fixture → no-op.
+ */
+export async function catatKunjungan(
+	fetchFn: Fetch,
+	input: { slug: string; pengunjung: string }
+): Promise<void> {
+	if (!hasApi()) return;
+	try {
+		await fetchFn(`${baseUrl()}/public/kunjungan`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			body: JSON.stringify(input),
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch (err) {
+		console.error('[omahe:api] POST /public/kunjungan gagal (diabaikan)', err);
+	}
 }
 
 // ---------------------------------------------------------------------------

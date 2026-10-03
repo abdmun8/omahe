@@ -48,6 +48,14 @@ di-enrich sisi Omahe via `GET /public/units?perumahanSlug=...` per proyek
 
 ## 1. `GET /public/units` (UNIT-04, `done` 2026-09-14)
 
+> **Update LANDING-07 (2026-10-03)** — urutan default `rekomendasi` =
+> partner berbayar dulu lalu **rotasi harian** (stabil sepanjang hari WIB).
+> Homepage: "Rekomendasi Hari Ini" (6), "Harga Terjangkau" (`hargaMax`
+> 300 jt + `harga_asc`), "Baru di Omahe" dari `GET /public/perumahan?sort=
+> terbaru&pageSize=4` — tampil hanya bila `meta.total ≥ 25`.
+> **ANALITIK-01**: `POST /public/kunjungan { slug, pengunjung }` lewat proxy
+> Omahe `/api/kunjungan` (beacon detail perumahan & tipe; data admin saja).
+>
 > **Update UNIT-07 (2026-10-03)** — param `sort`: `rekomendasi` (default,
 > partner berbayar di atas), `harga_asc`, `harga_desc` (berdasarkan
 > `hargaMin`, harga null selalu di akhir), `terbaru` (unit terbaru di grup),

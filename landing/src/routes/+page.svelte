@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { SITE } from '$lib/config';
+	import PerumahanBaruCard from '$lib/components/perumahan-baru-card.svelte';
+	import { HARGA_TERJANGKAU } from '$lib/config';
 	import { trackGabungClick } from '$lib/analytics';
 	import { withRef } from '$lib/ref';
 	import DeveloperCard from '$lib/components/developer-card.svelte';
@@ -87,8 +89,10 @@
 <section class="mx-auto max-w-6xl px-4 py-12">
 	<div class="flex items-end justify-between gap-4">
 		<div>
-			<h2 class="font-display text-ink text-2xl font-bold">Pilihan Terbaru</h2>
-			<p class="text-muted mt-1 text-sm">Tipe unit yang tersedia dan siap diajukan.</p>
+			<h2 class="font-display text-ink text-2xl font-bold">Rekomendasi Hari Ini</h2>
+			<p class="text-muted mt-1 text-sm">
+				Tipe unit yang tersedia dan siap diajukan — pilihan berganti setiap hari.
+			</p>
 		</div>
 		<Button variant="ghost" href={withRef('/cari', data.ref)} class="shrink-0">Lihat semua</Button>
 	</div>
@@ -105,6 +109,41 @@
 		</div>
 	{/if}
 </section>
+
+<!-- LANDING-07 — Harga Terjangkau (harga mulai ≤ Rp 300 jt, termurah dulu). -->
+{#if data.unitTerjangkau.length > 0}
+	<section class="mx-auto max-w-6xl px-4 pb-12">
+		<div class="flex items-end justify-between gap-4">
+			<div>
+				<h2 class="font-display text-ink text-2xl font-bold">Harga Terjangkau</h2>
+				<p class="text-muted mt-1 text-sm">Rumah dengan harga mulai di bawah Rp 300 juta.</p>
+			</div>
+			<Button
+				variant="ghost"
+				href={withRef(`/cari?hargaMax=${HARGA_TERJANGKAU}&sort=harga_asc`, data.ref)}
+				class="shrink-0">Lihat semua</Button
+			>
+		</div>
+		<div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{#each data.unitTerjangkau as unit (unit.id)}
+				<UnitCard {unit} ref={data.ref} source="homepage_terjangkau" />
+			{/each}
+		</div>
+	</section>
+{/if}
+
+<!-- LANDING-07 — Baru di Omahe (tampil otomatis saat ≥ 25 perumahan aktif). -->
+{#if data.perumahanBaru.length > 0}
+	<section class="mx-auto max-w-6xl px-4 pb-12">
+		<h2 class="font-display text-ink text-2xl font-bold">Baru di Omahe</h2>
+		<p class="text-muted mt-1 text-sm">Perumahan yang baru bergabung.</p>
+		<div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+			{#each data.perumahanBaru as perumahan (perumahan.slug)}
+				<PerumahanBaruCard {perumahan} ref={data.ref} />
+			{/each}
+		</div>
+	</section>
+{/if}
 
 <!-- Value prop -->
 <section class="bg-surface">

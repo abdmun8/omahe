@@ -113,6 +113,18 @@ export interface DeveloperRef {
 	slug: string;
 }
 
+/** LANDING-07 — item `GET /public/perumahan` (direktori; seksi "Baru di
+ *  Omahe"). Field lain (atribut pemasaran) diabaikan Omahe. */
+export interface PerumahanDirektori {
+	nama: string;
+	slug: string;
+	fotoUrl: string | null;
+	regionNama: string | null;
+	developer: DeveloperRef | null;
+	jumlahTipeTersedia: number;
+	prioritas: number;
+}
+
 /** Query string `GET /public/units`. */
 export interface UnitQuery {
 	regionKode?: string;

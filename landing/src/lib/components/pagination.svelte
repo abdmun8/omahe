@@ -6,12 +6,22 @@
 		page: halaman,
 		pageSize,
 		total,
-		basePath = '/cari'
-	}: { url: URL; page: number; pageSize: number; total: number; basePath?: string } = $props();
+		basePath = '/cari',
+		hrefFor = null
+	}: {
+		url: URL;
+		page: number;
+		pageSize: number;
+		total: number;
+		basePath?: string;
+		/** Paginasi berbasis path (mis. `/artikel/halaman/2`) alih-alih `?page=`. */
+		hrefFor?: ((n: number) => string) | null;
+	} = $props();
 
 	const totalHalaman = $derived(Math.max(1, Math.ceil(total / pageSize)));
 
 	function href(n: number): string {
+		if (hrefFor) return hrefFor(n);
 		const params = new URLSearchParams(url.searchParams);
 		if (n <= 1) params.delete('page');
 		else params.set('page', String(n));

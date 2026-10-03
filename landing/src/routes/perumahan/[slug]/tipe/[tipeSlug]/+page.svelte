@@ -1,5 +1,6 @@
 <script lang="ts">
 	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
+	import BeaconKunjungan from '$lib/components/beacon-kunjungan.svelte';
 	import Maximize from '@lucide/svelte/icons/maximize';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
 	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
@@ -316,3 +317,6 @@
 	tipeMinatAwal={t.nama}
 	ref={data.ref}
 />
+
+<!-- ANALITIK-01 — kunjungan tipe dihitung ke perumahannya. -->
+<BeaconKunjungan slug={p.slug} />

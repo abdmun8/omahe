@@ -1,5 +1,6 @@
 <script lang="ts">
 	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
+	import BeaconKunjungan from '$lib/components/beacon-kunjungan.svelte';
 	import AgenPemasar from '$lib/components/agen-pemasar.svelte';
 	import LandingSections from '$lib/components/landing-sections.svelte';
 	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
@@ -397,3 +398,6 @@
 	ref={data.ref}
 	{opsiTipe}
 />
+
+<!-- ANALITIK-01 — statistik kunjungan internal (tanpa tampilan). -->
+<BeaconKunjungan slug={p.slug} />
