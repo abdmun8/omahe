@@ -178,7 +178,7 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		expect(screen.getByText('Rp385 jt')).toBeInTheDocument();
 	});
 
-	// MONET-03: partner berbayar (prioritas > 0) — slot WA jadi "Form Minat".
+	// MONET-03: partner berbayar (prioritas > 0) — slot WA jadi "Minat".
 	const perumahanBerbayar = {
 		nama: 'Griya Asri',
 		slug: 'griya-asri',
@@ -187,33 +187,30 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		prioritas: 50
 	};
 
-	test('prioritas > 0 → tombol "Form Minat" menggantikan WhatsApp, Telepon tetap (MONET-03)', () => {
+	test('prioritas > 0 → tombol "Minat" (emas) menggantikan WhatsApp, tanpa Telepon (MONET-03/LEAD-02)', () => {
 		render(UnitCard, { unit: buatUnit({ perumahan: perumahanBerbayar }) });
 		const konteks = '36/72 di Griya Asri'; // ${unit.tipe} di ${unit.perumahan.nama} (buatUnit default)
 
+		expect(screen.getByRole('button', { name: `Minat tentang ${konteks}` })).toBeInTheDocument();
 		expect(
-			screen.getByRole('button', { name: `Isi form minat tentang ${konteks}` })
-		).toBeInTheDocument();
-		// Slot WA DIGANTI — link WA justru TIDAK boleh ada di kartu berbayar.
-		expect(
-			screen.queryByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+			screen.queryByRole('button', { name: `Hubungi via WhatsApp tentang ${konteks}` })
 		).toBeNull();
-		// Telepon tidak ikut berganti.
-		expect(screen.getByRole('link', { name: `Telepon tentang ${konteks}` })).toBeInTheDocument();
+		expect(screen.queryByRole('link', { name: `Telepon tentang ${konteks}` })).toBeNull();
 	});
 
-	test('prioritas 0 → WhatsApp muncul, tanpa tombol Form Minat (perilaku gratis tidak berubah)', () => {
+	test('prioritas 0 → tombol WhatsApp pembuka form (LEAD-02), bukan link wa.me', () => {
 		// Default buatUnit() sudah prioritas 0 — kartu partner GRATIS.
-		render(UnitCard, { unit: buatUnit() });
+		const { container } = render(UnitCard, { unit: buatUnit() });
 		const konteks = '36/72 di Griya Asri'; // ${unit.tipe} di ${unit.perumahan.nama} (buatUnit default)
 
 		expect(
-			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+			screen.getByRole('button', { name: `Hubungi via WhatsApp tentang ${konteks}` })
 		).toBeInTheDocument();
-		expect(screen.queryByRole('button', { name: `Isi form minat tentang ${konteks}` })).toBeNull();
+		expect(container.querySelector('a[href*="wa.me"]')).toBeNull();
+		expect(screen.queryByRole('button', { name: `Minat tentang ${konteks}` })).toBeNull();
 	});
 
-	test('prioritas undefined (data lama) → WhatsApp muncul, tanpa tombol Form Minat', () => {
+	test('prioritas undefined (data lama) → tombol WhatsApp, tanpa crash', () => {
 		// Respons API sebelum MONET-01: `undefined > 0` = false → gratis,
 		// TANPA crash — konsisten dengan gating badge "Promosi" di atas.
 		const perumahanLama = {
@@ -226,9 +223,8 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		const konteks = '36/72 di Griya Asri'; // ${unit.tipe} di ${unit.perumahan.nama} (buatUnit default)
 
 		expect(
-			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+			screen.getByRole('button', { name: `Hubungi via WhatsApp tentang ${konteks}` })
 		).toBeInTheDocument();
-		expect(screen.queryByRole('button', { name: `Isi form minat tentang ${konteks}` })).toBeNull();
 	});
 
 	// Iterasi 2 GA4: klik link nama perumahan → `select_property`. Param
@@ -293,11 +289,11 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 
 	test('klik WhatsApp (partner gratis) → whatsapp_click dengan entitas nama perumahan', async () => {
 		const gtagMock = stubGtag();
-		render(UnitCard, { unit: buatUnit() }); // prioritas 0 → slot WA tetap ada
+		render(UnitCard, { unit: buatUnit() }); // prioritas 0 → tombol WA (pembuka form)
 		const konteks = '36/72 di Griya Asri';
 
 		await fireEvent.click(
-			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+			screen.getByRole('button', { name: `Hubungi via WhatsApp tentang ${konteks}` })
 		);
 
 		// `entitas` (nama perumahan bersih) yang jadi param — BUKAN konteks.
@@ -306,17 +302,24 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		});
 	});
 
-	test('klik "Form Minat" → dialog lead terbuka (judul dialog terlihat)', async () => {
+	test('klik "Minat" → dialog lead terbuka (judul dialog terlihat)', async () => {
 		render(UnitCard, { unit: buatUnit({ perumahan: perumahanBerbayar }) });
 
-		fireEvent.click(screen.getByRole('button', { name: /Isi form minat/ }));
+		fireEvent.click(screen.getByRole('button', { name: /^Minat tentang/ }));
 
-		// Judul Dialog.Title — teks lengkap supaya unik terhadap tombol
-		// "Form Minat" yang juga memuat frasa itu.
-		expect(await screen.findByText('Form Minat — Griya Asri')).toBeInTheDocument();
+		// Judul Dialog.Title — teks lengkap supaya unik terhadap tombol "Minat".
+		expect(await screen.findByText('Minat — Griya Asri')).toBeInTheDocument();
 	});
 
-	test('tombol WhatsApp & Telepon selalu ada di DOM, apa pun kondisi lainnya', () => {
+	test('klik WhatsApp (gratis) → dialog lead terbuka dulu (LEAD-02)', async () => {
+		render(UnitCard, { unit: buatUnit() });
+
+		fireEvent.click(screen.getByRole('button', { name: /^Hubungi via WhatsApp/ }));
+
+		expect(await screen.findByText('Minat — Griya Asri')).toBeInTheDocument();
+	});
+
+	test('tombol WhatsApp selalu ada (Telepon disembunyikan, LEAD-02), apa pun kondisi lainnya', () => {
 		// Nama perumahan sengaja dibedakan antar varian: cleanup hanya jalan
 		// per-test (afterEach), jadi kedua kartu sempat hidup bersamaan di
 		// satu body — konteks (yang jadi bagian aria-label tombol) harus
@@ -341,9 +344,9 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 			render(UnitCard, { unit });
 
 			expect(
-				screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+				screen.getByRole('button', { name: `Hubungi via WhatsApp tentang ${konteks}` })
 			).toBeInTheDocument();
-			expect(screen.getByRole('link', { name: `Telepon tentang ${konteks}` })).toBeInTheDocument();
+			expect(screen.queryByRole('link', { name: `Telepon tentang ${konteks}` })).toBeNull();
 		}
 	});
 });

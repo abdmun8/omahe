@@ -5,6 +5,8 @@ import {
 	formatPeriodePromo,
 	isHttpUrl,
 	isMapsEmbedUrl,
+	nomorInternasional,
+	pesanWaPeminat,
 	telUrl,
 	waUrl
 } from './utils';
@@ -75,5 +77,35 @@ describe('formatPeriodePromo (PROMO-02)', () => {
 			'1 Okt 2026 – 31 Okt 2026'
 		);
 		expect(formatPeriodePromo('2026-09-30T17:00:00.000Z', null)).toBe('Mulai 1 Okt 2026');
+	});
+});
+
+describe('pesan WA peminat (LEAD-02)', () => {
+	test('nomorInternasional: 08…/62…/8… → +62…', () => {
+		expect(nomorInternasional('0812-3456-7890')).toBe('+6281234567890');
+		expect(nomorInternasional('6281234567890')).toBe('+6281234567890');
+		expect(nomorInternasional('81234567890')).toBe('+6281234567890');
+	});
+
+	test('memuat nama, nomor +62 (bisa diklik admin), perumahan, tipe & pesan', () => {
+		expect(
+			pesanWaPeminat({
+				nama: ' Budi ',
+				telepon: '081234567890',
+				namaPerumahan: 'Griya Asri',
+				tipeMinat: 'Tipe 36',
+				pesan: 'Masih ada unit?'
+			})
+		).toBe(
+			'Halo, saya Budi (+6281234567890).\nSaya tertarik dengan Griya Asri (Tipe 36) yang saya lihat di Omahe.\n\nMasih ada unit?'
+		);
+	});
+
+	test('tanpa tipe & pesan → dua baris saja', () => {
+		expect(
+			pesanWaPeminat({ nama: 'Ani', telepon: '0811111111', namaPerumahan: 'Griya Asri' })
+		).toBe(
+			'Halo, saya Ani (+62811111111).\nSaya tertarik dengan Griya Asri yang saya lihat di Omahe.'
+		);
 	});
 });

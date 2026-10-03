@@ -37,9 +37,9 @@ class ApiErrorTiruan extends Error {
 	}
 }
 
-const createLeadMock = mock<(fetchFn: typeof fetch, input: unknown) => Promise<void>>(
-	async () => {}
-);
+const createLeadMock = mock<
+	(fetchFn: typeof fetch, input: unknown) => Promise<{ whatsapp: string | null }>
+>(async () => ({ whatsapp: null }));
 
 mock.module('$lib/api', () => ({ ApiError: ApiErrorTiruan, createLead: createLeadMock }));
 
@@ -63,7 +63,7 @@ const bodyValid = JSON.stringify({
 
 beforeEach(() => {
 	createLeadMock.mockClear();
-	createLeadMock.mockImplementation(async () => {});
+	createLeadMock.mockImplementation(async () => ({ whatsapp: '628111000222' }));
 });
 
 describe('POST /api/lead (proxy MONET-03)', () => {
@@ -91,11 +91,14 @@ describe('POST /api/lead (proxy MONET-03)', () => {
 		});
 	});
 
-	test('createLead sukses → 200 { success: true, data: { ok: true } }', async () => {
+	test('createLead sukses → 200 { success: true, data: { ok: true, whatsapp } } (LEAD-02)', async () => {
 		const res = await postJson(bodyValid);
 
 		expect(res.status).toBe(200);
-		expect(await res.json()).toEqual({ success: true, data: { ok: true } });
+		expect(await res.json()).toEqual({
+			success: true,
+			data: { ok: true, whatsapp: '628111000222' }
+		});
 		// Input diteruskan utuh ke createLead (bentuk honeypot & ref tanpa filter).
 		expect(createLeadMock).toHaveBeenCalledTimes(1);
 		expect(createLeadMock.mock.calls[0]?.[1]).toMatchObject({

@@ -48,10 +48,10 @@
 	const urlHalaman = $derived(`${SITE.url}/perumahan/${p.slug}`);
 
 	/**
-	 * Partner berbayar (MONET-03): CTA kontak (desktop + sticky) jadi
-	 * "Form Minat" (lead masuk inbox perumahan via POST /public/leads,
-	 * sumber='detail'), bukan WA langsung. Partner gratis tetap WA.
-	 * `undefined` (respons lama tanpa MONET-01) = gratis.
+	 * Partner berbayar (MONET-03): CTA kontak (desktop + sticky) "Minat"
+	 * emas; gratis "WhatsApp". LEAD-02 — keduanya form dulu (lead masuk
+	 * inbox perumahan via POST /public/leads, sumber='detail'), lalu WA ke
+	 * nomor perumahan. `undefined` (respons lama tanpa MONET-01) = gratis.
 	 */
 	// AGEN-PROPERTI-01 — perumahan milik agen properti yang tampil juga
 	// memakai form minat (lead ke agen), tanpa syarat prioritas berbayar.
@@ -223,7 +223,8 @@
 			<ContactButtons
 				konteks={p.nama}
 				size="md"
-				onFormMinat={partnerBerbayar ? () => (formMinatTerbuka = true) : null}
+				onFormMinat={() => (formMinatTerbuka = true)}
+				gayaMinat={partnerBerbayar ? 'minat' : 'whatsapp'}
 			/>
 		</div>
 	</div>
@@ -385,16 +386,14 @@
 	formMinat={partnerBerbayar}
 />
 
-{#if partnerBerbayar}
-	<!-- Dialog desktop/CTA kolom ringkasan — sticky-cta punya instance-nya
-	     sendiri (state terpisah). Dua-duanya tak mungkin terbuka bersamaan:
-	     overlay modal menutupi tombol yang satu saat yang lain terbuka. -->
-	<LeadFormDialog
-		bind:open={formMinatTerbuka}
-		perumahanSlug={p.slug}
-		namaPerumahan={p.nama}
-		sumber="detail"
-		ref={data.ref}
-		{opsiTipe}
-	/>
-{/if}
+<!-- Dialog desktop/CTA kolom ringkasan — sticky-cta punya instance-nya
+     sendiri (state terpisah). Dua-duanya tak mungkin terbuka bersamaan:
+     overlay modal menutupi tombol yang satu saat yang lain terbuka. -->
+<LeadFormDialog
+	bind:open={formMinatTerbuka}
+	perumahanSlug={p.slug}
+	namaPerumahan={p.nama}
+	sumber="detail"
+	ref={data.ref}
+	{opsiTipe}
+/>

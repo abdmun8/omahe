@@ -78,6 +78,34 @@ export function waUrl(nomor: string, pesan?: string): string {
 	return `https://wa.me/${normalisasiNomor(nomor)}${teks}`;
 }
 
+/** LEAD-02 — nomor dalam format internasional `+62…` (bisa langsung
+ *  diklik di WhatsApp/HP penerima); nomor non-Indonesia apa adanya. */
+export function nomorInternasional(nomor: string): string {
+	const digit = normalisasiNomor(nomor);
+	return digit.startsWith('62') ? `+${digit}` : nomor.trim();
+}
+
+/**
+ * LEAD-02 — pesan pembuka WA peminat ke perumahan SETELAH mengisi form
+ * minat: nama + nomor `+62…` (admin perumahan tinggal klik) + properti
+ * yang diminati + pesan opsional dari form.
+ */
+export function pesanWaPeminat(d: {
+	nama: string;
+	telepon: string;
+	namaPerumahan: string;
+	tipeMinat?: string;
+	pesan?: string;
+}): string {
+	const tipe = d.tipeMinat?.trim() ? ` (${d.tipeMinat.trim()})` : '';
+	const baris = [
+		`Halo, saya ${d.nama.trim()} (${nomorInternasional(d.telepon)}).`,
+		`Saya tertarik dengan ${d.namaPerumahan}${tipe} yang saya lihat di Omahe.`
+	];
+	if (d.pesan?.trim()) baris.push('', d.pesan.trim());
+	return baris.join('\n');
+}
+
 export function telUrl(nomor: string): string {
 	return `tel:+${normalisasiNomor(nomor)}`;
 }

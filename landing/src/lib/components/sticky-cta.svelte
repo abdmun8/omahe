@@ -7,15 +7,13 @@
 	balik ke app `perumahan`.
 
 	MONET-03 (api-contract.md §8): perumahan partner BERBAYAR
-	(`prioritas > 0`) → CTA kontaknya "Form Minat" (buka LeadFormDialog,
-	sumber='detail'), bukan WA langsung. Partner gratis tetap WhatsApp.
+	(`prioritas > 0`) → CTA kontaknya "Minat" (emas). LEAD-02: perumahan
+	gratis tetap bertombol "WhatsApp", tapi KEDUANYA membuka LeadFormDialog
+	(sumber='detail') dulu, lalu WA ke nomor perumahan.
 -->
 <script lang="ts">
-	import { page } from '$app/state';
 	import { ajukanUrl } from '$lib/ref';
 	import { trackCtaAjukan, trackEvent } from '$lib/analytics';
-	import { SITE } from '$lib/config';
-	import { waUrl } from '$lib/utils';
 	import LeadFormDialog from './lead-form-dialog.svelte';
 	import Button from './ui/button.svelte';
 
@@ -24,7 +22,9 @@
 		nama,
 		ref = null,
 		prioritas = 0,
-		formMinat
+		formMinat,
+		namaPerumahan = undefined,
+		tipeMinatAwal = ''
 	}: {
 		slug: string;
 		nama: string;
@@ -33,11 +33,12 @@
 		/** AGEN-PROPERTI-01 — paksa CTA form minat (mis. perumahan milik agen
 		 *  properti); tidak diisi = aturan lama (`prioritas > 0`). */
 		formMinat?: boolean;
+		/** Nama perumahan untuk dialog bila `nama` berisi konteks lain
+		 *  (mis. "Tipe 36 di Griya Asri" di halaman tipe). */
+		namaPerumahan?: string;
+		/** Prefill tipe di form (halaman tipe). */
+		tipeMinatAwal?: string;
 	} = $props();
-
-	/** Kontak Omahe (ADMIN-05) dari layout root — fallback SITE kalau belum
-	 *  terisi (mis. respons lama/prerender tanpa data server). */
-	const nomorWhatsapp = $derived(page.data.kontak?.whatsapp ?? SITE.whatsapp);
 
 	/** undefined (respons lama tanpa MONET-01) = gratis. */
 	const partnerBerbayar = $derived(formMinat ?? prioritas > 0);
@@ -63,17 +64,17 @@
 			<!-- Accent emas — kuat setara WA tapi bukan hijau WhatsApp, senada
 			     badge "Promosi"; booking ("Ajukan") tetap primary. -->
 			<Button variant="accent" size="lg" class="flex-1" onclick={() => (formMinatTerbuka = true)}
-				>Form Minat</Button
+				>Minat</Button
 			>
 		{:else}
 			<Button
 				variant="whatsapp"
 				size="lg"
 				class="flex-1"
-				href={waUrl(nomorWhatsapp, `Halo, saya tertarik dengan ${nama} yang saya lihat di Omahe.`)}
-				target="_blank"
-				rel="noopener"
-				onclick={lacakWhatsapp}>WhatsApp</Button
+				onclick={() => {
+					lacakWhatsapp();
+					formMinatTerbuka = true;
+				}}>WhatsApp</Button
 			>
 		{/if}
 		<Button
@@ -86,15 +87,14 @@
 	</div>
 </div>
 
-{#if partnerBerbayar}
-	<LeadFormDialog
-		bind:open={formMinatTerbuka}
-		perumahanSlug={slug}
-		namaPerumahan={nama}
-		sumber="detail"
-		{ref}
-	/>
-{/if}
+<LeadFormDialog
+	bind:open={formMinatTerbuka}
+	perumahanSlug={slug}
+	namaPerumahan={namaPerumahan ?? nama}
+	sumber="detail"
+	{tipeMinatAwal}
+	{ref}
+/>
 
 <!-- Ruang kosong supaya konten terakhir halaman tidak tertutup bar di atas. -->
 <div class="h-20 md:hidden" aria-hidden="true"></div>

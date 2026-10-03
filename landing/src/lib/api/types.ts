@@ -392,7 +392,8 @@ export type LandingSection =
 export type LeadSumber = 'card' | 'slider' | 'detail';
 
 export interface LeadInput {
-	/** Slug perumahan tujuan — HANYA partner prioritas > 0 yang lolos. */
+	/** Slug perumahan tujuan. LEAD-02: semua perumahan aktif (backend
+	 *  `LEAD_BUTUH_PRIORITAS=false`), dulu hanya partner prioritas > 0. */
 	perumahanSlug: string;
 	/** 1–100 karakter (validasi server). */
 	nama: string;
@@ -409,6 +410,12 @@ export interface LeadInput {
 	 *  iseng mengisi. Dikirim apa adanya — server yang memutus (respons
 	 *  sukses & honeypot SAMA, jadi tidak ada yang bisa dibedakan di UI). */
 	website?: string;
+}
+
+/** LEAD-02 — hasil submit lead: nomor tujuan WA peminat (owner perumahan
+ *  atau agen Omahe pemilik `ref`); null → nomor umum Omahe. */
+export interface LeadHasil {
+	whatsapp: string | null;
 }
 
 // ---------------------------------------------------------------------------

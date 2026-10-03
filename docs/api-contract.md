@@ -32,7 +32,7 @@ ditandai eksplisit per-section.
 | `GET /public/developers/:slug` | DEVELOPER-01 | **sudah ada** (`done` 2026-09-13) — shape `proyek[]` lebih ringkas dari asumsi awal, lihat §3 | `/developer/:companySlug` |
 | `GET /public/perumahan` (list) | UNIT-04 | **sudah ada** (`done` 2026-09-14), BARU — tidak ada di versi dokumen sebelumnya; `+prioritas` MONET-01 | belum ada halaman Omahe yang eksplisit memakainya |
 | `GET /public/sliders` | MONET-02 | **sudah ada** (`done` 2026-09-18), BARU — lihat §7 | `/` (carousel) |
-| `POST /public/leads` | MONET-03 | **sudah ada** (`done` 2026-09-18), BARU — lihat §8 | dialog LeadForm kartu/detail partner berbayar |
+| `POST /public/leads` | MONET-03, LEAD-02 | **sudah ada** (`done` 2026-09-18; LEAD-02 2026-10-03: semua perumahan + `whatsapp` di respons) — lihat §8 | dialog LeadForm kartu/detail semua perumahan → lanjut WA ke owner |
 | `GET /public/mitra` | MITRA-01 | **sudah ada** (`done` 2026-09-22, epic di repo `perumahan`) — lihat §9 | `/mitra` (direktori mitra profesional; kategori dinamis omahe#3) |
 | `GET /public/regions` | — (belum dibahas) | belum ada — `/public/wilayah/{level}` ADA di `perumahan` tapi TIDAK difilter ke region yang punya perumahan aktif (lihat §5, gap masih terbuka) | opsi filter lokasi |
 
@@ -264,6 +264,20 @@ selain itu `/perumahan/{perumahan.slug}` **bawa passthrough `?ref=`**
 (kewajiban arsitektur — jangan putus rantai komisi mitra).
 
 ## 8. `POST /public/leads` (MONET-03, `done` 2026-09-18, BARU)
+
+> **Update LEAD-02 (2026-10-03)** — form minat kini untuk SEMUA perumahan
+> aktif (backend Omahe wajib `LEAD_BUTUH_PRIORITAS=false`; tanpa itu
+> perumahan gratis → 404). Respons sukses jadi
+> `{ success: true, data: { ok: true, whatsapp: "62…" | null } }` —
+> `whatsapp` = nomor owner perumahan (atau agen Omahe pemilik `ref`
+> `AO-…`, atau admin agen properti); null / honeypot → Omahe memakai
+> nomor umumnya. Setelah sukses dialog menampilkan **"Lanjut ke
+> WhatsApp"** ke nomor itu dengan pesan berisi nama + nomor `+62…`
+> peminat. Tombol kartu: partner berbayar "Minat" (emas), gratis
+> "WhatsApp" (hijau) — dua-duanya membuka form dulu. Notifikasi lead ke
+> owner/agen menulis nomor peminat `+62…`. Tombol Telepon disembunyikan
+> di seluruh situs (`TAMPILKAN_TELEPON` di `src/lib/config.ts`). Kartu
+> developer TIDAK ikut (tetap WA langsung ke nomor umum Omahe).
 
 Submit lead dari form publik Omahe — HANYA untuk perumahan partner
 berbayar (prioritas efektif MONET-01 > 0; selain itu 404 seragam).

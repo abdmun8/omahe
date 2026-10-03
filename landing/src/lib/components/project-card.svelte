@@ -5,6 +5,7 @@
 	import { formatAngka, formatRupiah, formatRupiahPenuh } from '$lib/utils';
 	import { withRef } from '$lib/ref';
 	import ContactButtons from './contact-buttons.svelte';
+	import LeadFormDialog from './lead-form-dialog.svelte';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
 
 	let {
@@ -16,6 +17,9 @@
 	// Iterasi 2 GA4: klik kartu proyek di profil developer. `developer` =
 	// NAMA developer dari konteks halaman pemanggil (bukan objek) — ikut
 	// ke param event tanpa PII. Link tetap asli, tidak mencegat navigasi.
+	// LEAD-02 — WhatsApp proyek = form dulu, lalu WA ke nomor perumahan.
+	let formMinatTerbuka = $state(false);
+
 	function lacakKlikKartu() {
 		trackEvent('select_property', {
 			perumahan: proyek.nama,
@@ -60,6 +64,19 @@
 		</p>
 		<p class="text-muted mt-1 text-xs">{formatAngka(proyek.unitTersedia)} unit tersedia</p>
 
-		<ContactButtons konteks={proyek.nama} entitas={proyek.nama} class="mt-4" />
+		<ContactButtons
+			konteks={proyek.nama}
+			entitas={proyek.nama}
+			onFormMinat={() => (formMinatTerbuka = true)}
+			gayaMinat="whatsapp"
+			class="mt-4"
+		/>
+		<LeadFormDialog
+			bind:open={formMinatTerbuka}
+			perumahanSlug={proyek.slug}
+			namaPerumahan={proyek.nama}
+			sumber="card"
+			{ref}
+		/>
 	</div>
 </article>

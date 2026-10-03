@@ -28,7 +28,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { env } from '$env/dynamic/private';
 import type { UnitListing } from './types';
-import { getDeveloper, getRegions, getUnits } from './client';
+import { createLead, getDeveloper, getRegions, getUnits } from './client';
 
 const API = 'https://api.perumahan.test';
 
@@ -346,5 +346,27 @@ describe('getKategoriMitra (jalur API asli, MITRA-04)', () => {
 		const fetchMock = (async () => envelope([])) as unknown as typeof fetch;
 		const { getKategoriMitra } = await import('./client');
 		expect(await getKategoriMitra(fetchMock)).toEqual([]);
+	});
+});
+
+describe('createLead — nomor tujuan WA (LEAD-02)', () => {
+	const input = {
+		perumahanSlug: 'griya-asri',
+		nama: 'Budi',
+		telepon: '081234567890',
+		sumber: 'card' as const
+	};
+
+	test('backend mengirim whatsapp → diteruskan', async () => {
+		const f = (async () =>
+			envelope({ ok: true, whatsapp: '628111000222' })) as unknown as typeof fetch;
+		expect(await createLead(f, input)).toEqual({ whatsapp: '628111000222' });
+	});
+
+	test('backend lama tanpa field / null → whatsapp null', async () => {
+		const lama = (async () => envelope({ ok: true })) as unknown as typeof fetch;
+		expect(await createLead(lama, input)).toEqual({ whatsapp: null });
+		const kosong = (async () => envelope({ ok: true, whatsapp: null })) as unknown as typeof fetch;
+		expect(await createLead(kosong, input)).toEqual({ whatsapp: null });
 	});
 });

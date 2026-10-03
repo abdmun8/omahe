@@ -2,6 +2,7 @@
 	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
 	import Maximize from '@lucide/svelte/icons/maximize';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
+	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import StickyCta from '$lib/components/sticky-cta.svelte';
@@ -32,6 +33,10 @@
 	let lightboxTerbuka = $state(false);
 	const fotoUrls = $derived(foto.map((f) => f.url as string));
 	const fotoUtama = $derived(foto[fotoAktif]?.url ?? foto[0]?.url ?? null);
+
+	// LEAD-02 — WhatsApp = form dulu (tipe ini jadi prefill), lalu WA ke
+	// nomor perumahan.
+	let formMinatTerbuka = $state(false);
 
 	const lokasi = $derived(formatLokasi(p));
 	const habis = $derived(t.unitTersedia === 0);
@@ -246,7 +251,13 @@
 						Ajukan Unit Ini
 					</Button>
 				{/if}
-				<ContactButtons konteks="{t.nama} di {p.nama}" size="md" />
+				<ContactButtons
+					konteks="{t.nama} di {p.nama}"
+					entitas={p.nama}
+					size="md"
+					onFormMinat={() => (formMinatTerbuka = true)}
+					gayaMinat="whatsapp"
+				/>
 			</div>
 		</aside>
 	</div>
@@ -288,5 +299,20 @@
 </div>
 
 {#if !habis}
-	<StickyCta slug={p.slug} nama="{t.nama} di {p.nama}" ref={data.ref} />
+	<StickyCta
+		slug={p.slug}
+		nama="{t.nama} di {p.nama}"
+		namaPerumahan={p.nama}
+		tipeMinatAwal={t.nama}
+		ref={data.ref}
+	/>
 {/if}
+
+<LeadFormDialog
+	bind:open={formMinatTerbuka}
+	perumahanSlug={p.slug}
+	namaPerumahan={p.nama}
+	sumber="detail"
+	tipeMinatAwal={t.nama}
+	ref={data.ref}
+/>

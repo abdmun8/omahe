@@ -15,6 +15,7 @@
 	import Badge from './ui/badge.svelte';
 	import type { PublicMitra } from '$lib/api/types';
 	import { labelKategoriDari } from '$lib/mitra';
+	import { TAMPILKAN_TELEPON } from '$lib/config';
 
 	let { mitra }: { mitra: PublicMitra } = $props();
 
@@ -57,7 +58,7 @@
 		</svg>
 		WhatsApp
 	</a>
-	{#if mitra.telepon}
+	{#if TAMPILKAN_TELEPON && mitra.telepon}
 		<a
 			href="tel:+{mitra.telepon}"
 			class="bg-surface text-primary inline-flex h-10 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors hover:brightness-95 {penuh

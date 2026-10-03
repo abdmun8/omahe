@@ -4,8 +4,8 @@
  * §"Component test dasar (1/2)").
  *
  * Yang dikunci di sini (README §"Yang wajib dijaga di setiap PR" &
- * keputusan 2026-09-13 §Kontak langsung di card): tombol WhatsApp dan
- * Telepon SELALU berdua ada di DOM (bukan kondisional), nomor fallback
+ * keputusan 2026-09-13 §Kontak langsung di card): tombol WhatsApp
+ * SELALU ada (Telepon disembunyikan sejak LEAD-02, 2026-10-03), nomor fallback
  * diambil dari `SITE.whatsapp`/`SITE.telepon` dengan normalisasi 62xxx,
  * dan `konteks` masuk ke pesan pembuka WA supaya lead tetap bisa
  * ditelusuri ke properti mana.
@@ -57,27 +57,15 @@ describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
 		expect(tautan.getAttribute('href')).toContain(encodeURIComponent(KONTEKS));
 	});
 
-	test('link Telepon: tel: + nomor default', () => {
-		render(ContactButtons, { konteks: KONTEKS });
-
-		const tautan = screen.getByRole('link', { name: `Telepon tentang ${KONTEKS}` });
-		expect(tautan.getAttribute('href')).toBe(`tel:+${telepon}`);
-	});
-
-	test('dua-duanya selalu ada di DOM — bukan kondisional', () => {
-		// Hanya `konteks` yang dikirim; tanpa prop nomor apa pun, kedua tombol
-		// tetap harus dirender (fallback ke nomor Omahe).
+	test('Telepon DISEMBUNYIKAN (TAMPILKAN_TELEPON=false, LEAD-02) — hanya WA', () => {
 		const { container } = render(ContactButtons, { konteks: KONTEKS });
 
-		const tautan = container.querySelectorAll('a');
-		expect(tautan).toHaveLength(2);
-		expect(
-			screen.queryByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` })
-		).not.toBeUndefined();
-		expect(screen.queryByRole('link', { name: `Telepon tentang ${KONTEKS}` })).not.toBeUndefined();
+		expect(container.querySelectorAll('a')).toHaveLength(1);
+		expect(screen.queryByRole('link', { name: `Telepon tentang ${KONTEKS}` })).toBeNull();
+		expect(container.querySelector('a[href^="tel:"]')).toBeNull();
 	});
 
-	test('klik WhatsApp/Telepon → event GA, tanpa entitas → konteks apa adanya', async () => {
+	test('klik WhatsApp → event GA, tanpa entitas → konteks apa adanya', async () => {
 		const gtag = vi.fn();
 		vi.stubGlobal('gtag', gtag);
 		render(ContactButtons, { konteks: KONTEKS });
@@ -85,10 +73,38 @@ describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
 		await fireEvent.click(
 			screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` })
 		);
-		await fireEvent.click(screen.getByRole('link', { name: `Telepon tentang ${KONTEKS}` }));
 
 		expect(gtag).toHaveBeenCalledWith('event', 'whatsapp_click', { perumahan: KONTEKS });
-		expect(gtag).toHaveBeenCalledWith('event', 'phone_click', { perumahan: KONTEKS });
+	});
+
+	test('onFormMinat + gayaMinat whatsapp → tombol WhatsApp membuka form (bukan link wa.me)', async () => {
+		const gtag = vi.fn();
+		vi.stubGlobal('gtag', gtag);
+		const onFormMinat = vi.fn();
+		const { container } = render(ContactButtons, {
+			konteks: KONTEKS,
+			entitas: 'Griya Asri',
+			onFormMinat,
+			gayaMinat: 'whatsapp'
+		});
+
+		expect(container.querySelector('a[href*="wa.me"]')).toBeNull();
+		await fireEvent.click(
+			screen.getByRole('button', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` })
+		);
+		expect(onFormMinat).toHaveBeenCalledTimes(1);
+		expect(gtag).toHaveBeenCalledWith('event', 'whatsapp_click', { perumahan: 'Griya Asri' });
+	});
+
+	test('onFormMinat gaya default → tombol "Minat" (partner berbayar)', async () => {
+		const onFormMinat = vi.fn();
+		render(ContactButtons, { konteks: KONTEKS, onFormMinat });
+
+		const tombol = screen.getByRole('button', { name: `Minat tentang ${KONTEKS}` });
+		expect(tombol.textContent).toContain('Minat');
+		expect(tombol.textContent).not.toContain('Form');
+		await fireEvent.click(tombol);
+		expect(onFormMinat).toHaveBeenCalledTimes(1);
 	});
 
 	test('prop entitas → jadi nilai param event; pesan WA tetap pakai konteks penuh', async () => {

@@ -43,3 +43,10 @@ export const NAV = [
 	{ href: '/tentang', label: 'Tentang' },
 	{ href: '/kontak', label: 'Kontak' }
 ] as const;
+
+/**
+ * Tombol Telepon di seluruh situs (kartu properti, detail, mitra, /kontak)
+ * — DISEMBUNYIKAN sementara (keputusan user 2026-10-03, LEAD-02): kontak
+ * lewat form + WhatsApp dulu. Ubah ke `true` untuk menampilkannya lagi.
+ */
+export const TAMPILKAN_TELEPON = false;

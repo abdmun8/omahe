@@ -10,7 +10,7 @@
 <script lang="ts">
 	import Badge from '$lib/components/ui/badge.svelte';
 	import Button from '$lib/components/ui/button.svelte';
-	import { SITE } from '$lib/config';
+	import { SITE, TAMPILKAN_TELEPON } from '$lib/config';
 	import { renderMarkdown, cuplikanDeskripsi } from '$lib/markdown';
 	import { labelKategoriDari } from '$lib/mitra';
 	import { waUrl, telUrl } from '$lib/utils';
@@ -100,7 +100,7 @@
 		<Button variant="whatsapp" href={waUrl(m.whatsapp, pesanWa)} target="_blank" rel="noopener">
 			WhatsApp
 		</Button>
-		{#if m.telepon}
+		{#if TAMPILKAN_TELEPON && m.telepon}
 			<Button variant="outline" href={telUrl(m.telepon)}>Telepon</Button>
 		{/if}
 	</div>

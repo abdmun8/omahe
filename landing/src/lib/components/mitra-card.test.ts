@@ -45,14 +45,8 @@ describe.skipIf(typeof document === 'undefined')('MitraCard', () => {
 		expect(wa.search).not.toContain('ref=');
 	});
 
-	test('telepon tersedia → tel:+62xxx; tidak tersedia → tombol tidak dirender', () => {
-		const { unmount } = render(MitraCard, { mitra: MITRA_DASAR });
-		expect((screen.getByRole('link', { name: /telepon/i }) as HTMLAnchorElement).href).toBe(
-			'tel:+62211234501'
-		);
-		unmount();
-
-		render(MitraCard, { mitra: { ...MITRA_DASAR, telepon: null } });
+	test('Telepon disembunyikan (TAMPILKAN_TELEPON=false, LEAD-02) walau nomor ada', () => {
+		render(MitraCard, { mitra: MITRA_DASAR });
 		expect(screen.queryByRole('link', { name: /telepon/i })).toBeNull();
 	});
 

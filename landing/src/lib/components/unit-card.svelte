@@ -40,10 +40,10 @@
 	);
 
 	/**
-	 * Partner berbayar (MONET-03): slot WA jadi "Form Minat" (lead masuk
-	 * inbox perumahan via POST /public/leads), Telepon tetap. Partner gratis
-	 * tidak berubah sama sekali — tetap WA + Telepon. `undefined` (respons
-	 * API lama tanpa MONET-01) = gratis.
+	 * Partner berbayar (MONET-03): tombol "Minat" emas; gratis: tombol
+	 * "WhatsApp". LEAD-02 — keduanya membuka form dulu (lead masuk inbox
+	 * perumahan via POST /public/leads), lalu WA ke nomor perumahan.
+	 * `undefined` (respons API lama tanpa MONET-01) = gratis.
 	 */
 	const partnerBerbayar = $derived(unit.perumahan.prioritas > 0);
 	let formMinatTerbuka = $state(false);
@@ -152,20 +152,19 @@
 		<ContactButtons
 			konteks="{unit.tipe} di {unit.perumahan.nama}"
 			entitas={unit.perumahan.nama}
-			onFormMinat={partnerBerbayar ? () => (formMinatTerbuka = true) : null}
+			onFormMinat={() => (formMinatTerbuka = true)}
+			gayaMinat={partnerBerbayar ? 'minat' : 'whatsapp'}
 			class="mt-3"
 		/>
-		{#if partnerBerbayar}
-			<!-- sumber='card' (api-contract.md §8): tipe unit jadi prefill,
-			     `ref` dari URL ikut terkirim (atribusi mitra). -->
-			<LeadFormDialog
-				bind:open={formMinatTerbuka}
-				perumahanSlug={unit.perumahan.slug}
-				namaPerumahan={unit.perumahan.nama}
-				sumber="card"
-				tipeMinatAwal={unit.tipe}
-				{ref}
-			/>
-		{/if}
+		<!-- sumber='card' (api-contract.md §8): tipe unit jadi prefill,
+		     `ref` dari URL ikut terkirim (atribusi mitra). -->
+		<LeadFormDialog
+			bind:open={formMinatTerbuka}
+			perumahanSlug={unit.perumahan.slug}
+			namaPerumahan={unit.perumahan.nama}
+			sumber="card"
+			tipeMinatAwal={unit.tipe}
+			{ref}
+		/>
 	</div>
 </article>

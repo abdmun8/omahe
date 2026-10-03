@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SITE } from '$lib/config';
+	import { SITE, TAMPILKAN_TELEPON } from '$lib/config';
 	import { page } from '$app/state';
 	import { telUrl, waUrl } from '$lib/utils';
 	import Button from '$lib/components/ui/button.svelte';
@@ -31,7 +31,9 @@
 	</p>
 
 	<dl class="mt-8 grid gap-4 sm:grid-cols-2">
-		<div class="border-line rounded-xl border bg-white p-5">
+		<div
+			class="border-line rounded-xl border bg-white p-5 {TAMPILKAN_TELEPON ? '' : 'sm:col-span-2'}"
+		>
 			<dt class="font-display text-ink text-lg font-bold">WhatsApp</dt>
 			<dd class="text-muted mt-1 text-sm">Cara tercepat — tim kami membalas di jam kerja.</dd>
 			<Button
@@ -44,13 +46,15 @@
 				Chat WhatsApp
 			</Button>
 		</div>
-		<div class="border-line rounded-xl border bg-white p-5">
-			<dt class="font-display text-ink text-lg font-bold">Telepon</dt>
-			<dd class="text-muted mt-1 text-sm">Bicara langsung dengan tim Omahe.</dd>
-			<Button variant="outline" class="mt-3 w-full" href={telUrl(kontak.telepon)}
-				>Telepon Sekarang</Button
-			>
-		</div>
+		{#if TAMPILKAN_TELEPON}
+			<div class="border-line rounded-xl border bg-white p-5">
+				<dt class="font-display text-ink text-lg font-bold">Telepon</dt>
+				<dd class="text-muted mt-1 text-sm">Bicara langsung dengan tim Omahe.</dd>
+				<Button variant="outline" class="mt-3 w-full" href={telUrl(kontak.telepon)}
+					>Telepon Sekarang</Button
+				>
+			</div>
+		{/if}
 		<div class="border-line rounded-xl border bg-white p-5 sm:col-span-2">
 			<dt class="text-muted text-xs">Email</dt>
 			<dd class="font-display text-ink mt-1 text-lg font-bold">

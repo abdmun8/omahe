@@ -7,9 +7,11 @@
 
 	Submit POST ke `/api/lead` (proxy server internal — `client.ts` itu
 	server-only), yang meneruskan ke `POST /public/leads` backend. Pasca
-	sukses: pesan "tim {namaPerumahan} akan menghubungi Anda" + tombol
-	sekunder WA ke nomor umum Omahe — TIDAK ada redirect ke WA partner
-	(seluruh inti fitur ini, api-contract.md §8).
+	sukses (LEAD-02, 2026-10-03): tombol utama "Lanjut ke WhatsApp" ke
+	nomor dari backend (owner perumahan / agen Omahe pemilik `ref`;
+	fallback nomor umum Omahe) dengan pesan pembuka berisi nama + nomor
+	`+62…` peminat supaya admin perumahan tinggal klik. Lead SUDAH
+	tercatat sebelum WA dibuka.
 
 	Honeypot `website` dikirim APA ADANYA (manusia tidak pernah mengisinya,
 	bot iseng mengisi) — keputusannya di server, bukan di sini; respons
@@ -26,7 +28,7 @@
 	import type { LeadSumber } from '$lib/api/types';
 	import { trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
-	import { waUrl } from '$lib/utils';
+	import { pesanWaPeminat, waUrl } from '$lib/utils';
 	import Button from './ui/button.svelte';
 
 	let {
@@ -78,6 +80,8 @@
 
 	let proses = $state(false);
 	let sukses = $state(false);
+	/** LEAD-02 — link WA pasca-sukses (dibekukan saat submit berhasil). */
+	let waLanjut = $state<string | null>(null);
 	let pesanError = $state<string | null>(null);
 
 	// Dialog ditutup: kalau pengiriman tadi SUKSES, form dikosongkan untuk
@@ -88,6 +92,7 @@
 		proses = false;
 		if (sukses) {
 			sukses = false;
+			waLanjut = null;
 			nama = '';
 			telepon = '';
 			tipeMinat = tipeMinatAwal;
@@ -150,6 +155,26 @@
 				}
 				throw new Error(teks);
 			}
+			// LEAD-02 — tujuan WA dari backend (null/agen-minat → nomor umum).
+			let tujuan: string | null = null;
+			try {
+				const body = await res.json();
+				if (typeof body?.data?.whatsapp === 'string' && body.data.whatsapp) {
+					tujuan = body.data.whatsapp;
+				}
+			} catch {
+				// body bukan JSON — pakai nomor umum Omahe.
+			}
+			waLanjut = waUrl(
+				tujuan ?? page.data.kontak?.whatsapp ?? SITE.whatsapp,
+				pesanWaPeminat({
+					nama,
+					telepon,
+					namaPerumahan: namaAgen && kodeAgen ? `layanan agen ${namaAgen}` : namaPerumahan,
+					tipeMinat: kodeAgen ? undefined : tipeMinat,
+					pesan
+				})
+			);
 			sukses = true;
 			// Iterasi 1 GA4: submit SUKSES → 'lead_form_submit' — HANYA metadata
 			// non-identitas. Nama & nomor telepon pengunjung TIDAK PERNAH masuk
@@ -183,7 +208,7 @@
 			<div class="flex items-start justify-between gap-4">
 				<div>
 					<Dialog.Title class="font-display text-ink text-lg font-extrabold">
-						{kodeAgen && namaAgen ? `Hubungi ${namaAgen}` : `Form Minat — ${namaPerumahan}`}
+						{kodeAgen && namaAgen ? `Hubungi ${namaAgen}` : `Minat — ${namaPerumahan}`}
 					</Dialog.Title>
 					<Dialog.Description class="text-muted mt-1 text-sm">
 						{#if namaAgen}
@@ -210,24 +235,22 @@
 							Terima kasih, tim {namaPerumahan} akan menghubungi Anda.
 						{/if}
 					</p>
-					<!-- Sekunder OPSIONAL ke nomor umum Omahe (bukan WA partner) —
-					     konteks nama properti masuk pesan pembuka, pola
-					     contact-buttons, supaya lead tetap bisa ditelusuri. -->
+					<!-- LEAD-02 — lanjut chat ke nomor perumahan/agen (fallback nomor
+					     umum Omahe); pesan pembuka memuat nama + nomor +62 peminat. -->
 					<Button
 						variant="whatsapp"
-						href={waUrl(
-							page.data.kontak?.whatsapp ?? SITE.whatsapp,
-							`Halo, saya ingin tanya tentang ${namaPerumahan} yang saya lihat di Omahe.`
-						)}
+						size="lg"
+						href={waLanjut ?? waUrl(page.data.kontak?.whatsapp ?? SITE.whatsapp)}
 						target="_blank"
 						rel="noopener"
+						onclick={() => trackEvent('whatsapp_click', { perumahan: namaPerumahan })}
 					>
 						<svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
 							<path
 								d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.39a9.86 9.86 0 0 0 4.74 1.21c5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2zm5.72 14.03c-.24.67-1.4 1.28-1.93 1.32-.5.04-.96.22-3.24-.67-2.73-1.07-4.46-3.85-4.6-4.03-.13-.18-1.1-1.46-1.1-2.78 0-1.32.7-1.97.94-2.24.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.48.24.57.8 1.98.87 2.12.07.14.12.3.02.49-.1.18-.15.29-.29.45-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.27.74 1.22 1.58 1.97 1.09.97 2 1.27 2.29 1.41.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.18-.28.37-.23.62-.14.25.09 1.6.76 1.87.9.28.13.46.2.53.31.07.11.07.65-.17 1.32z"
 							/>
 						</svg>
-						WhatsApp
+						Lanjut ke WhatsApp
 					</Button>
 					<Dialog.Close>
 						{#snippet child({ props })}

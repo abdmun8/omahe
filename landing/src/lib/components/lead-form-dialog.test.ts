@@ -12,8 +12,9 @@
  *     server-only, komponen memang tidak bisa memanggil `createLead()`
  *     langsung) dengan body sesuai kontrak, termasuk `ref` passthrough dan
  *     honeypot `website` APA ADANYA (keputusan honeypot ada di server);
- *   - respons sukses → pesan "akan menghubungi" + tombol sekunder WA ke
- *     nomor umum Omahe (BUKAN redirect ke WA partner — inti fitur ini);
+ *   - respons sukses → pesan "akan menghubungi" + tombol "Lanjut ke
+ *     WhatsApp" ke nomor dari backend (owner perumahan, LEAD-02) dengan
+ *     nama + nomor +62 peminat; fallback nomor umum Omahe;
  *   - status error (mis. 429 rate limit) → pesan backend tampil apa adanya.
  *
  * Tidak perlu mock `$lib/ref` seperti di `unit-card.test.ts` — graf import
@@ -32,7 +33,7 @@ import { fireEvent, render, screen } from '@testing-library/svelte';
 import { waitFor } from '@testing-library/dom';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { SITE } from '$lib/config';
-import { waUrl } from '$lib/utils';
+import { pesanWaPeminat, waUrl } from '$lib/utils';
 import LeadFormDialog from './lead-form-dialog.svelte';
 
 /** Props dasar — dialog langsung TERBUKA (`open: true`) supaya isinya
@@ -207,8 +208,12 @@ describe.skipIf(typeof document === 'undefined')('LeadFormDialog', () => {
 		);
 	});
 
-	test('respons sukses → pesan "akan menghubungi" + tombol sekunder WA ke nomor umum Omahe', async () => {
-		stubFetch({ ok: true, status: 200, json: async () => ({ ok: true }) });
+	test('respons sukses → "akan menghubungi" + Lanjut ke WhatsApp ke nomor perumahan (LEAD-02)', async () => {
+		stubFetch({
+			ok: true,
+			status: 200,
+			json: async () => ({ success: true, data: { ok: true, whatsapp: '628111000222' } })
+		});
 		render(LeadFormDialog, { props: propsDasar() });
 
 		isiWajibDanSubmit();
@@ -219,14 +224,38 @@ describe.skipIf(typeof document === 'undefined')('LeadFormDialog', () => {
 			await screen.findByText('Terima kasih, tim Griya Asri akan menghubungi Anda.')
 		).toBeInTheDocument();
 
-		// Tombol sekunder WA → nomor UMUM Omahe (SITE.whatsapp), TIDAK ada
-		// redirect ke WA partner — seluruh inti MONET-03 (§8).
-		const wa = screen.getByRole('link', { name: 'WhatsApp' });
+		// WA ke nomor OWNER perumahan dari backend; pesan memuat nama + nomor
+		// +62 peminat (admin perumahan tinggal klik) + tipe.
+		const wa = screen.getByRole('link', { name: 'Lanjut ke WhatsApp' });
 		expect(wa.getAttribute('href')).toBe(
-			waUrl(SITE.whatsapp, 'Halo, saya ingin tanya tentang Griya Asri yang saya lihat di Omahe.')
+			waUrl(
+				'628111000222',
+				pesanWaPeminat({
+					nama: 'Budi Santoso',
+					telepon: '081234567890',
+					namaPerumahan: 'Griya Asri',
+					tipeMinat: 'Tipe 36/72'
+				})
+			)
 		);
+		expect(decodeURIComponent(wa.getAttribute('href')!)).toContain('(+6281234567890)');
 		expect(wa.getAttribute('target')).toBe('_blank');
 		expect(wa.getAttribute('rel')).toContain('noopener');
+	});
+
+	test('backend tanpa nomor (whatsapp null / respons lama) → WA ke nomor umum Omahe', async () => {
+		stubFetch({ ok: true, status: 200, json: async () => ({ ok: true }) });
+		render(LeadFormDialog, { props: propsDasar() });
+
+		isiWajibDanSubmit();
+
+		const wa = await screen.findByRole('link', { name: 'Lanjut ke WhatsApp' });
+		expect(wa.getAttribute('href')).toContain(waUrl(SITE.whatsapp).split('?')[0]);
+	});
+
+	test('judul dialog "Minat — {perumahan}" (bukan "Form Minat")', () => {
+		render(LeadFormDialog, { props: propsDasar() });
+		expect(screen.getByText('Minat — Griya Asri')).toBeInTheDocument();
 	});
 
 	test('respons 429 dengan pesan → pesan backend tampil APA ADANYA, form tidak hilang', async () => {

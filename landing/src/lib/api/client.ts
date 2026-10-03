@@ -27,6 +27,7 @@ import type {
 	AgenDetail,
 	AgenSummary,
 	KontakOmahe,
+	LeadHasil,
 	LeadInput,
 	PageMeta,
 	Paginated,
@@ -436,8 +437,8 @@ export async function pesanErrorBackend(res: Response): Promise<string | null> {
  * Mode API asli: POST JSON; respons sukses & honeypot SAMA
  * `{success:true,data:{ok:true}}`, jadi cukup dibedakan statusnya.
  */
-export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<void> {
-	if (!hasSearchApi()) return;
+export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<LeadHasil> {
+	if (!hasSearchApi()) return { whatsapp: null };
 
 	let res: Response;
 	try {
@@ -452,7 +453,15 @@ export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<void
 	} catch {
 		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
 	}
-	if (res.ok) return;
+	if (res.ok) {
+		// LEAD-02 — nomor tujuan WA peminat (owner perumahan / agen Omahe);
+		// backend lama tanpa field ini / body aneh → null (nomor umum Omahe).
+		const body = (await res.json().catch(() => null)) as {
+			data?: { whatsapp?: unknown };
+		} | null;
+		const whatsapp = body?.data?.whatsapp;
+		return { whatsapp: typeof whatsapp === 'string' && whatsapp.trim() ? whatsapp : null };
+	}
 
 	// Pesan server lebih tahu: 400 punya detail field, 429 rate limit sudah
 	// ramah, 404 PESAN SERAGAM (jangan dipakai membedakan status komersial

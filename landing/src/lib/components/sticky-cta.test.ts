@@ -91,35 +91,37 @@ describe.skipIf(typeof document === 'undefined')('StickyCta', () => {
 		});
 	});
 
-	test('partner gratis (prioritas 0) → tombol WhatsApp; klik → whatsapp_click { perumahan }', async () => {
+	test('partner gratis (prioritas 0) → tombol WhatsApp; klik → whatsapp_click + form terbuka (LEAD-02)', async () => {
 		const gtagMock = stubGtag();
 		render(StickyCta, propsDasar());
 
-		expect(screen.queryByRole('button', { name: 'Form Minat' })).toBeNull();
+		expect(screen.queryByRole('button', { name: 'Minat' })).toBeNull();
 
-		const wa = screen.getByRole('link', { name: 'WhatsApp' });
+		// LEAD-02 — WhatsApp = tombol pembuka form (bukan link wa.me langsung).
+		const wa = screen.getByRole('button', { name: 'WhatsApp' });
 		await fireEvent.click(wa);
 
 		expect(gtagMock).toHaveBeenCalledWith('event', 'whatsapp_click', {
 			perumahan: 'Griya Asri'
 		});
+		expect(await screen.findByText('Minat — Griya Asri')).toBeInTheDocument();
 		// CTA booking tetap ada di samping WA.
 		expect(screen.getByRole('link', { name: 'Ajukan' })).toBeInTheDocument();
 	});
 
-	test('partner berbayar (prioritas > 0) → klik "Form Minat" membuka dialog + lead_form_open sumber "detail"', async () => {
+	test('partner berbayar (prioritas > 0) → klik "Minat" membuka dialog + lead_form_open sumber "detail"', async () => {
 		const gtagMock = stubGtag();
 		render(StickyCta, { ...propsDasar(), prioritas: 50 });
 
-		// Slot WA DIGANTI "Form Minat" — link WA tidak boleh ada.
-		expect(screen.queryByRole('link', { name: 'WhatsApp' })).toBeNull();
-		expect(screen.getByRole('button', { name: 'Form Minat' })).toBeInTheDocument();
+		// Slot WA DIGANTI "Minat" — tombol WhatsApp tidak ada.
+		expect(screen.queryByRole('button', { name: 'WhatsApp' })).toBeNull();
+		expect(screen.getByRole('button', { name: 'Minat' })).toBeInTheDocument();
 
-		await fireEvent.click(screen.getByRole('button', { name: 'Form Minat' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Minat' }));
 
 		// Isi dialog di-PORTAL ke document.body oleh bits-ui — screen query
 		// mencari di seluruh body (pola lead-form-dialog.test.ts).
-		expect(await screen.findByText('Form Minat — Griya Asri')).toBeInTheDocument();
+		expect(await screen.findByText('Minat — Griya Asri')).toBeInTheDocument();
 
 		// $effect berjalan pasca-dialog-terbuka — jangan assert sinkron.
 		await waitFor(() =>
