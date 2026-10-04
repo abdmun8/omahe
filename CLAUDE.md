@@ -93,3 +93,5 @@ Domain final: **`www.omahe.co.id`** (diganti dari rencana awal `omahe.id`, 2026-
 ## Keputusan Produk
 
 Lihat `docs/user-story.md` bagian "Keputusan" untuk detail (simulasi KPR, grouping properti per developer, kondisi baru/second, dll).
+
+**Update 2026-10-04 — `PEMASARAN-02` & `IMPORT-01` (repo `perumahan`)**: deskripsi perumahan kini Markdown aman (maks 8000) → `/perumahan/:slug` merender lewat `renderMarkdown()`, meta/JSON-LD pakai `cuplikanDeskripsi()` (api-contract §31); kategori `komersil_subsidi` ditambah (Omahe belum memakai `kategori`). Data 14 kawasan Widya (agen properti, `?situs=widya-pratama`) akan masuk lewat importer form Excel — perumahan agen tampil di Omahe dengan "Dipasarkan oleh" kecuali `tampil_di_omahe=false`. Repo Widya: branch `dev` (merge `ssr-api` di atas `main`).
