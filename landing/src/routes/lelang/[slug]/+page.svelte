@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
 	import LelangMinatDialog from '$lib/components/lelang-minat-dialog.svelte';
+	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import Badge from '$lib/components/ui/badge.svelte';
 	import Button from '$lib/components/ui/button.svelte';
@@ -136,6 +137,15 @@
 				<!-- Aman: renderMarkdown meng-escape HTML mentah (subset). -->
 				<div class="prose-artikel mt-6">{@html deskripsiHtml}</div>
 			{/if}
+
+			<!-- Peta lokasi (embed Google Maps tervalidasi + tombol petunjuk arah). -->
+			<div class="mt-8">
+				<PetaLokasi
+					address={lokasi || null}
+					mapsEmbedUrl={r.mapsEmbedUrl ?? null}
+					directionsUrl={r.directionsUrl ?? null}
+				/>
+			</div>
 
 			<section class="border-line mt-8 rounded-xl border p-4 text-sm leading-relaxed">
 				<h2 class="font-display text-ink text-base font-bold">Sebelum ikut lelang</h2>

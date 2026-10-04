@@ -815,6 +815,9 @@ export interface RumahLelangDetail extends Omit<RumahLelangKartu, 'fotoUrl'> {
 	penyelenggara: string | null;
 	kodeLot: string | null;
 	linkLelang: string | null;
+	/** Peta (pola LOKASI-03) — embed Google Maps & link petunjuk arah. */
+	mapsEmbedUrl?: string | null;
+	directionsUrl?: string | null;
 	foto: { url: string | null }[];
 	/** Tanggal lelang sudah lewat — halaman tetap tampil, label "Lelang selesai". */
 	selesai: boolean;
