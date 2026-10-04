@@ -24,7 +24,8 @@
 		prioritas = 0,
 		formMinat,
 		namaPerumahan = undefined,
-		tipeMinatAwal = ''
+		tipeMinatAwal = '',
+		tipeAjukan = null
 	}: {
 		slug: string;
 		nama: string;
@@ -38,6 +39,8 @@
 		namaPerumahan?: string;
 		/** Prefill tipe di form (halaman tipe). */
 		tipeMinatAwal?: string;
+		/** UNIT-09 — tipe untuk `?tipe=` di tombol Ajukan (halaman tipe). */
+		tipeAjukan?: string | null;
 	} = $props();
 
 	/** undefined (respons lama tanpa MONET-01) = gratis. */
@@ -81,7 +84,7 @@
 			variant="primary"
 			size="lg"
 			class="flex-1"
-			href={ajukanUrl(slug, ref)}
+			href={ajukanUrl(slug, ref, tipeAjukan)}
 			onclick={lacakAjukan}>Ajukan</Button
 		>
 	</div>

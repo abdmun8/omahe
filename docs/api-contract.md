@@ -48,6 +48,11 @@ di-enrich sisi Omahe via `GET /public/units?perumahanSlug=...` per proyek
 
 ## 1. `GET /public/units` (UNIT-04, `done` 2026-09-14)
 
+> **Update UNIT-09 (2026-10-04)** — tipe stok **Ringkas** ikut di hasil
+> (`unitTersedia` = jumlah tersedia, `hargaMin`/`hargaMax` = rentang dari
+> tipe). Bentuk item tidak berubah. Tombol Ajukan halaman tipe mengirim
+> `?tipe=` (dicatat backend sebagai tipe diminati booking).
+>
 > **Update LANDING-07 (2026-10-03)** — urutan default `rekomendasi` =
 > partner berbayar dulu lalu **rotasi harian** (stabil sepanjang hari WIB).
 > Homepage: "Rekomendasi Hari Ini" (6), "Harga Terjangkau" (`hargaMax`

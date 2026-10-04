@@ -246,7 +246,7 @@
 					<Button
 						variant="primary"
 						size="lg"
-						href={ajukanUrl(p.slug, data.ref)}
+						href={ajukanUrl(p.slug, data.ref, t.nama)}
 						class="hidden md:inline-flex"
 					>
 						Ajukan Unit Ini
@@ -305,6 +305,7 @@
 		nama="{t.nama} di {p.nama}"
 		namaPerumahan={p.nama}
 		tipeMinatAwal={t.nama}
+		tipeAjukan={t.nama}
 		ref={data.ref}
 	/>
 {/if}

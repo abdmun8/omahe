@@ -49,7 +49,10 @@ export function withRef(path: string, ref: string | null): string {
  * URL CTA booking — kembali ke app `perumahan`, BUKAN route Omahe. Booking
  * tidak pernah dibangun ulang di sini (CLAUDE.md §Arsitektur).
  */
-export function ajukanUrl(perumahanSlug: string, ref: string | null): string {
+export function ajukanUrl(perumahanSlug: string, ref: string | null, tipe?: string | null): string {
 	const base = env.PUBLIC_BOOKING_BASE_URL?.replace(/\/+$/, '') ?? '';
-	return withRef(`${base}/ajukan/${encodeURIComponent(perumahanSlug)}`, ref);
+	// UNIT-09 — `?tipe=` dari halaman tipe: dicatat sebagai tipe diminati
+	// booking (tipe stok Ringkas tidak punya unit untuk dipilih).
+	const qTipe = tipe?.trim() ? `?tipe=${encodeURIComponent(tipe.trim())}` : '';
+	return withRef(`${base}/ajukan/${encodeURIComponent(perumahanSlug)}${qTipe}`, ref);
 }

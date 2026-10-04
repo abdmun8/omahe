@@ -72,3 +72,13 @@ describe('ajukanUrl', () => {
 		);
 	});
 });
+
+describe('ajukanUrl + tipe (UNIT-09)', () => {
+	test('tipe ikut sebagai ?tipe=, ref tetap terbawa', async () => {
+		const { ajukanUrl } = await import('./ref');
+		const url = ajukanUrl('griya-asri', 'abc', 'Tipe 36');
+		expect(url).toContain('/ajukan/griya-asri?tipe=Tipe%2036');
+		expect(url).toContain('ref=abc');
+		expect(ajukanUrl('griya-asri', null, '  ')).not.toContain('tipe=');
+	});
+});
