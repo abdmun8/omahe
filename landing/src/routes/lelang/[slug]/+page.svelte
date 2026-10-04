@@ -13,7 +13,7 @@
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import Badge from '$lib/components/ui/badge.svelte';
 	import Button from '$lib/components/ui/button.svelte';
-	import { formatJadwalLelang, LABEL_HUNIAN } from '$lib/lelang';
+	import { formatJadwalLelang, hargaOriginalTampil, LABEL_HUNIAN } from '$lib/lelang';
 	import { renderMarkdown } from '$lib/markdown';
 	import { withRef } from '$lib/ref';
 	import { formatRupiahPenuh } from '$lib/utils';
@@ -29,6 +29,7 @@
 	const lokasi = $derived(
 		[r.alamat, r.kecamatanNama, r.regionNama, r.provinsiNama].filter(Boolean).join(', ')
 	);
+	const hargaOriginal = $derived(hargaOriginalTampil(r));
 	const deskripsiHtml = $derived(r.deskripsi ? renderMarkdown(r.deskripsi) : null);
 	const fakta = $derived(
 		[
@@ -111,6 +112,12 @@
 
 			<!-- Ringkasan angka utama di HP (kolom samping baru muncul di bawah). -->
 			<div class="bg-surface mt-4 rounded-xl p-4 lg:hidden">
+				{#if hargaOriginal}
+					<!-- Harga original (harga pasar) dicoret — tepat di atas nilai limit. -->
+					<p class="text-muted mb-0.5 text-xs line-through">
+						<span class="sr-only">Harga original </span>{formatRupiahPenuh(hargaOriginal)}
+					</p>
+				{/if}
 				<p class="text-muted text-xs">Nilai limit</p>
 				<p class="font-display text-primary text-2xl font-extrabold">
 					{formatRupiahPenuh(r.nilaiLimit)}
@@ -167,6 +174,12 @@
 		</div>
 
 		<aside class="border-line h-fit rounded-xl border bg-white p-5 lg:sticky lg:top-20">
+			{#if hargaOriginal}
+				<!-- Harga original (harga pasar) dicoret — tepat di atas nilai limit. -->
+				<p class="text-muted mb-0.5 text-xs line-through">
+					<span class="sr-only">Harga original </span>{formatRupiahPenuh(hargaOriginal)}
+				</p>
+			{/if}
 			<p class="text-muted text-xs">Nilai limit</p>
 			<p class="font-display text-primary text-2xl font-extrabold">
 				{formatRupiahPenuh(r.nilaiLimit)}

@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
 	import type { RumahLelangKartu } from '$lib/api/types';
-	import { formatTanggalRingkas } from '$lib/lelang';
+	import { formatTanggalRingkas, hargaOriginalTampil } from '$lib/lelang';
 	import { withRef } from '$lib/ref';
 	import { formatRupiah, formatRupiahPenuh } from '$lib/utils';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
@@ -13,6 +13,7 @@
 	let { rumah, ref = null }: { rumah: RumahLelangKartu; ref?: string | null } = $props();
 	const href = $derived(withRef(`/lelang/${rumah.slug}`, ref));
 	const lokasi = $derived([rumah.regionNama, rumah.provinsiNama].filter(Boolean).join(', '));
+	const hargaOriginal = $derived(hargaOriginalTampil(rumah));
 </script>
 
 <article
@@ -36,7 +37,13 @@
 			<a {href} class="hover:text-primary">{rumah.judul}</a>
 		</h3>
 		{#if lokasi}<p class="text-muted mt-0.5 text-xs">{lokasi}</p>{/if}
-		<p class="text-muted mt-3 text-xs">Nilai limit</p>
+		{#if hargaOriginal}
+			<!-- Harga original (harga pasar) dicoret — tepat di atas nilai limit. -->
+			<p class="text-muted mt-3 text-xs line-through">
+				<span class="sr-only">Harga original </span>{formatRupiah(hargaOriginal)}
+			</p>
+		{/if}
+		<p class="text-muted {hargaOriginal ? 'mt-0.5' : 'mt-3'} text-xs">Nilai limit</p>
 		<p
 			class="font-display text-primary text-lg font-extrabold"
 			title={formatRupiahPenuh(rumah.nilaiLimit)}

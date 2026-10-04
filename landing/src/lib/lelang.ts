@@ -45,3 +45,15 @@ export const FILTER_LIMIT = [
 	{ nilai: 500_000_000, label: '≤ Rp500 jt' },
 	{ nilai: 1_000_000_000, label: '≤ Rp1 M' }
 ] as const;
+
+/**
+ * Harga original yang layak tampil dicoret — hanya bila diisi DAN lebih
+ * besar dari nilai limit (harga coret yang ≤ limit menyesatkan; backend
+ * juga memaksakan aturan yang sama).
+ */
+export function hargaOriginalTampil(rumah: {
+	hargaOriginal?: number | null;
+	nilaiLimit: number;
+}): number | null {
+	return rumah.hargaOriginal && rumah.hargaOriginal > rumah.nilaiLimit ? rumah.hargaOriginal : null;
+}

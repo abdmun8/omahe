@@ -796,6 +796,8 @@ export interface RumahLelangKartu {
 	kamarMandi: number | null;
 	/** Nilai limit (harga minimum penawaran) — BUKAN "harga". */
 	nilaiLimit: number;
+	/** Harga original (mis. harga pasar) — tampil dicoret bila > nilai limit. */
+	hargaOriginal?: number | null;
 	uangJaminan: number;
 	/** ISO. */
 	tanggalLelang: string;
