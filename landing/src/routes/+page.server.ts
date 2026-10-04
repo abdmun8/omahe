@@ -1,5 +1,6 @@
 import {
 	getDevelopers,
+	getLelang,
 	getFeaturedUnits,
 	getPerumahanTerbaru,
 	getRegions,
@@ -27,18 +28,26 @@ async function failSoft<T>(label: string, task: Promise<T[]>): Promise<T[]> {
 }
 
 export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
-	const [unitUnggulan, unitTerjangkau, terbaru, developers, regions, sliders] = await Promise.all([
-		failSoft('unit unggulan', getFeaturedUnits(fetch, 6)),
-		// LANDING-07 — seksi "Harga Terjangkau" & "Baru di Omahe" (fail-soft).
-		failSoft('unit terjangkau', getUnitTerjangkau(fetch, 6)),
-		getPerumahanTerbaru(fetch, 4).catch((err) => {
-			console.error('[omahe:home] perumahan terbaru gagal dimuat — bagian disembunyikan', err);
-			return { items: [], total: 0 };
-		}),
-		failSoft('developer', getDevelopers(fetch)),
-		getRegions(fetch),
-		getSliders(fetch)
-	]);
+	const [unitUnggulan, unitTerjangkau, terbaru, developers, rumahLelang, regions, sliders] =
+		await Promise.all([
+			failSoft('unit unggulan', getFeaturedUnits(fetch, 6)),
+			// LANDING-07 — seksi "Harga Terjangkau" & "Baru di Omahe" (fail-soft).
+			failSoft('unit terjangkau', getUnitTerjangkau(fetch, 6)),
+			getPerumahanTerbaru(fetch, 4).catch((err) => {
+				console.error('[omahe:home] perumahan terbaru gagal dimuat — bagian disembunyikan', err);
+				return { items: [], total: 0 };
+			}),
+			failSoft('developer', getDevelopers(fetch)),
+			// LELANG-01 — seksi "Rumah Lelang" (3 terdekat; kosong → disembunyikan).
+			getLelang(fetch, { pageSize: 3 })
+				.then((h) => h.items)
+				.catch((err) => {
+					console.error('[omahe:home] rumah lelang gagal dimuat — bagian disembunyikan', err);
+					return [];
+				}),
+			getRegions(fetch),
+			getSliders(fetch)
+		]);
 	// "Baru di Omahe" baru tampil kalau perumahan aktif sudah cukup banyak
 	// (keputusan user: ≥ 25) — sebelum itu isinya hampir sama dengan
 	// rekomendasi.
@@ -51,6 +60,7 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 		unitUnggulan,
 		unitTerjangkau,
 		perumahanBaru,
+		rumahLelang,
 		developers: developers.slice(0, 3),
 		regions,
 		sliders

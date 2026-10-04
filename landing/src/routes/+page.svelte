@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SITE } from '$lib/config';
+	import LelangCard from '$lib/components/lelang-card.svelte';
 	import PerumahanBaruCard from '$lib/components/perumahan-baru-card.svelte';
 	import { HARGA_TERJANGKAU } from '$lib/config';
 	import { trackGabungClick } from '$lib/analytics';
@@ -127,6 +128,28 @@
 		<div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.unitTerjangkau as unit (unit.id)}
 				<UnitCard {unit} ref={data.ref} source="homepage_terjangkau" />
+			{/each}
+		</div>
+	</section>
+{/if}
+
+<!-- LELANG-01 — Rumah Lelang (3 jadwal terdekat; disembunyikan bila kosong). -->
+{#if data.rumahLelang.length > 0}
+	<section class="mx-auto max-w-6xl px-4 pb-12">
+		<div class="flex items-end justify-between gap-4">
+			<div>
+				<h2 class="font-display text-ink text-2xl font-bold">Rumah Lelang</h2>
+				<p class="text-muted mt-1 text-sm">
+					Agunan bank yang akan dilelang — harga mulai dari nilai limit.
+				</p>
+			</div>
+			<Button variant="ghost" href={withRef('/lelang', data.ref)} class="shrink-0"
+				>Lihat semua</Button
+			>
+		</div>
+		<div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{#each data.rumahLelang as rumah (rumah.slug)}
+				<LelangCard {rumah} ref={data.ref} />
 			{/each}
 		</div>
 	</section>

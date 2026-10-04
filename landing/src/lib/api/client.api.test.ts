@@ -28,7 +28,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { env } from '$env/dynamic/private';
 import type { UnitListing } from './types';
-import { createLead, getDeveloper, getRegions, getUnits } from './client';
+import { createLead, getDeveloper, getLelang, getRegions, getUnits } from './client';
 
 const API = 'https://api.perumahan.test';
 
@@ -394,5 +394,26 @@ describe('getUnits — urutan (UNIT-07)', () => {
 		await getUnits(f, { sort: 'acak' });
 		await getUnits(f, {});
 		for (const u of urls) expect(new URL(u).searchParams.has('sort')).toBe(false);
+	});
+});
+
+describe('getLelang (LELANG-01)', () => {
+	test('backend tanpa fitur lelang (404) → daftar kosong, bukan error', async () => {
+		const f = (async () => new Response('Not Found', { status: 404 })) as unknown as typeof fetch;
+		const hasil = await getLelang(f, {});
+		expect(hasil.items).toEqual([]);
+		expect(hasil.meta.total).toBe(0);
+	});
+
+	test('filter diteruskan ke query', async () => {
+		const urls: string[] = [];
+		const f = (async (url: string) => {
+			urls.push(url);
+			return envelope([], { total: 0, page: 1, pageSize: 12 });
+		}) as unknown as typeof fetch;
+		await getLelang(f, { regionKode: '32.16', limitMax: 500000000 });
+		const q = new URL(urls[0]).searchParams;
+		expect(q.get('regionKode')).toBe('32.16');
+		expect(q.get('limitMax')).toBe('500000000');
 	});
 });

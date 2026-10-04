@@ -809,3 +809,14 @@ dibandingkan case-insensitive). Respons `data`:
   → nomor owner.
 - Item `GET /public/perumahan` + `marketingWhatsapp` (dipakai situs agen untuk
   tombol WA kartu; Omahe tidak memakainya).
+
+## 32. Rumah lelang (LELANG-01, 2026-10-04)
+
+`GET /public/lelang?regionKode=&bankId=&limitMax=&page=&pageSize=` — rumah
+lelang AKAN datang (urut tanggal). `GET /public/lelang/bank` — opsi filter
+bank. `GET /public/lelang/:slug` — detail (`selesai: true` bila tanggal
+lewat; halaman tetap tampil). `POST /public/lelang/:slug/minat { nama,
+telepon, pesan?, website }` lewat proxy Omahe `/api/lelang-minat`, lalu WA ke
+kontak Omahe. Harga = **nilai limit** (+ uang jaminan), bukan "harga".
+Backend tanpa fitur instance `lelang` → 404 → Omahe menampilkan daftar
+kosong (seksi homepage tersembunyi).

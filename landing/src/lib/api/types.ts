@@ -780,3 +780,50 @@ export interface DetailBayar {
 	penerbitNama: string | null;
 	rekening: { bank: string | null; nomor: string | null; atasNama: string | null };
 }
+
+// ---------------------------------------------------------------------------
+// LELANG-01 — rumah lelang (`GET /public/lelang`, `/public/lelang/:slug`)
+// ---------------------------------------------------------------------------
+
+export interface RumahLelangKartu {
+	slug: string;
+	judul: string;
+	regionNama: string | null;
+	provinsiNama: string | null;
+	luasTanah: number | null;
+	luasBangunan: number | null;
+	kamarTidur: number | null;
+	kamarMandi: number | null;
+	/** Nilai limit (harga minimum penawaran) — BUKAN "harga". */
+	nilaiLimit: number;
+	uangJaminan: number;
+	/** ISO. */
+	tanggalLelang: string;
+	bank: { id: string; nama: string };
+	cabangBank: string | null;
+	fotoUrl: string | null;
+}
+
+export interface RumahLelangDetail extends Omit<RumahLelangKartu, 'fotoUrl'> {
+	/** Markdown — WAJIB lewat `$lib/markdown`. */
+	deskripsi: string | null;
+	kecamatanNama: string | null;
+	alamat: string | null;
+	sertifikat: string | null;
+	statusHunian: 'kosong' | 'dihuni' | 'tidak_diketahui';
+	batasJaminan: string | null;
+	penyelenggara: string | null;
+	kodeLot: string | null;
+	linkLelang: string | null;
+	foto: { url: string | null }[];
+	/** Tanggal lelang sudah lewat — halaman tetap tampil, label "Lelang selesai". */
+	selesai: boolean;
+}
+
+export interface LelangQuery {
+	regionKode?: string;
+	bankId?: string;
+	limitMax?: number;
+	page?: number;
+	pageSize?: number;
+}

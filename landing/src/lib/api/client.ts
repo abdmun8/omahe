@@ -53,7 +53,10 @@ import type {
 	DetailBayar,
 	PerumahanDirektori,
 	InfoSitus,
-	Sosial
+	Sosial,
+	RumahLelangKartu,
+	RumahLelangDetail,
+	LelangQuery
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -1163,4 +1166,83 @@ export async function unduhDokumenBayar(
 	const pesan = await pesanErrorBackend(res);
 	console.error(`[omahe:api] GET /public/bayar/:token/${jenis}.pdf → ${res.status}`);
 	throw new ApiError(res.status, pesan ?? 'Dokumen tidak dapat diunduh.');
+}
+
+// ---------------------------------------------------------------------------
+// LELANG-01 — rumah lelang
+// ---------------------------------------------------------------------------
+
+/**
+ * Daftar rumah lelang yang AKAN datang. Backend tanpa fitur `lelang`
+ * (instance lain / belum dinyalakan) membalas 404 → diperlakukan daftar
+ * kosong, bukan error. Mode fixture → kosong.
+ */
+export async function getLelang(
+	fetchFn: Fetch,
+	query: LelangQuery = {}
+): Promise<Paginated<RumahLelangKartu>> {
+	const page = Math.max(1, query.page ?? 1);
+	const pageSize = Math.min(48, Math.max(1, query.pageSize ?? DEFAULT_PAGE_SIZE));
+	const kosong = { items: [], meta: { total: 0, page, pageSize } };
+	if (!hasSearchApi()) return kosong;
+	const params = new URLSearchParams();
+	for (const [k, v] of Object.entries({ ...query, page, pageSize })) {
+		if (v !== undefined && v !== '') params.set(k, String(v));
+	}
+	const url = `${baseUrl()}/public/lelang?${params}`;
+	const res = await fetchFn(url, {
+		headers: { accept: 'application/json' },
+		signal: AbortSignal.timeout(TIMEOUT_MS)
+	});
+	if (res.status === 404) return kosong;
+	if (!res.ok) {
+		console.error(`[omahe:api] GET ${url} → ${res.status}`);
+		error(502, 'Data sedang tidak bisa dimuat. Coba lagi sebentar lagi.');
+	}
+	const body = (await res.json()) as { data: RumahLelangKartu[]; meta: PageMeta };
+	return { items: body.data, meta: body.meta };
+}
+
+/** Bank yang punya rumah lelang tampil (opsi filter) — fail-soft `[]`. */
+export async function getBankLelang(fetchFn: Fetch): Promise<{ id: string; nama: string }[]> {
+	if (!hasSearchApi()) return [];
+	try {
+		const res = await fetchFn(`${baseUrl()}/public/lelang/bank`, {
+			headers: { accept: 'application/json' },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+		if (!res.ok) return [];
+		return ((await res.json()) as { data: { id: string; nama: string }[] }).data;
+	} catch {
+		return [];
+	}
+}
+
+/** Detail rumah lelang (404 → halaman 404). */
+export async function getLelangDetail(fetchFn: Fetch, slug: string): Promise<RumahLelangDetail> {
+	if (!hasSearchApi()) error(404, 'Halaman tidak ditemukan.');
+	return apiGet<RumahLelangDetail>(fetchFn, `/public/lelang/${encodeURIComponent(slug)}`);
+}
+
+/** Form minat rumah lelang → `POST /public/lelang/:slug/minat`. */
+export async function kirimMinatLelang(
+	fetchFn: Fetch,
+	slug: string,
+	input: { nama: string; telepon: string; pesan?: string; website?: string }
+): Promise<void> {
+	if (!hasSearchApi()) return;
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/lelang/${encodeURIComponent(slug)}/minat`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			body: JSON.stringify(input),
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	if (res.ok) return;
+	const pesan = await pesanErrorBackend(res);
+	throw new ApiError(res.status, pesan ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');
 }
