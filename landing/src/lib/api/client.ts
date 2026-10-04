@@ -51,7 +51,9 @@ import type {
 	AgenMinatInput,
 	KartuNamaAgen,
 	DetailBayar,
-	PerumahanDirektori
+	PerumahanDirektori,
+	InfoSitus,
+	Sosial
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -796,6 +798,21 @@ interface SiteSettings {
 	sliderDelayDetik: number;
 	/** ADMIN-07 — musik latar (null = tidak ada / nonaktif). */
 	musik: { url: string; judul: string } | null;
+	/** KONTAK-01 — alamat kantor & media sosial (tanpa fallback SITE). */
+	situs: InfoSitus;
+}
+
+const situsKosong = (): InfoSitus => ({ alamatKantor: null, sosial: {} });
+
+/** KONTAK-01 — hanya URL https untuk platform yang dikenal (data liar dibuang). */
+export function sosialValid(raw: unknown): Sosial {
+	const hasil: Sosial = {};
+	if (!raw || typeof raw !== 'object') return hasil;
+	for (const k of ['instagram', 'facebook', 'tiktok', 'youtube'] as const) {
+		const v = (raw as Record<string, unknown>)[k];
+		if (typeof v === 'string' && v.startsWith('https://')) hasil[k] = v;
+	}
+	return hasil;
 }
 
 /** Jeda slide bawaan & batas aman (detik) — sinkron backend app-setting. */
@@ -839,7 +856,8 @@ export async function getSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 			kontak: kontakFallback(),
 			teks: teksFallback(),
 			sliderDelayDetik: SLIDER_DELAY_DEFAULT,
-			musik: null
+			musik: null,
+			situs: situsKosong()
 		};
 
 	if (siteCache && Date.now() < siteCache.kedaluwarsa) return siteCache.nilai;
@@ -868,6 +886,8 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 				omahe?: Record<string, unknown> | null;
 				sliderDelayDetik?: unknown;
 				musik?: unknown;
+				alamatKantor?: unknown;
+				sosial?: unknown;
 			} | null;
 		};
 		const k = body.data?.kontak;
@@ -884,7 +904,14 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 				heroSubjudul: ambilAtauFallback(o?.heroSubjudul, SITE.heroSubjudul)
 			},
 			sliderDelayDetik: normalisasiSliderDelay(body.data?.sliderDelayDetik),
-			musik: musikValid(body.data?.musik)
+			musik: musikValid(body.data?.musik),
+			situs: {
+				alamatKantor:
+					typeof body.data?.alamatKantor === 'string' && body.data.alamatKantor.trim() !== ''
+						? body.data.alamatKantor
+						: null,
+				sosial: sosialValid(body.data?.sosial)
+			}
 		};
 	} catch (err) {
 		console.error(
@@ -895,7 +922,8 @@ async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 			kontak: kontakFallback(),
 			teks: teksFallback(),
 			sliderDelayDetik: SLIDER_DELAY_DEFAULT,
-			musik: null
+			musik: null,
+			situs: situsKosong()
 		};
 	}
 }

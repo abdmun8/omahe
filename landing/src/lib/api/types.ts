@@ -236,6 +236,31 @@ export interface PerumahanDetail {
 	 * agen), tanpa syarat prioritas berbayar.
 	 */
 	agen?: AgenRef | null;
+	/** KONTAK-01 — kontak pemasaran perumahan (optional demi backend lama). */
+	kontak?: KontakPerumahan;
+}
+
+/** KONTAK-01 — media sosial (URL https; platform kosong = tidak ada). */
+export interface Sosial {
+	instagram?: string;
+	facebook?: string;
+	tiktok?: string;
+	youtube?: string;
+}
+
+/** KONTAK-01 — kontak pemasaran per perumahan (api-contract §32). */
+export interface KontakPerumahan {
+	kantorPemasaran: string | null;
+	jamOperasional: string | null;
+	marketingNama: string | null;
+	marketingWhatsapp: string | null;
+	sosial: Sosial;
+}
+
+/** KONTAK-01 — alamat kantor & media sosial situs Omahe (kosong = disembunyikan). */
+export interface InfoSitus {
+	alamatKantor: string | null;
+	sosial: Sosial;
 }
 
 /** AGEN-PROPERTI-01 — ringkasan agen di detail perumahan. */

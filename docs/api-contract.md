@@ -787,3 +787,20 @@ dibandingkan case-insensitive). Respons `data`:
   Konteks: data kawasan dari form Excel agen properti (posisi strategis,
   fasilitas, skema bayar) digabung ke deskripsi — epic `IMPORT-01` repo
   `perumahan`.
+
+## 32. Alamat kantor & media sosial situs + kontak pemasaran perumahan (KONTAK-01, 2026-10-04 — belum di-push/deploy)
+
+- `GET /public/app-settings[?situs=]` + `alamatKantor: string | null` dan
+  `sosial: { instagram?, facebook?, tiktok?, youtube? }` (URL https; platform
+  kosong = tidak ada). Omahe: footer menampilkan keduanya bila diisi
+  superadmin (Pengaturan → Kontak), tanpa fallback `SITE` (kosong =
+  disembunyikan). Dimuat sekali di layout root (`page.data.situs`).
+- `GET /public/perumahan/:slug` + `kontak: { kantorPemasaran, jamOperasional,
+  marketingNama, marketingWhatsapp, sosial }` (diisi admin perumahan di
+  Profil → "Kontak & Media Sosial"). Omahe: blok "Kontak Pemasaran" di
+  detail perumahan (disembunyikan bila kosong). Nomor WA TIDAK ditampilkan
+  langsung — alur form minat LEAD-02 tetap; `POST /public/leads` kini
+  membalas `whatsapp` = agen Omahe (ref `AO-…`) → **WA marketing perumahan**
+  → nomor owner.
+- Item `GET /public/perumahan` + `marketingWhatsapp` (dipakai situs agen untuk
+  tombol WA kartu; Omahe tidak memakainya).

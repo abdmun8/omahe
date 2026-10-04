@@ -64,6 +64,23 @@
 
 	// PEMASARAN-02 — deskripsi perumahan = Markdown subset aman (admin tenant);
 	// halaman merender HTML aman, meta/JSON-LD memakai cuplikan teks polos.
+	// KONTAK-01 — kontak pemasaran perumahan (blok disembunyikan bila kosong).
+	const LABEL_SOSIAL = {
+		instagram: 'Instagram',
+		facebook: 'Facebook',
+		tiktok: 'TikTok',
+		youtube: 'YouTube'
+	} as const;
+	const sosialPerumahan = $derived(
+		(Object.keys(LABEL_SOSIAL) as (keyof typeof LABEL_SOSIAL)[])
+			.filter((k) => p.kontak?.sosial?.[k]?.startsWith('https://'))
+			.map((k) => ({ label: LABEL_SOSIAL[k], url: p.kontak!.sosial[k] as string }))
+	);
+	const adaKontak = $derived(
+		Boolean(p.kontak?.kantorPemasaran || p.kontak?.jamOperasional || p.kontak?.marketingNama) ||
+			sosialPerumahan.length > 0
+	);
+
 	const deskripsiHtml = $derived(p.deskripsi?.trim() ? renderMarkdown(p.deskripsi) : null);
 	const deskripsiPolos = $derived(p.deskripsi?.trim() ? cuplikanDeskripsi(p.deskripsi) : null);
 
@@ -240,6 +257,47 @@
 	<div class="mt-8 space-y-10">
 		<!-- AGEN-OMAHE-03 — agen Omahe yang memasarkan (form minat per agen). -->
 		<AgenPemasar agen={data.agen} perumahanSlug={p.slug} namaPerumahan={p.nama} {opsiTipe} />
+
+		{#if adaKontak}
+			<section class="border-line rounded-xl border p-5">
+				<h2 class="font-display text-ink text-lg font-bold">Kontak Pemasaran</h2>
+				<dl class="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+					{#if p.kontak?.kantorPemasaran}
+						<div class="sm:col-span-2">
+							<dt class="text-muted text-xs tracking-wide uppercase">Kantor pemasaran</dt>
+							<dd class="text-ink mt-0.5">{p.kontak.kantorPemasaran}</dd>
+						</div>
+					{/if}
+					{#if p.kontak?.jamOperasional}
+						<div>
+							<dt class="text-muted text-xs tracking-wide uppercase">Jam operasional</dt>
+							<dd class="text-ink mt-0.5">{p.kontak.jamOperasional}</dd>
+						</div>
+					{/if}
+					{#if p.kontak?.marketingNama}
+						<div>
+							<dt class="text-muted text-xs tracking-wide uppercase">Marketing</dt>
+							<dd class="text-ink mt-0.5">{p.kontak.marketingNama}</dd>
+						</div>
+					{/if}
+					{#if sosialPerumahan.length > 0}
+						<div class="sm:col-span-2">
+							<dt class="text-muted text-xs tracking-wide uppercase">Media sosial</dt>
+							<dd class="mt-0.5 flex flex-wrap gap-x-4 gap-y-1">
+								{#each sosialPerumahan as s (s.label)}
+									<a
+										href={s.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="text-primary hover:underline">{s.label}</a
+									>
+								{/each}
+							</dd>
+						</div>
+					{/if}
+				</dl>
+			</section>
+		{/if}
 
 		{#if pakaiBuilder}
 			<LandingSections

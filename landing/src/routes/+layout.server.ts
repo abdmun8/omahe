@@ -13,6 +13,7 @@ import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ fetch }) => {
 	// ADMIN-06 — teks hero ikut di fetch yang sama (fail-soft ke SITE).
-	const { kontak, teks, sliderDelayDetik } = await getSiteSettings(fetch);
-	return { kontak, teks, sliderDelayDetik };
+	// KONTAK-01 — alamat kantor & media sosial (footer).
+	const { kontak, teks, sliderDelayDetik, situs } = await getSiteSettings(fetch);
+	return { kontak, teks, sliderDelayDetik, situs };
 };
