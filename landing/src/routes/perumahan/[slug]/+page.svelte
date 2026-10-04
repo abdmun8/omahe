@@ -12,6 +12,7 @@
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
 	import { SITE } from '$lib/config';
 	import { amankanJsonLd } from '$lib/jsonld';
+	import { renderMarkdown, cuplikanDeskripsi } from '$lib/markdown';
 	import { ajukanUrl, withRef } from '$lib/ref';
 	import {
 		formatAngka,
@@ -61,6 +62,11 @@
 	/** Opsi select tipe minat — dari daftar tipe unit di halaman ini. */
 	const opsiTipe = $derived([...new Set(data.tipeUnit.map((u) => u.tipe))]);
 
+	// PEMASARAN-02 — deskripsi perumahan = Markdown subset aman (admin tenant);
+	// halaman merender HTML aman, meta/JSON-LD memakai cuplikan teks polos.
+	const deskripsiHtml = $derived(p.deskripsi?.trim() ? renderMarkdown(p.deskripsi) : null);
+	const deskripsiPolos = $derived(p.deskripsi?.trim() ? cuplikanDeskripsi(p.deskripsi) : null);
+
 	// JSON-LD listing — WAJIB lewat amankanJsonLd(): nama/deskripsi datang
 	// dari input admin yang tidak disanitasi di backend; teks penutup tag
 	// script di tengah nilai bisa memutus tag script JSON-LD saat dirender
@@ -71,7 +77,7 @@
 			'@type': 'RealEstateListing',
 			name: p.nama,
 			url: urlHalaman,
-			...(p.deskripsi ? { description: p.deskripsi } : {}),
+			...(deskripsiPolos ? { description: deskripsiPolos } : {}),
 			...(fotoUtama ? { image: fotoUtama } : {}),
 			...(lokasi ? { address: lokasi } : {}),
 			...(hargaMulai !== null
@@ -119,7 +125,7 @@
 	<title>{p.nama}{p.regionNama ? ` — ${p.regionNama}` : ''} · Omahe</title>
 	<meta
 		name="description"
-		content={p.deskripsi?.slice(0, 155) ??
+		content={deskripsiPolos ??
 			`${p.nama}: ${formatAngka(totalUnit)} unit tersedia mulai ${formatRupiah(hargaMulai)}.`}
 	/>
 	<meta property="og:title" content={p.nama} />
@@ -243,10 +249,12 @@
 				ref={data.ref}
 			/>
 		{:else}
-			{#if p.deskripsi}
+			{#if deskripsiHtml}
 				<section>
 					<h2 class="font-display text-ink text-xl font-bold">Tentang {p.nama}</h2>
-					<p class="text-muted mt-3 leading-relaxed whitespace-pre-line">{p.deskripsi}</p>
+					<!-- Aman: renderMarkdown meng-escape seluruh HTML mentah lebih dulu
+					     dan hanya mengizinkan link http/https/mailto/tel. -->
+					<div class="prose-artikel prose-ringkas mt-3">{@html deskripsiHtml}</div>
 				</section>
 			{/if}
 

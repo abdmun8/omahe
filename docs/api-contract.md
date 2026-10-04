@@ -505,7 +505,7 @@ aksesibel & analytics memakai `judul ?? altText`.
 Additive — Omahe belum wajib memakainya:
 
 - Field baru di item `GET /public/perumahan` dan di `GET
-  /public/perumahan/:slug`: `kategori` (`komersil`|`subsidi`|null),
+  /public/perumahan/:slug`: `kategori` (`komersil`|`subsidi`|null — + `komersil_subsidi` sejak PEMASARAN-02, §31),
   `statusPemasaran` (`pra_launch`|`pembangunan`|`tersedia`|`siap_huni`|
   `sold_out`|null), `badge` (string|null, ≤40), `highlights` (string[], ≤5).
   Diisi admin perumahan di Profil → kartu "Info Pemasaran".
@@ -770,3 +770,20 @@ dibandingkan case-insensitive). Respons `data`:
   Terverifikasi Omahe · sejak <bulan tahun>".
 - Tanda lama "Agen terverifikasi" (ID card resmi) diganti ikon perisai
   "Agen resmi Omahe" supaya tidak tertukar dengan centang biru.
+
+## 31. Kategori "Komersil & Subsidi" + deskripsi perumahan Markdown (PEMASARAN-02, 2026-10-04 — belum di-push/deploy)
+
+- `kategori` perumahan (§17) kini `komersil` | `subsidi` |
+  **`komersil_subsidi`** | null (kawasan yang menjual keduanya; label
+  "Komersil & Subsidi"). Filter `GET /public/perumahan?kategori=komersil`
+  dan `=subsidi` IKUT memuat kawasan `komersil_subsidi`;
+  `=komersil_subsidi` hanya kawasan campuran. Omahe belum memakai
+  `kategori`, jadi tidak ada perubahan perilaku.
+- `deskripsi` di `GET /public/perumahan/:slug` = **Markdown subset aman**
+  tulisan admin tenant (maks 8000 karakter, dulu 4000 teks polos — teks
+  lama tetap valid sebagai paragraf). Omahe `/perumahan/:slug` merender
+  lewat `renderMarkdown()` (`landing/src/lib/markdown.ts`, BUKAN `marked`);
+  meta description & JSON-LD memakai `cuplikanDeskripsi()` (teks polos).
+  Konteks: data kawasan dari form Excel agen properti (posisi strategis,
+  fasilitas, skema bayar) digabung ke deskripsi — epic `IMPORT-01` repo
+  `perumahan`.
