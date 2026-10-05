@@ -109,3 +109,15 @@ describe('pesan WA peminat (LEAD-02)', () => {
 		);
 	});
 });
+
+describe('isMapsEmbedUrl — LELANG-02 bentuk koordinat', () => {
+	test('maps?q=lat,lng&output=embed diterima; variasi lain ditolak', () => {
+		expect(isMapsEmbedUrl('https://www.google.com/maps?q=-6.8688,107.5477&output=embed')).toBe(
+			true
+		);
+		expect(isMapsEmbedUrl('https://www.google.com/maps?q=-6.8,107.5&output=embed&x=1')).toBe(false);
+		expect(isMapsEmbedUrl('https://maps.google.com/maps?q=-6.8,107.5&output=embed')).toBe(false);
+		expect(isMapsEmbedUrl('https://www.google.com/maps?q=95,107.5&output=embed')).toBe(false);
+		expect(isMapsEmbedUrl('https://www.google.com/maps?q=Bandung&output=embed')).toBe(false);
+	});
+});

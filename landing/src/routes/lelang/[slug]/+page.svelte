@@ -49,7 +49,9 @@
 		name="description"
 		content="Rumah lelang {r.bank.nama}: nilai limit {formatRupiahPenuh(
 			r.nilaiLimit
-		)}, lelang {formatJadwalLelang(r.tanggalLelang)}. {lokasi}"
+		)}, {r.tanggalLelang
+			? `lelang ${formatJadwalLelang(r.tanggalLelang)}`
+			: 'jadwal lelang segera diumumkan'}. {lokasi}"
 	/>
 </svelte:head>
 

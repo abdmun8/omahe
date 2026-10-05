@@ -144,14 +144,28 @@ export function isMapsEmbedUrl(url: string | null | undefined): url is string {
 	if (!url) return false;
 	try {
 		const u = new URL(url);
-		return (
-			u.protocol === 'https:' &&
-			u.hostname === 'www.google.com' &&
-			(u.pathname === '/maps/embed' || u.pathname.startsWith('/maps/embed/'))
-		);
+		if (u.protocol !== 'https:' || u.hostname !== 'www.google.com') return false;
+		if (u.pathname === '/maps/embed' || u.pathname.startsWith('/maps/embed/')) return true;
+		return embedKoordinatSah(u);
 	} catch {
 		return false;
 	}
+}
+
+/**
+ * LELANG-02 — sama dengan backend: TEPAT `https://www.google.com/maps?q=
+ * <lat>,<lng>&output=embed` (hanya `q` & `output=embed`, koordinat sah).
+ */
+function embedKoordinatSah(u: URL): boolean {
+	if (u.pathname !== '/maps' || u.hash) return false;
+	const kunci = [...u.searchParams.keys()];
+	if (kunci.length !== 2 || !kunci.includes('q') || u.searchParams.get('output') !== 'embed')
+		return false;
+	const m = /^(-?\d{1,2}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)$/.exec(u.searchParams.get('q') ?? '');
+	if (!m) return false;
+	const lat = Number(m[1]);
+	const lng = Number(m[2]);
+	return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
 }
 
 /** LOKASI-03 — link petunjuk arah hanya http(s) (bukan javascript: dll). */

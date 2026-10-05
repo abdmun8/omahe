@@ -800,7 +800,8 @@ export interface RumahLelangKartu {
 	hargaOriginal?: number | null;
 	uangJaminan: number;
 	/** ISO. */
-	tanggalLelang: string;
+	/** LELANG-02 — null = "Segera" (jadwal belum diumumkan bank). */
+	tanggalLelang: string | null;
 	bank: { id: string; nama: string };
 	cabangBank: string | null;
 	fotoUrl: string | null;

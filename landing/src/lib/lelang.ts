@@ -3,7 +3,11 @@
  */
 
 /** "Selasa, 10 November 2026 · 10.00 WIB". */
-export function formatJadwalLelang(iso: string): string {
+/** LELANG-02 — label untuk aset tanpa tanggal lelang. */
+export const LABEL_SEGERA = 'Segera';
+
+export function formatJadwalLelang(iso: string | null): string {
+	if (!iso) return LABEL_SEGERA;
 	const d = new Date(iso);
 	if (Number.isNaN(d.getTime())) return '';
 	const tgl = d.toLocaleDateString('id-ID', {
@@ -22,7 +26,8 @@ export function formatJadwalLelang(iso: string): string {
 }
 
 /** "10 Nov 2026" ringkas untuk kartu. */
-export function formatTanggalRingkas(iso: string): string {
+export function formatTanggalRingkas(iso: string | null): string {
+	if (!iso) return LABEL_SEGERA;
 	const d = new Date(iso);
 	if (Number.isNaN(d.getTime())) return '';
 	return d.toLocaleDateString('id-ID', {

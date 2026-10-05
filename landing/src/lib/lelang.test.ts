@@ -10,6 +10,9 @@ describe('format jadwal lelang (WIB)', () => {
 	test('tanggal ringkas & input tidak sah', () => {
 		expect(formatTanggalRingkas('2026-11-10T03:00:00Z')).toContain('2026');
 		expect(formatJadwalLelang('salah')).toBe('');
+		// LELANG-02 — tanpa tanggal = "Segera".
+		expect(formatJadwalLelang(null)).toBe('Segera');
+		expect(formatTanggalRingkas(null)).toBe('Segera');
 	});
 });
 
