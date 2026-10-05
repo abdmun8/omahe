@@ -417,3 +417,17 @@ describe('getLelang (LELANG-01)', () => {
 		expect(q.get('limitMax')).toBe('500000000');
 	});
 });
+
+describe('AGEN-PROPERTI-03 — header X-Konsumen: omahe', () => {
+	test('permintaan API membawa penanda Omahe (perumahan agen tersembunyi disaring backend)', async () => {
+		const headers: Headers[] = [];
+		const fakeFetch = (async (_url: string, init?: RequestInit) => {
+			headers.push(new Headers(init?.headers));
+			return envelope([], { page: 1, pageSize: 12, total: 0 });
+		}) as unknown as typeof fetch;
+		await getUnits(fakeFetch, {});
+		await getRegions(fakeFetch);
+		expect(headers.length).toBeGreaterThan(0);
+		for (const h of headers) expect(h.get('x-konsumen')).toBe('omahe');
+	});
+});

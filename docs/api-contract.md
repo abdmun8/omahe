@@ -820,3 +820,12 @@ telepon, pesan?, website }` lewat proxy Omahe `/api/lelang-minat`, lalu WA ke
 kontak Omahe. Harga = **nilai limit** (+ uang jaminan), bukan "harga".
 Backend tanpa fitur instance `lelang` → 404 → Omahe menampilkan daftar
 kosong (seksi homepage tersembunyi).
+
+## §34 — Header `X-Konsumen: omahe` (AGEN-PROPERTI-03, 2026-10-05)
+
+Semua request server Omahe ke API membawa `X-Konsumen: omahe` (`KONSUMEN` di
+`landing/src/lib/api/client.ts`). Backend lalu menyembunyikan perumahan milik
+agen properti yang `tampil_di_omahe = false` (direktori, unit, detail → 404,
+sub-halaman, wilayah, developer, promo). Situs agen (`?situs=`) dan booking
+`/ajukan` tidak mengirim header ini sehingga tidak terpengaruh. JANGAN membuat
+request API dari Omahe tanpa header ini.

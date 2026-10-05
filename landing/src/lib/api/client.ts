@@ -62,6 +62,13 @@ import type {
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
 type Fetch = typeof globalThis.fetch;
 
+/**
+ * AGEN-PROPERTI-03 — penanda permintaan dari server Omahe: backend lalu
+ * menyembunyikan perumahan milik agen properti yang tidak tampil di Omahe
+ * (situs agen & booking `/ajukan` tidak mengirim header ini).
+ */
+const KONSUMEN = { 'x-konsumen': 'omahe' } as const;
+
 const baseUrl = () => env.OMAHE_API_BASE_URL?.replace(/\/+$/, '') ?? '';
 const hasApi = () => baseUrl() !== '';
 /** UNIT-04 + DEVELOPER-01 sudah live di backend? */
@@ -73,7 +80,7 @@ const TIMEOUT_MS = Number(env.OMAHE_API_TIMEOUT_MS ?? 8000);
 async function apiGet<T>(fetchFn: Fetch, path: string, params?: URLSearchParams): Promise<T> {
 	const url = `${baseUrl()}${path}${params && [...params].length ? `?${params}` : ''}`;
 	const res = await fetchFn(url, {
-		headers: { accept: 'application/json' },
+		headers: { accept: 'application/json', ...KONSUMEN },
 		signal: AbortSignal.timeout(TIMEOUT_MS)
 	});
 
@@ -118,7 +125,7 @@ export async function getUnits(fetchFn: Fetch, query: UnitQuery): Promise<Pagina
 		}
 		const url = `${baseUrl()}/public/units?${params}`;
 		const res = await fetchFn(url, {
-			headers: { accept: 'application/json' },
+			headers: { accept: 'application/json', ...KONSUMEN },
 			signal: AbortSignal.timeout(TIMEOUT_MS)
 		});
 		if (!res.ok) {
@@ -212,7 +219,7 @@ export async function getPerumahanTerbaru(
 	if (!hasSearchApi()) return { items: [], total: 0 };
 	const url = `${baseUrl()}/public/perumahan?sort=terbaru&page=1&pageSize=${limit}`;
 	const res = await fetchFn(url, {
-		headers: { accept: 'application/json' },
+		headers: { accept: 'application/json', ...KONSUMEN },
 		signal: AbortSignal.timeout(TIMEOUT_MS)
 	});
 	if (!res.ok) throw new Error(`GET ${url} → ${res.status}`);
@@ -233,7 +240,7 @@ export async function catatKunjungan(
 	try {
 		await fetchFn(`${baseUrl()}/public/kunjungan`, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			headers: { 'content-type': 'application/json', accept: 'application/json', ...KONSUMEN },
 			body: JSON.stringify(input),
 			signal: AbortSignal.timeout(TIMEOUT_MS)
 		});
@@ -515,7 +522,7 @@ export async function createLead(fetchFn: Fetch, input: LeadInput): Promise<Lead
 	try {
 		res = await fetchFn(`${baseUrl()}/public/leads`, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			headers: { 'content-type': 'application/json', accept: 'application/json', ...KONSUMEN },
 			// Honeypot `website` & `ref` dikirim APA ADANYA (tanpa filter klien) —
 			// keputusan honeypot ada di server, bukan di sini (api-contract.md §8).
 			body: JSON.stringify(input),
@@ -680,7 +687,7 @@ export async function getVerifikasiAgen(fetchFn: Fetch, kodeRaw: string): Promis
 	let res: Response;
 	try {
 		res = await fetchFn(`${baseUrl()}/public/agen-omahe/verifikasi/${encodeURIComponent(kode)}`, {
-			headers: { accept: 'application/json' },
+			headers: { accept: 'application/json', ...KONSUMEN },
 			signal: AbortSignal.timeout(TIMEOUT_MS)
 		});
 	} catch (err) {
@@ -879,7 +886,7 @@ export async function getKontak(fetchFn: Fetch): Promise<KontakOmahe> {
 async function fetchSiteSettings(fetchFn: Fetch): Promise<SiteSettings> {
 	try {
 		const res = await fetchFn(`${baseUrl()}/public/app-settings`, {
-			headers: { accept: 'application/json' },
+			headers: { accept: 'application/json', ...KONSUMEN },
 			signal: AbortSignal.timeout(KONTAK_TIMEOUT_MS)
 		});
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -999,7 +1006,7 @@ export async function kirimMinatAgen(fetchFn: Fetch, input: AgenMinatInput): Pro
 	try {
 		res = await fetchFn(`${baseUrl()}/public/agen-omahe/${encodeURIComponent(kodeAgen)}/minat`, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			headers: { 'content-type': 'application/json', accept: 'application/json', ...KONSUMEN },
 			body: JSON.stringify(body),
 			signal: AbortSignal.timeout(TIMEOUT_MS)
 		});
@@ -1072,7 +1079,7 @@ export async function lihatTagihanBayar(
 	try {
 		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/lihat`, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			headers: { 'content-type': 'application/json', accept: 'application/json', ...KONSUMEN },
 			body: JSON.stringify({ turnstile }),
 			signal: AbortSignal.timeout(TIMEOUT_MS)
 		});
@@ -1105,7 +1112,7 @@ export async function kirimBuktiBayar(
 	try {
 		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/bukti`, {
 			method: 'POST',
-			headers: { accept: 'application/json' },
+			headers: { accept: 'application/json', ...KONSUMEN },
 			body: form,
 			// Unggah beberapa MB + simpan ke storage — timeout umum (8 dtk) terlalu ketat.
 			signal: AbortSignal.timeout(Math.max(TIMEOUT_MS, 30_000))
@@ -1156,7 +1163,7 @@ export async function unduhDokumenBayar(
 	let res: Response;
 	try {
 		res = await fetchFn(`${baseUrl()}/public/bayar/${encodeURIComponent(token)}/${jenis}.pdf`, {
-			headers: { accept: 'application/pdf' },
+			headers: { accept: 'application/pdf', ...KONSUMEN },
 			signal: AbortSignal.timeout(Math.max(TIMEOUT_MS, 20_000))
 		});
 	} catch {
@@ -1191,7 +1198,7 @@ export async function getLelang(
 	}
 	const url = `${baseUrl()}/public/lelang?${params}`;
 	const res = await fetchFn(url, {
-		headers: { accept: 'application/json' },
+		headers: { accept: 'application/json', ...KONSUMEN },
 		signal: AbortSignal.timeout(TIMEOUT_MS)
 	});
 	if (res.status === 404) return kosong;
@@ -1208,7 +1215,7 @@ export async function getBankLelang(fetchFn: Fetch): Promise<{ id: string; nama:
 	if (!hasSearchApi()) return [];
 	try {
 		const res = await fetchFn(`${baseUrl()}/public/lelang/bank`, {
-			headers: { accept: 'application/json' },
+			headers: { accept: 'application/json', ...KONSUMEN },
 			signal: AbortSignal.timeout(TIMEOUT_MS)
 		});
 		if (!res.ok) return [];
@@ -1235,7 +1242,7 @@ export async function kirimMinatLelang(
 	try {
 		res = await fetchFn(`${baseUrl()}/public/lelang/${encodeURIComponent(slug)}/minat`, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json', accept: 'application/json' },
+			headers: { 'content-type': 'application/json', accept: 'application/json', ...KONSUMEN },
 			body: JSON.stringify(input),
 			signal: AbortSignal.timeout(TIMEOUT_MS)
 		});
