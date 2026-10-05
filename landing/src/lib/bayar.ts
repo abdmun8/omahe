@@ -11,7 +11,7 @@
  *   2. Token Turnstile SEKALI PAKAI — dipakai untuk `lihat`, harus di-reset
  *      widget sebelum `bukti` (diurus komponen halaman).
  *   3. Validasi file bukti di Omahe = mirror backend (`image/jpeg`,
- *      `image/png`, `application/pdf`; ukuran ≤ 4 MB — lihat
+ *      `image/png`, `image/webp`, `application/pdf`; ukuran ≤ 4 MB — lihat
  *      `MAKS_BUKTI_BYTES`) supaya file terlalu besar DITOLAK
  *      di proxy SEBELUM diteruskan (hemat bandwith + tidak memicu rate
  *      limit backend untuk upload yang pasti gagal).
@@ -84,14 +84,14 @@ export function labelStatusBayar(status: string): LabelStatus {
 export const MAKS_BUKTI_BYTES = 4 * 1024 * 1024;
 
 /** MIME yang diterima backend — jangan lebih longgar di sini. */
-export const MIME_BUKTI = ['image/jpeg', 'image/png', 'application/pdf'] as const;
+export const MIME_BUKTI = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'] as const;
 
 export type HasilValidasiFile = { ok: true } | { ok: false; pesan: string };
 
 /** Validasi klien + proxy (pesan sengaja meniru pesan backend). */
 export function validasiFileBukti(file: File): HasilValidasiFile {
 	if (!(MIME_BUKTI as readonly string[]).includes(file.type))
-		return { ok: false, pesan: 'Bukti harus berupa berkas JPG, PNG, atau PDF.' };
+		return { ok: false, pesan: 'Bukti harus berupa berkas JPG, PNG, WebP, atau PDF.' };
 	if (file.size > MAKS_BUKTI_BYTES) return { ok: false, pesan: 'Ukuran berkas maksimal 4 MB.' };
 	if (file.size === 0)
 		return { ok: false, pesan: 'Berkas kosong — pilih berkas bukti yang benar.' };

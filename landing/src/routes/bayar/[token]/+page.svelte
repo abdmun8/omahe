@@ -537,14 +537,14 @@
 						<form class="mt-5" onsubmit={unggah} aria-label="Unggah bukti pembayaran">
 							<label for="bukti-file" class="text-ink mb-1 block text-sm font-medium">
 								Bukti transfer <span class="text-muted font-normal"
-									>(JPG, PNG, atau PDF — maks 4 MB)</span
+									>(JPG, PNG, WebP, atau PDF — maks 4 MB)</span
 								>
 							</label>
 							<input
 								id="bukti-file"
 								name="bukti"
 								type="file"
-								accept="image/jpeg,image/png,application/pdf"
+								accept="image/jpeg,image/png,image/webp,application/pdf"
 								onchange={pilihFile}
 								class="border-line text-ink file:text-primary hover:border-primary/40 cursor-pointer rounded-lg border bg-white p-2 text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-transparent file:px-2 file:py-1 file:text-sm file:font-semibold"
 							/>

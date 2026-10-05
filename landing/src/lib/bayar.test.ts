@@ -82,14 +82,14 @@ describe('labelStatusBayar', () => {
 describe('validasiFileBukti', () => {
 	const file = (type: string, size: number) => new File([new Uint8Array(size)], 'bukti', { type });
 
-	test('JPG/PNG/PDF ≤ 4 MB lolos', () => {
+	test('JPG/PNG/WebP/PDF ≤ 4 MB lolos', () => {
 		expect(validasiFileBukti(file('image/jpeg', 1024))).toEqual({ ok: true });
 		expect(validasiFileBukti(file('image/png', 1024))).toEqual({ ok: true });
+		expect(validasiFileBukti(file('image/webp', 1024))).toEqual({ ok: true });
 		expect(validasiFileBukti(file('application/pdf', MAKS_BUKTI_BYTES))).toEqual({ ok: true });
 	});
 
-	test('MIME di luar JPG/PNG/PDF ditolak (mirror backend)', () => {
-		expect(validasiFileBukti(file('image/webp', 1024)).ok).toBe(false);
+	test('MIME di luar JPG/PNG/WebP/PDF ditolak (mirror backend)', () => {
 		expect(validasiFileBukti(file('image/gif', 1024)).ok).toBe(false);
 		expect(validasiFileBukti(file('', 1024)).ok).toBe(false);
 	});
