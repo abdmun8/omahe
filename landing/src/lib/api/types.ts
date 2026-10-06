@@ -826,7 +826,19 @@ export interface RumahLelangDetail extends Omit<RumahLelangKartu, 'fotoUrl'> {
 	selesai: boolean;
 }
 
+/** LELANG-03 — kabupaten/kota yang punya rumah lelang tayang (urut prioritas). */
+export interface LokasiLelang {
+	kode: string;
+	nama: string;
+	/** Slug URL ramah SEO: `/lelang/lokasi/:slug` (mis. `kabupaten-bandung`). */
+	slug: string;
+	jumlah: number;
+	prioritas: boolean;
+}
+
 export interface LelangQuery {
+	/** LELANG-03 — slug kabupaten (`kabupaten-bandung`); diutamakan atas regionKode. */
+	lokasi?: string;
 	regionKode?: string;
 	bankId?: string;
 	limitMax?: number;

@@ -62,3 +62,20 @@ export function hargaOriginalTampil(rumah: {
 }): number | null {
 	return rumah.hargaOriginal && rumah.hargaOriginal > rumah.nilaiLimit ? rumah.hargaOriginal : null;
 }
+
+/** Angka positif dari query string; kosong/aneh → undefined. */
+export function angkaPositif(raw: string | null): number | undefined {
+	if (raw === null || raw.trim() === '') return undefined;
+	const n = Number(raw);
+	return Number.isFinite(n) && n > 0 ? n : undefined;
+}
+
+/** LELANG-03 — query string /lelang tanpa param lokasi (bank, limit, ref
+ *  ikut; halaman direset) untuk redirect ke `/lelang/lokasi/:slug`. */
+export function sisaQueryLelang(url: URL): string {
+	const sp = new URLSearchParams(url.searchParams);
+	for (const k of ['lokasi', 'regionKode', 'page']) sp.delete(k);
+	for (const [k, v] of [...sp]) if (v === '') sp.delete(k);
+	const qs = sp.toString();
+	return qs ? `?${qs}` : '';
+}

@@ -56,7 +56,8 @@ import type {
 	Sosial,
 	RumahLelangKartu,
 	RumahLelangDetail,
-	LelangQuery
+	LelangQuery,
+	LokasiLelang
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -1187,10 +1188,12 @@ export async function unduhDokumenBayar(
 export async function getLelang(
 	fetchFn: Fetch,
 	query: LelangQuery = {}
-): Promise<Paginated<RumahLelangKartu>> {
+): Promise<
+	Paginated<RumahLelangKartu> & { lokasi: Omit<LokasiLelang, 'jumlah' | 'prioritas'> | null }
+> {
 	const page = Math.max(1, query.page ?? 1);
 	const pageSize = Math.min(48, Math.max(1, query.pageSize ?? DEFAULT_PAGE_SIZE));
-	const kosong = { items: [], meta: { total: 0, page, pageSize } };
+	const kosong = { items: [], meta: { total: 0, page, pageSize }, lokasi: null };
 	if (!hasSearchApi()) return kosong;
 	const params = new URLSearchParams();
 	for (const [k, v] of Object.entries({ ...query, page, pageSize })) {
@@ -1206,8 +1209,26 @@ export async function getLelang(
 		console.error(`[omahe:api] GET ${url} → ${res.status}`);
 		error(502, 'Data sedang tidak bisa dimuat. Coba lagi sebentar lagi.');
 	}
-	const body = (await res.json()) as { data: RumahLelangKartu[]; meta: PageMeta };
-	return { items: body.data, meta: body.meta };
+	const body = (await res.json()) as {
+		data: RumahLelangKartu[];
+		meta: PageMeta & { lokasi?: Omit<LokasiLelang, 'jumlah' | 'prioritas'> | null };
+	};
+	return { items: body.data, meta: body.meta, lokasi: body.meta.lokasi ?? null };
+}
+
+/** LELANG-03 — kabupaten ber-rumah-lelang tayang (fail-soft → []). */
+export async function getLokasiLelang(fetchFn: Fetch): Promise<LokasiLelang[]> {
+	if (!hasSearchApi()) return [];
+	try {
+		const res = await fetchFn(`${baseUrl()}/public/lelang/lokasi`, {
+			headers: { accept: 'application/json', ...KONSUMEN },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+		if (!res.ok) return [];
+		return ((await res.json()) as { data: LokasiLelang[] }).data;
+	} catch {
+		return [];
+	}
 }
 
 /** Bank yang punya rumah lelang tampil (opsi filter) — fail-soft `[]`. */

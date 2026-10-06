@@ -1,4 +1,11 @@
-import { getAgenList, getAllUnitListings, getDevelopers, getMitra, getPromoList } from '$lib/api';
+import {
+	getAgenList,
+	getAllUnitListings,
+	getDevelopers,
+	getLokasiLelang,
+	getMitra,
+	getPromoList
+} from '$lib/api';
 import { artikelTayang } from '$lib/artikel';
 import { SITE } from '$lib/config';
 import { bacaArtikel, hariIniWib } from '$lib/server/artikel';
@@ -27,7 +34,7 @@ const STATIS = [
 ];
 
 export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
-	const [unit, developers, artikel, promo, agen, mitra] = await Promise.all([
+	const [unit, developers, artikel, promo, agen, mitra, lokasiLelang] = await Promise.all([
 		getAllUnitListings(fetch),
 		getDevelopers(fetch),
 		// Artikel dihitung sinkron dari konten repo — bukan fetch API.
@@ -37,7 +44,9 @@ export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
 		// AGEN-PROPERTI-01 — fail-soft ke [] (getAgenList).
 		getAgenList(fetch),
 		// PROFIL-01 — halaman profil mitra `/mitra/:slug` (fail-soft []).
-		getMitra(fetch)
+		getMitra(fetch),
+		// LELANG-03 — halaman rumah lelang per kabupaten (fail-soft []).
+		getLokasiLelang(fetch)
 	]);
 
 	// Satu timestamp untuk semua URL non-artikel di response ini: data dari
@@ -72,7 +81,8 @@ export const GET: RequestHandler = async ({ fetch, setHeaders }) => {
 		...agen.map((a) => ({ loc: `${SITE.url}/agen/${a.slug}`, lastmod })),
 		...mitra.map((mi) => ({ loc: `${SITE.url}/mitra/${mi.slug}`, lastmod })),
 		...slugProyek.map((slug) => ({ loc: `${SITE.url}/perumahan/${slug}`, lastmod })),
-		...urlTipe.map((loc) => ({ loc, lastmod }))
+		...urlTipe.map((loc) => ({ loc, lastmod })),
+		...lokasiLelang.map((l) => ({ loc: `${SITE.url}/lelang/lokasi/${l.slug}`, lastmod }))
 	];
 
 	setHeaders({

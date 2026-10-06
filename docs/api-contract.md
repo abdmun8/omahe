@@ -829,3 +829,12 @@ agen properti yang `tampil_di_omahe = false` (direktori, unit, detail → 404,
 sub-halaman, wilayah, developer, promo). Situs agen (`?situs=`) dan booking
 `/ajukan` tidak mengirim header ini sehingga tidak terpengaruh. JANGAN membuat
 request API dari Omahe tanpa header ini.
+
+## §35 — Lokasi rumah lelang & URL SEO (LELANG-03, 2026-10-06)
+
+- `GET /public/lelang/lokasi` → `[{ kode, nama, slug, jumlah, prioritas }]` — kabupaten/kota yang punya rumah
+  lelang tayang, urut area prioritas superadmin lalu jumlah. Omahe: `getLokasiLelang` (fail-soft `[]`).
+- `GET /public/lelang?lokasi=<slug>` → filter kabupaten; `meta.lokasi` = `{ kode, nama, slug }` atau `null` (slug
+  tak dikenal → hasil kosong). Daftar diurutkan area prioritas dulu, lalu jadwal.
+- Omahe: halaman `/lelang/lokasi/:slug` (judul "Rumah Lelang di <wilayah>", canonical tanpa query, noindex bila
+  kosong / terfilter bank-limit, 404 bila `meta.lokasi` null); `/lelang?lokasi=` & `?regionKode=` lama → 301.

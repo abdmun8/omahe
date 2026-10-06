@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test';
-import { formatJadwalLelang, formatTanggalRingkas, hargaOriginalTampil } from './lelang';
+import {
+	angkaPositif,
+	formatJadwalLelang,
+	formatTanggalRingkas,
+	hargaOriginalTampil,
+	sisaQueryLelang
+} from './lelang';
 
 describe('format jadwal lelang (WIB)', () => {
 	test('jadwal lengkap memakai zona WIB', () => {
@@ -24,5 +30,22 @@ describe('harga original dicoret', () => {
 		expect(hargaOriginalTampil({ ...dasar, hargaOriginal: 400_000_000 })).toBeNull();
 		expect(hargaOriginalTampil({ ...dasar, hargaOriginal: null })).toBeNull();
 		expect(hargaOriginalTampil({ ...dasar })).toBeNull();
+	});
+});
+
+describe('LELANG-03 — URL lokasi', () => {
+	test('sisaQueryLelang: buang lokasi/regionKode/page & nilai kosong, bank/limit/ref ikut', () => {
+		expect(
+			sisaQueryLelang(
+				new URL('https://x/lelang?lokasi=kabupaten-bandung&bankId=b1&limitMax=&page=3&ref=AO-1')
+			)
+		).toBe('?bankId=b1&ref=AO-1');
+		expect(sisaQueryLelang(new URL('https://x/lelang?regionKode=32.04'))).toBe('');
+	});
+	test('angkaPositif', () => {
+		expect(angkaPositif('500000000')).toBe(500000000);
+		expect(angkaPositif('')).toBeUndefined();
+		expect(angkaPositif('-1')).toBeUndefined();
+		expect(angkaPositif('abc')).toBeUndefined();
 	});
 });
