@@ -2,11 +2,21 @@
 	Direktori Mitra Profesional — KJPP & Notaris (MITRA-01, issue omahe#1).
 	Empty-state bukan skeleton: di mode API asli sebelum backend live,
 	halaman ini jujur "belum ada mitra" (fixture hanya dev).
+
+	2026-10-08: tab "Semua" dipisah PER KATEGORI (section berjudul per
+	kategori, urut chip master; Agen Omahe tetap paling atas) — bukan lagi
+	satu grid campur. Tab "Agen Omahe" mendapat pencarian (q: nama/kantor/
+	kode) + paginasi server-side (GET form tanpa JS tetap jalan; `page`
+	dipakai komponen Pagination).
 -->
 <script lang="ts">
+	import { page } from '$app/state';
 	import AgenOmaheCard from '$lib/components/agen-omahe-card.svelte';
 	import MitraCard from '$lib/components/mitra-card.svelte';
 	import Button from '$lib/components/ui/button.svelte';
+	import Pagination from '$lib/components/pagination.svelte';
+	import { formatAngka } from '$lib/utils';
+	import type { PublicMitra } from '$lib/api/types';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -15,6 +25,31 @@
 	const labelKategoriTerpilih = $derived(
 		data.chips.find((c) => c.nilai === data.kategori)?.label ?? ''
 	);
+
+	/** 2026-10-08 — tab "Semua": kelompokkan mitra per kategori mengikuti
+	 *  urutan chip (= urutan master). Kategori tanpa mitra TIDAK jadi
+	 *  section (tab kategorinya sendiri yang punya empty-state); mitra
+	 *  berkategori di luar chip → section "Lainnya" di akhir. */
+	const kelompokSemua = $derived.by(() => {
+		const perKategori = new Map<string, PublicMitra[]>();
+		for (const m of data.mitra) {
+			const lama = perKategori.get(m.kategori) ?? [];
+			lama.push(m);
+			perKategori.set(m.kategori, lama);
+		}
+		const chips = data.chips.filter((c) => c.nilai !== null);
+		const hasil: Array<{ slug: string | null; label: string; mitra: PublicMitra[] }> = [];
+		const terpakai = new Set<string>();
+		for (const c of chips) {
+			const isi = perKategori.get(c.nilai!) ?? [];
+			if (isi.length === 0) continue;
+			hasil.push({ slug: c.nilai, label: c.label, mitra: isi });
+			terpakai.add(c.nilai!);
+		}
+		const sisa = data.mitra.filter((m) => !terpakai.has(m.kategori));
+		if (sisa.length > 0) hasil.push({ slug: null, label: 'Lainnya', mitra: sisa });
+		return hasil;
+	});
 </script>
 
 <svelte:head>
@@ -67,22 +102,61 @@
 			Agen resmi Omahe dengan keanggotaan aktif — identitasnya bisa dicek lewat tautan verifikasi.
 			Tinggalkan kontak Anda, agen akan membantu mencarikan rumah yang pas.
 		</p>
-		{#if data.agen.length === 0}
+
+		<!-- 2026-10-08 — pencarian direktori agen: GET form (tanpa JS tetap
+		     jalan, URL bisa dibagikan); `page` reset otomatis karena form
+		     tidak membawanya. -->
+		<form method="GET" action="/mitra" class="mt-4 flex max-w-xl gap-2">
+			<input type="hidden" name="tab" value="agen" />
+			<label for="cari-agen" class="sr-only">Cari agen</label>
+			<input
+				id="cari-agen"
+				name="q"
+				type="search"
+				value={data.qAgen}
+				maxlength="100"
+				placeholder="Cari nama, kantor, atau kode agen…"
+				class="border-line text-ink placeholder:text-muted h-11 w-full rounded-lg border bg-white px-3 text-sm"
+			/>
+			<Button type="submit" size="md" class="shrink-0">Cari</Button>
+		</form>
+
+		{#if data.agen.items.length === 0}
 			<div class="bg-surface mt-6 rounded-2xl p-8 text-center">
-				<p class="text-ink font-semibold">Belum ada agen yang ditampilkan</p>
+				<p class="text-ink font-semibold">
+					{data.qAgen ? 'Tidak ada agen yang cocok' : 'Belum ada agen yang ditampilkan'}
+				</p>
 				<p class="text-muted mx-auto mt-1 max-w-md text-sm leading-relaxed">
-					Ingin menjadi agen Omahe? Lihat caranya di
-					<a href="/gabung/agen" class="text-primary font-medium hover:underline"
-						>halaman gabung agen</a
-					>.
+					{#if data.qAgen}
+						Coba kata kunci lain — misalnya nama depan agen, nama kantor, atau kode seperti
+						“OMHA-A0001”.
+					{:else}
+						Ingin menjadi agen Omahe? Lihat caranya di
+						<a href="/gabung/agen" class="text-primary font-medium hover:underline"
+							>halaman gabung agen</a
+						>.
+					{/if}
 				</p>
 			</div>
 		{:else}
-			<ul class="mt-6 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-				{#each data.agen as a (a.kodeAgen)}
+			<p class="text-muted mt-4 text-sm">
+				{formatAngka(data.agen.total)}
+				{data.agen.total === 1 ? 'agen' : 'agen'}{data.qAgen ? ` untuk “${data.qAgen}”` : ''}
+			</p>
+			<ul class="mt-3 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+				{#each data.agen.items as a (a.kodeAgen)}
 					<li><AgenOmaheCard agen={a} /></li>
 				{/each}
 			</ul>
+			<div class="mt-8">
+				<Pagination
+					url={page.url}
+					page={data.agen.halaman}
+					pageSize={data.agen.perHalaman}
+					total={data.agen.total}
+					basePath="/mitra"
+				/>
+			</div>
 		{/if}
 	{:else if data.mitra.length === 0 && data.kategori}
 		<!-- MITRA-04 — kategori master aktif tapi belum punya mitra: tab tetap
@@ -97,7 +171,7 @@
 			</p>
 			<Button href="/gabung/mitra" class="mt-5">Gabung sebagai mitra</Button>
 		</div>
-	{:else if data.mitra.length === 0 && data.agen.length === 0}
+	{:else if data.mitra.length === 0 && data.agen.items.length === 0}
 		<div class="bg-surface mt-8 rounded-2xl p-8 text-center">
 			<p class="text-ink font-semibold">Belum ada mitra yang ditampilkan</p>
 			<p class="text-muted mx-auto mt-1 max-w-md text-sm leading-relaxed">
@@ -109,15 +183,40 @@
 			</p>
 		</div>
 	{:else}
-		<ul class="mt-6 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-			<!-- Tab "Semua": Agen Omahe dulu (keputusan user 2026-10-01), lalu mitra
-			     urut kategori master (diurutkan di load). Tab kategori → agen kosong. -->
-			{#each data.agen as a (a.kodeAgen)}
-				<li><AgenOmaheCard agen={a} /></li>
-			{/each}
-			{#each data.mitra as mitra (mitra.id)}
-				<li><MitraCard {mitra} /></li>
-			{/each}
-		</ul>
+		<!-- 2026-10-08 — tab "Semua" DIPISAH PER KATEGORI: tiap kategori punya
+		     section berjudul sendiri (urut master), Agen Omahe tetap pertama. -->
+		{#if data.agen.items.length > 0}
+			<section aria-labelledby="semua-agen-omahe" class="mt-8">
+				<div class="flex items-baseline justify-between gap-4">
+					<h2 id="semua-agen-omahe" class="font-display text-ink text-lg font-bold">Agen Omahe</h2>
+					<a href="/mitra?tab=agen" class="text-primary shrink-0 text-sm font-medium hover:underline"
+						>Lihat semua agen</a
+					>
+				</div>
+				<ul class="mt-4 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+					{#each data.agen.items as a (a.kodeAgen)}
+						<li><AgenOmaheCard agen={a} /></li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
+		{#each kelompokSemua as kelompok (kelompok.label)}
+			<section aria-labelledby="semua-{kelompok.slug ?? 'lainnya'}" class="mt-8">
+				<h2
+					id="semua-{kelompok.slug ?? 'lainnya'}"
+					class="font-display text-ink text-lg font-bold"
+				>
+					{kelompok.label}
+					<span class="text-muted ml-1 text-sm font-medium"
+						>({formatAngka(kelompok.mitra.length)})</span
+					>
+				</h2>
+				<ul class="mt-4 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+					{#each kelompok.mitra as mitra (mitra.id)}
+						<li><MitraCard {mitra} /></li>
+					{/each}
+				</ul>
+			</section>
+		{/each}
 	{/if}
 </div>

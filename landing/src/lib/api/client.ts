@@ -48,6 +48,7 @@ import type {
 	VerifikasiAgen,
 	AgenPemasar,
 	AgenDirektori,
+	AgenDirektoriHasil,
 	AgenMinatInput,
 	KartuNamaAgen,
 	DetailBayar,
@@ -981,17 +982,65 @@ export async function getAgenPemasar(
  * Pola `getAgenPemasar`: fixture HANYA non-produksi, gagal → `[]`
  * (tab menampilkan empty-state, halaman tidak jatuh).
  */
-export async function getDirektoriAgen(fetchFn: Fetch): Promise<AgenDirektori[]> {
+/**
+ * Direktori agen + pencarian + paginasi (2026-10-08, api-contract §23):
+ * `q` cocok nama/kantor/kode agen; `halaman` 1-based. Backend baru
+ * membalas `{ items, total, halaman, perHalaman, totalHalaman }`; backend
+ * LAMA (array polos) dibungkus jadi halaman tunggal supaya deploy
+ * Omahe↔backend tidak harus serentak. Fail-soft halaman kosong.
+ */
+export async function getDirektoriAgen(
+	fetchFn: Fetch,
+	opsi: { q?: string; halaman?: number } = {}
+): Promise<AgenDirektoriHasil> {
+	const kosong: AgenDirektoriHasil = {
+		items: [],
+		total: 0,
+		halaman: 1,
+		perHalaman: 24,
+		totalHalaman: 1
+	};
 	if (!hasSearchApi()) {
-		if (import.meta.env.PROD === true) return [];
-		return fixtures.DIREKTORI_AGEN;
+		if (import.meta.env.PROD === true) return kosong;
+		// Fixture: saring + paginasi lokal — meniru backend (nama/kantor/kode).
+		const kata = (opsi.q ?? '').trim().toLowerCase();
+		const saringan = kata
+			? fixtures.DIREKTORI_AGEN.filter(
+					(a) =>
+						a.nama.toLowerCase().includes(kata) ||
+					a.kantorNama.toLowerCase().includes(kata) ||
+					a.kodeAgen.toLowerCase().includes(kata)
+			)
+			: fixtures.DIREKTORI_AGEN;
+		const total = saringan.length;
+		const totalHalaman = Math.max(1, Math.ceil(total / 24));
+		const halaman = Math.min(Math.max(1, opsi.halaman ?? 1), totalHalaman);
+		return {
+			items: saringan.slice((halaman - 1) * 24, halaman * 24),
+			total,
+			halaman,
+			perHalaman: 24,
+			totalHalaman
+		};
 	}
 	try {
-		const data = await apiGet<AgenDirektori[]>(fetchFn, '/public/agen-omahe');
-		return Array.isArray(data) ? data : [];
+		const params = new URLSearchParams();
+		if (opsi.q?.trim()) params.set('q', opsi.q.trim());
+		if (opsi.halaman && opsi.halaman > 1) params.set('halaman', String(opsi.halaman));
+		const qs = params.toString();
+		const data = await apiGet<AgenDirektoriHasil | AgenDirektori[]>(
+			fetchFn,
+			`/public/agen-omahe${qs ? `?${qs}` : ''}`
+		);
+		if (Array.isArray(data)) {
+			// Backend lama — bungkus jadi halaman tunggal.
+			return { items: data, total: data.length, halaman: 1, perHalaman: data.length || 24, totalHalaman: 1 };
+		}
+		if (data && typeof data === 'object' && Array.isArray(data.items)) return data;
+		return kosong;
 	} catch (err) {
 		console.error('[omahe:api] GET /public/agen-omahe gagal — fallback ke [] (empty-state)', err);
-		return [];
+		return kosong;
 	}
 }
 

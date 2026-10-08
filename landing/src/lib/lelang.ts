@@ -64,9 +64,16 @@ export function hargaOriginalTampil(rumah: {
 }
 
 /** Angka positif dari query string; kosong/aneh → undefined. */
+/** Angka rupiah/pagination dari query — TIDAK valid diabaikan, bukan
+ *  error (URL sering diedit manual). 2026-10-08: non-digit di-strip dulu
+ *  ("500.000.000" → 500000000 — tanda titik pemisah ribuan yang lumrah
+ *  diketik/ditempel pengunjung, sebelumnya Number() malah membaca 500). */
 export function angkaPositif(raw: string | null): number | undefined {
-	if (raw === null || raw.trim() === '') return undefined;
-	const n = Number(raw);
+	if (raw === null) return undefined;
+	if (raw.trim().startsWith('-')) return undefined;
+	const digit = raw.replace(/\D/g, '');
+	if (digit === '') return undefined;
+	const n = Number(digit);
 	return Number.isFinite(n) && n > 0 ? n : undefined;
 }
 

@@ -27,7 +27,7 @@
 	}: {
 		regions: RegionOption[];
 		ref?: string | null;
-		nilai?: { regionKode?: string; hargaMaks?: number; tipe?: string };
+		nilai?: { regionKode?: string; hargaMin?: number; hargaMaks?: number; tipe?: string };
 		kompak?: boolean;
 	} = $props();
 
@@ -66,18 +66,27 @@
 	// — hanya kata kunci tipe/lokasi/harga, bukan input pribadi pengunjung.
 	function lacakSubmit(e: SubmitEvent) {
 		const form = e.currentTarget as HTMLFormElement;
-		const hargaMaks = (form.elements.namedItem('hargaMax') as HTMLSelectElement | null)?.value;
+		// 2026-10-08 — harga min/maks dibaca dari elemen form (varian penuh =
+		// input ketik sendiri; kompak = select preset `hargaMax`).
+		const min = (form.elements.namedItem('hargaMin') as HTMLInputElement | null)?.value;
+		const maks = (form.elements.namedItem('hargaMax') as HTMLInputElement | HTMLSelectElement | null)
+			?.value;
 		trackEvent('search', {
 			search_term: kataKunci.trim() || undefined,
 			region: lokasi || undefined,
-			// Form belum punya filter harga MINIMUM — slot disiapkan (selalu
-			// ter-strip) untuk kalau nanti field-nya benar-benar ada.
-			harga_min: undefined,
-			harga_max: hargaMaks ? Number(hargaMaks) : undefined,
+			harga_min: min ? Number(min) : undefined,
+			harga_max: maks ? Number(maks) : undefined,
 			// Homepage = varian kompak; /cari = varian penuh. ('home' disiapkan
 			// untuk homepage varian penuh kalau suatu saat ada — butuh prop baru.)
 			form: kompak ? 'home_kompak' : 'cari'
 		});
+	}
+
+	/** Rupiah ketik sendiri — hanya digit (titik/spasi di-strip live;
+	 *  parsing server juga toleran non-digit, `/cari/+page.server.ts`). */
+	function maskDigit(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		input.value = input.value.replace(/\D/g, '').slice(0, 15);
 	}
 
 	// Kelas dasar field TANPA tinggi — tingginya dipisah supaya varian kompak
@@ -97,7 +106,7 @@
 		'gap-3',
 		kompak
 			? 'flex flex-wrap items-center gap-2 sm:grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-[2fr_1.5fr_1.5fr_auto]'
-			: 'grid sm:grid-cols-2 lg:grid-cols-[2fr_1.5fr_1.5fr_auto]'
+			: 'grid sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1.5fr_auto]'
 	)}
 >
 	<!-- `ref` ikut dibawa sebagai hidden input: submit form membangun URL
@@ -116,18 +125,50 @@
 		</select>
 	</div>
 
-	<!-- Harga = filter lanjutan: di mobile kompak disembunyikan (tetap di DOM
-	     supaya submit form tidak berubah), muncul lagi di sm+. -->
-	<div class={cn(kompak && 'hidden sm:block')}>
-		<label for="cari-harga" class="sr-only">Harga maksimal</label>
-		<select id="cari-harga" name="hargaMax" class={cn(kelas, tinggi)}>
-			<option value="">Semua harga</option>
-			{#each BATAS_HARGA as batas (batas.nilai)}
-				<option value={batas.nilai} selected={nilai.hargaMaks === batas.nilai}>{batas.label}</option
-				>
-			{/each}
-		</select>
-	</div>
+	<!-- Harga: varian kompak (homepage) = preset cepat; varian penuh (/cari)
+	     = INPUT KETIK SENDIRI min & maks (2026-10-08) — non-digit di-strip,
+	     URL tetap angka polos. Kompak menyembunyikan di mobile (tetap di DOM
+	     supaya submit form tidak berubah). -->
+	{#if kompak}
+		<div class="hidden sm:block">
+			<label for="cari-harga" class="sr-only">Harga maksimal</label>
+			<select id="cari-harga" name="hargaMax" class={cn(kelas, tinggi)}>
+				<option value="">Semua harga</option>
+				{#each BATAS_HARGA as batas (batas.nilai)}
+					<option value={batas.nilai} selected={nilai.hargaMaks === batas.nilai}
+						>{batas.label}</option
+					>
+				{/each}
+			</select>
+		</div>
+	{:else}
+		<div>
+			<label for="cari-harga-min" class="sr-only">Harga minimum</label>
+			<input
+				id="cari-harga-min"
+				name="hargaMin"
+				type="text"
+				inputmode="numeric"
+				placeholder="Harga min. (Rp)"
+				value={nilai.hargaMin ?? ''}
+				oninput={maskDigit}
+				class={cn(kelas, tinggi)}
+			/>
+		</div>
+		<div>
+			<label for="cari-harga-maks" class="sr-only">Harga maksimal</label>
+			<input
+				id="cari-harga-maks"
+				name="hargaMax"
+				type="text"
+				inputmode="numeric"
+				placeholder="Harga maks. (Rp)"
+				value={nilai.hargaMaks ?? ''}
+				oninput={maskDigit}
+				class={cn(kelas, tinggi)}
+			/>
+		</div>
+	{/if}
 
 	<div class={cn(kompak && 'min-w-0 flex-1')}>
 		<label for="cari-tipe" class="sr-only">Tipe rumah</label>

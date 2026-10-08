@@ -696,6 +696,19 @@ export interface AgenDirektori {
 	profesional?: boolean;
 }
 
+/**
+ * Hasil direktori agen terpaginasi (2026-10-08, api-contract §23) — `q`
+ * mencocokkan nama/kantor/kode; `halaman` sudah diklem backend ke rentang
+ * sah. Backend lama (array polos) → dibungkus jadi halaman tunggal.
+ */
+export interface AgenDirektoriHasil {
+	items: AgenDirektori[];
+	total: number;
+	halaman: number;
+	perHalaman: number;
+	totalHalaman: number;
+}
+
 /** Body minat umum ke agen (proxy `/api/agen-minat`). */
 export interface AgenMinatInput {
 	kodeAgen: string;
@@ -842,6 +855,8 @@ export interface LelangQuery {
 	regionKode?: string;
 	bankId?: string;
 	limitMax?: number;
+	/** 2026-10-08 — batas BAWAH nilai limit (harga ketik sendiri di /lelang). */
+	limitMin?: number;
 	page?: number;
 	pageSize?: number;
 }

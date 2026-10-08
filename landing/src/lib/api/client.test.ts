@@ -265,16 +265,33 @@ describe('getAgenPemasar (AGEN-OMAHE-03, mode fixture)', () => {
 
 // AGEN-OMAHE-04 — direktori agen (mode fixture).
 describe('getDirektoriAgen (AGEN-OMAHE-04, mode fixture)', () => {
-	test('fixture dev: agen tanpa nomor HP, urut kantor', async () => {
+	test('fixture dev: agen tanpa nomor HP, terpaginasi', async () => {
 		const { getDirektoriAgen, KODE_AGEN_PATTERN } = await import('./client');
-		const agen = await getDirektoriAgen(fetchDummy);
-		expect(agen.length).toBeGreaterThan(0);
-		for (const a of agen) {
+		const hasil = await getDirektoriAgen(fetchDummy);
+		expect(hasil.items.length).toBeGreaterThan(0);
+		expect(hasil.total).toBe(hasil.items.length);
+		expect(hasil.halaman).toBe(1);
+		for (const a of hasil.items) {
 			// AGEN-OMAHE-05: kode fixture kini `OMHA-A…` (kode lama `OMH-…`
 			// tetap sah — ikut pola kanonik client, bukan hardcode satu era.
 			expect(a.kodeAgen).toMatch(KODE_AGEN_PATTERN);
 			expect('telepon' in a).toBe(false);
 		}
+	});
+
+	// 2026-10-08 — pencarian + paginasi (meniru backend di mode fixture).
+	test('q mencocokkan nama/kantor/kode; halaman diklem', async () => {
+		const { getDirektoriAgen } = await import('./client');
+		const cari = await getDirektoriAgen(fetchDummy, { q: 'omahe' });
+		expect(cari.total).toBeGreaterThanOrEqual(1);
+		for (const a of cari.items) {
+			expect((a.nama + a.kantorNama + a.kodeAgen).toLowerCase()).toContain('omahe');
+		}
+		const kosong = await getDirektoriAgen(fetchDummy, { q: 'tidak-ada-agen-seperti-ini' });
+		expect(kosong).toEqual({ items: [], total: 0, halaman: 1, perHalaman: 24, totalHalaman: 1 });
+		// Halaman 99 diklem ke totalHalaman.
+		const hal = await getDirektoriAgen(fetchDummy, { halaman: 99 });
+		expect(hal.halaman).toBe(hal.totalHalaman);
 	});
 
 	test('kirimMinatAgen mode fixture → sukses tanpa fetch, whatsapp null (nomor umum)', async () => {

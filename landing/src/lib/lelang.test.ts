@@ -47,5 +47,10 @@ describe('LELANG-03 — URL lokasi', () => {
 		expect(angkaPositif('')).toBeUndefined();
 		expect(angkaPositif('-1')).toBeUndefined();
 		expect(angkaPositif('abc')).toBeUndefined();
+		// 2026-10-08 — pemisah ribuan di-strip (harga ketik sendiri).
+		expect(angkaPositif('500.000.000')).toBe(500000000);
+		expect(angkaPositif('Rp 650.000.000')).toBe(650000000);
+		expect(angkaPositif(' 350 ')).toBe(350);
+		expect(angkaPositif(null)).toBeUndefined();
 	});
 });

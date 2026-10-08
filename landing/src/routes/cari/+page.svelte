@@ -49,6 +49,7 @@
 			ref={data.ref}
 			nilai={{
 				regionKode: data.query.regionKode,
+				hargaMin: data.query.hargaMin,
 				hargaMaks: data.query.hargaMax,
 				tipe: data.query.tipe
 			}}

@@ -618,10 +618,17 @@ dibandingkan case-insensitive). Respons `data`:
 
 ## 23. Direktori agen Omahe & minat umum (AGEN-OMAHE-04, backend `done` 2026-09-27 — belum di-push/deploy)
 
-- `GET /public/agen-omahe` → `[{ nama, kantorNama, fotoUrl | null,
-  kodeAgen }]` — anggota & kantor aktif + membership aktif, urut kantor
-  lalu nama. Tanpa nomor HP. Omahe: `getDirektoriAgen` (fixture dev-saja,
-  fail-soft `[]`) → tab **Agen Omahe** di `/mitra?tab=agen`.
+- `GET /public/agen-omahe` → **2026-10-08: pencarian + paginasi** — `?q=`
+  (cocok nama agen / nama kantor / kode agen, case-insensitive) +
+  `?halaman=&perHalaman=` (default 24, maks 48) → `{ items: [{ nama,
+  kantorNama, fotoUrl | null, kodeAgen, profesional }], total, halaman,
+  perHalaman, totalHalaman }`; `halaman` diklem backend ke rentang sah.
+  Sebelumnya array polos tanpa param — Omahe masih menoleransi bentuk lama
+  (dibungkus jadi halaman tunggal) supaya deploy tidak harus serentak.
+  Anggota & kantor aktif + membership aktif, urut kantor lalu nama. Tanpa
+  nomor HP. Omahe: `getDirektoriAgen` (fixture dev-saja meniru saring+
+  paginasi, fail-soft halaman kosong) → tab **Agen Omahe** di
+  `/mitra?tab=agen&q=&page=` (form GET + Pagination).
 - `POST /public/agen-omahe/:kodeAgen/minat { nama, telepon, pesan?,
   website }` → `{ ok: true, whatsapp }`; 400 validasi, 404 agen tidak aktif, 429
   >3/24 jam per (telepon, agen). **LEAD-02 (perbaikan 2026-10-08):**
@@ -823,6 +830,9 @@ bank. `GET /public/lelang/:slug` — detail (`selesai: true` bila tanggal
 lewat; halaman tetap tampil). `POST /public/lelang/:slug/minat { nama,
 telepon, pesan?, website }` lewat proxy Omahe `/api/lelang-minat`, lalu WA ke
 kontak Omahe. Harga = **nilai limit** (+ uang jaminan), bukan "harga".
+**2026-10-08**: `limitMin` didukung (`nilaiLimit >= x`) berdampingan
+`limitMax` — filter harga di Omahe `/lelang` kini dua input KETIK SENDIRI
+min/maks rupiah (preset chip lama dihapus; non-digit di-strip).
 Backend tanpa fitur instance `lelang` → 404 → Omahe menampilkan daftar
 kosong (seksi homepage tersembunyi).
 

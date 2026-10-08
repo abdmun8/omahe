@@ -13,6 +13,7 @@ export const load: PageServerLoad = async ({ params, url, fetch, setHeaders }) =
 	const query = {
 		lokasi: params.lokasi,
 		bankId: url.searchParams.get('bankId') || undefined,
+		limitMin: angka(url.searchParams.get('limitMin')),
 		limitMax: angka(url.searchParams.get('limitMax')),
 		page: angka(url.searchParams.get('page')) || 1
 	};

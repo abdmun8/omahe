@@ -52,6 +52,17 @@ export const NAV = [
  */
 export const TAMPILKAN_TELEPON = false;
 
+/**
+ * Form minat: setelah submit TERSIMPAN ke backend, dialog OTOMATIS melanjutkan
+ * ke wa.me/<nomor tujuan>?text=<isi> (nomor agen/perumahan dari backend, LEAD-02)
+ * — tanpa menunggu klik "Lanjut ke WhatsApp". Dinyalakan karena nomor WA
+ * gateway Omahe terblokir (2026-10-08): hand-off chat langsung jadi satu-satunya
+ * kanal yang pasti sampai; tombol manual tetap tampil sebagai fallback.
+ * Navigasi pakai location (bukan window.open) supaya tidak kena popup blocker.
+ * Set `false` untuk kembali ke perilaku klik-manual.
+ */
+export const LANJUT_WA_OTOMATIS = true;
+
 /** LANDING-07 — batas harga seksi "Harga Terjangkau" homepage (harga mulai
  *  ≤ nilai ini). Di sini (bukan `$lib/api`) supaya komponen klien boleh
  *  meng-import-nya. */

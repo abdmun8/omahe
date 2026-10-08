@@ -27,7 +27,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import type { LeadSumber } from '$lib/api/types';
 	import { trackEvent } from '$lib/analytics';
-	import { SITE } from '$lib/config';
+	import { LANJUT_WA_OTOMATIS, SITE } from '$lib/config';
 	import { pesanWaPeminat, waUrl } from '$lib/utils';
 	import Button from './ui/button.svelte';
 
@@ -177,6 +177,19 @@
 				})
 			);
 			sukses = true;
+			// 2026-10-08 — auto-lanjut ke wa.me setelah lead TERSIMPAT (nomor WA
+			// gateway terblokir — hand-off chat jadi kanal utama; klik "Kirim" adalah
+			// user gesture, location.assign tidak kena popup blocker). Tombol
+			// "Lanjut ke WhatsApp" tetap tampil sebagai fallback bila navigasi
+			// gagal/diblokir atau saklar dimatikan. jsdom (test) tidak
+			// mengimplementasikan navigasi — dilewati supaya output test bersih.
+			if (LANJUT_WA_OTOMATIS && waLanjut && !navigator.userAgent.includes('jsdom')) {
+				try {
+					window.location.assign(waLanjut);
+				} catch {
+					// Navigasi gagal — tombol manual tetap ada.
+				}
+			}
 			// Iterasi 1 GA4: submit SUKSES → 'lead_form_submit' — HANYA metadata
 			// non-identitas. Nama & nomor telepon pengunjung TIDAK PERNAH masuk
 			// sini (aturan Google ToS, lihat src/lib/analytics.ts); `tipe_minat`

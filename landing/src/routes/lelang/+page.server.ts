@@ -21,6 +21,7 @@ export const load: PageServerLoad = async ({ url, fetch, setHeaders }) => {
 	}
 	const query = {
 		bankId: url.searchParams.get('bankId') || undefined,
+		limitMin: angka(url.searchParams.get('limitMin')),
 		limitMax: angka(url.searchParams.get('limitMax')),
 		page: angka(url.searchParams.get('page')) || 1
 	};

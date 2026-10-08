@@ -1,4 +1,5 @@
 import { getDirektoriAgen, getKategoriMitra, getMitra } from '$lib/api';
+import type { AgenDirektoriHasil } from '$lib/api/types';
 import { kategoriChips, urutkanMitraPerKategori } from '$lib/mitra';
 import type { PageServerLoad } from './$types';
 
@@ -23,14 +24,26 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 	// kategori tetap tampil (satu fetch mitra tetap dibutuhkan untuk chip).
 	const tabAgen = url.searchParams.get('tab') === 'agen';
 	const q = url.searchParams.get('kategori');
+	// 2026-10-08 — pencarian + paginasi direktori agen (hanya di tab agen;
+	// `page` dipakai Pagination, param `q` panjangnya dibatasi).
+	const qAgen = (tabAgen ? (url.searchParams.get('q') ?? '') : '').trim().slice(0, 100);
+	const halamanAgen = tabAgen ? Math.max(1, Number(url.searchParams.get('page')) || 1) : 1;
 	// Tab "Semua" (tanpa kategori & bukan tab agen) juga memuat agen:
 	// keputusan user 2026-10-01 — Agen Omahe tampil PERTAMA, lalu mitra
-	// mengikuti urutan kategori master.
+	// mengikuti urutan kategori master (halaman 1 saja; lengkapnya di tab
+	// agen — sekarang terpaginasi).
 	const butuhAgen = tabAgen || q === null;
+	const agenKosong: AgenDirektoriHasil = {
+		items: [],
+		total: 0,
+		halaman: 1,
+		perHalaman: 24,
+		totalHalaman: 1
+	};
 	const [semua, master, agenSemua] = await Promise.all([
 		getMitra(fetch),
 		getKategoriMitra(fetch),
-		butuhAgen ? getDirektoriAgen(fetch) : Promise.resolve([])
+		butuhAgen ? getDirektoriAgen(fetch, { q: qAgen, halaman: halamanAgen }) : Promise.resolve(agenKosong)
 	]);
 	const chips = kategoriChips(semua, master);
 	// Null/undefined = "Semua"; hanya nilai yang BENAR-BENAR ada di chip yang
@@ -38,7 +51,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 	const kategori = q !== null && chips.some((c) => c.nilai === q) ? q : undefined;
 	// `?kategori=` tak dikenal = tampilan "Semua" juga (sertakan agen bila
 	// sudah dimuat).
-	const agen = tabAgen || !kategori ? agenSemua : [];
+	const agen = tabAgen || !kategori ? agenSemua : agenKosong;
 	return {
 		mitra: kategori
 			? semua.filter((m) => m.kategori === kategori)
@@ -46,6 +59,8 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		kategori: tabAgen ? undefined : kategori,
 		chips,
 		tabAgen,
-		agen
+		agen,
+		qAgen,
+		halamanAgen
 	};
 };

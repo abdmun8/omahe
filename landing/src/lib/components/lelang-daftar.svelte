@@ -3,11 +3,14 @@
 	Filter lokasi = kabupaten yang BENAR-BENAR punya rumah lelang (urut area
 	prioritas superadmin). Form GET ke /lelang; server mengalihkan ?lokasi=
 	ke URL ramah SEO /lelang/lokasi/:slug (bank & nilai limit tetap query).
+
+	2026-10-08 — nilai limit bisa DIKETIK SENDIRI (min & maks, rupiah);
+	non-digit di-strip di input supaya URL tetap angka polos (preset chip
+	lama diganti penuh). Tanpa JS tetap jalan (form GET murni).
 -->
 <script lang="ts">
 	import LelangCard from '$lib/components/lelang-card.svelte';
 	import Pagination from '$lib/components/pagination.svelte';
-	import { FILTER_LIMIT } from '$lib/lelang';
 	import { formatAngka } from '$lib/utils';
 	import type { LokasiLelang, Paginated, RumahLelangKartu } from '$lib/api/types';
 
@@ -24,15 +27,22 @@
 		hasil: Paginated<RumahLelangKartu>;
 		lokasi: LokasiLelang[];
 		bank: { id: string; nama: string }[];
-		query: { bankId?: string; limitMax?: number };
+		query: { bankId?: string; limitMin?: number; limitMax?: number };
 		lokasiAktif: { slug: string; nama: string } | null;
 		ref: string | null;
 		url: URL;
 		basePath: string;
 	} = $props();
+
+	/** Rupiah ketik sendiri — hanya digit (titik/spasi di-strip live,
+	 *  pola `angkaPositif` server juga toleran non-digit). */
+	function maskDigit(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		input.value = input.value.replace(/\D/g, '').slice(0, 15);
+	}
 </script>
 
-<form method="GET" action="/lelang" class="mt-6 grid gap-3 sm:grid-cols-4">
+<form method="GET" action="/lelang" class="mt-6 grid gap-3 sm:grid-cols-5">
 	{#if ref}<input type="hidden" name="ref" value={ref} />{/if}
 	<select
 		name="lokasi"
@@ -57,16 +67,28 @@
 			<option value={b.id} selected={query.bankId === b.id}>{b.nama}</option>
 		{/each}
 	</select>
-	<select
-		name="limitMax"
-		aria-label="Nilai limit"
+	<label for="lelang-limit-min" class="sr-only">Nilai limit minimum</label>
+	<input
+		id="lelang-limit-min"
+		name="limitMin"
+		type="text"
+		inputmode="numeric"
+		placeholder="Limit min. (Rp)"
+		value={query.limitMin ?? ''}
+		oninput={maskDigit}
 		class="border-line h-11 rounded-lg border bg-white px-3 text-sm"
-	>
-		<option value="">Semua nilai limit</option>
-		{#each FILTER_LIMIT as f (f.nilai)}
-			<option value={f.nilai} selected={query.limitMax === f.nilai}>{f.label}</option>
-		{/each}
-	</select>
+	/>
+	<label for="lelang-limit-maks" class="sr-only">Nilai limit maksimum</label>
+	<input
+		id="lelang-limit-maks"
+		name="limitMax"
+		type="text"
+		inputmode="numeric"
+		placeholder="Limit maks. (Rp)"
+		value={query.limitMax ?? ''}
+		oninput={maskDigit}
+		class="border-line h-11 rounded-lg border bg-white px-3 text-sm"
+	/>
 	<button type="submit" class="bg-primary h-11 rounded-lg px-4 text-sm font-semibold text-white"
 		>Terapkan</button
 	>

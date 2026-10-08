@@ -79,21 +79,28 @@ describe.skipIf(typeof document === 'undefined')('SearchForm', () => {
 		render(SearchForm, { regions: REGIONS });
 
 		expect(screen.getByLabelText('Lokasi')).not.toBeNull();
+		expect(screen.getByLabelText('Harga minimum')).not.toBeNull();
 		expect(screen.getByLabelText('Harga maksimal')).not.toBeNull();
 		expect(screen.getByLabelText('Tipe rumah')).not.toBeNull();
 	});
 
-	test('varian default (/cari): harga & tipe tetap dirender + nilai terisi', () => {
+	test('varian default (/cari): harga min/maks INPUT + nilai terisi', () => {
 		const { container } = render(SearchForm, {
 			regions: REGIONS,
-			nilai: { regionKode: '32.01', hargaMaks: 500_000_000, tipe: '36' }
+			nilai: { regionKode: '32.01', hargaMin: 300_000_000, hargaMaks: 500_000_000, tipe: '36' }
 		});
 
 		const lokasi = container.querySelector<HTMLSelectElement>('#cari-lokasi');
-		const harga = container.querySelector<HTMLSelectElement>('#cari-harga');
+		const min = container.querySelector<HTMLInputElement>('#cari-harga-min');
+		const maks = container.querySelector<HTMLInputElement>('#cari-harga-maks');
 		const tipe = container.querySelector<HTMLInputElement>('#cari-tipe');
 		expect(lokasi!.value).toBe('32.01');
-		expect(harga!.value).toBe('500000000');
+		// 2026-10-08 — harga ketik sendiri (type text + inputmode numeric).
+		expect(min!.value).toBe('300000000');
+		expect(maks!.value).toBe('500000000');
+		expect(min!.inputMode).toBe('numeric');
+		// Varian penuh TIDAK punya select preset lagi.
+		expect(container.querySelector('#cari-harga')).toBeNull();
 		expect(tipe!.value).toBe('36');
 		// Opsi region tetap dirender dari prop `regions`.
 		expect(container.querySelectorAll('#cari-lokasi option').length).toBe(REGIONS.length + 1);

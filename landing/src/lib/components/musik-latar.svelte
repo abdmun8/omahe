@@ -30,8 +30,17 @@
 	async function putar() {
 		if (!audio) {
 			audio = new Audio('/api/musik/file');
+			// Looping: atribut loop + fallback event 'ended' (belt & braces —
+			// sebagian browser/WebView mengabaikan atribut loop untuk sumber
+			// redirect/presigned; replay eksplisit menjamin musik tidak berhenti).
 			audio.loop = true;
 			audio.volume = 0.4;
+			audio.addEventListener('ended', () => {
+				if (audio?.loop) {
+					audio.currentTime = 0;
+					audio.play().catch(() => (berbunyi = false));
+				}
+			});
 			audio.addEventListener('pause', () => (berbunyi = false));
 			audio.addEventListener('play', () => (berbunyi = true));
 		}
