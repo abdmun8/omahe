@@ -277,11 +277,11 @@ describe('getDirektoriAgen (AGEN-OMAHE-04, mode fixture)', () => {
 		}
 	});
 
-	test('kirimMinatAgen mode fixture → no-op sukses tanpa fetch', async () => {
+	test('kirimMinatAgen mode fixture → sukses tanpa fetch, whatsapp null (nomor umum)', async () => {
 		const { kirimMinatAgen } = await import('./client');
 		await expect(
 			kirimMinatAgen(fetchDummy, { kodeAgen: 'OMH-7KQ2MX', nama: 'Budi', telepon: '0812' })
-		).resolves.toBeUndefined();
+		).resolves.toEqual({ whatsapp: null });
 	});
 });
 

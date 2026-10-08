@@ -623,9 +623,14 @@ dibandingkan case-insensitive). Respons `data`:
   lalu nama. Tanpa nomor HP. Omahe: `getDirektoriAgen` (fixture dev-saja,
   fail-soft `[]`) → tab **Agen Omahe** di `/mitra?tab=agen`.
 - `POST /public/agen-omahe/:kodeAgen/minat { nama, telepon, pesan?,
-  website }` → `{ ok: true }`; 400 validasi, 404 agen tidak aktif, 429
-  >3/24 jam per (telepon, agen). Omahe: proxy `/api/agen-minat` +
-  `LeadFormDialog` mode `kodeAgen`.
+  website }` → `{ ok: true, whatsapp }`; 400 validasi, 404 agen tidak aktif, 429
+  >3/24 jam per (telepon, agen). **LEAD-02 (perbaikan 2026-10-08):**
+  `whatsapp` = nomor agen (`62…`) supaya "Lanjut ke WhatsApp" di dialog
+  Omahe membuka chat ke NOMOR AGEN — sebelumnya respons tanpa `whatsapp`
+  sehingga chat peminat jatuh ke nomor umum (principal) Omahe. Honeypot →
+  `whatsapp` null (bentuk respons tetap seragam, pola `/public/leads`).
+  Omahe: proxy `/api/agen-minat` (meneruskan `whatsapp`) + `LeadFormDialog`
+  mode `kodeAgen`.
 - **Bentuk error backend** `perumahan` = `{ error, code, issues? }` (bukan
   `{ message }`) — `pesanErrorBackend()` mengambil pesan issue pertama /
   `error`. Sebelum 2026-09-27 `createLead` membaca `message` sehingga pesan

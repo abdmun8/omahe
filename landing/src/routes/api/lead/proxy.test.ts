@@ -10,13 +10,13 @@
  * SvelteKit types dilewati lewat `Parameters<typeof POST>[0]`.
  *
  * `createLead` TIDAK dipanggil beneran: `$lib/api` di-mock sebelum
- * `./+server` dimuat (dynamic import setelah `mock.module` — import statis
- * ESM ter-hoist, jadi harus dinamis supaya mock terpasang lebih dulu, pola
- * yang sama dengan alasan `vi.mock` di komponen). Mock menggantikan
- * `src/lib/api/index.ts` SELURUHNYA — `client.ts` (server-only, narik
- * `$env/dynamic/private`) tidak pernah dimuat dari graf file ini. Kelas
- * `ApiError` tiruan DIREFERENSIKAN dari mock itu sendiri supaya
- * `err instanceof ApiError` di handler benar-benar kena.
+ * `./+server` dimuat (dynamic import setelah mock terpasang — import statis
+ * ESM ter-hoisted, jadi harus dinamis supaya mock terpasang lebih dulu, pola
+ * yang sama dengan alasan `vi.mock` di komponen). Mock-nya BERSAMA di
+ * `$lib/test/proxy-api-mock.ts` — WAJIB mengeksport semua nama handler
+ * proxy karena `mock.module` bocor antar file test (pelajaran CI) — dan
+ * menggantikan `src/lib/api/index.ts` SELURUHNYA: `client.ts` (server-only,
+ * narik `$env/dynamic/private`) tidak pernah dimuat dari graf file ini.
  *
  * Diverifikasi: `mock.module('$lib/api')` memang meng-intercept import
  * specifier `$lib/api` di bun (tes 429 akan merah kalau tidak).
@@ -26,22 +26,13 @@
  * jadi `svelte-kit sync`/`build` akan gagal. `proxy.test.ts` tanpa prefix
  * adalah modul biasa yang diabaikan Kit.
  */
-import { beforeEach, describe, expect, mock, test } from 'bun:test';
+import { beforeEach, describe, expect, test } from 'bun:test';
+import { ApiErrorTiruan, createLeadMock, pasangMockLibApi } from '$lib/test/proxy-api-mock';
 
-class ApiErrorTiruan extends Error {
-	readonly status: number;
-	constructor(status: number, message: string) {
-		super(message);
-		this.name = 'ApiError';
-		this.status = status;
-	}
-}
-
-const createLeadMock = mock<
-	(fetchFn: typeof fetch, input: unknown) => Promise<{ whatsapp: string | null }>
->(async () => ({ whatsapp: null }));
-
-mock.module('$lib/api', () => ({ ApiError: ApiErrorTiruan, createLead: createLeadMock }));
+// Mock bersama (BOTH createLead + kirimMinatAgen) — mock.module bocor
+// antar file test, jangan buat mock.module '$lib/api' sendiri di sini
+// (lihat $lib/test/proxy-api-mock.ts).
+pasangMockLibApi();
 
 const { POST } = await import('./+server');
 

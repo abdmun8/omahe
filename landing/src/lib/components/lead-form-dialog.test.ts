@@ -253,6 +253,42 @@ describe.skipIf(typeof document === 'undefined')('LeadFormDialog', () => {
 		expect(wa.getAttribute('href')).toContain(waUrl(SITE.whatsapp).split('?')[0]);
 	});
 
+	// AGEN-OMAHE-04 — mode `kodeAgen` (tab Agen Omahe /mitra). Regresi
+	// 2026-10-08: dulu chat peminat jatuh ke nomor umum (principal) Omahe
+	// karena proxy tidak meneruskan `whatsapp` agen — sekarang WA ke NOMOR
+	// AGEN, dan tanpa field (respons lama) tetap fallback nomor umum.
+	test('mode kodeAgen: respons whatsapp agen → WA ke NOMOR AGEN (bukan nomor umum Omahe)', async () => {
+		const fetchMock = stubFetch({
+			ok: true,
+			status: 200,
+			json: async () => ({ success: true, data: { ok: true, whatsapp: '628999000111' } })
+		});
+		render(LeadFormDialog, {
+			props: { ...propsDasar(), ref: null, namaAgen: 'Rina Agen', kodeAgen: 'OMHA-A0042' }
+		});
+
+		isiWajibDanSubmit();
+
+		expect(await screen.findByText('Terima kasih, agen Rina Agen akan menghubungi Anda.')).toBeInTheDocument();
+		// POST ke proxy minat agen, bukan /api/lead.
+		expect(fetchMock.mock.calls[0][0]).toBe('/api/agen-minat');
+		const wa = screen.getByRole('link', { name: 'Lanjut ke WhatsApp' });
+		expect(wa.getAttribute('href')).toContain(waUrl('628999000111').split('?')[0]);
+		expect(wa.getAttribute('href')).not.toContain(waUrl(SITE.whatsapp).split('?')[0]);
+	});
+
+	test('mode kodeAgen tanpa whatsapp (respons lama) → fallback WA ke nomor umum Omahe', async () => {
+		stubFetch({ ok: true, status: 200, json: async () => ({ success: true, data: { ok: true } }) });
+		render(LeadFormDialog, {
+			props: { ...propsDasar(), ref: null, namaAgen: 'Rina Agen', kodeAgen: 'OMHA-A0042' }
+		});
+
+		isiWajibDanSubmit();
+
+		const wa = await screen.findByRole('link', { name: 'Lanjut ke WhatsApp' });
+		expect(wa.getAttribute('href')).toContain(waUrl(SITE.whatsapp).split('?')[0]);
+	});
+
 	test('judul dialog "Minat — {perumahan}" (bukan "Form Minat")', () => {
 		render(LeadFormDialog, { props: propsDasar() });
 		expect(screen.getByText('Minat — Griya Asri')).toBeInTheDocument();

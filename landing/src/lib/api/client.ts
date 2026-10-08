@@ -997,11 +997,12 @@ export async function getDirektoriAgen(fetchFn: Fetch): Promise<AgenDirektori[]>
 
 /**
  * Kirim minat umum ke agen (`POST /public/agen-omahe/:kode/minat`). Pola
- * `createLead`: pesan backend (400/404/429) diteruskan lewat `ApiError`.
- * Mode fixture → no-op sukses (dev).
+ * `createLead`: pesan backend (400/404/429) diteruskan lewat `ApiError`;
+ * respons memuat `whatsapp` = nomor agen (LEAD-02 — chat peminat ke agen,
+ * bukan nomor umum Omahe/principal). Mode fixture → whatsapp null (dev).
  */
-export async function kirimMinatAgen(fetchFn: Fetch, input: AgenMinatInput): Promise<void> {
-	if (!hasSearchApi()) return;
+export async function kirimMinatAgen(fetchFn: Fetch, input: AgenMinatInput): Promise<LeadHasil> {
+	if (!hasSearchApi()) return { whatsapp: null };
 	const { kodeAgen, ...body } = input;
 	let res: Response;
 	try {
@@ -1014,7 +1015,14 @@ export async function kirimMinatAgen(fetchFn: Fetch, input: AgenMinatInput): Pro
 	} catch {
 		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
 	}
-	if (res.ok) return;
+	if (res.ok) {
+		// Backend lama tanpa field ini / body aneh → null (nomor umum Omahe).
+		const body = (await res.json().catch(() => null)) as {
+			data?: { whatsapp?: unknown };
+		} | null;
+		const whatsapp = body?.data?.whatsapp;
+		return { whatsapp: typeof whatsapp === 'string' && whatsapp.trim() ? whatsapp : null };
+	}
 	const serverMessage = await pesanErrorBackend(res);
 	console.error(`[omahe:api] POST minat agen → ${res.status}`);
 	throw new ApiError(res.status, serverMessage ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');

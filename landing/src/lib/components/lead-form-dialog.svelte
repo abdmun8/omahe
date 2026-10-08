@@ -8,10 +8,10 @@
 	Submit POST ke `/api/lead` (proxy server internal — `client.ts` itu
 	server-only), yang meneruskan ke `POST /public/leads` backend. Pasca
 	sukses (LEAD-02, 2026-10-03): tombol utama "Lanjut ke WhatsApp" ke
-	nomor dari backend (owner perumahan / agen Omahe pemilik `ref`;
-	fallback nomor umum Omahe) dengan pesan pembuka berisi nama + nomor
-	`+62…` peminat supaya admin perumahan tinggal klik. Lead SUDAH
-	tercatat sebelum WA dibuka.
+	nomor dari backend — agen Omahe (mode `kodeAgen`/minat umum maupun
+	`ref` AO-…), WA marketing, atau owner perumahan; fallback nomor umum
+	Omahe — dengan pesan pembuka berisi nama + nomor `+62…` peminat
+	supaya penerima tinggal klik. Lead SUDAH tercatat sebelum WA dibuka.
 
 	Honeypot `website` dikirim APA ADANYA (manusia tidak pernah mengisinya,
 	bot iseng mengisi) — keputusannya di server, bukan di sini; respons
@@ -155,7 +155,8 @@
 				}
 				throw new Error(teks);
 			}
-			// LEAD-02 — tujuan WA dari backend (null/agen-minat → nomor umum).
+			// LEAD-02 — tujuan WA dari backend: nomor agen (minat umum maupun
+			// ref AO-…) / WA marketing / owner perumahan; null → nomor umum Omahe.
 			let tujuan: string | null = null;
 			try {
 				const body = await res.json();
