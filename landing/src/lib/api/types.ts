@@ -792,6 +792,10 @@ export interface DetailBayar {
 	bisaKwitansi?: boolean;
 	penerbitNama: string | null;
 	rekening: { bank: string | null; nomor: string | null; atasNama: string | null };
+	/** 2026-10-08 — QRIS opsi pembayaran: URL presigned gambar QRIS
+	 *  unggahan superadmin; tampil sebagai alternatif transfer. Null/absen =
+	 *  opsi QRIS tidak aktif (backend lama). */
+	qrisUrl?: string | null;
 }
 
 // ---------------------------------------------------------------------------

@@ -461,6 +461,27 @@
 					</p>
 				</div>
 
+				<!-- 2026-10-08 — QRIS: opsi bayar pertama kalau superadmin memasangnya. -->
+				{#if d.qrisUrl}
+					<div class="border-line mt-5 rounded-xl border px-4 py-4">
+						<p class="text-muted text-xs font-medium tracking-wide uppercase">Atau scan QRIS</p>
+						<div class="mt-3 flex flex-wrap items-start gap-4">
+							<img
+								src={d.qrisUrl}
+								alt="QRIS pembayaran tagihan"
+								width={180}
+								height={180}
+								loading="lazy"
+								class="rounded-lg border bg-white p-1"
+							/>
+							<p class="text-muted max-w-xs text-sm leading-relaxed">
+								Pindai dengan aplikasi pembayaran/e-wallet Anda. Setelah membayar, tetap
+								unggah bukti pembayaran lewat form di bawah supaya cepat diverifikasi.
+							</p>
+						</div>
+					</div>
+				{/if}
+
 				<!-- Rekening tujuan -->
 				{#if d.rekening.nomor || d.rekening.bank}
 					<div class="border-line mt-5 rounded-xl border px-4 py-4">
