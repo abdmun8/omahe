@@ -65,30 +65,47 @@
 </script>
 
 <article
-	class="border-line flex min-w-0 gap-3 rounded-xl border bg-white p-3 transition-shadow hover:shadow-md sm:flex-col sm:gap-0 sm:overflow-hidden sm:p-0"
+	class="border-line group flex min-w-0 gap-3 rounded-xl border bg-white p-3 transition-all hover:-translate-y-0.5 hover:shadow-md sm:flex-col sm:gap-0 sm:overflow-hidden sm:p-0"
 >
+	<!-- DASH — thumbnail klikabel ke HALAMAN TIPE (utama); nama perumahan
+	     di bawah ke landing perumahan (dua target berbeda, keputusan user). -->
 	<div class="relative h-28 w-28 shrink-0 sm:h-44 sm:w-full">
-		{#if fotoKartu}
-			<img
-				src={fotoKartu}
-				alt="Foto {unit.tipe} di {unit.perumahan.nama}"
-				loading="lazy"
-				class="h-full w-full rounded-lg object-cover sm:rounded-none"
-			/>
-		{:else}
-			<PhotoPlaceholder class="h-full w-full rounded-lg sm:rounded-none" />
-		{/if}
+		<a
+			href={hrefDetail}
+			class="block h-full w-full"
+			aria-label="Lihat tipe {unit.tipe} di {unit.perumahan.nama}"
+			onclick={lacakKlikKartu}
+		>
+			{#if fotoKartu}
+				<img
+					src={fotoKartu}
+					alt="Foto {unit.tipe} di {unit.perumahan.nama}"
+					loading="lazy"
+					class="h-full w-full rounded-lg object-cover transition-opacity group-hover:opacity-90 sm:rounded-none"
+				/>
+			{:else}
+				<PhotoPlaceholder class="h-full w-full rounded-lg sm:rounded-none" />
+			{/if}
+		</a>
 		{#if unit.perumahan.prioritas > 0}
 			<!-- MONET-01: prioritas milik perumahan induk. Dipasang di pojok
 			     thumbnail — badge tipe/unit-tersisa ada di area konten, jadi
 			     keduanya tidak mungkin bertabrakan. -->
-			<PromosiBadge class="absolute top-1.5 left-1.5" />
+			<PromosiBadge class="pointer-events-none absolute top-1.5 left-1.5" />
 		{/if}
 	</div>
 
 	<div class="flex min-w-0 flex-1 flex-col sm:p-4">
 		<div class="flex items-start gap-2">
-			<Badge variant="accent">{unit.tipe}</Badge>
+			<!-- DASH — badge tipe = link ke halaman tipe (bukan sekadar label). -->
+			<a
+				href={hrefDetail}
+				onclick={lacakKlikKartu}
+				class="hover:opacity-80"
+				aria-label="Lihat tipe {unit.tipe}"
+			>
+				<Badge variant="accent">{unit.tipe}</Badge>
+			</a>
 			{#if unit.unitTersedia <= 3}
 				<Badge variant="muted">{unit.unitTersedia} unit tersisa</Badge>
 			{/if}
@@ -98,9 +115,14 @@
 			{hargaRingkas}
 		</p>
 
+		<!-- DASH — nama perumahan → LANDING PERUMAHAN (beda dari thumbnail/
+		     badge yang ke halaman tipe). -->
 		<h3 class="text-ink mt-1 truncate text-sm font-semibold">
-			<a href={hrefDetail} class="hover:text-primary-light" onclick={lacakKlikKartu}
-				>{unit.perumahan.nama}</a
+			<a
+				href={withRef(`/perumahan/${unit.perumahan.slug}`, ref)}
+				class="hover:text-primary-light"
+				onclick={lacakKlikKartu}
+				title="Lihat perumahan {unit.perumahan.nama}">{unit.perumahan.nama}</a
 			>
 		</h3>
 

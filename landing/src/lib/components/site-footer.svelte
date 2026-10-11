@@ -29,9 +29,14 @@
 <footer class="border-line bg-surface mt-16 border-t">
 	<div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
 		<div class="sm:col-span-2 lg:col-span-2">
-			<span class="font-display text-primary text-xl font-extrabold">
-				Omahe<span class="text-accent">.</span>
-			</span>
+			<!-- DASH — logo gambar menggantikan teks (omahe-logo.jpeg). -->
+			<img
+				src="/omahe-logo.jpeg"
+				alt="Omahe"
+				class="h-10 w-auto"
+				width="40"
+				height="40"
+			/>
 			<p class="font-display text-accent-dark mt-1 text-sm">{tagline}</p>
 			<p class="text-muted mt-3 max-w-sm text-sm leading-relaxed">{SITE.deskripsi}</p>
 			{#if situs.alamatKantor}

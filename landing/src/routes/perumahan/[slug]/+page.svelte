@@ -36,7 +36,13 @@
 			: null
 	);
 	const totalUnit = $derived(data.tipeUnit.reduce((sum, u) => sum + u.unitTersedia, 0));
-	const fotoUtama = $derived(p.photos.find((f) => f.url !== null)?.url ?? null);
+	// DASH/BARU-OMAHE — fallback hero: tanpa galeri situs (photos kosong)
+	// → cover tipe pertama (prioritas sama kartu rekomendasi homepage).
+	const fotoUtama = $derived(
+		p.photos.find((f) => f.url !== null)?.url ??
+			data.tipeUnit.find((u) => u.fotoTipeUrl)?.fotoTipeUrl ??
+			null
+	);
 	/** LOKASI-01 — "alamat, Kec. X, Kabupaten Y, Provinsi Z" (null = kosong). */
 	const lokasi = $derived(formatLokasi(p));
 	/**
@@ -380,13 +386,22 @@
 				<ul class="mt-4 grid gap-3 sm:grid-cols-2">
 					{#each data.tipeUnit as unit (unit.id)}
 						<!-- UNIT-05 — cover khusus tipe (fallback tanpa foto) + link ke
-						     halaman detail tipe kalau backend sudah mengirim tipeSlug. -->
+						     halaman detail tipe kalau backend sudah mengirim tipeSlug.
+						     DASH — SELURUH kartu klikabel ke tipe (overlay); tombol
+						     "Ajukan" di atas overlay (z-20) tetap ke form pengajuan. -->
 						{@const hrefTipe = unit.tipeSlug
 							? withRef(`/perumahan/${p.slug}/tipe/${unit.tipeSlug}`, data.ref)
 							: null}
 						<li
-							class="border-line flex items-center justify-between gap-4 rounded-xl border bg-white p-4"
+							class="border-line hover:border-primary/40 relative flex items-center justify-between gap-4 rounded-xl border bg-white p-4 transition-shadow hover:shadow-md"
 						>
+							{#if hrefTipe}
+								<a
+									href={hrefTipe}
+									class="absolute inset-0 z-10 rounded-xl"
+									aria-label="Lihat tipe {unit.tipe} — {p.nama}"
+								></a>
+							{/if}
 							{#if unit.fotoTipeUrl}
 								<img
 									src={unit.fotoTipeUrl}
@@ -434,7 +449,11 @@
 									>
 								{/if}
 							</div>
-							<Button variant="outline" href={ajukanUrl(p.slug, data.ref)} class="shrink-0">
+							<Button
+								variant="outline"
+								href={ajukanUrl(p.slug, data.ref)}
+								class="relative z-20 shrink-0"
+							>
 								Ajukan
 							</Button>
 						</li>

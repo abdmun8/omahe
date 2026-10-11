@@ -112,15 +112,30 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		expect(screen.queryByRole('link', { name: 'Citra Land Nusantara' })).toBeNull();
 	});
 
-	test('link nama perumahan membawa ref, disisipkan SEBELUM hash', () => {
-		// hrefDetail = withRef('/perumahan/griya-asri#tipe-unit', ref) —
-		// satu-satunya link internal di kartu ini yang path-nya mengandung
-		// hash. Test ini sekaligus membuktikan mock withRef di atas benar
-		// menangani pemisahan hash (bug mock lama: ref menempel SETELAH hash).
+	test('link nama perumahan → LANDING PERUMAHAN, ref disisipkan sebelum hash (DASH)', () => {
+		// DASH — nama perumahan TIDAK lagi ke detail tipe (perilaku lama:
+		// hrefDetail dengan hash #tipe-unit), melainkan ke landing perumahan
+		// polos. Target tipe pindah ke thumbnail & badge (test di bawah).
 		render(UnitCard, { unit: buatUnit(), ref: 'abc123' });
 
 		const tautan = screen.getByRole('link', { name: 'Griya Asri' });
-		expect(tautan.getAttribute('href')).toBe('/perumahan/griya-asri?ref=abc123#tipe-unit');
+		expect(tautan.getAttribute('href')).toBe('/perumahan/griya-asri?ref=abc123');
+	});
+
+	test('thumbnail & badge tipe → halaman detail tipe kalau tipeSlug ada (DASH)', () => {
+		render(
+			UnitCard,
+			{ unit: buatUnit({ tipeSlug: '36-72', fotoTipeUrl: 'https://img/tipe.webp' }), ref: 'abc123' },
+		);
+		const tautanTipe = screen.getAllByRole('link', { name: /Lihat tipe 36\/72/i });
+		// Thumbnail + badge — keduanya ke halaman tipe.
+		expect(tautanTipe.length).toBeGreaterThanOrEqual(2);
+		for (const t of tautanTipe) {
+			expect(t.getAttribute('href')).toBe('/perumahan/griya-asri/tipe/36-72?ref=abc123');
+		}
+		// Nama perumahan tetap ke landing perumahan (dua target berbeda).
+		const tautanPerumahan = screen.getByRole('link', { name: 'Griya Asri' });
+		expect(tautanPerumahan.getAttribute('href')).toBe('/perumahan/griya-asri?ref=abc123');
 	});
 
 	test('badge "unit tersisa" muncul kalau unitTersedia <= 3', () => {

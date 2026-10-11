@@ -9,17 +9,17 @@
 
 <a
 	href={withRef(`/perumahan/${perumahan.slug}`, ref)}
-	class="border-line group flex flex-col overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-md"
+	class="border-line group flex flex-col overflow-hidden rounded-xl border bg-white transition-all hover:-translate-y-0.5 hover:shadow-md"
 >
 	{#if perumahan.fotoUrl}
 		<img
 			src={perumahan.fotoUrl}
 			alt="Foto {perumahan.nama}"
 			loading="lazy"
-			class="h-36 w-full object-cover"
+			class="aspect-[16/10] w-full object-cover transition-opacity group-hover:opacity-90"
 		/>
 	{:else}
-		<PhotoPlaceholder class="h-36 w-full" />
+		<PhotoPlaceholder class="aspect-[16/10] w-full" />
 	{/if}
 	<div class="flex flex-1 flex-col p-3">
 		<h3 class="font-display text-ink group-hover:text-primary text-base font-bold">

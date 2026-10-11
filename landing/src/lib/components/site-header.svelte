@@ -29,9 +29,14 @@
 <header class="border-line sticky top-0 z-40 border-b bg-white/95 backdrop-blur">
 	<div class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
 		<a href={withRef('/', ref)} class="flex items-center gap-2" aria-label="Omahe — beranda">
-			<span class="font-display text-primary text-xl font-extrabold tracking-tight">
-				Omahe<span class="text-accent">.</span>
-			</span>
+			<!-- DASH — logo gambar menggantikan teks (omahe-logo.jpeg). -->
+			<img
+				src="/omahe-logo.jpeg"
+				alt="Omahe"
+				class="h-9 w-auto"
+				width="36"
+				height="36"
+			/>
 		</a>
 
 		<nav class="ml-auto hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
