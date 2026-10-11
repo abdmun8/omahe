@@ -5,8 +5,7 @@
       "namespace": "android_app",
       "package_name": "id.co.omahe.app",
       "sha256_cert_fingerprints": [
-        "GANTI:SHA256:KUNCI_APP_SIGNING_PLAY_CONSOLE",
-        "GANTI:SHA256:KUNCI_UPLOAD_ANDROID_KEYSTORE"
+        "20:47:FA:78:FF:DD:2B:B6:41:13:1A:2B:2A:82:B8:33:E0:87:0E:57:17:A0:34:40:7D:87:E2:0A:99:97:07:4D"
       ]
     }
   }
