@@ -50,6 +50,9 @@
 
 <svelte:head>
 	<link rel="icon" href="/omahe-logo.jpeg" />
+	<!-- PWA (PLAY-01): manifest dibaca Bubblewrap untuk aplikasi Play Store (TWA). -->
+	<link rel="manifest" href="/manifest.webmanifest" />
+	<link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" />
 	<meta property="og:site_name" content={SITE.nama} />
 	<meta property="og:type" content="website" />
 	<meta property="og:locale" content="id_ID" />

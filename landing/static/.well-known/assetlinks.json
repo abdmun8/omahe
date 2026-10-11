@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "id.co.omahe.app",
+      "sha256_cert_fingerprints": [
+        "GANTI:SHA256:KUNCI_APP_SIGNING_PLAY_CONSOLE",
+        "GANTI:SHA256:KUNCI_UPLOAD_ANDROID_KEYSTORE"
+      ]
+    }
+  }
+]
