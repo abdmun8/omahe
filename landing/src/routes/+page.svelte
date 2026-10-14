@@ -86,6 +86,22 @@
 	</div>
 </section>
 
+<!-- Promo Pilihan (MONET-01) — perumahan partner berbayar, dipilih OTOMATIS
+     dari prioritas efektif backend (masa promo kedaluwarsa = 0 → hilang
+     sendiri). Kosong / gagal → seksi disembunyikan. Tepat di atas
+     "Rekomendasi Hari Ini"; grid 2 kolom di mobile, 3 di lg (6 item). -->
+{#if data.perumahanPromo.length > 0}
+	<section class="mx-auto max-w-6xl px-4 pt-12">
+		<h2 class="font-display text-ink text-2xl font-bold">Promo Pilihan</h2>
+		<p class="text-muted mt-1 text-sm">Perumahan pilihan dengan penawaran khusus.</p>
+		<div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-3">
+			{#each data.perumahanPromo as perumahan (perumahan.slug)}
+				<PerumahanBaruCard {perumahan} ref={data.ref} promo />
+			{/each}
+		</div>
+	</section>
+{/if}
+
 <!-- Unit unggulan -->
 <section class="mx-auto max-w-6xl px-4 py-12">
 	<div class="flex items-end justify-between gap-4">

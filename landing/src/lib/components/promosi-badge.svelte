@@ -17,7 +17,13 @@
 	import { cn } from '$lib/utils';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 
-	let { size = 'sm', class: className = '' }: { size?: 'sm' | 'md'; class?: string } = $props();
+	/** Label default "Promosi" (MONET-01); "Promo Pilihan" homepage memakai
+	 *  label "Promo" — pemanggil lain tidak berubah (bawaan). */
+	let {
+		size = 'sm',
+		label = 'Promosi',
+		class: className = ''
+	}: { size?: 'sm' | 'md'; label?: string; class?: string } = $props();
 
 	// `sm` untuk pojok thumbnail & baris badge kartu; `md` mengikuti ukuran
 	// pill `ui/badge.svelte` (px-2.5 py-1 text-xs) kalau butuh lebih menonjol.
@@ -35,7 +41,7 @@
 		className
 	)}
 >
-	<!-- Ikon dekoratif — makna sudah disampaikan teks "Promosi". -->
+	<!-- Ikon dekoratif — makna sudah disampaikan teks label. -->
 	<Sparkles size={iconSizes[size]} aria-hidden="true" />
-	Promosi
+	{label}
 </span>

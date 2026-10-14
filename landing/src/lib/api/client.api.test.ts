@@ -27,8 +27,15 @@
  */
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { env } from '$env/dynamic/private';
-import type { UnitListing } from './types';
-import { createLead, getDeveloper, getLelang, getRegions, getUnits } from './client';
+import type { PerumahanDirektori, UnitListing } from './types';
+import {
+	createLead,
+	getDeveloper,
+	getLelang,
+	getPerumahanPromo,
+	getRegions,
+	getUnits
+} from './client';
 
 const API = 'https://api.perumahan.test';
 
@@ -394,6 +401,59 @@ describe('getUnits — urutan (UNIT-07)', () => {
 		await getUnits(f, { sort: 'acak' });
 		await getUnits(f, {});
 		for (const u of urls) expect(new URL(u).searchParams.has('sort')).toBe(false);
+	});
+});
+
+// Promo Pilihan homepage (MONET-01) — endpoint direktori §6 TANPA `sort`
+// (urutan prioritas efektif di backend), saring `prioritas > 0` di sini.
+describe('getPerumahanPromo (jalur API asli, MONET-01)', () => {
+	const direktori = (slug: string, prioritas: number): PerumahanDirektori => ({
+		nama: slug,
+		slug,
+		fotoUrl: null,
+		regionNama: 'Kab. Bogor, Jawa Barat',
+		developer: null,
+		jumlahTipeTersedia: 2,
+		prioritas
+	});
+
+	test('URL benar: TANPA sort, page=1 & pageSize=limit (default 6)', async () => {
+		const urls: string[] = [];
+		const f = (async (url: string) => {
+			urls.push(url);
+			return envelope([], { total: 0, page: 1, pageSize: 6 });
+		}) as unknown as typeof fetch;
+		await getPerumahanPromo(f);
+		await getPerumahanPromo(f, 3);
+
+		const [bawaan, custom] = urls.map((u) => new URL(u));
+		expect(bawaan!.pathname).toBe('/public/perumahan');
+		// TANPA sort — urutan prioritas efektif DESC → nama diurus backend.
+		expect(bawaan!.searchParams.has('sort')).toBe(false);
+		expect(bawaan!.searchParams.get('page')).toBe('1');
+		expect(bawaan!.searchParams.get('pageSize')).toBe('6');
+		expect(custom!.searchParams.get('pageSize')).toBe('3');
+	});
+
+	test('item prioritas 0 dibuang (perumahan gratis bukan promo); > 0 diteruskan', async () => {
+		const f = (async () =>
+			envelope([direktori('promo-emas', 3), direktori('promo-perak', 1), direktori('gratis', 0)], {
+				total: 3,
+				page: 1,
+				pageSize: 6
+			})) as unknown as typeof fetch;
+		const hasil = await getPerumahanPromo(f);
+		expect(hasil.map((p) => p.slug)).toEqual(['promo-emas', 'promo-perak']);
+	});
+
+	test('semua item gratis → [] (seksi disembunyikan, bukan error)', async () => {
+		const f = (async () =>
+			envelope([direktori('gratis-a', 0), direktori('gratis-b', 0)], {
+				total: 2,
+				page: 1,
+				pageSize: 6
+			})) as unknown as typeof fetch;
+		await expect(getPerumahanPromo(f)).resolves.toEqual([]);
 	});
 });
 

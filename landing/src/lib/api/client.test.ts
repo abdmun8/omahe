@@ -11,7 +11,14 @@
 import { afterEach, describe, expect, test, setSystemTime } from 'bun:test';
 import { env } from '$env/dynamic/private';
 import { SITE } from '$lib/config';
-import { getKontak, getPerumahan, getSiteSettings, getTipeDetail, getUnits } from './client';
+import {
+	getKontak,
+	getPerumahan,
+	getPerumahanPromo,
+	getSiteSettings,
+	getTipeDetail,
+	getUnits
+} from './client';
 import { UNIT_LISTINGS } from './fixtures';
 
 /**
@@ -316,6 +323,13 @@ describe('getKategoriMitra (MITRA-04, mode fixture)', () => {
 		// (empty-state + CTA gabung) tetap teruji di dev fixture.
 		const punyaMitra = new Set(MITRA.map((m) => m.kategori));
 		expect(master!.some((k) => !punyaMitra.has(k.slug))).toBe(true);
+	});
+});
+
+// Promo Pilihan homepage (MONET-01) — mode fixture: seksi disembunyikan.
+describe('getPerumahanPromo (mode fixture)', () => {
+	test('tanpa API → [] TANPA network sama sekali', async () => {
+		await expect(getPerumahanPromo(fetchDummy, 6)).resolves.toEqual([]);
 	});
 });
 

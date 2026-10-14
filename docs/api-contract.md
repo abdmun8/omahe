@@ -30,7 +30,7 @@ ditandai eksplisit per-section.
 | `GET /public/units` | UNIT-04 | **sudah ada** (`done` 2026-09-14) | `/`, `/cari`, `/perumahan/:slug` |
 | `GET /public/developers` | DEVELOPER-01 | **sudah ada** (`done` 2026-09-13) | `/`, `/developer` |
 | `GET /public/developers/:slug` | DEVELOPER-01 | **sudah ada** (`done` 2026-09-13) — shape `proyek[]` lebih ringkas dari asumsi awal, lihat §3 | `/developer/:companySlug` |
-| `GET /public/perumahan` (list) | UNIT-04 | **sudah ada** (`done` 2026-09-14), BARU — tidak ada di versi dokumen sebelumnya; `+prioritas` MONET-01 | belum ada halaman Omahe yang eksplisit memakainya |
+| `GET /public/perumahan` (list) | UNIT-04 | **sudah ada** (`done` 2026-09-14), BARU — tidak ada di versi dokumen sebelumnya; `+prioritas` MONET-01 | `/` — seksi Promo Pilihan (prioritas > 0, §6) & Baru di Omahe (`?sort=terbaru`) |
 | `GET /public/sliders` | MONET-02 | **sudah ada** (`done` 2026-09-18), BARU — lihat §7 | `/` (carousel) |
 | `POST /public/leads` | MONET-03, LEAD-02 | **sudah ada** (`done` 2026-09-18; LEAD-02 2026-10-03: semua perumahan + `whatsapp` di respons) — lihat §8 | dialog LeadForm kartu/detail semua perumahan → lanjut WA ke owner |
 | `GET /public/mitra` | MITRA-01 | **sudah ada** (`done` 2026-09-22, epic di repo `perumahan`) — lihat §9 | `/mitra` (direktori mitra profesional; kategori dinamis omahe#3) |
@@ -236,14 +236,17 @@ profil SATU perumahan). List perumahan `isActive=true`, filter
   "fotoUrl": "https://...",              // foto pertama, presigned, nullable
   "regionKode": "32.01", "regionNama": "Kab. Bogor, Jawa Barat",  // nullable
   "developer": { "nama": "PT ...", "slug": "..." },               // null kalau tidak ada
-  "jumlahTipeTersedia": 4                // COUNT DISTINCT tipe unit tersedia, BUKAN jumlah unit fisik
+  "jumlahTipeTersedia": 4,               // COUNT DISTINCT tipe unit tersedia, BUKAN jumlah unit fisik
+  "prioritas": 2                         // MONET-01 — prioritas EFEKTIF (kedaluwarsa otomatis 0)
 }
 ```
 
-Belum ada halaman Omahe yang eksplisit memakai endpoint ini di site map
-saat ini (§Site map di `CLAUDE.md`) — dicatat di sini supaya tidak
-dibangun ulang lewat cara lain (mis. dedup manual dari `GET /public/units`)
-kalau kebutuhan direktori "semua project" muncul nanti.
+**Dipakai homepage Omahe sejak 2026-10-14** — seksi **"Promo Pilihan"**
+(`getPerumahanPromo` di `landing/src/lib/api/client.ts`): `page=1&pageSize=6`
+TANPA `sort` (urutan default backend sudah prioritas efektif DESC → nama),
+lalu saring `prioritas > 0` di sisi Omahe (perumahan gratis bukan promo);
+hasil kosong → seksi disembunyikan. Seksi "Baru di Omahe" tetap memakai
+varian `?sort=terbaru` (`getPerumahanTerbaru`, LANDING-07).
 
 ## Yang TIDAK diminta Omahe
 

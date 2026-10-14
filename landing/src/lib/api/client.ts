@@ -230,6 +230,28 @@ export async function getPerumahanTerbaru(
 }
 
 /**
+ * Seksi "Promo Pilihan" homepage (MONET-01): perumahan partner berbayar —
+ * TANPA `sort` (urutan default backend sudah prioritas efektif DESC → nama,
+ * api-contract.md §6), tiap item membawa `prioritas` EFEKTIF (masa promo
+ * kedaluwarsa otomatis 0). Ambil halaman pertama sebesar `limit`, lalu buang
+ * `prioritas <= 0` — perumahan gratis bukan promo. Sisa kosong → pemanggil
+ * (`+page.server.ts`, fail-soft) menyembunyikan seksi.
+ *
+ * Fixture mode → kosong, pola `getPerumahanTerbaru` (seksi disembunyikan).
+ */
+export async function getPerumahanPromo(fetchFn: Fetch, limit = 6): Promise<PerumahanDirektori[]> {
+	if (!hasSearchApi()) return [];
+	const url = `${baseUrl()}/public/perumahan?page=1&pageSize=${limit}`;
+	const res = await fetchFn(url, {
+		headers: { accept: 'application/json', ...KONSUMEN },
+		signal: AbortSignal.timeout(TIMEOUT_MS)
+	});
+	if (!res.ok) throw new Error(`GET ${url} → ${res.status}`);
+	const body = (await res.json()) as { data: PerumahanDirektori[]; meta: PageMeta };
+	return body.data.filter((p) => p.prioritas > 0);
+}
+
+/**
  * ANALITIK-01 — teruskan beacon kunjungan halaman perumahan ke backend
  * (`POST /public/kunjungan`). Fail-soft total: statistik internal tidak
  * boleh mengganggu pengunjung. Mode fixture → no-op.
@@ -1008,9 +1030,9 @@ export async function getDirektoriAgen(
 			? fixtures.DIREKTORI_AGEN.filter(
 					(a) =>
 						a.nama.toLowerCase().includes(kata) ||
-					a.kantorNama.toLowerCase().includes(kata) ||
-					a.kodeAgen.toLowerCase().includes(kata)
-			)
+						a.kantorNama.toLowerCase().includes(kata) ||
+						a.kodeAgen.toLowerCase().includes(kata)
+				)
 			: fixtures.DIREKTORI_AGEN;
 		const total = saringan.length;
 		const totalHalaman = Math.max(1, Math.ceil(total / 24));
@@ -1034,7 +1056,13 @@ export async function getDirektoriAgen(
 		);
 		if (Array.isArray(data)) {
 			// Backend lama — bungkus jadi halaman tunggal.
-			return { items: data, total: data.length, halaman: 1, perHalaman: data.length || 24, totalHalaman: 1 };
+			return {
+				items: data,
+				total: data.length,
+				halaman: 1,
+				perHalaman: data.length || 24,
+				totalHalaman: 1
+			};
 		}
 		if (data && typeof data === 'object' && Array.isArray(data.items)) return data;
 		return kosong;
