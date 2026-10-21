@@ -12,6 +12,8 @@ Dokumen ini adalah **ringkasan & fondasi**. Detail per area ada di file terpisah
 | [03-pertumbuhan-follower.md](03-pertumbuhan-follower.md) | Taktik menaikkan follower di TikTok, Instagram, Facebook |
 | [04-strategi-live.md](04-strategi-live.md) | Live harian 15.00–18.00 WIB: rundown, skrip, peran, KPI |
 | [05-penanganan-lead.md](05-penanganan-lead.md) | SOP WhatsApp: balas cepat, kualifikasi, follow-up sampai akad |
+| [06-video-perkenalan-ai.md](06-video-perkenalan-ai.md) | Step by step membuat video perkenalan Omahe dengan AI (naskah, prompt, tools, edit, upload) |
+| [07-rencana-7-hari-pertama.md](07-rencana-7-hari-pertama.md) | **Mulai di sini**: jadwal posting & live harian 22–28 Okt 2026 + evaluasi Hari 7 |
 
 ---
 
@@ -105,6 +107,8 @@ Akun resmi: **`@omaheofficial`** di TikTok, Instagram & Facebook.
 ## 5. Roadmap 90 hari
 
 ### Fase 0 — Fondasi (Minggu 1–2)
+
+> Posting dimulai **22 Oktober 2026**. Rincian minggu pertama per hari: [07-rencana-7-hari-pertama.md](07-rencana-7-hari-pertama.md).
 
 - [ ] Optimasi profil ketiga akun (bio, foto profil logo, link, sorotan IG) → lihat 03
 - [ ] Nomor **WhatsApp Business** khusus marketing + katalog + balasan cepat → lihat 05
