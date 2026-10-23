@@ -2,24 +2,28 @@
 	Kartu nama digital agen Omahe (AGEN-OMAHE-05, api-contract §26) — link
 	yang dibagikan agen sendiri ke calon pembeli. Aktif: hero foto lanskap
 	3:2 (PROFIL-01; gradasi + inisial bila belum ada foto), nama, kode,
-	kantor, WhatsApp, simpan kontak (vCard), "Tentang & Pengalaman"
-	(Markdown aman), perumahan yang dipasarkan (link membawa `?ref=` KODE
-	AGEN supaya booking/lead tercatat untuk agen ini). Tidak aktif:
-	identitas + status saja, tanpa kontak.
+	kantor, "Chat WhatsApp" (LEAD-02 — membuka form minat dulu; lead
+	tercatat untuk agen, lalu dialog otomatis lanjut ke wa.me nomor agen),
+	simpan kontak (vCard), "Tentang & Pengalaman" (Markdown aman),
+	perumahan yang dipasarkan (link membawa `?ref=` KODE AGEN supaya
+	booking/lead tercatat untuk agen ini). Tidak aktif: identitas + status
+	saja, tanpa kontak.
 -->
 <script lang="ts">
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import BadgeProfesional from '$lib/components/badge-profesional.svelte';
+	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import { SITE } from '$lib/config';
 	import { trackEvent } from '$lib/analytics';
 	import { renderMarkdown } from '$lib/markdown';
-	import { waUrl } from '$lib/utils';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 	const k = $derived(data.kartu);
 	const aktif = $derived(k.status === 'aktif');
+
+	let formTerbuka = $state(false);
 
 	const inisial = $derived(
 		k.nama
@@ -112,17 +116,19 @@
 						: ''}
 				</a>
 				<div class="mt-5 flex w-full flex-col gap-2">
-					{#if k.whatsapp}
-						<Button
-							variant="whatsapp"
-							href={waUrl(k.whatsapp, `Halo ${k.nama}, saya dapat kartu nama Anda dari Omahe.`)}
-							target="_blank"
-							rel="noopener"
-							onclick={() => trackEvent('kartu_nama_wa', { agen: k.kodeAgen })}
-						>
-							Chat WhatsApp
-						</Button>
-					{/if}
+					<!-- LEAD-02 — form dulu (lead tercatat untuk agen via proxy
+				     `/api/agen-minat`), lalu dialog otomatis lanjut ke wa.me
+				     nomor agen. Tombol tetap tampil walau `whatsapp` kosong —
+				     form tetap mencatat lead (fallback kontak tim Omahe). -->
+					<Button
+						variant="whatsapp"
+						onclick={() => {
+							trackEvent('kartu_nama_wa', { agen: k.kodeAgen });
+							formTerbuka = true;
+						}}
+					>
+						Chat WhatsApp
+					</Button>
 					<Button
 						variant="outline"
 						href={`/agen-omahe/${encodeURIComponent(k.kodeAgen)}/vcard`}
@@ -171,3 +177,15 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Form minat ke agen (LEAD-02) — pola persis `agen-omahe-card`:
+     `perumahanSlug=""` + mode `kodeAgen` → POST `/api/agen-minat`, lead
+     tercatat untuk agen ini, sukses → WA otomatis ke nomor agen. -->
+<LeadFormDialog
+	bind:open={formTerbuka}
+	perumahanSlug=""
+	namaPerumahan="Omahe"
+	sumber="card"
+	namaAgen={k.nama}
+	kodeAgen={k.kodeAgen}
+/>

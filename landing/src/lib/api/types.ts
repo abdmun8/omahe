@@ -694,6 +694,10 @@ export interface AgenDirektori {
 	kodeAgen: string;
 	/** AGEN-OMAHE-07 — centang biru (opsional, backend lama tidak mengirim). */
 	profesional?: boolean;
+	/** AGEN-OMAHE-08 — prioritas promosi efektif 0–100 (0 = tidak promosi;
+	 *  masa promo habis otomatis turun ke 0, pola MONET-01). Backend lama
+	 *  tanpa field → dinormalisasi ke 0 di `client.ts`. */
+	prioritas: number;
 }
 
 /**

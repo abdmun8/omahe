@@ -77,15 +77,14 @@ describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
 		expect(gtag).toHaveBeenCalledWith('event', 'whatsapp_click', { perumahan: KONTEKS });
 	});
 
-	test('onFormMinat + gayaMinat whatsapp → tombol WhatsApp membuka form (bukan link wa.me)', async () => {
+	test('onFormMinat → tombol WhatsApp membuka form (bukan link wa.me)', async () => {
 		const gtag = vi.fn();
 		vi.stubGlobal('gtag', gtag);
 		const onFormMinat = vi.fn();
 		const { container } = render(ContactButtons, {
 			konteks: KONTEKS,
 			entitas: 'Griya Asri',
-			onFormMinat,
-			gayaMinat: 'whatsapp'
+			onFormMinat
 		});
 
 		expect(container.querySelector('a[href*="wa.me"]')).toBeNull();
@@ -96,13 +95,17 @@ describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
 		expect(gtag).toHaveBeenCalledWith('event', 'whatsapp_click', { perumahan: 'Griya Asri' });
 	});
 
-	test('onFormMinat gaya default → tombol "Minat" (partner berbayar)', async () => {
+	test('onFormMinat tanpa prop lain → tetap WhatsApp, BUKAN "Minat" emas (varian accent dihapus 2026-10-23)', async () => {
 		const onFormMinat = vi.fn();
-		render(ContactButtons, { konteks: KONTEKS, onFormMinat });
+		const { container } = render(ContactButtons, { konteks: KONTEKS, onFormMinat });
 
-		const tombol = screen.getByRole('button', { name: `Minat tentang ${KONTEKS}` });
-		expect(tombol.textContent).toContain('Minat');
-		expect(tombol.textContent).not.toContain('Form');
+		// Cabang "Minat" (variant accent, MONET-03) sudah dihapus — tombol
+		// pembuka form kini SELALU hijau WhatsApp, apa pun status partner.
+		expect(screen.queryByRole('button', { name: `Minat tentang ${KONTEKS}` })).toBeNull();
+		const tombol = screen.getByRole('button', {
+			name: `Hubungi via WhatsApp tentang ${KONTEKS}`
+		});
+		expect(container.querySelector('a[href*="wa.me"]')).toBeNull();
 		await fireEvent.click(tombol);
 		expect(onFormMinat).toHaveBeenCalledTimes(1);
 	});

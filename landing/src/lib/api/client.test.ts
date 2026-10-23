@@ -286,6 +286,20 @@ describe('getDirektoriAgen (AGEN-OMAHE-04, mode fixture)', () => {
 		}
 	});
 
+	// AGEN-OMAHE-08 — fixture meniru backend: terurut `prioritas` DESC dan
+	// dua agen berprioritas > 0 (jalur badge "Promosi" di kartu tetap
+	// teruji di dev), sisanya 0.
+	test('fixture terurut prioritas DESC; field prioritas terisi di semua item', async () => {
+		const { getDirektoriAgen } = await import('./client');
+		const hasil = await getDirektoriAgen(fetchDummy);
+		const prioritas = hasil.items.map((a) => a.prioritas);
+		expect(prioritas).toEqual([...prioritas].sort((a, b) => b - a));
+		expect(prioritas.some((p) => p > 0)).toBe(true);
+		for (const a of hasil.items) {
+			expect(a.prioritas).toBeGreaterThanOrEqual(0);
+		}
+	});
+
 	// 2026-10-08 — pencarian + paginasi (meniru backend di mode fixture).
 	test('q mencocokkan nama/kantor/kode; halaman diklem', async () => {
 		const { getDirektoriAgen } = await import('./client');

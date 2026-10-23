@@ -15,10 +15,11 @@
  *
  * Iterasi 2 GA4: klik "Ajukan" → `cta_ajukan` { perumahan, ada_ref }
  * (diagnostik putusnya rantai komisi — CLAUDE.md §Redirect `/p/:slug`),
- * klik WA partner gratis → `whatsapp_click`, dan partner berbayar
- * (MONET-03) → "Form Minat" membuka LeadFormDialog dengan sumber 'detail'
- * (event `lead_form_open`). Tracking tidak mencegat navigasi — tombol
- * tetap link sungguhan.
+ * klik WhatsApp → `whatsapp_click` + LeadFormDialog sumber 'detail'
+ * (event `lead_form_open`) — tombol WhatsApp-aja SATU untuk semua
+ * perumahan sejak 2026-10-23 (tombol "Minat" emas MONET-03 dihapus;
+ * prop `prioritas`/`formMinat` ikut dihapus dari komponen). Tracking
+ * tidak mencegat navigasi — tombol tetap link sungguhan.
  */
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { waitFor } from '@testing-library/dom';
@@ -52,7 +53,7 @@ function stubGtag() {
 }
 
 function propsDasar() {
-	return { slug: 'griya-asri', nama: 'Griya Asri', prioritas: 0 };
+	return { slug: 'griya-asri', nama: 'Griya Asri' };
 }
 
 afterEach(() => {
@@ -91,10 +92,13 @@ describe.skipIf(typeof document === 'undefined')('StickyCta', () => {
 		});
 	});
 
-	test('partner gratis (prioritas 0) → tombol WhatsApp; klik → whatsapp_click + form terbuka (LEAD-02)', async () => {
+	test('tombol WhatsApp SATU untuk semua (eks partner berbayar pun tanpa "Minat") — klik → whatsapp_click + lead_form_open sumber "detail"', async () => {
 		const gtagMock = stubGtag();
 		render(StickyCta, propsDasar());
 
+		// Cabang "Minat" (variant accent, MONET-03) sudah dihapus — meski
+		// komponen tidak lagi menerima `prioritas`, tombol WhatsApp wajib
+		// tetap dirender dan membuka dialog dengan sumber 'detail'.
 		expect(screen.queryByRole('button', { name: 'Minat' })).toBeNull();
 
 		// LEAD-02 — WhatsApp = tombol pembuka form (bukan link wa.me langsung).
@@ -105,23 +109,6 @@ describe.skipIf(typeof document === 'undefined')('StickyCta', () => {
 			perumahan: 'Griya Asri'
 		});
 		expect(await screen.findByText('Minat — Griya Asri')).toBeInTheDocument();
-		// CTA booking tetap ada di samping WA.
-		expect(screen.getByRole('link', { name: 'Ajukan' })).toBeInTheDocument();
-	});
-
-	test('partner berbayar (prioritas > 0) → klik "Minat" membuka dialog + lead_form_open sumber "detail"', async () => {
-		const gtagMock = stubGtag();
-		render(StickyCta, { ...propsDasar(), prioritas: 50 });
-
-		// Slot WA DIGANTI "Minat" — tombol WhatsApp tidak ada.
-		expect(screen.queryByRole('button', { name: 'WhatsApp' })).toBeNull();
-		expect(screen.getByRole('button', { name: 'Minat' })).toBeInTheDocument();
-
-		await fireEvent.click(screen.getByRole('button', { name: 'Minat' }));
-
-		// Isi dialog di-PORTAL ke document.body oleh bits-ui — screen query
-		// mencari di seluruh body (pola lead-form-dialog.test.ts).
-		expect(await screen.findByText('Minat — Griya Asri')).toBeInTheDocument();
 
 		// $effect berjalan pasca-dialog-terbuka — jangan assert sinkron.
 		await waitFor(() =>
@@ -130,7 +117,7 @@ describe.skipIf(typeof document === 'undefined')('StickyCta', () => {
 				sumber: 'detail'
 			})
 		);
-		// "Ajukan" tetap dirender — booking tidak digantikan form minat.
+		// CTA booking tetap ada di samping WA.
 		expect(screen.getByRole('link', { name: 'Ajukan' })).toBeInTheDocument();
 	});
 });

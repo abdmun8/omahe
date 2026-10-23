@@ -10,6 +10,7 @@ import {
 } from '$lib/api';
 import { cacheKonten } from '$lib/cache';
 import { AMBANG_PERUMAHAN_BARU } from '$lib/config';
+import { kumpulkanSlugPromo, saringBukanPromo } from '$lib/promo-saring';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -30,7 +31,7 @@ async function failSoft<T>(label: string, task: Promise<T[]>): Promise<T[]> {
 
 export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 	const [
-		unitUnggulan,
+		unitUnggulanKandidat,
 		unitTerjangkau,
 		terbaru,
 		perumahanPromo,
@@ -39,10 +40,12 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 		regions,
 		sliders
 	] = await Promise.all([
-		failSoft('unit unggulan', getFeaturedUnits(fetch, 6)),
+		// Kandidat diambil LEBIH BANYAK dari kebutuhan slot (12 untuk 6, 8
+		// untuk 4) — sebagian gugur saringan anti-dobel promo di bawah.
+		failSoft('unit unggulan', getFeaturedUnits(fetch, 12)),
 		// LANDING-07 — seksi "Harga Terjangkau" & "Baru di Omahe" (fail-soft).
 		failSoft('unit terjangkau', getUnitTerjangkau(fetch, 6)),
-		getPerumahanTerbaru(fetch, 4).catch((err) => {
+		getPerumahanTerbaru(fetch, 8).catch((err) => {
 			console.error('[omahe:home] perumahan terbaru gagal dimuat — bagian disembunyikan', err);
 			return { items: [], total: 0 };
 		}),
@@ -60,10 +63,25 @@ export const load: PageServerLoad = async ({ fetch, setHeaders }) => {
 		getRegions(fetch),
 		getSliders(fetch)
 	]);
+	// MONET-01 anti-dobel: perumahan yang sudah tampil di "Promo Pilihan"
+	// (partner berbayar) tidak boleh muncul lagi di seksi organik — slot
+	// homepage jangan diboroskan dua kali untuk perumahan yang sama.
+	const slugPromo = kumpulkanSlugPromo(perumahanPromo);
+	const unitUnggulan = saringBukanPromo(
+		unitUnggulanKandidat,
+		slugPromo,
+		(u) => u.perumahan.slug,
+		6
+	);
+
 	// "Baru di Omahe" baru tampil kalau perumahan aktif sudah cukup banyak
 	// (keputusan user: ≥ 25) — sebelum itu isinya hampir sama dengan
-	// rekomendasi.
-	const perumahanBaru = terbaru.total >= AMBANG_PERUMAHAN_BARU ? terbaru.items : [];
+	// rekomendasi. Ambang memakai TOTAL perumahan aktif (`terbaru.total`
+	// dari meta backend), bukan jumlah item halaman ini.
+	const perumahanBaru =
+		terbaru.total >= AMBANG_PERUMAHAN_BARU
+			? saringBukanPromo(terbaru.items, slugPromo, (p) => p.slug, 4)
+			: [];
 
 	// Kalau data inti gagal, cache edge dipersingkat supaya halaman kosong
 	// tidak tersaji 5 menit penuh setelah backend pulih.

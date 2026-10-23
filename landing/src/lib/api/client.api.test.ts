@@ -31,6 +31,7 @@ import type { PerumahanDirektori, UnitListing } from './types';
 import {
 	createLead,
 	getDeveloper,
+	getDirektoriAgen,
 	getLelang,
 	getPerumahanPromo,
 	getRegions,
@@ -489,5 +490,44 @@ describe('AGEN-PROPERTI-03 — header X-Konsumen: omahe', () => {
 		await getRegions(fakeFetch);
 		expect(headers.length).toBeGreaterThan(0);
 		for (const h of headers) expect(h.get('x-konsumen')).toBe('omahe');
+	});
+});
+
+describe('getDirektoriAgen (jalur API asli) — prioritas AGEN-OMAHE-08', () => {
+	/** Item direktori bentuk respons backend (urutan sudah DESC dari server). */
+	const agen = (kodeAgen: string, prioritas?: number) => ({
+		nama: `Agen ${kodeAgen}`,
+		kantorNama: 'Omahe Bogor',
+		fotoUrl: null,
+		kodeAgen,
+		...(prioritas === undefined ? {} : { prioritas })
+	});
+
+	test('respons baru: prioritas dipakai apa adanya, bentuk halaman dipertahankan', async () => {
+		const f = (async () =>
+			envelope([agen('OMHA-A0001', 80), agen('OMHA-A0002', 0)], {
+				total: 2,
+				halaman: 1,
+				perHalaman: 24,
+				totalHalaman: 1
+			})) as unknown as typeof fetch;
+		const hasil = await getDirektoriAgen(f);
+		expect(hasil.items.map((a) => a.prioritas)).toEqual([80, 0]);
+		expect(hasil.total).toBe(2);
+	});
+
+	test('respons lama tanpa field prioritas → dinormalisasi ke 0 (badge tidak menyala palsu)', async () => {
+		const f = (async () =>
+			envelope([agen('OMHA-A0003'), agen('OMHA-A0004')], { total: 2 })) as unknown as typeof fetch;
+		const hasil = await getDirektoriAgen(f);
+		expect(hasil.items.map((a) => a.prioritas)).toEqual([0, 0]);
+	});
+
+	test('bentuk array polos (backend lebih lama) → dibungkus halaman tunggal + prioritas 0', async () => {
+		const f = (async () => envelope([agen('OMHA-A0005')])) as unknown as typeof fetch;
+		const hasil = await getDirektoriAgen(f);
+		expect(hasil.items).toHaveLength(1);
+		expect(hasil.items[0]?.prioritas).toBe(0);
+		expect(hasil.totalHalaman).toBe(1);
 	});
 });

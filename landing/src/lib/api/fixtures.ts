@@ -697,26 +697,31 @@ export const AGEN_PEMASAR: Record<string, AgenPemasar[]> = {
 
 /** Direktori agen Omahe (AGEN-OMAHE-04) — DEV-SAJA, pola AGEN_PEMASAR.
  *  PROFIL-01 — foto 3:2 lanskap; satu entri TANPA foto menjaga jalur
- *  placeholder gradasi + inisial di kartu. */
+ *  placeholder gradasi + inisial di kartu. AGEN-OMAHE-08 — terurut
+ *  `prioritas` DESC meniru backend; dua agen berprioritas > 0 menjaga
+ *  jalur badge "Promosi" di kartu. */
 export const DIREKTORI_AGEN: AgenDirektori[] = [
-	{
-		nama: 'Dimas Nugraha',
-		kantorNama: 'Omahe Bogor',
-		fotoUrl: null,
-		kodeAgen: 'OMHA-A0002'
-	},
 	{
 		nama: 'Widya Pratama',
 		kantorNama: 'Omahe Bogor',
 		fotoUrl: 'https://picsum.photos/seed/omahe-agen-widya/1200/800',
 		kodeAgen: 'OMHA-A0001',
+		prioritas: 80,
 		profesional: true
 	},
 	{
 		nama: 'Sari Anggraini',
 		kantorNama: 'Omahe Depok',
 		fotoUrl: 'https://picsum.photos/seed/omahe-agen-sari/1200/800',
-		kodeAgen: 'OMHA-A0003'
+		kodeAgen: 'OMHA-A0003',
+		prioritas: 40
+	},
+	{
+		nama: 'Dimas Nugraha',
+		kantorNama: 'Omahe Bogor',
+		fotoUrl: null,
+		kodeAgen: 'OMHA-A0002',
+		prioritas: 0
 	}
 ];
 

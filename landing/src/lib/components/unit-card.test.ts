@@ -123,10 +123,10 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 	});
 
 	test('thumbnail & badge tipe → halaman detail tipe kalau tipeSlug ada (DASH)', () => {
-		render(
-			UnitCard,
-			{ unit: buatUnit({ tipeSlug: '36-72', fotoTipeUrl: 'https://img/tipe.webp' }), ref: 'abc123' },
-		);
+		render(UnitCard, {
+			unit: buatUnit({ tipeSlug: '36-72', fotoTipeUrl: 'https://img/tipe.webp' }),
+			ref: 'abc123'
+		});
 		const tautanTipe = screen.getAllByRole('link', { name: /Lihat tipe 36\/72/i });
 		// Thumbnail + badge — keduanya ke halaman tipe.
 		expect(tautanTipe.length).toBeGreaterThanOrEqual(2);
@@ -193,7 +193,9 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		expect(screen.getByText('Rp385 jt')).toBeInTheDocument();
 	});
 
-	// MONET-03: partner berbayar (prioritas > 0) — slot WA jadi "Minat".
+	// Keputusan 2026-10-23: tombol emas "Minat" (MONET-03) dihapus — partner
+	// berbayar bertombol WhatsApp yang sama dengan reguler; pembedanya cuma
+	// badge "Promosi".
 	const perumahanBerbayar = {
 		nama: 'Griya Asri',
 		slug: 'griya-asri',
@@ -202,14 +204,14 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		prioritas: 50
 	};
 
-	test('prioritas > 0 → tombol "Minat" (emas) menggantikan WhatsApp, tanpa Telepon (MONET-03/LEAD-02)', () => {
+	test('prioritas > 0 (eks-partner berbayar) → tetap tombol WhatsApp, bukan "Minat" emas', () => {
 		render(UnitCard, { unit: buatUnit({ perumahan: perumahanBerbayar }) });
 		const konteks = '36/72 di Griya Asri'; // ${unit.tipe} di ${unit.perumahan.nama} (buatUnit default)
 
-		expect(screen.getByRole('button', { name: `Minat tentang ${konteks}` })).toBeInTheDocument();
 		expect(
-			screen.queryByRole('button', { name: `Hubungi via WhatsApp tentang ${konteks}` })
-		).toBeNull();
+			screen.getByRole('button', { name: `Hubungi via WhatsApp tentang ${konteks}` })
+		).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: `Minat tentang ${konteks}` })).toBeNull();
 		expect(screen.queryByRole('link', { name: `Telepon tentang ${konteks}` })).toBeNull();
 	});
 
@@ -317,12 +319,12 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		});
 	});
 
-	test('klik "Minat" → dialog lead terbuka (judul dialog terlihat)', async () => {
+	test('klik WhatsApp (prioritas > 0) → dialog lead terbuka juga (satu tombol untuk semua)', async () => {
 		render(UnitCard, { unit: buatUnit({ perumahan: perumahanBerbayar }) });
 
-		fireEvent.click(screen.getByRole('button', { name: /^Minat tentang/ }));
+		fireEvent.click(screen.getByRole('button', { name: /^Hubungi via WhatsApp/ }));
 
-		// Judul Dialog.Title — teks lengkap supaya unik terhadap tombol "Minat".
+		// Judul Dialog.Title — teks lengkap supaya unik terhadap tombol WA.
 		expect(await screen.findByText('Minat — Griya Asri')).toBeInTheDocument();
 	});
 

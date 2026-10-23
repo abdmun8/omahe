@@ -40,12 +40,11 @@
 	);
 
 	/**
-	 * Partner berbayar (MONET-03): tombol "Minat" emas; gratis: tombol
-	 * "WhatsApp". LEAD-02 — keduanya membuka form dulu (lead masuk inbox
-	 * perumahan via POST /public/leads), lalu WA ke nomor perumahan.
-	 * `undefined` (respons API lama tanpa MONET-01) = gratis.
+	 * LEAD-02: tombol kontak SELALU "WhatsApp" yang membuka form dulu (lead
+	 * masuk inbox perumahan via POST /public/leads), lalu WA ke nomor
+	 * perumahan — partner berbayar TIDAK dibedakan lagi (tombol emas "Minat"
+	 * dihapus 2026-10-23); pembedanya cuma badge "Promosi" di thumbnail.
 	 */
-	const partnerBerbayar = $derived(unit.perumahan.prioritas > 0);
 	let formMinatTerbuka = $state(false);
 
 	// Iterasi 2 GA4: klik kartu (link nama perumahan ke halaman detail).
@@ -175,7 +174,6 @@
 			konteks="{unit.tipe} di {unit.perumahan.nama}"
 			entitas={unit.perumahan.nama}
 			onFormMinat={() => (formMinatTerbuka = true)}
-			gayaMinat={partnerBerbayar ? 'minat' : 'whatsapp'}
 			class="mt-3"
 		/>
 		<!-- sumber='card' (api-contract.md §8): tipe unit jadi prefill,

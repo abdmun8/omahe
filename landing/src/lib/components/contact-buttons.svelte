@@ -19,12 +19,13 @@
 	LeadFormDialog) — perilaku partner gratis TIDAK berubah sama sekali.
 
 	LEAD-02 (2026-10-03, keputusan user): SEMUA perumahan memakai form
-	dulu — `onFormMinat` diisi untuk setiap perumahan; `gayaMinat` hanya
-	memilih tampilan tombol: "Minat" (emas, partner berbayar) atau
-	"WhatsApp" (hijau, gratis) — keduanya membuka form, lalu WA ke nomor
-	perumahan setelah lead tercatat. Tombol Telepon DISEMBUNYIKAN di semua
-	lokasi untuk saat ini (keputusan user 2026-10-03) — saklar
-	`TAMPILKAN_TELEPON` di `$lib/config`.
+	dulu — `onFormMinat` diisi untuk setiap perumahan dan tombolnya SELALU
+	"WhatsApp" (hijau): form dulu (lead tercatat), lalu WA ke nomor
+	perumahan dari dialog. Tombol emas "Minat" untuk partner berbayar
+	(MONET-03) DIHAPUS 2026-10-23 — tombol sponsored kini sama persis
+	dengan reguler; badge "Promosi" di kartu tetap pembedanya. Tombol
+	Telepon DISEMBUNYIKAN di semua lokasi untuk saat ini (keputusan user
+	2026-10-03) — saklar `TAMPILKAN_TELEPON` di `$lib/config`.
 -->
 <script lang="ts">
 	import { page } from '$app/state';
@@ -40,7 +41,6 @@
 		nomorTelepon = page.data.kontak?.telepon ?? SITE.telepon,
 		size = 'sm',
 		onFormMinat = null,
-		gayaMinat = 'minat',
 		class: className = ''
 	}: {
 		/** Nama properti/developer yang ditanyakan — masuk ke pesan pembuka WA. */
@@ -61,9 +61,6 @@
 		 * langsung di card); jangan diubah.
 		 */
 		onFormMinat?: (() => void) | null;
-		/** LEAD-02 — tampilan tombol pembuka form: 'minat' (emas, partner
-		 *  berbayar) atau 'whatsapp' (hijau, perumahan gratis). */
-		gayaMinat?: 'minat' | 'whatsapp';
 		class?: string;
 	} = $props();
 
@@ -82,9 +79,10 @@
 </script>
 
 <div class="flex flex-wrap gap-2 {className}">
-	{#if onFormMinat && gayaMinat === 'whatsapp'}
+	{#if onFormMinat}
 		<!-- LEAD-02 — tampil seperti WhatsApp, tapi form dulu (lead tercatat),
-		     baru lanjut WA ke nomor perumahan dari dialog. -->
+		     baru lanjut WA ke nomor perumahan dari dialog. Partner berbayar
+		     TIDAK dibedakan lagi (tombol emas "Minat" dihapus 2026-10-23). -->
 		<Button
 			variant="whatsapp"
 			{size}
@@ -97,28 +95,6 @@
 		>
 			{@render ikonWhatsapp()}
 			WhatsApp
-		</Button>
-	{:else if onFormMinat}
-		<!-- Slot WA diganti form minat (partner berbayar, api-contract.md §8).
-		     Accent emas = kuat setara WA tapi BUKAN hijau WhatsApp, supaya
-		     tidak mengesankan aksi WA; senada dengan badge "Promosi". -->
-		<Button
-			variant="accent"
-			{size}
-			onclick={onFormMinat}
-			class="flex-1"
-			aria-label="Minat tentang {konteks}"
-		>
-			<svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
-				<path
-					d="M15.5 3.5l5 5L8 21H3v-5L15.5 3.5z"
-					stroke="currentColor"
-					stroke-width="1.6"
-					stroke-linejoin="round"
-				/>
-				<path d="M13 6l5 5" stroke="currentColor" stroke-width="1.6" />
-			</svg>
-			Minat
 		</Button>
 	{:else}
 		<Button

@@ -257,7 +257,6 @@
 					entitas={p.nama}
 					size="md"
 					onFormMinat={() => (formMinatTerbuka = true)}
-					gayaMinat="whatsapp"
 				/>
 			</div>
 		</aside>

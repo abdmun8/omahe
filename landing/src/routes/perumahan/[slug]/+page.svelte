@@ -56,14 +56,12 @@
 	const urlHalaman = $derived(`${SITE.url}/perumahan/${p.slug}`);
 
 	/**
-	 * Partner berbayar (MONET-03): CTA kontak (desktop + sticky) "Minat"
-	 * emas; gratis "WhatsApp". LEAD-02 — keduanya form dulu (lead masuk
-	 * inbox perumahan via POST /public/leads, sumber='detail'), lalu WA ke
-	 * nomor perumahan. `undefined` (respons lama tanpa MONET-01) = gratis.
+	 * LEAD-02: CTA kontak (desktop + sticky) SELALU "WhatsApp" yang membuka
+	 * form dulu (lead masuk inbox perumahan via POST /public/leads,
+	 * sumber='detail'), lalu WA ke nomor perumahan — partner berbayar TIDAK
+	 * dibedakan lagi (tombol emas "Minat" dihapus 2026-10-23; perumahan
+	 * milik agen properti pun lewat jalur form yang sama).
 	 */
-	// AGEN-PROPERTI-01 — perumahan milik agen properti yang tampil juga
-	// memakai form minat (lead ke agen), tanpa syarat prioritas berbayar.
-	const partnerBerbayar = $derived(p.prioritas > 0 || !!p.agen);
 	let formMinatTerbuka = $state(false);
 	/** Opsi select tipe minat — dari daftar tipe unit di halaman ini. */
 	const opsiTipe = $derived([...new Set(data.tipeUnit.map((u) => u.tipe))]);
@@ -250,12 +248,7 @@
 			>
 				Ajukan Unit Ini
 			</Button>
-			<ContactButtons
-				konteks={p.nama}
-				size="md"
-				onFormMinat={() => (formMinatTerbuka = true)}
-				gayaMinat={partnerBerbayar ? 'minat' : 'whatsapp'}
-			/>
+			<ContactButtons konteks={p.nama} size="md" onFormMinat={() => (formMinatTerbuka = true)} />
 		</div>
 	</div>
 
@@ -464,13 +457,7 @@
 	</div>
 </div>
 
-<StickyCta
-	slug={p.slug}
-	nama={p.nama}
-	ref={data.ref}
-	prioritas={p.prioritas}
-	formMinat={partnerBerbayar}
-/>
+<StickyCta slug={p.slug} nama={p.nama} ref={data.ref} />
 
 <!-- Dialog desktop/CTA kolom ringkasan — sticky-cta punya instance-nya
      sendiri (state terpisah). Dua-duanya tak mungkin terbuka bersamaan:

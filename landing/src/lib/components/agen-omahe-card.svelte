@@ -1,9 +1,10 @@
 <!--
 	Kartu agen di tab "Agen Omahe" halaman Mitra (AGEN-OMAHE-04): foto
 	LANSKAP 3:2 di atas kartu (PROFIL-01 — tanpa foto → blok gradasi hijau
-	dengan inisial besar), lalu nama, kode, kantor, tanda terverifikasi →
-	halaman verifikasi ID card, "Lihat Profil" → kartu nama digital
-	`/agen-omahe/:kode`, dan "Hubungi" = form minat ke agen (lead tercatat
+	dengan inisial besar; badge "Promosi" pojok foto bila `prioritas > 0`,
+	AGEN-OMAHE-08 — tombol tidak dibedakan), lalu nama, kode, kantor, tanda
+	terverifikasi → halaman verifikasi ID card, "Lihat Profil" → kartu nama
+	digital `/agen-omahe/:kode`, dan "Hubungi" = form minat ke agen (lead tercatat
 	untuk agen, WA ke agen). Nomor HP agen sengaja tidak ditampilkan.
 -->
 <script lang="ts">
@@ -12,6 +13,7 @@
 	import type { AgenDirektori } from '$lib/api/types';
 	import { trackEvent } from '$lib/analytics';
 	import LeadFormDialog from './lead-form-dialog.svelte';
+	import PromosiBadge from './promosi-badge.svelte';
 	import Button from './ui/button.svelte';
 
 	let { agen }: { agen: AgenDirektori } = $props();
@@ -36,24 +38,32 @@
 
 <article class="border-line flex h-full flex-col overflow-hidden rounded-2xl border bg-white">
 	<!-- PROFIL-01 — foto lanskap 3:2; `width/height` pas rasio untuk CLS. -->
-	{#if agen.fotoUrl}
-		<img
-			src={agen.fotoUrl}
-			alt={`Foto ${agen.nama}`}
-			width="1200"
-			height="800"
-			loading="lazy"
-			decoding="async"
-			class="aspect-[3/2] w-full object-cover"
-		/>
-	{:else}
-		<div
-			class="from-primary-light to-primary-dark flex aspect-[3/2] w-full items-center justify-center bg-gradient-to-br"
-			aria-hidden="true"
-		>
-			<span class="font-display text-4xl font-bold text-white/90">{inisial}</span>
-		</div>
-	{/if}
+	<div class="relative">
+		{#if agen.fotoUrl}
+			<img
+				src={agen.fotoUrl}
+				alt={`Foto ${agen.nama}`}
+				width="1200"
+				height="800"
+				loading="lazy"
+				decoding="async"
+				class="aspect-[3/2] w-full object-cover"
+			/>
+		{:else}
+			<div
+				class="from-primary-light to-primary-dark flex aspect-[3/2] w-full items-center justify-center bg-gradient-to-br"
+				aria-hidden="true"
+			>
+				<span class="font-display text-4xl font-bold text-white/90">{inisial}</span>
+			</div>
+		{/if}
+		{#if agen.prioritas > 0}
+			<!-- AGEN-OMAHE-08 — agen promosi (prioritas efektif > 0). Pojok
+			     foto, pola unit-card/perumahan-baru-card; tombol hubungi
+			     TIDAK ikut dibedakan (keputusan 2026-10-23). -->
+			<PromosiBadge class="pointer-events-none absolute top-1.5 left-1.5" />
+		{/if}
+	</div>
 
 	<div class="flex flex-1 flex-col items-center p-5 text-center">
 		<h2 class="font-display text-ink text-base font-bold">

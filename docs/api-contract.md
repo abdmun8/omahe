@@ -632,6 +632,14 @@ dibandingkan case-insensitive). Respons `data`:
   nomor HP. Omahe: `getDirektoriAgen` (fixture dev-saja meniru saring+
   paginasi, fail-soft halaman kosong) → tab **Agen Omahe** di
   `/mitra?tab=agen&q=&page=` (form GET + Pagination).
+- **AGEN-OMAHE-08 (promosi agen di direktori, 2026-10-23):** tiap item
+  kini membawa `prioritas: number` — prioritas promosi EFEKTIF 0–100
+  (0 = tidak promosi; masa promo habis otomatis turun ke 0, pola
+  MONET-01) dan urutan balikan berubah jadi PRIORITAS DESC (sebelumnya:
+  kantor lalu nama). Omahe menampilkan badge "Promosi" di pojok foto
+  kartu agen bila `prioritas > 0`; tombol hubungi TIDAK dibedakan.
+  Respons lama tanpa field → Omahe menormalisasi ke 0 (`client.ts`,
+  fixture dev punya 2 agen berprioritas > 0, terurut DESC meniru backend).
 - `POST /public/agen-omahe/:kodeAgen/minat { nama, telepon, pesan?,
   website }` → `{ ok: true, whatsapp }`; 400 validasi, 404 agen tidak aktif, 429
   >3/24 jam per (telepon, agen). **LEAD-02 (perbaikan 2026-10-08):**

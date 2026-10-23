@@ -68,7 +68,6 @@
 			konteks={proyek.nama}
 			entitas={proyek.nama}
 			onFormMinat={() => (formMinatTerbuka = true)}
-			gayaMinat="whatsapp"
 			class="mt-4"
 		/>
 		<LeadFormDialog

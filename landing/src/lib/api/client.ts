@@ -1000,6 +1000,18 @@ export async function getAgenPemasar(
 // Direktori agen Omahe + minat umum (AGEN-OMAHE-04) -------------------------------
 
 /**
+ * AGEN-OMAHE-08 — `prioritas` wajib ada di tipe `AgenDirektori`, tapi
+ * backend lama tidak mengirimnya: bukan number (atau nilai <= 0 aneh) →
+ * 0 (tidak promosi) supaya badge "Promosi" tidak menyala palsu.
+ */
+function normalisasiPrioritasAgen(agen: AgenDirektori): AgenDirektori {
+	const prioritas = (agen as { prioritas?: unknown }).prioritas;
+	return typeof prioritas === 'number' && prioritas > 0
+		? { ...agen, prioritas }
+		: { ...agen, prioritas: 0 };
+}
+
+/**
  * Agen Omahe aktif untuk tab "Agen Omahe" di `/mitra` (api-contract §23).
  * Pola `getAgenPemasar`: fixture HANYA non-produksi, gagal → `[]`
  * (tab menampilkan empty-state, halaman tidak jatuh).
@@ -1038,7 +1050,7 @@ export async function getDirektoriAgen(
 		const totalHalaman = Math.max(1, Math.ceil(total / 24));
 		const halaman = Math.min(Math.max(1, opsi.halaman ?? 1), totalHalaman);
 		return {
-			items: saringan.slice((halaman - 1) * 24, halaman * 24),
+			items: saringan.slice((halaman - 1) * 24, halaman * 24).map(normalisasiPrioritasAgen),
 			total,
 			halaman,
 			perHalaman: 24,
@@ -1055,16 +1067,19 @@ export async function getDirektoriAgen(
 			`/public/agen-omahe${qs ? `?${qs}` : ''}`
 		);
 		if (Array.isArray(data)) {
-			// Backend lama — bungkus jadi halaman tunggal.
+			// Backend lama — bungkus jadi halaman tunggal (+ prioritas → 0).
 			return {
-				items: data,
+				items: data.map(normalisasiPrioritasAgen),
 				total: data.length,
 				halaman: 1,
 				perHalaman: data.length || 24,
 				totalHalaman: 1
 			};
 		}
-		if (data && typeof data === 'object' && Array.isArray(data.items)) return data;
+		if (data && typeof data === 'object' && Array.isArray(data.items)) {
+			// AGEN-OMAHE-08 — normalisasi per item (respons lama tanpa field).
+			return { ...data, items: data.items.map(normalisasiPrioritasAgen) };
+		}
 		return kosong;
 	} catch (err) {
 		console.error('[omahe:api] GET /public/agen-omahe gagal — fallback ke [] (empty-state)', err);
