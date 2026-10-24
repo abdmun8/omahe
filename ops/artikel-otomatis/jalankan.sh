@@ -10,7 +10,8 @@
 # Bekerja di clone TERPISAH ($BOT) supaya tidak mengganggu repo kerja harian.
 set -euo pipefail
 
-export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+NODE_BIN="$(ls -d "$HOME"/.nvm/versions/node/*/bin 2>/dev/null | sort -V | tail -1)" # pi butuh node
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:${NODE_BIN:+$NODE_BIN:}/usr/local/bin:/usr/bin:/bin"
 REMOTE="git@github.com:abdmun8/omahe.git"
 BOT="${ARTIKEL_BOT_DIR:-$HOME/projects/omahe-artikel-bot}"
 STATE="$HOME/.local/state/omahe-artikel"
@@ -26,6 +27,7 @@ flock -n 9 || { echo "$(date -Is) proses lain masih jalan" >>"$STATE/cron.log"; 
 exec >>"$LOG" 2>&1
 log() { echo "[$(date '+%F %T')] $*"; }
 gagal() { log "GAGAL: $*"; echo "$TANGGAL GAGAL: $*" >>"$STATE/ringkasan.log"; exit 1; }
+trap 'gagal "perintah gagal di baris $LINENO (exit $?)"' ERR
 
 log "=== mulai artikel $TANGGAL ==="
 
@@ -76,7 +78,7 @@ RENDER_DAFTAR_ARTIKEL="$(for f in "$DIR_ARTIKEL"/*.md; do
   t=$(grep -m1 "^tanggal:" "$f" | cut -d"'" -f2); g=$(grep -m1 "^tag:" "$f" | cut -d"'" -f2)
   j=$(grep -m1 "^judul:" "$f" | cut -d"'" -f2); echo "$t · $g · $(basename "$f" .md) · $j"
 done | sort -r | head -40)"
-RENDER_TAG_TERAKHIR="$(echo "$RENDER_DAFTAR_ARTIKEL" | head -2 | cut -d'·' -f2 | xargs)"
+RENDER_TAG_TERAKHIR="$(echo "$RENDER_DAFTAR_ARTIKEL" | head -2 | awk -F ' · ' '{print $2}' | xargs)"
 export RENDER_DAFTAR_ARTIKEL RENDER_TAG_TERAKHIR
 
 # --- 1. riset (Claude) ---
