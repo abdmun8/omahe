@@ -82,6 +82,7 @@ RENDER_TAG_TERAKHIR="$(echo "$RENDER_DAFTAR_ARTIKEL" | head -2 | awk -F ' · ' '
 export RENDER_DAFTAR_ARTIKEL RENDER_TAG_TERAKHIR
 
 # --- 1. riset (Claude) ---
+rm -f "$KERJA/brief.md" # jangan pakai brief basi dari percobaan sebelumnya
 log "1/4 riset (claude)"
 render "$BOT/ops/artikel-otomatis/prompt-riset.md" >"$KERJA/prompt-riset.txt"
 claude_jalan "$KERJA/prompt-riset.txt" riset \
