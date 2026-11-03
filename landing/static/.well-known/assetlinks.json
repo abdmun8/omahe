@@ -1,10 +1,13 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
-      "package_name": "id.co.omahe.app",
+      "package_name": "id.co.omahe.app.twa",
       "sha256_cert_fingerprints": [
+        "E2:6E:37:79:10:8B:B6:EE:60:14:57:92:B5:9F:DC:9D:2A:9A:0C:9B:64:58:EF:A7:35:7F:6B:FD:B2:E2:ED:27",
         "20:47:FA:78:FF:DD:2B:B6:41:13:1A:2B:2A:82:B8:33:E0:87:0E:57:17:A0:34:40:7D:87:E2:0A:99:97:07:4D"
       ]
     }
