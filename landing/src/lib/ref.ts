@@ -53,6 +53,10 @@ export function ajukanUrl(perumahanSlug: string, ref: string | null, tipe?: stri
 	const base = env.PUBLIC_BOOKING_BASE_URL?.replace(/\/+$/, '') ?? '';
 	// UNIT-09 — `?tipe=` dari halaman tipe: dicatat sebagai tipe diminati
 	// booking (tipe stok Ringkas tidak punya unit untuk dipilih).
-	const qTipe = tipe?.trim() ? `?tipe=${encodeURIComponent(tipe.trim())}` : '';
-	return withRef(`${base}/ajukan/${encodeURIComponent(perumahanSlug)}${qTipe}`, ref);
+	// KOMISI-OMAHE-01 — `src=omahe`: booking tercatat berasal dari Omahe
+	// (atribusi komisi Omahe di app perumahan). `ref` tetap terbawa apa adanya.
+	const params = new URLSearchParams();
+	if (tipe?.trim()) params.set('tipe', tipe.trim());
+	params.set('src', 'omahe');
+	return withRef(`${base}/ajukan/${encodeURIComponent(perumahanSlug)}?${params.toString()}`, ref);
 }

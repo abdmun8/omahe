@@ -61,14 +61,14 @@ describe('ajukanUrl', () => {
 	test('mengarah ke app perumahan, bukan route Omahe, dan membawa ref', async () => {
 		const { ajukanUrl } = await import('./ref');
 		expect(ajukanUrl('griya-asri-bogor', 'abc')).toBe(
-			'https://app.perumahan.test/ajukan/griya-asri-bogor?ref=abc'
+			'https://app.perumahan.test/ajukan/griya-asri-bogor?src=omahe&ref=abc'
 		);
 	});
 
 	test('tanpa ref tetap valid — booking langsung tanpa mitra juga sah', async () => {
 		const { ajukanUrl } = await import('./ref');
 		expect(ajukanUrl('griya-asri-bogor', null)).toBe(
-			'https://app.perumahan.test/ajukan/griya-asri-bogor'
+			'https://app.perumahan.test/ajukan/griya-asri-bogor?src=omahe'
 		);
 	});
 });
@@ -77,7 +77,7 @@ describe('ajukanUrl + tipe (UNIT-09)', () => {
 	test('tipe ikut sebagai ?tipe=, ref tetap terbawa', async () => {
 		const { ajukanUrl } = await import('./ref');
 		const url = ajukanUrl('griya-asri', 'abc', 'Tipe 36');
-		expect(url).toContain('/ajukan/griya-asri?tipe=Tipe%2036');
+		expect(url).toContain('/ajukan/griya-asri?tipe=Tipe+36&src=omahe');
 		expect(url).toContain('ref=abc');
 		expect(ajukanUrl('griya-asri', null, '  ')).not.toContain('tipe=');
 	});

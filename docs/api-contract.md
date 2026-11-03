@@ -864,3 +864,19 @@ request API dari Omahe tanpa header ini.
   tak dikenal → hasil kosong). Daftar diurutkan area prioritas dulu, lalu jadwal.
 - Omahe: halaman `/lelang/lokasi/:slug` (judul "Rumah Lelang di <wilayah>", canonical tanpa query, noindex bila
   kosong / terfilter bank-limit, 404 bila `meta.lokasi` null); `/lelang?lokasi=` & `?regionKode=` lama → 301.
+
+## §36 — Tayang Omahe & program Omahe (TAYANG-01/02, KOMISI-OMAHE-01, 2026-11-03)
+
+- **Gerbang tayang** (repo `perumahan`): daftar/pencarian/homepage/sitemap/regions/developer
+  hanya memuat perumahan **profil lengkap** (foto, kabupaten/kota, tipe ber-harga — item wajib
+  diatur superadmin) **dan masa tayang aktif** (gratis 30 hari sejak pertama tayang, lalu
+  Rp250.000/tahun). Omahe tidak perlu menyaring sendiri.
+- `GET /public/perumahan/:slug` (+`?full=1`) tetap 200 untuk perumahan yang tidak tayang
+  (QR/ref tidak putus) dengan `tayangOmahe: false` → Omahe memasang `noindex, follow`.
+- `programOmahe: { dp0: boolean, cashback: number | null, teksSyarat: string }` — di item
+  `GET /public/perumahan` & `GET /public/units` (key **hanya ada** bila perumahan ikut program)
+  dan di detail (`null` bila tidak ikut). Omahe: badge "DP 0%*" di `unit-card` &
+  `perumahan-baru-card` (kanan atas thumbnail), blok "Program khusus pembeli lewat Omahe" di
+  detail.
+- `ajukanUrl()` selalu menambah `src=omahe` — app `perumahan` mencatat booking sebagai
+  "dari Omahe" (atribusi komisi Omahe saat akad). `ref` tetap terbawa apa adanya.

@@ -256,6 +256,18 @@
 		</div>
 	</div>
 
+	{#if p.programOmahe && (p.programOmahe.dp0 || p.programOmahe.cashback)}
+		<!-- KOMISI-OMAHE-01 — program Omahe: promo DP 0% & cashback pembeli. -->
+		<section class="border-primary/30 bg-primary/5 mt-6 rounded-xl border p-4" data-testid="program-omahe">
+			<p class="font-display text-ink text-base font-bold">Program khusus pembeli lewat Omahe</p>
+			<ul class="text-ink mt-1 space-y-0.5 text-sm">
+				{#if p.programOmahe.dp0}<li>✓ Promo DP 0%* bersama bank mitra</li>{/if}
+				{#if p.programOmahe.cashback}<li>✓ Cashback {formatRupiahPenuh(p.programOmahe.cashback)}</li>{/if}
+			</ul>
+			<p class="text-muted mt-2 text-xs">*{p.programOmahe.teksSyarat}</p>
+		</section>
+	{/if}
+
 	<!-- Konten -->
 	<div class="mt-8 space-y-10">
 		<!-- AGEN-OMAHE-03 — agen Omahe yang memasarkan (form minat per agen). -->

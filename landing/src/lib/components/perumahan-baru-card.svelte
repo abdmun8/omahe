@@ -9,6 +9,7 @@
 	import { withRef } from '$lib/ref';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
 	import PromosiBadge from './promosi-badge.svelte';
+	import Dp0Badge from './dp0-badge.svelte';
 
 	let {
 		perumahan,
@@ -35,6 +36,9 @@
 		{#if promo}
 			<!-- Badge di pojok thumbnail, pola unit-card — tidak menutupi nama. -->
 			<PromosiBadge label="Promo" class="pointer-events-none absolute top-1.5 left-1.5" />
+		{/if}
+		{#if perumahan.programOmahe?.dp0}
+			<Dp0Badge syarat={perumahan.programOmahe.teksSyarat} class="pointer-events-none absolute top-1.5 right-1.5" />
 		{/if}
 	</div>
 	<div class="flex flex-1 flex-col p-3">

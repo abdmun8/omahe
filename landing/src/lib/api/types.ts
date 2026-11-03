@@ -58,9 +58,21 @@ export interface Paginated<T> {
  * `siteplanSheetId`, `posX`/`posY`) TIDAK pernah ada di sini — tidak boleh
  * diekspos publik (UNIT-04).
  */
+/** KOMISI-OMAHE-01 (repo perumahan) — program Omahe perumahan: promo DP 0%
+ *  (diurus Omahe dengan bank) + cashback pembeli. Absen/null = tidak ikut. */
+export interface ProgramOmahe {
+	dp0: boolean;
+	/** Rupiah; null = tanpa cashback. */
+	cashback: number | null;
+	/** Teks S&K untuk ditampilkan bersama badge. */
+	teksSyarat: string;
+}
+
 export interface UnitListing {
 	/** Stabil per (perumahanSlug, tipe) — dipakai sebagai key list & anchor. */
 	id: string;
+	/** KOMISI-OMAHE-01 — program Omahe perumahan induk (absen = tidak ikut). */
+	programOmahe?: ProgramOmahe | null;
 	tipe: string;
 	/** m², null kalau data unit belum diisi. */
 	luasTanah: number | null;
@@ -123,6 +135,8 @@ export interface PerumahanDirektori {
 	developer: DeveloperRef | null;
 	jumlahTipeTersedia: number;
 	prioritas: number;
+	/** KOMISI-OMAHE-01 — program Omahe (absen = tidak ikut). */
+	programOmahe?: ProgramOmahe | null;
 }
 
 /** Query string `GET /public/units`. */
@@ -213,6 +227,8 @@ export interface PerumahanDetail {
 	 * `noindex`. Absen (backend lama/fixture) = tayang.
 	 */
 	tayangOmahe?: boolean;
+	/** KOMISI-OMAHE-01 — program Omahe (DP 0% / cashback); null = tidak ikut. */
+	programOmahe?: ProgramOmahe | null;
 	/**
 	 * Perluasan DEVELOPER-01 — optional karena endpoint yang SEKARANG jalan
 	 * belum mengembalikannya. Jangan asumsikan ada.

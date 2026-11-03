@@ -146,6 +146,17 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		expect(screen.getByText('2 unit tersedia')).toBeInTheDocument();
 	});
 
+	test('KOMISI-OMAHE-01: badge "DP 0%*" hanya bila programOmahe.dp0', () => {
+		const { unmount } = render(UnitCard, {
+			unit: buatUnit({ programOmahe: { dp0: true, cashback: 1000000, teksSyarat: 'S&K berlaku' } })
+		});
+		expect(screen.getByTestId('dp0-badge')).toHaveTextContent('DP 0%*');
+		expect(screen.getByTestId('dp0-badge')).toHaveAttribute('title', 'S&K berlaku');
+		unmount();
+		render(UnitCard, { unit: buatUnit() });
+		expect(screen.queryByTestId('dp0-badge')).toBeNull();
+	});
+
 	test('badge "unit tersisa" tidak muncul kalau unitTersedia > 3', () => {
 		render(UnitCard, { unit: buatUnit({ unitTersedia: 10 }) });
 

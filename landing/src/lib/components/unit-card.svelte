@@ -14,6 +14,7 @@
 	import LeadFormDialog from './lead-form-dialog.svelte';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
 	import PromosiBadge from './promosi-badge.svelte';
+	import Dp0Badge from './dp0-badge.svelte';
 	import Badge from './ui/badge.svelte';
 
 	let {
@@ -91,6 +92,10 @@
 			     thumbnail — badge tipe/unit-tersisa ada di area konten, jadi
 			     keduanya tidak mungkin bertabrakan. -->
 			<PromosiBadge class="pointer-events-none absolute top-1.5 left-1.5" />
+		{/if}
+		{#if unit.programOmahe?.dp0}
+			<!-- KOMISI-OMAHE-01 — program DP 0% perumahan induk (kanan atas). -->
+			<Dp0Badge syarat={unit.programOmahe.teksSyarat} class="pointer-events-none absolute top-1.5 right-1.5" />
 		{/if}
 	</div>
 
