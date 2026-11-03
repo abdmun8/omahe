@@ -74,6 +74,73 @@ describe('client (mode fixture, env kosong)', () => {
 		expect(hasil.meta.total).toBe(0);
 	});
 
+	// UNIT-10 — filter baru di jalur fixture (mirror backend `GET /public/units`):
+	// `q` dipecah per kata (AND antar-kata, OR antar-kolom: nama perumahan/
+	// tipe/developer/kecamatan/kab-kota/alamat), `kecamatanKode` exact,
+	// kamar min (tipe TANPA data kamar tidak lolos).
+	test('getUnits: q satu kata cocok nama perumahan, case-insensitive', async () => {
+		const hasil = await getUnits(fetchDummy, { q: 'KENANGA' });
+		expect(hasil.items.length).toBe(2);
+		expect(hasil.items.every((u) => u.perumahan.slug === 'villa-kenanga-residence')).toBe(true);
+	});
+
+	test('getUnits: q multi-kata AND — semua kata wajib cocok (kolom bebas)', async () => {
+		// Kedua kata cocok di NAMA perumahan yang sama.
+		const duaKata = await getUnits(fetchDummy, { q: 'griya bogor' });
+		expect(duaKata.items.length).toBe(3);
+		// Kata terpisah di kolom berbeda tetap lolos (OR antar-kolom): 'kota' di
+		// regionNama, 'bogor' juga di regionNama/alamat villa.
+		const kolomBeda = await getUnits(fetchDummy, { q: 'kota bogor' });
+		expect(kolomBeda.items.length).toBeGreaterThan(0);
+		expect(kolomBeda.items.every((u) => u.perumahan.regionKode === '32.71')).toBe(true);
+		// AND ketat: 'kenanga' (villa) + 'bandung' tidak ada di satu perumahan pun.
+		expect((await getUnits(fetchDummy, { q: 'kenanga bandung' })).items).toEqual([]);
+	});
+
+	test('getUnits: q mencocokkan kecamatan, developer, dan tipe', async () => {
+		// Kecamatan (kecamatanNama perumahan Cakrawala = Cidadap).
+		const kec = await getUnits(fetchDummy, { q: 'cidadap' });
+		expect(kec.items.every((u) => u.perumahan.slug === 'cakrawala-hills-bandung')).toBe(true);
+		// Developer (OR kolom): dua perumahan milik Nusa Land.
+		const dev = await getUnits(fetchDummy, { q: 'nusa land' });
+		expect(dev.items.every((u) => u.developer?.slug === 'nusa-land-development')).toBe(true);
+		expect(dev.items.length).toBe(5);
+		// Tipe: 36 cocok di Griya Asri, Sentosa Park, dan Puri Mentari.
+		const tipe = await getUnits(fetchDummy, { q: 'tipe 36' });
+		expect(tipe.items.map((u) => u.tipe)).toEqual(['Tipe 36/72', 'Tipe 36/72', 'Tipe 36/60']);
+	});
+
+	test('getUnits: kecamatanKode exact match (fixture + helper kecamatanKode)', async () => {
+		const hasil = await getUnits(fetchDummy, { kecamatanKode: '32.73.03' });
+		expect(hasil.items.length).toBe(2);
+		expect(hasil.items.every((u) => u.perumahan.slug === 'cakrawala-hills-bandung')).toBe(true);
+		// Kode tidak dikenal → kosong, bukan error.
+		expect((await getUnits(fetchDummy, { kecamatanKode: '99.99.99' })).items).toEqual([]);
+	});
+
+	test('getUnits: kamar min — tipe TANPA data kamar TIDAK lolos (null !== n)', async () => {
+		// Hanya Tipe 72/140 Cakrawala yang punya kamarTidur >= 3.
+		const tidur3 = await getUnits(fetchDummy, { kamarTidurMin: 3 });
+		expect(tidur3.items.map((u) => u.id)).toEqual(['cakrawala-hills-bandung--tipe-72-140']);
+		const tidur2 = await getUnits(fetchDummy, { kamarTidurMin: 2 });
+		expect(tidur2.items.length).toBe(2);
+		const mandi2 = await getUnits(fetchDummy, { kamarMandiMin: 2 });
+		expect(mandi2.items.map((u) => u.id)).toEqual(['cakrawala-hills-bandung--tipe-72-140']);
+		// Gabungan dengan q: kamar 2 di Cakrawala saja.
+		const gabung = await getUnits(fetchDummy, { q: 'bandung', kamarTidurMin: 2 });
+		expect(gabung.items.length).toBe(2);
+	});
+
+	test('getRegions fixture membawa kecamatan per kabupaten (UNIT-10)', async () => {
+		const { getRegions } = await import('./client');
+		const regions = await getRegions(fetchDummy);
+		const bandung = regions.find((r) => r.kode === '32.73');
+		expect(bandung?.kecamatan?.map((k) => k.nama)).toEqual(['Cidadap', 'Sukasari']);
+		// Region tanpa perumahan fixture → kecamatan [] (cermin backend).
+		const kosong = regions.find((r) => r.kode === '36.03');
+		expect(kosong?.kecamatan).toEqual([]);
+	});
+
 	test('fetchDummy benar-benar melempar — tiga tes di atas lolos tanpa network sedikit pun', () => {
 		expect(tolakNetwork).toThrow('Tidak boleh ada panggilan network');
 	});

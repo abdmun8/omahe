@@ -33,9 +33,18 @@ vi.mock('$lib/ref', () => ({
 	}
 }));
 
+// UNIT-10 — REGIONS test kini membawa `kecamatan` (opsional di tipe) —
+// 31.71 sengaja TANPA kecamatan (`[]`) untuk jalur region kosong.
 const REGIONS: RegionOption[] = [
-	{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' },
-	{ kode: '31.71', nama: 'Jakarta Selatan, DKI Jakarta' }
+	{
+		kode: '32.01',
+		nama: 'Kab. Bogor, Jawa Barat',
+		kecamatan: [
+			{ kode: '32.01.11', nama: 'Ciawi' },
+			{ kode: '32.01.05', nama: 'Cibinong' }
+		]
+	},
+	{ kode: '31.71', nama: 'Jakarta Selatan, DKI Jakarta', kecamatan: [] }
 ];
 
 afterEach(() => {
@@ -81,19 +90,96 @@ describe.skipIf(typeof document === 'undefined')('SearchForm', () => {
 		expect(screen.getByLabelText('Lokasi')).not.toBeNull();
 		expect(screen.getByLabelText('Harga minimum')).not.toBeNull();
 		expect(screen.getByLabelText('Harga maksimal')).not.toBeNull();
-		expect(screen.getByLabelText('Tipe rumah')).not.toBeNull();
+		// UNIT-10 — kotak utama kini kata kunci `q` (bukan lagi "Tipe rumah").
+		expect(screen.getByLabelText('Kata kunci')).not.toBeNull();
+		expect(screen.getByLabelText('Kecamatan')).not.toBeNull();
+		expect(screen.getByLabelText('Kamar tidur')).not.toBeNull();
+		expect(screen.getByLabelText('Kamar mandi')).not.toBeNull();
+	});
+
+	test('kotak utama kirim name="q" dengan placeholder & seed q ?? tipe (UNIT-10)', () => {
+		const { container, unmount } = render(SearchForm, {
+			regions: REGIONS,
+			nilai: { q: 'griya asri' }
+		});
+		const q = container.querySelector<HTMLInputElement>('#cari-kata-kunci');
+		expect(q!.getAttribute('name')).toBe('q');
+		expect(q!.value).toBe('griya asri');
+		expect(q!.placeholder).toBe('Nama perumahan, lokasi, atau tipe');
+		unmount();
+
+		// URL lama yang masih membawa `?tipe=` tetap terisi ke kotak q —
+		// submit berikutnya mengirim `q`, BUKAN mengulang `tipe`.
+		const legacy = render(SearchForm, { regions: REGIONS, nilai: { tipe: '36' } });
+		expect(legacy.container.querySelector<HTMLInputElement>('#cari-kata-kunci')!.value).toBe('36');
+		expect(legacy.container.querySelector('input[name="tipe"]')).toBeNull();
+	});
+
+	test('UNIT-10 varian penuh: nilai awal kamar & kecamatan terisi', () => {
+		const { container } = render(SearchForm, {
+			regions: REGIONS,
+			nilai: { regionKode: '32.01', kecamatanKode: '32.01.11', kamarTidurMin: 3, kamarMandiMin: 2 }
+		});
+
+		const kecamatan = container.querySelector<HTMLSelectElement>('#cari-kecamatan');
+		const tidur = container.querySelector<HTMLSelectElement>('#cari-kamar-tidur');
+		const mandi = container.querySelector<HTMLSelectElement>('#cari-kamar-mandi');
+		expect(tidur!.value).toBe('3');
+		expect(mandi!.value).toBe('2');
+		// Opsi kecamatan sesuai kab/kota terpilih (32.01 → Ciawi/Cibinong).
+		const opsi = [...kecamatan!.options].map((o) => o.value);
+		expect(opsi).toEqual(['', '32.01.11', '32.01.05']);
+		expect(kecamatan!.value).toBe('32.01.11');
+	});
+
+	test('UNIT-10: kecamatan disabled tanpa lokasi ("Pilih kab/kota dulu"), aktif + opsi setelah pilih lokasi', async () => {
+		const { container } = render(SearchForm, { regions: REGIONS });
+		const kecamatan = container.querySelector<HTMLSelectElement>('#cari-kecamatan');
+		expect(kecamatan!.disabled).toBe(true);
+		expect(kecamatan!.options[0].textContent).toBe('Pilih kab/kota dulu');
+
+		await fireEvent.change(screen.getByLabelText('Lokasi'), { target: { value: '32.01' } });
+		expect(kecamatan!.disabled).toBe(false);
+		const opsi = [...kecamatan!.options].map((o) => ({ v: o.value, t: o.textContent }));
+		expect(opsi[0]).toEqual({ v: '', t: 'Semua kecamatan' });
+		expect(opsi.map((o) => o.v)).toContain('32.01.11');
+	});
+
+	test('UNIT-10: ganti lokasi mengosongkan kecamatan yang tidak ada di kab/kota baru', async () => {
+		const { container } = render(SearchForm, {
+			regions: REGIONS,
+			nilai: { regionKode: '32.01', kecamatanKode: '32.01.11' }
+		});
+		const kecamatan = container.querySelector<HTMLSelectElement>('#cari-kecamatan');
+		expect(kecamatan!.value).toBe('32.01.11');
+
+		// Pindah ke kab/kota yang TIDAK punya kecamatan 32.01.11 → reset.
+		await fireEvent.change(screen.getByLabelText('Lokasi'), { target: { value: '31.71' } });
+		expect(kecamatan!.value).toBe('');
+	});
+
+	test('varian kompak: tanpa baris kecamatan/kamar (hanya varian penuh)', () => {
+		const { container } = render(SearchForm, { regions: REGIONS, kompak: true });
+
+		expect(container.querySelector('#cari-kecamatan')).toBeNull();
+		expect(container.querySelector('#cari-kamar-tidur')).toBeNull();
+		expect(container.querySelector('#cari-kamar-mandi')).toBeNull();
+		// Kotak q kompak: placeholder pendek.
+		expect(container.querySelector<HTMLInputElement>('#cari-kata-kunci')!.placeholder).toBe(
+			'Cari perumahan / lokasi'
+		);
 	});
 
 	test('varian default (/cari): harga min/maks INPUT + nilai terisi', () => {
 		const { container } = render(SearchForm, {
 			regions: REGIONS,
-			nilai: { regionKode: '32.01', hargaMin: 300_000_000, hargaMaks: 500_000_000, tipe: '36' }
+			nilai: { regionKode: '32.01', hargaMin: 300_000_000, hargaMaks: 500_000_000, q: '36' }
 		});
 
 		const lokasi = container.querySelector<HTMLSelectElement>('#cari-lokasi');
 		const min = container.querySelector<HTMLInputElement>('#cari-harga-min');
 		const maks = container.querySelector<HTMLInputElement>('#cari-harga-maks');
-		const tipe = container.querySelector<HTMLInputElement>('#cari-tipe');
+		const kataKunci = container.querySelector<HTMLInputElement>('#cari-kata-kunci');
 		expect(lokasi!.value).toBe('32.01');
 		// 2026-10-08 — harga ketik sendiri (type text + inputmode numeric).
 		expect(min!.value).toBe('300000000');
@@ -101,7 +187,7 @@ describe.skipIf(typeof document === 'undefined')('SearchForm', () => {
 		expect(min!.inputMode).toBe('numeric');
 		// Varian penuh TIDAK punya select preset lagi.
 		expect(container.querySelector('#cari-harga')).toBeNull();
-		expect(tipe!.value).toBe('36');
+		expect(kataKunci!.value).toBe('36');
 		// Opsi region tetap dirender dari prop `regions`.
 		expect(container.querySelectorAll('#cari-lokasi option').length).toBe(REGIONS.length + 1);
 	});
@@ -131,14 +217,14 @@ describe.skipIf(typeof document === 'undefined')('SearchForm', () => {
 		await fireEvent.change(screen.getByLabelText('Lokasi'), {
 			target: { value: '32.01' }
 		});
-		await fireEvent.input(screen.getByLabelText('Tipe rumah'), {
+		await fireEvent.input(screen.getByLabelText('Kata kunci'), {
 			target: { value: '36' }
 		});
 
 		const tautan = screen.getByRole('link', { name: 'Filter lanjutan (harga, dll.)' });
-		// Urutan param: regionKode & tipe dari form, ref disisipkan withRef
-		// setelahnya (query sudah ada → pemisah `&`).
-		expect(tautan.getAttribute('href')).toBe('/cari?regionKode=32.01&tipe=36&ref=abc123');
+		// UNIT-10 — href membawa `q` (bukan lagi `tipe`); ref disisipkan
+		// withRef setelahnya (query sudah ada → pemisah `&`).
+		expect(tautan.getAttribute('href')).toBe('/cari?regionKode=32.01&q=36&ref=abc123');
 	});
 
 	test('varian kompak tanpa isian & tanpa ref → link polos ke /cari', () => {
@@ -163,16 +249,34 @@ describe.skipIf(typeof document === 'undefined')('SearchForm', () => {
 		await fireEvent.change(screen.getByLabelText('Harga maksimal'), {
 			target: { value: '500000000' }
 		});
-		await fireEvent.input(screen.getByLabelText('Tipe rumah'), { target: { value: ' 45 ' } });
+		await fireEvent.input(screen.getByLabelText('Kata kunci'), { target: { value: ' 45 ' } });
 
 		fireEvent.submit(container.querySelector('form')!);
 
 		// `search_term` di-trim; harga_max jadi angka; harga_min tidak ada di
-		// form → undefined → ter-strip total (tidak muncul sebagai key).
+			// form → undefined → ter-strip total (tidak muncul sebagai key).
 		expect(gtag).toHaveBeenCalledWith('event', 'search', {
 			search_term: '45',
 			region: '31.71',
 			harga_max: 500_000_000,
+			form: 'cari'
+		});
+	});
+
+	test('UNIT-10: submit → GA membawa kecamatan & kamar_tidur_min bila terisi', async () => {
+		const gtag = vi.fn();
+		vi.stubGlobal('gtag', gtag);
+		const { container } = render(SearchForm, {
+			regions: REGIONS,
+			nilai: { regionKode: '32.01', kecamatanKode: '32.01.11', kamarTidurMin: 2 }
+		});
+
+		fireEvent.submit(container.querySelector('form')!);
+
+		expect(gtag).toHaveBeenCalledWith('event', 'search', {
+			region: '32.01',
+			kecamatan: '32.01.11',
+			kamar_tidur_min: 2,
 			form: 'cari'
 		});
 	});

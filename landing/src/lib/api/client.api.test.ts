@@ -160,6 +160,29 @@ describe('getUnits (jalur API asli)', () => {
 		expect(hasil.items).toHaveLength(2);
 		expect(hasil.meta.total).toBe(2);
 	});
+
+	// UNIT-10 — param baru HARUS benar-benar terkirim ke backend (kalau tidak,
+	// filter hanya jalan di fixture dan diam-diam mati di produksi).
+	test('UNIT-10: q/kecamatanKode/kamarTidurMin/kamarMandiMin terkirim ke query backend', async () => {
+		const dipanggil: string[] = [];
+		const fetchMock = (async (input: RequestInfo | URL) => {
+			dipanggil.push(String(input));
+			return envelope([], { total: 0, page: 1, pageSize: 12 });
+		}) as unknown as typeof fetch;
+
+		await getUnits(fetchMock, {
+			q: 'griya asri',
+			kecamatanKode: '32.73.03',
+			kamarTidurMin: 3,
+			kamarMandiMin: 2
+		});
+
+		const url = new URL(dipanggil[0]);
+		expect(url.searchParams.get('q')).toBe('griya asri');
+		expect(url.searchParams.get('kecamatanKode')).toBe('32.73.03');
+		expect(url.searchParams.get('kamarTidurMin')).toBe('3');
+		expect(url.searchParams.get('kamarMandiMin')).toBe('2');
+	});
 });
 
 describe('getDeveloper (jalur API asli) — enrichment stats per-proyek', () => {
@@ -308,12 +331,26 @@ describe('getRegions (jalur API asli) — fail-soft saat backend belum implement
 		expect(hasil).toEqual([]);
 	});
 
-	test('endpoint ADA & sukses → hasilnya diteruskan apa adanya (fail-soft tidak menutupi jalur normal)', async () => {
+	test('backend lama TANPA field kecamatan → dinormalkan ke [] (UNIT-10, field aditif)', async () => {
 		const fetchMock = (async () =>
 			envelope([{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' }])) as unknown as typeof fetch;
 
 		const hasil = await getRegions(fetchMock);
-		expect(hasil).toEqual([{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' }]);
+		expect(hasil).toEqual([{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat', kecamatan: [] }]);
+	});
+
+	test('backend baru dengan kecamatan → diteruskan apa adanya (UNIT-10)', async () => {
+		const fetchMock = (async () =>
+			envelope([
+				{
+					kode: '32.73',
+					nama: 'Kota Bandung, Jawa Barat',
+					kecamatan: [{ kode: '32.73.03', nama: 'Cidadap' }]
+				}
+			])) as unknown as typeof fetch;
+
+		const hasil = await getRegions(fetchMock);
+		expect(hasil[0]?.kecamatan).toEqual([{ kode: '32.73.03', nama: 'Cidadap' }]);
 	});
 });
 

@@ -880,3 +880,20 @@ request API dari Omahe tanpa header ini.
   detail.
 - `ajukanUrl()` selalu menambah `src=omahe` — app `perumahan` mencatat booking sebagai
   "dari Omahe" (atribusi komisi Omahe saat akad). `ref` tetap terbawa apa adanya.
+
+## §37 — Kata kunci, kecamatan & kamar di pencarian publik (UNIT-10, 2026-11-03)
+
+- `GET /public/units` param BARU: `q` (kata kunci — nama perumahan/tipe/developer aktif/
+  kecamatan/kab-kota/alamat; dipecah per kata spasi, SEMUA kata wajib cocok (AND antar-kata,
+  OR antar-kolom), ILIKE contains, wildcard di-escape; maks 100 char / 6 kata, sisanya
+  diabaikan), `kecamatanKode` (exact `perumahan.kecamatan_kode`), `kamarTidurMin` /
+  `kamarMandiMin` (int 1–10; tipe TANPA data kamar TIDAK lolos saat filter aktif — beda dari
+  harga yang meng-OR `IS NULL`). Nilai aneh → diabaikan (bukan 400), pola UNIT-04.
+- `GET /public/regions` field aditif per item: `kecamatan: {kode, nama}[]` — kecamatan dari
+  perumahan yang lolos syarat tayang yang sama, urut nama; TANPA endpoint baru. Backend lama
+  tidak mengirim field ini → Omahe `getRegions` menormalkan ke `[]`.
+- Sisi Omahe (`/cari` + homepage): kotak utama form kini `q` (`tipe` lama tetap diparse,
+  URL lama tetap jalan, form tidak pernah mengirim `tipe` lagi); varian penuh menambah baris
+  select kecamatan (opsi mengikuti kab/kota terpilih) + kamar tidur/mandi minimal; chip
+  kata kunci & kamar tidur di filter bar; judul `Hasil pencarian “<q>”`, noindex bila
+  q/kecamatan/kamar aktif.

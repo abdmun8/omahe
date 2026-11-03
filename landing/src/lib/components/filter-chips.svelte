@@ -24,11 +24,14 @@
 	];
 
 	/** URL baru dengan satu param diubah; `page` selalu direset ke 1 karena
-	 *  halaman 3 dari filter lama hampir pasti bukan halaman 3 filter baru. */
+	 *  halaman 3 dari filter lama hampir pasti bukan halaman 3 filter baru.
+	 *  UNIT-10 — ganti kab/kota juga menghapus `kecamatanKode`: kode kecamatan
+	 *  milik kabupaten lain pasti tidak bermakna (UI form reset juga). */
 	function hrefDengan(key: string, value: string | null): string {
 		const params = new URLSearchParams(url.searchParams);
 		if (value === null) params.delete(key);
 		else params.set(key, value);
+		if (key === 'regionKode') params.delete('kecamatanKode');
 		params.delete('page');
 		const qs = params.toString();
 		return `/cari${qs ? `?${qs}` : ''}`;
@@ -36,7 +39,18 @@
 
 	function hrefTanpaFilter(): string {
 		const params = new URLSearchParams(url.searchParams);
-		for (const key of ['regionKode', 'hargaMin', 'hargaMax', 'tipe', 'developerSlug', 'page']) {
+		for (const key of [
+			'regionKode',
+			'kecamatanKode',
+			'hargaMin',
+			'hargaMax',
+			'tipe',
+			'q',
+			'kamarTidurMin',
+			'kamarMandiMin',
+			'developerSlug',
+			'page'
+		]) {
 			params.delete(key);
 		}
 		const qs = params.toString();
@@ -45,10 +59,21 @@
 
 	const regionAktif = $derived(url.searchParams.get('regionKode'));
 	const hargaAktif = $derived(url.searchParams.get('hargaMax'));
+	// UNIT-10 — kata kunci & filter kamar aktif (bila ada).
+	const qAktif = $derived(url.searchParams.get('q'));
+	const kamarAktif = $derived(url.searchParams.get('kamarTidurMin'));
 	const adaFilter = $derived(
-		['regionKode', 'hargaMin', 'hargaMax', 'tipe', 'developerSlug'].some((k) =>
-			url.searchParams.has(k)
-		)
+		[
+			'regionKode',
+			'kecamatanKode',
+			'hargaMin',
+			'hargaMax',
+			'tipe',
+			'q',
+			'kamarTidurMin',
+			'kamarMandiMin',
+			'developerSlug'
+		].some((k) => url.searchParams.has(k))
 	);
 
 	const chip = (aktif: boolean) =>
@@ -61,6 +86,32 @@
 </script>
 
 <div class="space-y-2">
+	{#if qAktif}
+		<!-- UNIT-10 — chip kata kunci aktif: klik = hapus q (kembali ke semua
+		     hasil, filter lain tetap). Baris sendiri supaya grup lokasi/harga
+		     tetap murni satu semantik. -->
+		<div class="-mx-4 overflow-x-auto px-4 pb-1">
+			<div class="flex gap-2" role="group" aria-label="Kata kunci">
+				<a href={hrefDengan('q', null)} class={chip(true)}>
+					“{qAktif}”
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="ml-1 h-3.5 w-3.5"
+						aria-hidden="true"
+					>
+						<path d="M18 6 6 18" /><path d="m6 6 12 12" />
+					</svg>
+					<span class="sr-only">Hapus kata kunci</span>
+				</a>
+			</div>
+		</div>
+	{/if}
+
 	<div class="-mx-4 overflow-x-auto px-4 pb-1">
 		<div class="flex gap-2" role="group" aria-label="Filter lokasi">
 			<a href={hrefDengan('regionKode', null)} class={chip(regionAktif === null)}>Semua lokasi</a>
@@ -83,6 +134,17 @@
 			{#if adaFilter}
 				<a href={hrefTanpaFilter()} class="{chip(false)} border-dashed">Reset filter</a>
 			{/if}
+		</div>
+	</div>
+
+	<!-- UNIT-10 — kamar tidur minimal (Semua/2+/3+/4+; 1+ identik dengan
+	     Semua, tidak ditawarkan). -->
+	<div class="-mx-4 overflow-x-auto px-4 pb-1">
+		<div class="flex gap-2" role="group" aria-label="Filter kamar tidur">
+			<a href={hrefDengan('kamarTidurMin', null)} class={chip(kamarAktif === null)}>Semua kamar</a>
+			{#each ['2', '3', '4'] as n (n)}
+				<a href={hrefDengan('kamarTidurMin', n)} class={chip(kamarAktif === n)}>{n}+ kamar</a>
+			{/each}
 		</div>
 	</div>
 </div>

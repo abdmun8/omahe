@@ -40,15 +40,61 @@ import type {
 	DetailBayar
 } from './types';
 
+/** UNIT-10 — kecamatan per kabupaten/kota (fixture `GET /public/regions`).
+ *  Region TANPA perumahan fixture (36.03/34.71) sengaja `[]` — cermin
+ *  backend yang mengambil kecamatan dari perumahan tayang saja; menjaga
+ *  jalur "region tanpa kecamatan" tetap teruji di dev. */
 export const REGIONS: RegionOption[] = [
-	{ kode: '32.01', nama: 'Kab. Bogor, Jawa Barat' },
-	{ kode: '32.71', nama: 'Kota Bogor, Jawa Barat' },
-	{ kode: '32.73', nama: 'Kota Bandung, Jawa Barat' },
-	{ kode: '36.03', nama: 'Kab. Serang, Banten' },
-	{ kode: '36.71', nama: 'Kota Tangerang, Banten' },
-	{ kode: '33.74', nama: 'Kota Semarang, Jawa Tengah' },
-	{ kode: '35.15', nama: 'Kab. Sidoarjo, Jawa Timur' },
-	{ kode: '34.71', nama: 'Kota Yogyakarta, DI Yogyakarta' }
+	{
+		kode: '32.01',
+		nama: 'Kab. Bogor, Jawa Barat',
+		kecamatan: [
+			{ kode: '32.01.11', nama: 'Ciawi' },
+			{ kode: '32.01.05', nama: 'Cibinong' }
+		]
+	},
+	{
+		kode: '32.71',
+		nama: 'Kota Bogor, Jawa Barat',
+		kecamatan: [
+			{ kode: '32.71.05', nama: 'Tanah Sareal' },
+			{ kode: '32.71.02', nama: 'Bogor Tengah' }
+		]
+	},
+	{
+		kode: '32.73',
+		nama: 'Kota Bandung, Jawa Barat',
+		kecamatan: [
+			{ kode: '32.73.03', nama: 'Cidadap' },
+			{ kode: '32.73.10', nama: 'Sukasari' }
+		]
+	},
+	{ kode: '36.03', nama: 'Kab. Serang, Banten', kecamatan: [] },
+	{
+		kode: '36.71',
+		nama: 'Kota Tangerang, Banten',
+		kecamatan: [
+			{ kode: '36.71.05', nama: 'Jatiuwung' },
+			{ kode: '36.71.07', nama: 'Cipondoh' }
+		]
+	},
+	{
+		kode: '33.74',
+		nama: 'Kota Semarang, Jawa Tengah',
+		kecamatan: [
+			{ kode: '33.74.06', nama: 'Ngaliyan' },
+			{ kode: '33.74.04', nama: 'Banyumanik' }
+		]
+	},
+	{
+		kode: '35.15',
+		nama: 'Kab. Sidoarjo, Jawa Timur',
+		kecamatan: [
+			{ kode: '35.15.14', nama: 'Taman' },
+			{ kode: '35.15.06', nama: 'Sidoarjo' }
+		]
+	},
+	{ kode: '34.71', nama: 'Kota Yogyakarta, DI Yogyakarta', kecamatan: [] }
 ];
 
 interface FixtureProject {
@@ -76,6 +122,9 @@ interface FixtureProject {
 	}>;
 	/** LOKASI-01 — nama kecamatan contoh. */
 	kecamatanNama?: string;
+	/** UNIT-10 — kode kecamatan Kemendagri contoh (untuk filter
+	 *  `kecamatanKode`; pasangan `kecamatan` di `REGIONS` di atas). */
+	kecamatanKode?: string;
 }
 
 const PROJECTS: FixtureProject[] = [
@@ -86,6 +135,8 @@ const PROJECTS: FixtureProject[] = [
 		regionKode: '32.01',
 		developerSlug: 'nusa-land-development',
 		alamat: 'Jl. Raya Tajur No. 88, Ciawi, Kab. Bogor',
+		kecamatanNama: 'Ciawi',
+		kecamatanKode: '32.01.11',
 		deskripsi:
 			'Hunian keluarga di kaki Gunung Salak, 10 menit dari pintu tol Ciawi. Cluster tertutup dengan one gate system, taman bermain, dan jalur pedestrian di seluruh area.',
 		tipe: [
@@ -101,6 +152,8 @@ const PROJECTS: FixtureProject[] = [
 		regionKode: '32.71',
 		developerSlug: 'nusa-land-development',
 		alamat: 'Jl. Kenanga Raya No. 12, Tanah Sareal, Kota Bogor',
+		kecamatanNama: 'Tanah Sareal',
+		kecamatanKode: '32.71.05',
 		deskripsi:
 			'Rumah dua lantai di tengah kota Bogor, berjarak 5 menit dari Stasiun Bogor. Cocok untuk komuter yang tetap ingin akses sekolah dan rumah sakit dalam radius 2 km.',
 		tipe: [
@@ -116,6 +169,7 @@ const PROJECTS: FixtureProject[] = [
 		developerSlug: 'cakrawala-griya-utama',
 		alamat: 'Jl. Setiabudi Atas KM 12, Ledeng, Kota Bandung',
 		kecamatanNama: 'Cidadap',
+		kecamatanKode: '32.73.03',
 		deskripsi:
 			'Cluster berkontur di Bandung utara dengan pemandangan lembah. Setiap unit menghadap taman linier; akses ke kawasan pendidikan Setiabudi 15 menit.',
 		tipe: [
@@ -152,6 +206,8 @@ const PROJECTS: FixtureProject[] = [
 		regionKode: '35.15',
 		developerSlug: 'bumi-sentosa-properti',
 		alamat: 'Jl. Raya Wage No. 45, Taman, Kab. Sidoarjo',
+		kecamatanNama: 'Taman',
+		kecamatanKode: '35.15.14',
 		deskripsi:
 			'Perumahan subsidi dan komersial berdampingan, 20 menit ke Bandara Juanda. Fasilitas masjid, ruko, dan sekolah dasar di dalam kawasan.',
 		tipe: [
@@ -166,6 +222,8 @@ const PROJECTS: FixtureProject[] = [
 		regionKode: '33.74',
 		developerSlug: 'bumi-sentosa-properti',
 		alamat: 'Jl. Ngaliyan Raya No. 7, Ngaliyan, Kota Semarang',
+		kecamatanNama: 'Ngaliyan',
+		kecamatanKode: '33.74.06',
 		deskripsi:
 			'Kawasan hunian 12 hektar di Semarang barat dengan danau retensi sebagai pusat kawasan. Tahap 2 sedang dibuka.',
 		tipe: [
@@ -180,6 +238,8 @@ const PROJECTS: FixtureProject[] = [
 		regionKode: '36.71',
 		developerSlug: null,
 		alamat: 'Jl. Gatot Subroto KM 5, Jatiuwung, Kota Tangerang',
+		kecamatanNama: 'Jatiuwung',
+		kecamatanKode: '36.71.05',
 		deskripsi:
 			'Rumah siap huni dekat kawasan industri Jatake. Unit terbatas, sebagian besar sudah terjual pada tahap pertama.',
 		tipe: [{ tipe: 'Tipe 36/60', luasTanah: 60, luasBangunan: 36, harga: 465000000, tersedia: 5 }]
@@ -411,6 +471,12 @@ export function tipeDetail(perumahanSlug: string, tipeSlug: string): TipeDetail 
 
 export function projectSlugs(): string[] {
 	return PROJECTS.map((p) => p.slug);
+}
+
+/** UNIT-10 — kode kecamatan perumahan fixture (exact match filter
+ *  `kecamatanKode` di `filterFixtureUnits` client.ts; null = belum diisi). */
+export function kecamatanKode(slug: string): string | null {
+	return PROJECTS.find((p) => p.slug === slug)?.kecamatanKode ?? null;
 }
 
 /**

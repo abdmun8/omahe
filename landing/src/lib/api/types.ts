@@ -147,6 +147,16 @@ export interface UnitQuery {
 	tipe?: string;
 	perumahanSlug?: string;
 	developerSlug?: string;
+	/** UNIT-10 — kata kunci: nama perumahan/tipe/developer/kecamatan/kab-kota/
+	 *  alamat; dipecah per kata, SEMUA kata wajib cocok (AND), contains
+	 *  case-insensitive. Backend memotong di 100 char / 6 kata. */
+	q?: string;
+	/** UNIT-10 — exact `perumahan.kecamatan_kode` (Kemendagri, mis. 32.73.03). */
+	kecamatanKode?: string;
+	/** UNIT-10 — kamar minimal (int 1–10); tipe TANPA data kamar tidak lolos
+	 *  saat filter aktif (bukan perilaku harga yang meng-OR `IS NULL`). */
+	kamarTidurMin?: number;
+	kamarMandiMin?: number;
 	/** UNIT-07 — urutan (`$lib/urutan-unit`); `rekomendasi`/absen = default
 	 *  backend dan tidak dikirim. */
 	sort?: string;
@@ -487,6 +497,10 @@ export interface LeadHasil {
 export interface RegionOption {
 	kode: string;
 	nama: string;
+	/** UNIT-10 — kecamatan (dari perumahan tayang ber-unit) per kabupaten,
+	 *  urut nama. Optional: backend lama belum mengirim field ini → client
+	 *  `getRegions` menormalkan jadi `[]`. */
+	kecamatan?: Array<{ kode: string; nama: string }>;
 }
 
 // ---------------------------------------------------------------------------

@@ -117,6 +117,8 @@ export async function getUnits(fetchFn: Fetch, query: UnitQuery): Promise<Pagina
 		// UNIT-07 — `rekomendasi` = default backend: tidak dikirim (URL & cache
 		// sama dengan sebelum ada fitur urutan).
 		const urutan = parseUrutan(sort);
+		// UNIT-10 — `q`/`kecamatanKode`/`kamarTidurMin`/`kamarMandiMin` ikut
+		// otomatis lewat `backendQuery` di bawah (nilai undefined/'' di-strip).
 		for (const [key, value] of Object.entries({
 			...backendQuery,
 			sort: urutan === 'rekomendasi' ? undefined : urutan,
@@ -171,11 +173,44 @@ function normalisasiUnit(u: RawUnitListing): UnitListing {
 
 /** Mirror filter `GET /public/units` di atas fixture — bentuk hasil identik. */
 function filterFixtureUnits(query: UnitQuery & { page: number; pageSize: number }) {
+	// UNIT-10 — kata kunci dipecah per kata; SETIAP kata wajib cocok di
+	// SALAH SATU kolom (AND antar-kata, OR antar-kolom) — cermin backend.
+	const kata = (query.q ?? '')
+		.trim()
+		.toLowerCase()
+		.split(/\s+/)
+		.filter(Boolean)
+		.slice(0, 6);
 	const cocok = fixtures.UNIT_LISTINGS.filter((u) => {
 		if (query.regionKode && u.perumahan.regionKode !== query.regionKode) return false;
 		if (query.perumahanSlug && u.perumahan.slug !== query.perumahanSlug) return false;
 		if (query.developerSlug && u.developer?.slug !== query.developerSlug) return false;
 		if (query.tipe && !u.tipe.toLowerCase().includes(query.tipe.toLowerCase())) return false;
+		if (
+			query.kecamatanKode &&
+			fixtures.kecamatanKode(u.perumahan.slug) !== query.kecamatanKode
+		)
+			return false;
+		// UNIT-10 — kamar min: tipe TANPA data kamar tidak lolos (null !== n).
+		const tidur = u.kamarTidur ?? null;
+		if (query.kamarTidurMin !== undefined && (tidur === null || tidur < query.kamarTidurMin))
+			return false;
+		const mandi = u.kamarMandi ?? null;
+		if (query.kamarMandiMin !== undefined && (mandi === null || mandi < query.kamarMandiMin))
+			return false;
+		for (const k of kata) {
+			const kolom = [
+				u.perumahan.nama,
+				u.tipe,
+				u.developer?.nama,
+				u.perumahan.kecamatanNama,
+				u.perumahan.regionNama,
+				u.perumahan.alamat
+			]
+				.filter((v): v is string => typeof v === 'string')
+				.map((v) => v.toLowerCase());
+			if (!kolom.some((v) => v.includes(k))) return false;
+		}
 		// Rentang harga dibandingkan ke harga TERENDAH tipe ini — kartu yang
 		// punya satu unit di bawah plafon tetap relevan buat pencari.
 		if (query.hargaMin !== undefined && (u.hargaMax ?? 0) < query.hargaMin) return false;
@@ -441,7 +476,10 @@ export async function getRegions(fetchFn: Fetch): Promise<RegionOption[]> {
 		// `apiGet` saat backend bermasalah — ditemukan 2026-09-15: tanpa
 		// fallback ini, kedua halaman 404 TOTAL waktu endpoint belum ada.
 		try {
-			return await apiGet<RegionOption[]>(fetchFn, '/public/regions');
+			const raw = await apiGet<RegionOption[]>(fetchFn, '/public/regions');
+			// UNIT-10 — `kecamatan` field aditif: backend lama belum mengirim
+			// → normalkan ke `[]` supaya komponen tidak pernah membaca undefined.
+			return raw.map((r) => ({ ...r, kecamatan: r.kecamatan ?? [] }));
 		} catch (err) {
 			console.error(
 				'[omahe:api] GET /public/regions gagal — fallback ke [] (lihat api-contract.md §5)',
