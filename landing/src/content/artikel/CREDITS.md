@@ -10,6 +10,7 @@ apresiasi dan agar mudah dilacak ulang. File ini DIREGENERASI OTOMATIS oleh
 | --- | --- | --- | --- |
 | kpr-flpp-2026-realisasi-dan-tenor | Chris Weiher | https://unsplash.com/photos/aerial-view-of-a-housing-development-with-red-roofs-_Y_tYBjUjs8 | https://images.unsplash.com/photo-1776066361436-65884f2d14e5?fm=jpg&fit=crop&w=1600&h=900&q=80 |
 | ppn-dtp-rumah-tenggat-desember-2026 | Jakub Żerdzicki | https://unsplash.com/photos/t0CRdNl_mTg | https://images.unsplash.com/photo-1759428679273-11d914866394?fm=jpg&fit=crop&w=1600&h=900&q=80 |
+| kpr-dp-0-persen-diperpanjang-2027 | Towfiqu barbhuiya | https://unsplash.com/photos/man-holding-model-house-at-desk-with-calculator-05XcCfTOzN4 | https://images.unsplash.com/photo-1626178793926-22b28830aa30?fm=jpg&fit=crop&w=1600&h=900&q=80 |
 | kredit-properti-september-2026-kpr-tumbuh-tipis | Tolu Olubode | https://unsplash.com/photos/gray-concrete-building-under-construction-PlBsJ5MybGc | https://images.unsplash.com/photo-1508450859948-4e04fabaa4ea?fm=jpg&fit=crop&w=1600&h=900&q=80 |
 | bunga-fixed-vs-floating-kpr | Vitaly Gariev | https://unsplash.com/photos/elderly-couple-reviewing-documents-at-home-Y0H9pZqoX0M | https://images.unsplash.com/photo-1758691031730-640885ad19e5?fm=jpg&fit=crop&w=1600&h=900&q=80 |
 | kpr-subsidi-6-persen-pekerja-gaji-17-juta | Jakub Żerdzicki | https://unsplash.com/photos/ZWiKjts3amM | https://images.unsplash.com/photo-1763621605783-307c1743e308?fm=jpg&fit=crop&w=1600&h=900&q=80 |
