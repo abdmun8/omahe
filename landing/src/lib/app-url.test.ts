@@ -8,13 +8,13 @@ import { describe, expect, test } from 'bun:test';
 describe('daftarPerumahanUrl', () => {
 	test('mengarah ke form AUTH-05 di app perumahan, bukan route Omahe', async () => {
 		const { daftarPerumahanUrl } = await import('./app-url');
-		expect(daftarPerumahanUrl()).toBe('https://app.perumahan.test/daftar/perumahan');
+		expect(daftarPerumahanUrl()).toBe('https://app.perumahan.test/daftar/perumahan?src=omahe-gabung');
 	});
 });
 
 describe('daftarPerusahaanUrl', () => {
 	test('mengarah ke form AUTH-05 di app perumahan, bukan route Omahe', async () => {
 		const { daftarPerusahaanUrl } = await import('./app-url');
-		expect(daftarPerusahaanUrl()).toBe('https://app.perumahan.test/daftar/perusahaan');
+		expect(daftarPerusahaanUrl()).toBe('https://app.perumahan.test/daftar/perusahaan?src=omahe-gabung');
 	});
 });

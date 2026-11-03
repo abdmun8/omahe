@@ -13,19 +13,23 @@
  *
  * TIDAK ada passthrough `?ref=`: pendaftaran di luar rantai komisi
  * perumahan (pola yang sama dengan kontak mitra, api-contract.md §9).
+ *
+ * AUTH-14 (2026-11-03) — `?src=` sumber pendaftaran (whitelist `[a-z0-9-]`
+ * di backend), tampil di halaman review superadmin; bawaan `omahe-gabung`
+ * karena semua pemanggil ada di `/gabung/*`.
  */
 import { env } from '$env/dynamic/public';
 
 const base = () => env.PUBLIC_BOOKING_BASE_URL?.replace(/\/+$/, '') ?? '';
 
 /** Form pendaftaran mandiri developer/agen perumahan (AUTH-05 `done`). */
-export function daftarPerumahanUrl(): string {
-	return `${base()}/daftar/perumahan`;
+export function daftarPerumahanUrl(sumber = 'omahe-gabung'): string {
+	return `${base()}/daftar/perumahan?src=${sumber}`;
 }
 
 /** Form pendaftaran mandiri mitra perusahaan/profesional (AUTH-05 `done`). */
-export function daftarPerusahaanUrl(): string {
-	return `${base()}/daftar/perusahaan`;
+export function daftarPerusahaanUrl(sumber = 'omahe-gabung'): string {
+	return `${base()}/daftar/perusahaan?src=${sumber}`;
 }
 
 /**
