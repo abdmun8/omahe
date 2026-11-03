@@ -208,6 +208,12 @@ export interface PerumahanDetail {
 	 */
 	sections: LandingSection[] | null;
 	/**
+	 * TAYANG-01 (repo `perumahan`) — `false` = profil belum lengkap / tidak
+	 * tayang di daftar Omahe; halaman tetap bisa dibuka (QR/ref) tapi diberi
+	 * `noindex`. Absen (backend lama/fixture) = tayang.
+	 */
+	tayangOmahe?: boolean;
+	/**
 	 * Perluasan DEVELOPER-01 — optional karena endpoint yang SEKARANG jalan
 	 * belum mengembalikannya. Jangan asumsikan ada.
 	 */

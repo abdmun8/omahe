@@ -149,6 +149,10 @@
 		content={deskripsiPolos ??
 			`${p.nama}: ${formatAngka(totalUnit)} unit tersedia mulai ${formatRupiah(hargaMulai)}.`}
 	/>
+	{#if p.tayangOmahe === false}
+		<!-- TAYANG-01 — belum tayang di daftar Omahe: halaman tetap terbuka untuk QR/ref, tidak diindeks. -->
+		<meta name="robots" content="noindex, follow" />
+	{/if}
 	<meta property="og:title" content={p.nama} />
 	{#if fotoUtama}<meta property="og:image" content={fotoUtama} />{/if}
 	<!-- Tag <script> utuh lewat {@html} — Svelte 5 menolak <script> non-JS di
