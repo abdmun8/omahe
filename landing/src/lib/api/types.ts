@@ -904,3 +904,19 @@ export interface LelangQuery {
 	page?: number;
 	pageSize?: number;
 }
+
+// ---------------------------------------------------------------------------
+// KERJASAMA-02 — QR kode pendek kerjasama (`GET /public/kerjasama/q/:kode`, api-contract §38)
+// ---------------------------------------------------------------------------
+
+/**
+ * Isi QR cetak perumahan×perusahaan mitra: QR meng-encode
+ * `https://www.omahe.co.id/q/<KODE>`, route `/q/[kode]` Omahe me-resolve
+ * kode itu via endpoint ini lalu 302 ke `/perumahan/:slug?ref=`. `ref`
+ * = `kerjasama.qrCode` (hex 64) — sama yang dipakai passthrough `?ref=`
+ * biasa (PRD §4 & §7 repo `perumahan`).
+ */
+export interface KerjasamaQr {
+	perumahanSlug: string;
+	ref: string;
+}

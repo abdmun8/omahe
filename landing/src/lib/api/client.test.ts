@@ -445,3 +445,28 @@ describe('pesanErrorBackend', () => {
 		expect(await pesanErrorBackend(new Response('oops', { status: 404 }))).toBeNull();
 	});
 });
+
+// KERJASAMA-02 — resolve kode QR pendek kerjasama (mode fixture, env kosong).
+// Pola `getVerifikasiAgen`: fixture dev saja; produksi tanpa API jujur
+// `null` (route `/q/[kode]` 302 ke `/`), dan kode tak sesuai pola alfabet
+// backend ditolak LOKAL tanpa fetch (fetchDummy = penjaga anti-network).
+describe('getKerjasamaQr (KERJASAMA-02, mode fixture)', () => {
+	test('kode fixture (input kecil semua → normalisasi uppercase) → slug + ref hex64', async () => {
+		const { getKerjasamaQr } = await import('./client');
+		expect(await getKerjasamaQr(fetchDummy, 'k7m2qx')).toEqual({
+			perumahanSlug: 'griya-asri-bogor',
+			ref: 'a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2'
+		});
+	});
+
+	test('kode rapi tapi tidak terdaftar → null', async () => {
+		const { getKerjasamaQr } = await import('./client');
+		expect(await getKerjasamaQr(fetchDummy, 'AAAAAA')).toBeNull();
+	});
+
+	test('kode tak sesuai pola → null TANPA fetch sama sekali', async () => {
+		const { getKerjasamaQr } = await import('./client');
+		for (const salah of ['', 'abc', 'K7M2Q', 'K7M2QXX', 'K7M20X', 'k7m2qx!', '../etc/passwd'])
+			expect(await getKerjasamaQr(fetchDummy, salah)).toBeNull();
+	});
+});

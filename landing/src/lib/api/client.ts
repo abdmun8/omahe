@@ -19,6 +19,7 @@ import { musikValid } from '$lib/musik';
 import { error } from '@sveltejs/kit';
 import { SITE } from '$lib/config';
 import { TOKEN_BAYAR_PATTERN, pdfInvoiceContoh } from '$lib/bayar';
+import { REF_PATTERN } from '$lib/ref';
 import * as fixtures from './fixtures';
 import { parseUrutan, urutkanUnitFixture } from '$lib/urutan-unit';
 import { HARGA_TERJANGKAU } from '$lib/config';
@@ -58,7 +59,8 @@ import type {
 	RumahLelangKartu,
 	RumahLelangDetail,
 	LelangQuery,
-	LokasiLelang
+	LokasiLelang,
+	KerjasamaQr
 } from './types';
 
 /** `fetch` bawaan SvelteKit `load` — dioper masuk supaya ikut dedupe & SSR. */
@@ -767,6 +769,77 @@ export async function getVerifikasiAgen(fetchFn: Fetch, kodeRaw: string): Promis
 	} catch (err) {
 		console.error('[omahe:api] GET verifikasi agen — body bukan JSON', err);
 		return { ketemu: false, layananError: true };
+	}
+}
+
+// ---------------------------------------------------------------------------
+// QR kode pendek kerjasama (KERJASAMA-02, api-contract §38)
+// ---------------------------------------------------------------------------
+
+/**
+ * Kode QR pendek backend: 6 karakter dari alfabet tanpa ambigu
+ * (tanpa 0/O/1/I/L). Kode tak sesuai pola ditolak LOKAL tanpa fetch —
+ * selain menghemat, itu juga menghalangi slug aneh menyusup ke URL
+ * redirect di `routes/q/[kode]`.
+ */
+export const KODE_QR_KERJASAMA_PATTERN = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/;
+
+/**
+ * Resolve kode QR pendek kerjasama perumahan×perusahaan mitra
+ * (`GET /public/kerjasama/q/:kode`, api-contract §38) → slug + `ref`
+ * untuk 302 `/perumahan/:slug?ref=` di `routes/q/[kode]`.
+ *
+ * Pola `getVerifikasiAgen` tapi fail-soft `null` (BUKAN state halaman):
+ * SETIAP pindai QR yang ketemu dihitung "pindai" di backend, jadi response
+ * ini WAJIB tidak ter-cache di jalur mana pun — route-nya memasang
+ * `cache-control: no-store`, dan sisi client di sini juga tidak ada
+ * penyimpanan hasil. 404 = kode tidak dikenal/nonaktif → `null` biasa
+ * (bukan layanan error); error jaringan/body aneh → `null` + log.
+ */
+export async function getKerjasamaQr(fetchFn: Fetch, kodeRaw: string): Promise<KerjasamaQr | null> {
+	const kode = kodeRaw.trim().toUpperCase();
+	if (!KODE_QR_KERJASAMA_PATTERN.test(kode)) return null;
+
+	if (!hasSearchApi()) {
+		// Fixture HANYA non-produksi (guard `PROD === true` pola
+		// `getVerifikasiAgen` — ter-tree-shake di build produksi, tetap
+		// teruji di `bun test`). Produksi tanpa API jujur `null` → route
+		// 302 ke `/`, bukan perumahan palsu.
+		if (import.meta.env.PROD === true) return null;
+		return fixtures.KERJASAMA_QR[kode] ?? null;
+	}
+
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/kerjasama/q/${encodeURIComponent(kode)}`, {
+			headers: { accept: 'application/json', ...KONSUMEN },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch (err) {
+		console.error('[omahe:api] GET /public/kerjasama/q gagal — fail-soft null', err);
+		return null;
+	}
+	if (res.status === 404) return null;
+	if (!res.ok) {
+		console.error(`[omahe:api] GET /public/kerjasama/q → ${res.status}`);
+		return null;
+	}
+	try {
+		const body = (await res.json()) as ApiEnvelope<KerjasamaQr>;
+		const data = body?.data;
+		if (
+			!data ||
+			typeof data.perumahanSlug !== 'string' ||
+			!data.perumahanSlug ||
+			typeof data.ref !== 'string' ||
+			!REF_PATTERN.test(data.ref)
+		) {
+			return null;
+		}
+		return { perumahanSlug: data.perumahanSlug, ref: data.ref };
+	} catch (err) {
+		console.error('[omahe:api] GET /public/kerjasama/q — body bukan JSON', err);
+		return null;
 	}
 }
 

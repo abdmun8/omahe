@@ -24,7 +24,7 @@ export const REF_PARAM = 'ref';
  * membuang ref yang sah — tapi tetap menolak karakter yang bisa dipakai
  * menyelundupkan sesuatu ke URL tujuan.
  */
-const REF_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+export const REF_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 
 /** Ambil `ref` dari URL. Nilai yang bentuknya tidak masuk akal dibuang. */
 export function readRef(url: URL): string | null {

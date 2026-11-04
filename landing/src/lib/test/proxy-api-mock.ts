@@ -9,11 +9,11 @@
  * Export named '…' not found`.
  *
  * Karena itu mock ini WAJIB mengeksport SEMUA nama yang dipakai handler
- * proxy mana pun (`createLead` + `kirimMinatAgen` + `ApiError`) — file
- * test baru yang butuh nama lain HARUS ditambahkan ke sini, bukan membuat
- * mock.module sendiri. Kelas `ApiErrorTiruan` dibagikan supaya cek
- * `err instanceof ApiError` di handler kena walau registrasi mock
- * terakhir datang dari file lain.
+ * mana pun (`createLead` + `kirimMinatAgen` + `ApiError`, + `getKerjasamaQr`
+ * untuk route `/q/[kode]` — KERJASAMA-02) — file test baru yang butuh nama
+ * lain HARUS ditambahkan ke sini, bukan membuat mock.module sendiri. Kelas
+ * `ApiErrorTiruan` dibagikan supaya cek `err instanceof ApiError` di handler
+ * kena walau registrasi mock terakhir datang dari file lain.
  */
 import { mock } from 'bun:test';
 
@@ -35,11 +35,17 @@ export const kirimMinatAgenMock = mock<
 	(fetchFn: typeof fetch, input: unknown) => Promise<{ whatsapp: string | null }>
 >(async () => ({ whatsapp: null }));
 
+/** KERJASAMA-02 — resolve kode QR pendek untuk route `/q/[kode]`. */
+export const getKerjasamaQrMock = mock<
+	(fetchFn: typeof fetch, kode: unknown) => Promise<{ perumahanSlug: string; ref: string } | null>
+>(async () => null);
+
 /** Pasang mock `$lib/api` — panggil SEBELUM `await import('./+server')`. */
 export function pasangMockLibApi(): void {
 	mock.module('$lib/api', () => ({
 		ApiError: ApiErrorTiruan,
 		createLead: createLeadMock,
-		kirimMinatAgen: kirimMinatAgenMock
+		kirimMinatAgen: kirimMinatAgenMock,
+		getKerjasamaQr: getKerjasamaQrMock
 	}));
 }

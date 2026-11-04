@@ -897,3 +897,28 @@ request API dari Omahe tanpa header ini.
   select kecamatan (opsi mengikuti kab/kota terpilih) + kamar tidur/mandi minimal; chip
   kata kunci & kamar tidur di filter bar; judul `Hasil pencarian “<q>”`, noindex bila
   q/kecamatan/kamar aktif.
+
+## §38 — Kode QR pendek kerjasama (KERJASAMA-02, 2026-11-04)
+
+- `GET /public/kerjasama/q/:kode` (repo `perumahan`, publik tanpa auth) → 200
+  `{ success: true, data: { perumahanSlug: string, ref: string } }`; 404 bila kode tidak
+  dikenal/nonaktif. `kode` = 6 karakter alfabet tanpa ambigu `23456789ABCDEFGHJKMNPQRSTUVWXYZ`
+  (backend menormalisasi trim + uppercase); `ref` = hex 64 (`kerjasama.qrCode`) — sama yang
+  dipakai passthrough `?ref=` biasa (PRD §4 & §7).
+- QR cetak kerjasama perumahan×perusahaan mitra meng-encode `https://www.omahe.co.id/q/<KODE>`
+  (bukan URL panjang — QR tetap kecil dan tujuan bisa dipindah tanpa cetak ulang). **Setiap hit
+  yang ketemu dihitung "pindai" di backend → response ini TIDAK BOLEH di-cache di jalur mana
+  pun.**
+- Sisi Omahe: `getKerjasamaQr()` (`client.ts`, pola `getVerifikasiAgen` — kode tak sesuai pola
+  ditolak lokal tanpa fetch; 404/error/body aneh → fail-soft `null`; validasi `perumahanSlug`
+  non-kosong + `ref` lolos `REF_PATTERN`) + route `routes/q/[kode]/+server.ts` GET saja:
+  ketemu → `302 /perumahan/:slug?ref=` (slug & ref di-encode); tidak ketemu → `302 /`. Respons
+  (redirect juga) memakai `cache-control: no-store` (supaya tiap pindai tetap sampai backend) +
+  `x-robots-tag: noindex`; tidak di-prerender dan tidak masuk sitemap.
+- **Ref tersimpan 90 hari per slug** (`src/lib/ref-tersimpan.ts`, browser saja): kunci
+  `omahe:ref:<slug>`, nilai JSON `{ref, exp}`, exp = sekarang + 90 hari; bentuk rusak/kedaluwarsa
+  → hapus + `null`; semua akses localStorage dalam try/catch (mode privat). Di-root layout
+  (`+layout.ts`, universal load, hanya `browser` + route `/perumahan/[slug]…`): `ref` di URL ada
+  → simpan (LAST-TOUCH, selalu menimpa); tidak ada → pakai simpanan → `page.data.ref` terisi
+  sehingga CTA `ajukanUrl()` & form minat otomatis membawa ref saat pembeli kembali lewat
+  Google tanpa query string. URL bar tidak diubah.

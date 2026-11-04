@@ -1,4 +1,6 @@
+import { browser } from '$app/environment';
 import { readRef } from '$lib/ref';
+import { ambilRef, simpanRef } from '$lib/ref-tersimpan';
 import type { LayoutLoad } from './$types';
 
 /**
@@ -16,7 +18,7 @@ import type { LayoutLoad } from './$types';
  * (`?ref=` muncul di nav header/footer pasca-hidrasi), lihat TASKS.md item
  * "Prerender halaman statis".
  */
-export const load: LayoutLoad = ({ data, url }) => {
+export const load: LayoutLoad = ({ data, url, params, route }) => {
 	let ref: string | null = null;
 	try {
 		ref = readRef(url);
@@ -24,6 +26,24 @@ export const load: LayoutLoad = ({ data, url }) => {
 		// sedang prerender — HTML awal tanpa ref, diisi ulang pasca-hidrasi.
 		ref = null;
 	}
+
+	// KERJASAMA-02 — ref tersimpan 90 hari per slug perumahan. Pembeli yang
+	// memindai QR kerjasama lalu kembali lewat Google tanpa query string
+	// tetap membawa atribusi (komisi mitra tidak hilang diam-diam). HANYA
+	// di browser (localStorage), HANYA di route `/perumahan/[slug]…`
+	// (detail + halaman tipe — dua-duanya punya CTA `ajukanUrl()`), dan
+	// LAST-TOUCH: ref di URL selalu menimpa simpanan. URL bar tidak diubah.
+	if (browser && route.id?.startsWith('/perumahan/[slug]') && params.slug) {
+		if (ref) {
+			simpanRef(params.slug, ref);
+		} else {
+			// `ambilRef` sudah fail-soft (try/catch internal) — nilainya
+			// mengalir ke `page.data.ref` sehingga CTA booking & form minat
+			// membawa ref tanpa perubahan di komponen mana pun.
+			ref = ambilRef(params.slug);
+		}
+	}
+
 	// `data` = hasil `+layout.server.ts` (kontak Omahe, ADMIN-05) — WAJIB
 	// diteruskan, kalau tidak `page.data.kontak` jadi undefined di seluruh
 	// halaman dan semua komponen diam-diam mundur ke fallback `SITE.*`.

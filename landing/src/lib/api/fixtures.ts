@@ -37,7 +37,8 @@ import type {
 	AgenPemasar,
 	AgenDirektori,
 	KartuNamaAgen,
-	DetailBayar
+	DetailBayar,
+	KerjasamaQr
 } from './types';
 
 /** UNIT-10 — kecamatan per kabupaten/kota (fixture `GET /public/regions`).
@@ -852,5 +853,20 @@ export const TAGIHAN_BAYAR: Record<string, DetailBayar> = {
 		bisaUnggah: true,
 		penerbitNama: 'Omahe',
 		rekening: { bank: 'BCA', nomor: '1234567890', atasNama: 'PT Omahe Digital Nusantara' }
+	}
+};
+
+/**
+ * QR kode pendek kerjasama (KERJASAMA-02, api-contract §38) — DEV-SAJA
+ * (pola VERIFIKASI_AGEN). Route `/q/:kode` me-resolve kode via endpoint
+ * `GET /public/kerjasama/q/:kode`; fixture ini supaya alur pindai → 302
+ * `/perumahan/:slug?ref=` bisa dicoba tanpa backend. Kode 6 karakter tanpa
+ * ambigu (alfabet backend: tanpa 0/O/1/I/L); `ref` hex 64 seperti
+ * `kerjasama.qrCode` asli; slug mengarah ke perumahan fixture yang ada.
+ */
+export const KERJASAMA_QR: Record<string, KerjasamaQr> = {
+	K7M2QX: {
+		perumahanSlug: 'griya-asri-bogor',
+		ref: 'a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2'
 	}
 };
