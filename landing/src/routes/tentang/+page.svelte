@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { SITE } from '$lib/config';
 	import Button from '$lib/components/ui/button.svelte';
+	import GooglePlayBadge from '$lib/components/google-play-badge.svelte';
 </script>
 
 <svelte:head>
@@ -54,6 +55,13 @@
 				bekas (second) belum termasuk — alur verifikasi dan kepemilikannya berbeda, dan kami memilih
 				mengerjakannya dengan benar ketimbang menambahkannya setengah jalan.
 			</p>
+		</div>
+		<div>
+			<h2 class="font-display text-ink text-lg font-bold">Aplikasi Omahe</h2>
+			<p class="mt-3">Omahe kini tersedia sebagai aplikasi Android di Google Play.</p>
+			<div class="mt-3">
+				<GooglePlayBadge />
+			</div>
 		</div>
 	</div>
 

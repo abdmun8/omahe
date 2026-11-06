@@ -15,6 +15,8 @@ export const SITE = {
 	/** Versi ringkas (≤160 char) untuk meta/og description — SERP memotong di sekitar situ. */
 	deskripsiSingkat: 'Temukan hunian yang dirancang untuk memenuhi kebutuhan hidup Anda.',
 	url: 'https://www.omahe.co.id',
+	/** Listing aplikasi Android (TWA, PLAY-01). */
+	playStoreUrl: 'https://play.google.com/store/apps/details?id=id.co.omahe.app.twa',
 	/**
 	 * Measurement ID Google Analytics 4. ID measurement memang PUBLIK by
 	 * design (terlihat di source HTML setiap halaman) — aman ditulis di

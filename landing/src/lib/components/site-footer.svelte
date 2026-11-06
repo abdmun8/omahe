@@ -2,6 +2,7 @@
 	import { NAV, SITE } from '$lib/config';
 	import { withRef } from '$lib/ref';
 	import { page } from '$app/state';
+	import GooglePlayBadge from '$lib/components/google-play-badge.svelte';
 
 	// ADMIN-05 — email Omahe dari API (layout root), fallback config.
 	const emailOmahe = $derived(page.data.kontak?.email ?? SITE.email);
@@ -56,6 +57,9 @@
 					{/each}
 				</ul>
 			{/if}
+			<div class="mt-4">
+				<GooglePlayBadge />
+			</div>
 		</div>
 
 		<div>
