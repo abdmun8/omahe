@@ -19,7 +19,7 @@ import { musikValid } from '$lib/musik';
 import { error } from '@sveltejs/kit';
 import { SITE } from '$lib/config';
 import { TOKEN_BAYAR_PATTERN, pdfInvoiceContoh } from '$lib/bayar';
-import { REF_PATTERN } from '$lib/ref';
+import { REF_OMAHE_PATTERN, REF_PATTERN } from '$lib/ref';
 import * as fixtures from './fixtures';
 import { parseUrutan, urutkanUnitFixture } from '$lib/urutan-unit';
 import { HARGA_TERJANGKAU } from '$lib/config';
@@ -826,17 +826,30 @@ export async function getKerjasamaQr(fetchFn: Fetch, kodeRaw: string): Promise<K
 	}
 	try {
 		const body = (await res.json()) as ApiEnvelope<KerjasamaQr>;
-		const data = body?.data;
-		if (
-			!data ||
-			typeof data.perumahanSlug !== 'string' ||
-			!data.perumahanSlug ||
-			typeof data.ref !== 'string' ||
-			!REF_PATTERN.test(data.ref)
-		) {
-			return null;
+		const data = body?.data as
+			| Partial<Record<'jenis' | 'perumahanSlug' | 'ref' | 'namaPerusahaan', unknown>>
+			| null
+			| undefined;
+		// `ref` divalidasi REF_PATTERN untuk SEMUA jenis (melindungi URL
+		// redirect); jenis `omahe` mengasah polanya ke `OP-XXXXXX`.
+		if (!data || typeof data.ref !== 'string' || !REF_PATTERN.test(data.ref)) return null;
+
+		if (data.jenis === 'omahe') {
+			if (!REF_OMAHE_PATTERN.test(data.ref)) return null;
+			const nama =
+				typeof data.namaPerusahaan === 'string'
+					? data.namaPerusahaan.trim().slice(0, 120)
+					: '';
+			return {
+				jenis: 'omahe',
+				perumahanSlug: null,
+				ref: data.ref,
+				namaPerusahaan: nama || 'mitra Omahe'
+			};
 		}
-		return { perumahanSlug: data.perumahanSlug, ref: data.ref };
+		// Tanpa `jenis` (backend lama KERJASAMA-02) atau `jenis:'perumahan'`.
+		if (typeof data.perumahanSlug !== 'string' || !data.perumahanSlug) return null;
+		return { jenis: 'perumahan', perumahanSlug: data.perumahanSlug, ref: data.ref };
 	} catch (err) {
 		console.error('[omahe:api] GET /public/kerjasama/q — body bukan JSON', err);
 		return null;

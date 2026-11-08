@@ -9,6 +9,7 @@
  * tanpa perlu tahu detail status komersial (404 pun seragam, §8).
  */
 import { ApiError, createLead, type LeadInput } from '$lib/api';
+import { KODE_REFERRAL_PATTERN } from '$lib/ref-pola';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
@@ -19,9 +20,26 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 		return json({ message: 'Permintaan tidak valid.' }, { status: 400 });
 	}
 
+	// KERJASAMA-03 — kode referral opsional (6 karakter alfabet tanpa 0/O/1/I/L):
+	// dinormalisasi trim+uppercase, disalurkan ke backend HANYA bila valid
+	// (dipakai backend bila `ref` kosong); salah bentuk → 400 ramah, bukan
+	// diteruskan mentah-mentah.
+	const kodeReferral =
+		typeof input.kodeReferral === 'string' ? input.kodeReferral.trim().toUpperCase() : '';
+	if (kodeReferral && !KODE_REFERRAL_PATTERN.test(kodeReferral)) {
+		return json(
+			{
+				message:
+					'Kode referral tidak valid — harus 6 karakter huruf/angka tanpa 0, O, 1, I, L.'
+			},
+			{ status: 400 }
+		);
+	}
+	const inputBersih: LeadInput = { ...input, kodeReferral: kodeReferral || undefined };
+
 	let whatsapp: string | null;
 	try {
-		({ whatsapp } = await createLead(fetch, input));
+		({ whatsapp } = await createLead(fetch, inputBersih));
 	} catch (err) {
 		if (err instanceof ApiError) return json({ message: err.message }, { status: err.status });
 		console.error('[omahe:api] POST /api/lead gagal tak terduga', err);

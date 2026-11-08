@@ -916,9 +916,40 @@ request API dari Omahe tanpa header ini.
   (redirect juga) memakai `cache-control: no-store` (supaya tiap pindai tetap sampai backend) +
   `x-robots-tag: noindex`; tidak di-prerender dan tidak masuk sitemap.
 - **Ref tersimpan 90 hari per slug** (`src/lib/ref-tersimpan.ts`, browser saja): kunci
-  `omahe:ref:<slug>`, nilai JSON `{ref, exp}`, exp = sekarang + 90 hari; bentuk rusak/kedaluwarsa
-  → hapus + `null`; semua akses localStorage dalam try/catch (mode privat). Di-root layout
-  (`+layout.ts`, universal load, hanya `browser` + route `/perumahan/[slug]…`): `ref` di URL ada
-  → simpan (LAST-TOUCH, selalu menimpa); tidak ada → pakai simpanan → `page.data.ref` terisi
-  sehingga CTA `ajukanUrl()` & form minat otomatis membawa ref saat pembeli kembali lewat
-  Google tanpa query string. URL bar tidak diubah.
+  `omahe:ref:<slug>`, nilai JSON `{ref, exp, t}` (`t` aditif KERJASAMA-03; bentuk lama tanpa `t` tetap
+  dibaca, dianggap `t = 0`), exp = sekarang + 90 hari; bentuk rusak/kedaluwarsa → hapus + `null`; semua
+  akses localStorage dalam try/catch (mode privat). Di-root layout (`+layout.ts`, universal load, hanya
+  `browser`): `ref` di URL ada → simpan (LAST-TOUCH, selalu menimpa); tidak ada → pakai simpanan →
+  `page.data.ref` terisi sehingga CTA `ajukanUrl()` & form minat otomatis membawa ref saat pembeli
+  kembali lewat Google tanpa query string. URL bar tidak diubah.
+
+## §39 — QR kerjasama Omahe × perusahaan & kode referral (KERJASAMA-03, 2026-11-08)
+
+- `GET /public/kerjasama/q/:kode` kini punya DUA jenis payload (field `data.jenis`):
+  - `'perumahan'` → `{ jenis: 'perumahan', perumahanSlug, ref }` — respons backend lama TANPA `jenis`
+    diperlakukan begini juga (normalisasi di `getKerjasamaQr` sisi Omahe);
+  - `'omahe'` → `{ jenis: 'omahe', perumahanSlug: null, ref: 'OP-XXXXXX', namaPerusahaan }` — QR
+    kerjasama Omahe × PERUSAHAAN. `ref` = kode pendek `OP-` + 6 karakter alfabet tanpa ambigu
+    (`23456789ABCDEFGHJKMNPQRSTUVWXYZ`); `namaPerusahaan` string ≤ 120.
+  Tiap hit yang ketemu tetap dihitung pindai — tetap TIDAK boleh di-cache.
+- Ref `OP-…` dipakai di `?ref=` seperti ref lain: booking `/ajukan/:slug?ref=OP-…` & lead publik
+  membawa atribusi perusahaan — HANYA untuk perumahan ikut Program Omahe; selain itu backend
+  mengabaikan diam-diam.
+- `POST /public/leads` menerima field opsional `kodeReferral` (6 karakter alfabet yang sama, tanpa
+  prefiks `OP-`) — dipakai backend HANYA bila `ref` kosong. Sisi Omahe: kolom "Kode referral
+  (opsional)" di dialog form minat muncul HANYA bila `page.data.ref` kosong; normalisasi
+  trim+uppercase + validasi pola lokal & di proxy `/api/lead` (salah bentuk → 400 ramah).
+- Route Omahe `/q/[kode]` jenis `omahe` → `302 /?ref=<OP-…>&mitra=<nama ter-encode>` (tetap
+  `cache-control: no-store` + `x-robots-tag: noindex`); jenis `perumahan` seperti semula →
+  `302 /perumahan/:slug?ref=`.
+- **Ref GLOBAL** (`ref-tersimpan.ts`): `simpanRefGlobal(ref, nama?, now?)` / `ambilRefGlobal(now?)`
+  (kunci `omahe:ref:_global`, `{ref, nama?, exp, t}`, 90 hari). Layout LAST-TOUCH lintas keduanya:
+  URL ref `OP-…` di halaman mana pun → simpan global; URL ref lain di `/perumahan/[slug]…` → simpan
+  per slug; tanpa ref di URL → halaman perumahan memakai yang `t`-nya terbaru antara per-slug vs
+  global, halaman lain memakai global (link kartu `withRef` ikut membawa). `page.data.ref` tetap
+  satu-satunya sumber untuk `ajukanUrl()` & form minat.
+- Banner homepage "Rekomendasi dari <nama>" — hanya bila ref global aktif & ada nama (dari resolve
+  `/q/:kode` via `?mitra=`, dibersihkan & hanya disimpan bila ref di URL memang `OP-…`). Nama adalah
+  LABEL TAMPILAN SAJA (anti-spoof: tidak pernah dibaca dari `?dari=`/`?mitra=` bebas di URL biasa);
+  atribusi tetap dari `ref` yang divalidasi backend. Tutup banner hanya menyembunyikan banner.
+- Fixture non-prod: kode `QA7MPN` → `{jenis:'omahe', ref:'OP-QA7MPN', namaPerusahaan:'PT Contoh Mitra'}`.

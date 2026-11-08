@@ -35,10 +35,14 @@ export const kirimMinatAgenMock = mock<
 	(fetchFn: typeof fetch, input: unknown) => Promise<{ whatsapp: string | null }>
 >(async () => ({ whatsapp: null }));
 
-/** KERJASAMA-02 — resolve kode QR pendek untuk route `/q/[kode]`. */
+/** KERJASAMA-02/03 — resolve kode QR pendek untuk route `/q/[kode]` (union dua jenis). */
+export type KerjasamaQrMock =
+	| { jenis: 'perumahan'; perumahanSlug: string; ref: string }
+	| { jenis: 'omahe'; perumahanSlug: null; ref: string; namaPerusahaan: string };
+
 export const getKerjasamaQrMock = mock<
-	(fetchFn: typeof fetch, kode: unknown) => Promise<{ perumahanSlug: string; ref: string } | null>
->(async () => null);
+	(fetchFn: typeof fetch, kode: unknown) => Promise<KerjasamaQrMock | null>
+>(async (): Promise<KerjasamaQrMock | null> => null);
 
 /** Pasang mock `$lib/api` — panggil SEBELUM `await import('./+server')`. */
 export function pasangMockLibApi(): void {

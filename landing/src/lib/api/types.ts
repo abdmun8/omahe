@@ -478,6 +478,10 @@ export interface LeadInput {
 	sumber: LeadSumber;
 	/** ≤50 — passthrough `?ref=` dari URL (atribusi mitra, kewajiban CLAUDE.md). */
 	ref?: string;
+	/** KERJASAMA-03 — kode referral 6 karakter (alfabet tanpa 0/O/1/I/L),
+	 *  opsional, dipakai backend HANYA bila `ref` kosong (atribusi perusahaan
+	 *  Program Omahe dari form minat tanpa ref di URL). */
+	kodeReferral?: string;
 	/** HONEYPOT — field tersembunyi; manusia WAJIB mengosongkannya, bot
 	 *  iseng mengisi. Dikirim apa adanya — server yang memutus (respons
 	 *  sukses & honeypot SAMA, jadi tidak ada yang bisa dibedakan di UI). */
@@ -910,13 +914,16 @@ export interface LelangQuery {
 // ---------------------------------------------------------------------------
 
 /**
- * Isi QR cetak perumahan×perusahaan mitra: QR meng-encode
+ * Isi QR cetak kerjasama (KERJASAMA-02/03, api-contract §38). QR meng-encode
  * `https://www.omahe.co.id/q/<KODE>`, route `/q/[kode]` Omahe me-resolve
- * kode itu via endpoint ini lalu 302 ke `/perumahan/:slug?ref=`. `ref`
- * = `kerjasama.qrCode` (hex 64) — sama yang dipakai passthrough `?ref=`
- * biasa (PRD §4 & §7 repo `perumahan`).
+ * kode itu via endpoint ini lalu 302. DUA jenis (tahap 5 KERJASAMA-03):
+ *   - `perumahan` — QR kerjasama perumahan×perusahaan mitra; `ref` =
+ *     `kerjasama.qrCode` (hex 64) → 302 `/perumahan/:slug?ref=`.
+ *   - `omahe` — QR kerjasama Omahe×PERUSAHAAN; `ref` = kode `OP-XXXXXX` →
+ *     302 `/?ref=OP-…&mitra=<nama>` (atribusi perusahaan di app perumahan).
+ * Respons backend LAMA tanpa `jenis` dinormalisasi `getKerjasamaQr` ke
+ * `'perumahan'` — bentuk di sini adalah BENTUK SETELAH normalisasi.
  */
-export interface KerjasamaQr {
-	perumahanSlug: string;
-	ref: string;
-}
+export type KerjasamaQr =
+	| { jenis: 'perumahan'; perumahanSlug: string; ref: string }
+	| { jenis: 'omahe'; perumahanSlug: null; ref: string; namaPerusahaan: string };

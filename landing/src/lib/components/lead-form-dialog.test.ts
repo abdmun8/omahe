@@ -29,7 +29,7 @@
  * kritis: TIDAK ada PII (nama/nomor telepon pengunjung) yang bocor ke
  * parameter event — aturan Google ToS (src/lib/analytics.ts).
  */
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { waitFor } from '@testing-library/dom';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { SITE } from '$lib/config';
@@ -336,5 +336,52 @@ describe.skipIf(typeof document === 'undefined')('LeadFormDialog', () => {
 		expect(screen.getByLabelText('Nomor WhatsApp')).toHaveAttribute('maxlength', '20');
 		expect(screen.getByLabelText(/Tipe yang diminati/)).toHaveAttribute('maxlength', '50');
 		expect(screen.getByLabelText(/^Pesan/)).toHaveAttribute('maxlength', '500');
+	});
+
+	// ------------------------------------------------------------------
+	// KERJASAMA-03 — kolom "Kode referral (opsional)": tampil HANYA bila
+	// `ref` kosong (tanpa atribusi ref), normalisasi + validasi lokal,
+	// diteruskan ke proxy `/api/lead` sebagai `kodeReferral`.
+	// ------------------------------------------------------------------
+
+	test('kolom kode referral tampil hanya bila ref kosong (KERJASAMA-03)', () => {
+		// Dengan ref → kolom TIDAK ada.
+		render(LeadFormDialog, { props: propsDasar() });
+		expect(screen.queryByLabelText(/^Kode referral/)).toBeNull();
+		cleanup();
+
+		// Tanpa ref → kolom ada, maxlength 6.
+		render(LeadFormDialog, { props: { ...propsDasar(), ref: null } });
+		const kode = screen.getByLabelText(/^Kode referral/) as HTMLInputElement;
+		expect(kode).toHaveAttribute('maxlength', '6');
+	});
+
+	test('kode referral valid → dinormalisasi uppercase & diteruskan ke proxy (KERJASAMA-03)', async () => {
+		const fetchMock = stubFetch({ ok: true, status: 200, json: async () => ({ ok: true }) });
+		render(LeadFormDialog, { props: { ...propsDasar(), ref: null } });
+
+		fireEvent.input(screen.getByLabelText('Nama'), { target: { value: 'Budi' } });
+		fireEvent.input(screen.getByLabelText('Nomor WhatsApp'), { target: { value: '081234567890' } });
+		fireEvent.input(screen.getByLabelText(/^Kode referral/), { target: { value: ' qa7mpn ' } });
+		centangSetuju();
+		fireEvent.submit(screen.getByRole('button', { name: 'Kirim' }).closest('form')!);
+		await screen.findByText('Terima kasih, tim Griya Asri akan menghubungi Anda.');
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1]?.body as string).kodeReferral).toBe('QA7MPN');
+	});
+
+	test('kode referral salah bentuk → ditolak LOKAL, tidak ada fetch (KERJASAMA-03)', async () => {
+		const fetchMock = stubFetch({ ok: true, status: 200, json: async () => ({ ok: true }) });
+		render(LeadFormDialog, { props: { ...propsDasar(), ref: null } });
+
+		fireEvent.input(screen.getByLabelText('Nama'), { target: { value: 'Budi' } });
+		fireEvent.input(screen.getByLabelText('Nomor WhatsApp'), { target: { value: '081234567890' } });
+		fireEvent.input(screen.getByLabelText(/^Kode referral/), { target: { value: 'QA7MP' } });
+		centangSetuju();
+		fireEvent.submit(screen.getByRole('button', { name: 'Kirim' }).closest('form')!);
+
+		expect(await screen.findByRole('alert')).toHaveTextContent('Kode referral tidak valid');
+		expect(fetchMock).not.toHaveBeenCalled();
+		expect(screen.queryByText(/Terima kasih/)).toBeNull();
 	});
 });

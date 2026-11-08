@@ -27,9 +27,17 @@ export const prerender = false;
 
 export const GET: RequestHandler = async ({ fetch, params }) => {
 	const qr = await getKerjasamaQr(fetch, params.kode ?? '');
-	const location = qr
-		? `/perumahan/${encodeURIComponent(qr.perumahanSlug)}?ref=${encodeURIComponent(qr.ref)}`
-		: '/';
+	// KERJASAMA-03 — dua jenis: QR perumahan → halaman detail perumahan;
+	// QR Omahe×perusahaan → homepage dengan ref GLOBAL `OP-…` + `mitra`
+	// (nama perusahaan, LABEL TAMPILAN SAJA — atribusi tetap dari `ref`
+	// yang divalidasi backend; nama di bersihkan ulang di layout sebelum
+	// disimpan). Keduanya `cache-control: no-store` — hitung pindai.
+	let location = '/';
+	if (qr?.jenis === 'perumahan') {
+		location = `/perumahan/${encodeURIComponent(qr.perumahanSlug)}?ref=${encodeURIComponent(qr.ref)}`;
+	} else if (qr?.jenis === 'omahe') {
+		location = `/?ref=${encodeURIComponent(qr.ref)}&mitra=${encodeURIComponent(qr.namaPerusahaan)}`;
+	}
 	return new Response(null, {
 		status: 302,
 		headers: {

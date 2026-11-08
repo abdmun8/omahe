@@ -569,13 +569,13 @@ describe('getDirektoriAgen (jalur API asli) — prioritas AGEN-OMAHE-08', () => 
 	});
 });
 
-describe('getKerjasamaQr (KERJASAMA-02, jalur API asli)', () => {
+describe('getKerjasamaQr (KERJASAMA-02/03, jalur API asli)', () => {
 	/** Hex 64 seperti `kerjasama.qrCode` backend. */
 	const REF = 'a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2';
 	const envelopeQr = (ref: string, slug = 'griya-asri-bogor') =>
 		envelope({ perumahanSlug: slug, ref });
 
-	test('200 valid → slug + ref; kode dinormalisasi trim+uppercase di URL; header konsumen Omahe', async () => {
+	test('200 valid (backend lama tanpa `jenis`) → dinormalisasi jenis perumahan; kode dinormalisasi trim+uppercase di URL; header konsumen Omahe', async () => {
 		const { getKerjasamaQr } = await import('./client');
 		const urls: string[] = [];
 		const heads: Headers[] = [];
@@ -585,12 +585,53 @@ describe('getKerjasamaQr (KERJASAMA-02, jalur API asli)', () => {
 			return envelopeQr(REF);
 		}) as unknown as typeof fetch;
 		expect(await getKerjasamaQr(f, ' k7m2qx ')).toEqual({
+			jenis: 'perumahan',
 			perumahanSlug: 'griya-asri-bogor',
 			ref: REF
 		});
 		expect(urls).toEqual([`${API}/public/kerjasama/q/K7M2QX`]);
 		expect(heads[0]?.get('accept')).toBe('application/json');
 		expect(heads[0]?.get('x-konsumen')).toBe('omahe');
+	});
+
+	test('KERJASAMA-03 — jenis omahe → ref OP-… + nama (trim, fallback "mitra Omahe" bila kosong)', async () => {
+		const { getKerjasamaQr } = await import('./client');
+		const f = (async () =>
+			envelope({
+				jenis: 'omahe',
+				perumahanSlug: null,
+				ref: 'OP-QA7MPN',
+				namaPerusahaan: '  PT Mitra Sejahtera  '
+			})) as unknown as typeof fetch;
+		expect(await getKerjasamaQr(f, 'QA7MPN')).toEqual({
+			jenis: 'omahe',
+			perumahanSlug: null,
+			ref: 'OP-QA7MPN',
+			namaPerusahaan: 'PT Mitra Sejahtera'
+		});
+
+		const fKosong = (async () =>
+			envelope({ jenis: 'omahe', perumahanSlug: null, ref: 'OP-QA7MPN', namaPerusahaan: '   ' })) as unknown as typeof fetch;
+		expect(await getKerjasamaQr(fKosong, 'QA7MPN')).toEqual({
+			jenis: 'omahe',
+			perumahanSlug: null,
+			ref: 'OP-QA7MPN',
+			namaPerusahaan: 'mitra Omahe'
+		});
+	});
+
+	test('KERJASAMA-03 — jenis omahe tapi ref BUKAN pola OP-XXXXXX → null', async () => {
+		const { getKerjasamaQr } = await import('./client');
+		for (const salah of ['OP-QA7MP', 'OP-0A7MPN', 'OP-QA7MPNX', 'qa7mpn', 'OP-QA7M0N']) {
+			const f = (async () =>
+				envelope({
+					jenis: 'omahe',
+					perumahanSlug: null,
+					ref: salah,
+					namaPerusahaan: 'PT Contoh'
+				})) as unknown as typeof fetch;
+			expect(await getKerjasamaQr(f, 'QA7MPN')).toBeNull();
+		}
 	});
 
 	test('404 → null (kode tidak dikenal/nonaktif — bukan error, route 302 ke `/`)', async () => {

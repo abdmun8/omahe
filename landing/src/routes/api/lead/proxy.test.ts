@@ -111,4 +111,36 @@ describe('POST /api/lead (proxy MONET-03)', () => {
 		expect(body.message).toBe('Pengiriman gagal. Coba lagi sebentar lagi.');
 		expect(body.message).not.toContain('kredensial');
 	});
+
+	// KERJASAMA-03 — kolom "Kode referral (opsional)" di dialog.
+	test('kodeReferral valid → dinormalisasi trim+uppercase, diteruskan ke backend', async () => {
+		const res = await postJson(
+			JSON.stringify({ ...JSON.parse(bodyValid), kodeReferral: '  qa7mpn  ' })
+		);
+
+		expect(res.status).toBe(200);
+		expect(createLeadMock.mock.calls[0]?.[1]).toMatchObject({ kodeReferral: 'QA7MPN' });
+	});
+
+	test('kodeReferral salah bentuk → 400 ramah, TIDAK diteruskan ke backend', async () => {
+		for (const salah of ['QA7MP', 'QA7MPNX', '0A7MPN', 'qa7mp!']) {
+			const res = await postJson(JSON.stringify({ ...JSON.parse(bodyValid), kodeReferral: salah }));
+			expect(res.status).toBe(400);
+			const body = (await res.json()) as { message: string };
+			expect(body.message).toContain('Kode referral tidak valid');
+		}
+		expect(createLeadMock).not.toHaveBeenCalled();
+	});
+
+	test('kodeReferral bukan string (junk) → dinolkan, keputusan bentuk di proxy/backend', async () => {
+		const res = await postJson(JSON.stringify({ ...JSON.parse(bodyValid), kodeReferral: 42 }));
+		expect(res.status).toBe(200);
+		expect((createLeadMock.mock.calls[0]?.[1] as Record<string, unknown>).kodeReferral).toBeUndefined();
+	});
+
+	test('kodeReferral kosong/ketiadaan → undefined (JSON.stringify menghapus key — tidak sampai backend)', async () => {
+		await postJson(JSON.stringify({ ...JSON.parse(bodyValid), kodeReferral: '   ' }));
+		expect((createLeadMock.mock.calls[0]?.[1] as Record<string, unknown>).kodeReferral).toBeUndefined();
+		expect(JSON.stringify(createLeadMock.mock.calls[0]?.[1])).not.toContain('kodeReferral');
+	});
 });

@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { readRef } from '$lib/ref';
-import { ambilRef, simpanRef } from '$lib/ref-tersimpan';
+import { hitungRefLayout } from '$lib/ref-tersimpan';
 import type { LayoutLoad } from './$types';
 
 /**
@@ -19,33 +19,29 @@ import type { LayoutLoad } from './$types';
  * "Prerender halaman statis".
  */
 export const load: LayoutLoad = ({ data, url, params, route }) => {
-	let ref: string | null = null;
+	let refUrl: string | null = null;
 	try {
-		ref = readRef(url);
+		refUrl = readRef(url);
 	} catch {
 		// sedang prerender — HTML awal tanpa ref, diisi ulang pasca-hidrasi.
-		ref = null;
+		refUrl = null;
 	}
 
-	// KERJASAMA-02 — ref tersimpan 90 hari per slug perumahan. Pembeli yang
-	// memindai QR kerjasama lalu kembali lewat Google tanpa query string
-	// tetap membawa atribusi (komisi mitra tidak hilang diam-diam). HANYA
-	// di browser (localStorage), HANYA di route `/perumahan/[slug]…`
-	// (detail + halaman tipe — dua-duanya punya CTA `ajukanUrl()`), dan
-	// LAST-TOUCH: ref di URL selalu menimpa simpanan. URL bar tidak diubah.
-	if (browser && route.id?.startsWith('/perumahan/[slug]') && params.slug) {
-		if (ref) {
-			simpanRef(params.slug, ref);
-		} else {
-			// `ambilRef` sudah fail-soft (try/catch internal) — nilainya
-			// mengalir ke `page.data.ref` sehingga CTA booking & form minat
-			// membawa ref tanpa perubahan di komponen mana pun.
-			ref = ambilRef(params.slug);
-		}
-	}
+	// KERJASAMA-02/03 — seluruh logika pemilihan & penyimpanan ref (per-slug
+	// vs GLOBAL `OP-…`, LAST-TOUCH, nama `?mitra=`) diekstrak ke
+	// `hitungRefLayout()` di `src/lib/ref-tersimpan.ts` supaya bisa diuji —
+	// shim natif `$app/environment` di bun test tidak bisa di-mock dari file
+	// proyek. Di sini tinggal wiring tipis; URL bar tidak diubah.
+	const { ref, refGlobalNama } = hitungRefLayout({
+		browser,
+		refUrl,
+		slug: params.slug ?? null,
+		diRutePerumahan: route.id?.startsWith('/perumahan/[slug]') === true && !!params.slug,
+		url
+	});
 
 	// `data` = hasil `+layout.server.ts` (kontak Omahe, ADMIN-05) — WAJIB
 	// diteruskan, kalau tidak `page.data.kontak` jadi undefined di seluruh
 	// halaman dan semua komponen diam-diam mundur ke fallback `SITE.*`.
-	return { ...data, ref };
+	return { ...data, ref, refGlobalNama };
 };

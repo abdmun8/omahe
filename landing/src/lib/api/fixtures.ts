@@ -866,7 +866,16 @@ export const TAGIHAN_BAYAR: Record<string, DetailBayar> = {
  */
 export const KERJASAMA_QR: Record<string, KerjasamaQr> = {
 	K7M2QX: {
+		jenis: 'perumahan',
 		perumahanSlug: 'griya-asri-bogor',
 		ref: 'a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2'
+	},
+	// KERJASAMA-03 (tahap 5) — QR kerjasama Omahe×perusahaan: 302 ke
+	// `/?ref=OP-QA7MPN&mitra=PT%20Contoh%20Mitra` (bukan halaman perumahan).
+	QA7MPN: {
+		jenis: 'omahe',
+		perumahanSlug: null,
+		ref: 'OP-QA7MPN',
+		namaPerusahaan: 'PT Contoh Mitra'
 	}
 };

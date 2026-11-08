@@ -26,6 +26,17 @@ export const REF_PARAM = 'ref';
  */
 export const REF_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 
+/**
+ * KERJASAMA-03 — pola & helper ref memakai modul bebas-dependensi
+ * `$lib/ref-pola.ts` (re-export di bawah) supaya komponen browser bisa
+ * memakainya tanpa menarik `$env/dynamic/public` (lihat dokumen modul itu).
+ */
+export {
+	REF_OMAHE_PATTERN,
+	KODE_REFERRAL_PATTERN,
+	bersihkanNamaMitra
+} from './ref-pola';
+
 /** Ambil `ref` dari URL. Nilai yang bentuknya tidak masuk akal dibuang. */
 export function readRef(url: URL): string | null {
 	const raw = url.searchParams.get(REF_PARAM);

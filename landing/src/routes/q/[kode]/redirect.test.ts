@@ -37,9 +37,10 @@ beforeEach(() => {
 	getKerjasamaQrMock.mockImplementation(async () => null);
 });
 
-describe('GET /q/[kode] (KERJASAMA-02)', () => {
+describe('GET /q/[kode] (KERJASAMA-02/03)', () => {
 	test('kode ketemu → 302 /perumahan/:slug?ref= + no-store + noindex', async () => {
 		getKerjasamaQrMock.mockImplementation(async () => ({
+			jenis: 'perumahan',
 			perumahanSlug: 'griya-asri-bogor',
 			ref: REF
 		}));
@@ -54,6 +55,23 @@ describe('GET /q/[kode] (KERJASAMA-02)', () => {
 		expect(getKerjasamaQrMock).toHaveBeenCalledWith(expect.anything(), 'K7M2QX');
 	});
 
+	test('KERJASAMA-03 — jenis omahe → 302 `/?ref=OP-…&mitra=<nama>` + no-store', async () => {
+		getKerjasamaQrMock.mockImplementation(async () => ({
+			jenis: 'omahe',
+			perumahanSlug: null,
+			ref: 'OP-QA7MPN',
+			namaPerusahaan: 'PT Contoh Mitra'
+		}));
+		const res = await GET(event('QA7MPN'));
+		expect(res.status).toBe(302);
+		expect(res.headers.get('location')).toBe(
+			`/?ref=OP-QA7MPN&mitra=${encodeURIComponent('PT Contoh Mitra')}`
+		);
+		// Hitung pindai berlaku juga untuk QR Omahe×perusahaan.
+		expect(res.headers.get('cache-control')).toBe('no-store');
+		expect(res.headers.get('x-robots-tag')).toBe('noindex');
+	});
+
 	test('resolve gagal (404/error jaringan → null) → 302 `/`, pemindai tidak lihat error', async () => {
 		const res = await GET(event('ZZZZZZ'));
 		expect(res.status).toBe(302);
@@ -64,6 +82,7 @@ describe('GET /q/[kode] (KERJASAMA-02)', () => {
 
 	test('slug & ref di-encode sebelum masuk header `location`', async () => {
 		getKerjasamaQrMock.mockImplementation(async () => ({
+			jenis: 'perumahan',
 			perumahanSlug: 'perumahan dengan spasi',
 			ref: 'abc_def-123'
 		}));

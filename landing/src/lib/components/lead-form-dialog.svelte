@@ -28,6 +28,7 @@
 	import type { LeadSumber } from '$lib/api/types';
 	import { trackEvent } from '$lib/analytics';
 	import { LANJUT_WA_OTOMATIS, SITE } from '$lib/config';
+	import { KODE_REFERRAL_PATTERN } from '$lib/ref-pola';
 	import { pesanWaPeminat, waUrl } from '$lib/utils';
 	import Button from './ui/button.svelte';
 
@@ -73,6 +74,9 @@
 	// svelte-ignore state_referenced_locally
 	let tipeMinat = $state(tipeMinatAwal);
 	let pesan = $state('');
+	/** KERJASAMA-03 — kode referral 6 karakter (alfabet tanpa 0/O/1/I/L);
+	 *  kolom hanya muncul bila `ref` kosong (sudah ada atribusi ref). */
+	let kodeReferral = $state('');
 	/** HONEYPOT — manusia tidak melihat field ini, bot mengisinya. */
 	let website = $state('');
 	/** Persetujuan privasi WAJIB sebelum submit (api-contract.md §8). */
@@ -98,6 +102,7 @@
 			tipeMinat = tipeMinatAwal;
 			pesan = '';
 			website = '';
+			kodeReferral = '';
 			setuju = false;
 		}
 	});
@@ -116,6 +121,15 @@
 		if (proses) return;
 		proses = true;
 		pesanError = null;
+		// KERJASAMA-03 — validasi lokal kode referral (6 karakter alfabet
+		// tanpa ambigu): salah bentuk → pesan ramah, TIDAK dikirim ke backend.
+		const kodeRapi = kodeReferral.trim().toUpperCase();
+		if (!ref && !kodeAgen && kodeRapi && !KODE_REFERRAL_PATTERN.test(kodeRapi)) {
+			pesanError =
+				'Kode referral tidak valid — harus 6 karakter huruf/angka tanpa 0, O, 1, I, L. Periksa lagi, atau kosongkan.';
+			proses = false;
+			return;
+		}
 		try {
 			const res = kodeAgen
 				? await fetch('/api/agen-minat', {
@@ -140,6 +154,7 @@
 							pesan: pesan.trim() || undefined,
 							sumber,
 							ref: ref ?? undefined,
+							kodeReferral: !ref && !kodeAgen && kodeRapi ? kodeRapi : undefined,
 							website // honeypot dikirim APA ADANYA — server yang menangani.
 						})
 					});
@@ -332,6 +347,27 @@
 								/>
 							{/if}
 						</div>{/if}
+
+					{#if !ref && !kodeAgen}
+						<div>
+							<label for="{uid}-kode" class="text-ink mb-1 block text-sm font-medium">
+								Kode referral <span class="text-muted font-normal">(opsional)</span>
+							</label>
+							<input
+								id="{uid}-kode"
+								name="kodeReferral"
+								type="text"
+								maxlength="6"
+								placeholder="mis. QA7MPN"
+								autocomplete="off"
+								bind:value={kodeReferral}
+								class="{kelasField} uppercase"
+							/>
+							<p class="text-muted mt-1 text-xs">
+								Punya kode referral dari mitra kami? Masukkan 6 karakternya (tanpa 0, O, 1, I, L).
+							</p>
+						</div>
+					{/if}
 
 					<div>
 						<label for="{uid}-pesan" class="text-ink mb-1 block text-sm font-medium">

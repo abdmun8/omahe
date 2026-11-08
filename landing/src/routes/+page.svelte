@@ -9,6 +9,7 @@
 	import SearchForm from '$lib/components/search-form.svelte';
 	import SliderCarousel from '$lib/components/slider-carousel.svelte';
 	import UnitCard from '$lib/components/unit-card.svelte';
+	import BannerRekomendasi from '$lib/components/banner-rekomendasi.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import type { PageData } from './$types';
 
@@ -61,6 +62,13 @@
 	>
 		<SliderCarousel sliders={data.sliders} ref={data.ref} delayDetik={data.sliderDelayDetik} />
 	</section>
+{/if}
+
+<!-- KERJASAMA-03 — banner "Rekomendasi dari <nama mitra>" bila ref GLOBAL
+     (QR kerjasama Omahe×perusahaan) aktif; nama dari resolve `/q/:kode`,
+     bukan dari URL bebas. Bisa ditutup — ref tetap. -->
+{#if data.refGlobalNama}
+	<BannerRekomendasi nama={data.refGlobalNama} />
 {/if}
 
 <!-- Hero + pencarian. Padding vertikal lebih ramping di mobile (default)
