@@ -1,0 +1,20 @@
+{
+  "name": "omahe-sosmed-video",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/plus-jakarta-sans": "^5.3.0",
+    "@revideo/2d": "^0.11.0",
+    "@revideo/core": "^0.11.0",
+    "@revideo/ffmpeg": "^0.11.0",
+    "@revideo/renderer": "^0.11.0",
+    "@revideo/vite-plugin": "^0.11.0",
+    "msedge-tts": "^2.1.1"
+  },
+  "devDependencies": {
+    "@revideo/ui": "^0.11.0",
+    "tsx": "^4.23.15",
+    "yauzl": "^3.4.0"
+  }
+}

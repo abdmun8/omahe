@@ -1,0 +1,136 @@
+{
+  "id": "2026-11-08-hitung-kpr-subsidi",
+  "pilar": "edukasi",
+  "template": "T2",
+  "suara": "id-ID-GadisNeural",
+  "catatanKaki": "Ilustrasi, bukan penawaran. Batas harga & penghasilan rumah subsidi berbeda per wilayah. Foto: perumahan subsidi di Karawang (ilustrasi).",
+  "adegan": [
+    {
+      "jenis": "foto",
+      "foto": [
+        "api:tipe/nirwana-residence/28-60#0"
+      ],
+      "judul": "Gaji 3,5 Juta Bisa KPR Rumah?",
+      "sub": "Yuk, hitung bareng",
+      "narasi": "Gaji tiga setengah juta, bisa cicil rumah sendiri? Yuk, hitung."
+    },
+    {
+      "jenis": "angka",
+      "foto": [
+        "api:tipe/klari-regency/28-60#0"
+      ],
+      "judul": "Contoh: Rumah Subsidi di Karawang",
+      "angka": [
+        {
+          "label": "Harga rumah",
+          "nilai": "Rp166 juta"
+        },
+        {
+          "label": "Uang muka 1%",
+          "nilai": "Rp1,66 juta"
+        },
+        {
+          "label": "Pinjaman KPR",
+          "nilai": "± Rp164 juta"
+        }
+      ],
+      "narasi": "Contoh rumah subsidi di Karawang, harganya 166 juta. Uang muka satu persen, pinjamannya sekitar 164 juta."
+    },
+    {
+      "jenis": "angka",
+      "foto": [
+        "api:tipe/mercu-raya-city/28-60#0"
+      ],
+      "judul": "Pakai KPR Subsidi FLPP",
+      "angka": [
+        {
+          "label": "Bunga tetap",
+          "nilai": "5% / tahun"
+        },
+        {
+          "label": "Tenor",
+          "nilai": "20 tahun"
+        },
+        {
+          "label": "Cicilan per bulan",
+          "nilai": "± Rp1,08 juta",
+          "sorot": true
+        }
+      ],
+      "narasi": "Pakai KPR subsidi FLPP, bunga tetap lima persen, dua puluh tahun. Cicilannya sekitar satu juta delapan puluh ribu sebulan."
+    },
+    {
+      "jenis": "angka",
+      "foto": [
+        "api:tipe/nirwana-residence/28-60#0"
+      ],
+      "judul": "Patokan Bank",
+      "angka": [
+        {
+          "label": "Cicilan maksimal",
+          "nilai": "1/3 gaji"
+        },
+        {
+          "label": "Gaji minimal",
+          "nilai": "± Rp3,25 juta",
+          "sorot": true
+        }
+      ],
+      "narasi": "Bank biasanya minta cicilan maksimal sepertiga gaji. Jadi, gaji sekitar tiga seperempat juta sudah cukup."
+    },
+    {
+      "jenis": "poin",
+      "foto": [
+        "api:tipe/klari-regency/28-60#0"
+      ],
+      "judul": "Tapi Cek Dulu Syaratnya",
+      "poin": [
+        "Belum punya rumah",
+        "Belum pernah dapat subsidi rumah",
+        "Penghasilan di bawah batas wilayah",
+        "Riwayat kredit (SLIK) bersih"
+      ],
+      "narasi": "Tapi cek syaratnya: belum punya rumah, belum pernah dapat subsidi, penghasilan di bawah batas, dan riwayat kredit bersih."
+    },
+    {
+      "jenis": "penutup",
+      "judul": "Hitung cicilanmu sendiri",
+      "url": "omahe.co.id/kpr",
+      "kredit": "Simulasi anuitas: pinjaman Rp164,34 juta, bunga tetap 5%, 240 bulan.",
+      "subtitle": false,
+      "narasi": "Hitung cicilanmu sendiri di omahe titik co titik id."
+    }
+  ],
+  "caption": "Gaji Rp3,5 juta bisa KPR rumah? Ini hitungannya 👇\n\n🏠 Rumah subsidi Rp166 juta (contoh di Karawang)\n💰 DP 1% = Rp1,66 juta → pinjaman ± Rp164 juta\n📉 KPR subsidi FLPP: bunga tetap 5%, tenor 20 tahun\n➡️ Cicilan ± Rp1,08 juta/bulan\n\nPatokan bank: cicilan maks. 1/3 gaji → gaji minimal ± Rp3,25 juta.\n\nSyarat: belum punya rumah, belum pernah dapat subsidi, penghasilan di bawah batas wilayah, SLIK bersih.\n\nHitung sendiri di omahe.co.id/kpr (link di bio).\n\nIlustrasi, bukan penawaran.",
+  "hashtag": [
+    "#kprsubsidi",
+    "#rumahsubsidi",
+    "#flpp",
+    "#rumahkarawang",
+    "#tipsrumah",
+    "#omahe"
+  ],
+  "link": "https://www.omahe.co.id/kpr?utm_source=instagram&utm_medium=social&utm_campaign=video-2026-11-08-hitung-kpr-subsidi",
+  "fakta": [
+    {
+      "klaim": "Rumah subsidi Rp166 juta di Karawang",
+      "sumber": "API /public/units — klari-regency, mercu-raya-city, nirwana-residence tipe 28/60 hargaMin 166000000"
+    },
+    {
+      "klaim": "FLPP bunga tetap 5% (rumah tapak), DP 1–5%, tenor 20 tahun",
+      "sumber": "artikel Omahe rumah-subsidi-syarat-kelebihan-batasan & kredit-properti-september-2026"
+    },
+    {
+      "klaim": "Cicilan ± Rp1.084.571/bulan",
+      "sumber": "anuitas P=164.340.000, r=5%/12, n=240 (dihitung ulang)"
+    },
+    {
+      "klaim": "Cicilan maks 1/3 penghasilan → gaji min ± Rp3,25 juta",
+      "sumber": "landing/src/lib/kpr.ts penghasilanMinimal = cicilan × 3"
+    },
+    {
+      "klaim": "Syarat: belum punya rumah, belum pernah subsidi, penghasilan dalam plafon, skor kredit layak",
+      "sumber": "artikel rumah-subsidi-syarat-kelebihan-batasan §Syarat inti"
+    }
+  ]
+}

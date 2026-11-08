@@ -1,0 +1,118 @@
+{
+  "id": "2026-11-08-casa-green-karawang",
+  "pilar": "marketing",
+  "template": "T1",
+  "suara": "id-ID-GadisNeural",
+  "catatanKaki": "*Gambar ilustrasi. Bonus developer & promo Omahe dapat berubah. DP 0% melalui bank mitra Omahe, S&K berlaku.",
+  "adegan": [
+    {
+      "jenis": "foto",
+      "foto": [
+        "api:tipe/casa-green-karawang/aster-grande#0"
+      ],
+      "judul": "Rumah 2 Lantai di Karawang",
+      "sub": "mulai Rp600 jutaan",
+      "narasi": "Rumah dua lantai di Karawang, mulai 600 jutaan. Kenalan dulu sama Casa Green Karawang."
+    },
+    {
+      "jenis": "foto",
+      "foto": [
+        "api:tipe/casa-green-karawang/aster-grande#4",
+        "api:tipe/casa-green-karawang/aster-grande#2"
+      ],
+      "judul": "Tipe Aster Grande",
+      "chip": [
+        "3 Kamar Tidur",
+        "2 Balkon",
+        "Carport",
+        "LT 66 m² · LB 47 m²"
+      ],
+      "narasi": "Tipe Aster Grande punya tiga kamar tidur, dua balkon, dan carport, di atas tanah 66 meter persegi."
+    },
+    {
+      "jenis": "foto",
+      "foto": [
+        "api:tipe/casa-green-karawang/aster-grande#5"
+      ],
+      "judul": "Purwasari, Karawang",
+      "chip": [
+        "±10 menit ke Tol Kalihurip"
+      ],
+      "narasi": "Lokasinya di Purwasari, sekitar sepuluh menit ke pintu tol Kalihurip."
+    },
+    {
+      "jenis": "poin",
+      "foto": [
+        "api:tipe/casa-green-karawang/aster-grande#1"
+      ],
+      "judul": "Bonus dari Developer*",
+      "poin": [
+        "Gratis biaya sampai SHM",
+        "Gratis smart home & CCTV",
+        "Gratis AC & kanopi"
+      ],
+      "narasi": "Dari developer, ada bonus gratis biaya sampai SHM, smart home, CCTV, AC, dan kanopi."
+    },
+    {
+      "jenis": "angka",
+      "foto": [
+        "api:tipe/casa-green-karawang/aster-grande#0"
+      ],
+      "judul": "Promo Omahe",
+      "angka": [
+        {
+          "label": "Uang muka",
+          "nilai": "DP 0%*",
+          "sorot": true
+        },
+        {
+          "label": "Cashback setelah akad",
+          "nilai": "Rp1 juta",
+          "sorot": true
+        }
+      ],
+      "narasi": "Khusus lewat Omahe sampai akhir tahun: DP nol persen, plus cashback satu juta rupiah setelah akad.",
+      "sub": "s.d. 31 Des 2026"
+    },
+    {
+      "jenis": "penutup",
+      "judul": "Cek detail & jadwalkan survei",
+      "url": "omahe.co.id",
+      "kredit": "Casa Green Karawang · PT. Hanusentra Propertindo",
+      "subtitle": false,
+      "narasi": "Cek detail dan jadwalkan survei di omahe titik co titik id."
+    }
+  ],
+  "caption": "Rumah 2 lantai di Karawang, mulai Rp600 jutaan 🏡\n\nCasa Green Karawang — tipe Aster Grande: 3 kamar tidur, 2 balkon, carport, LT 66 m² / LB 47 m². Lokasi di Purwasari, ±10 menit ke Tol Kalihurip.\n\n🎁 Bonus developer: gratis biaya s.d. SHM, smart home & CCTV, AC & kanopi.\n💚 Promo Omahe s.d. 31 Des 2026: DP 0%* + cashback Rp1 juta setelah akad.\n\nCek detail & jadwalkan survei di omahe.co.id (link di bio).\n\n*Gambar ilustrasi. DP 0% melalui bank mitra Omahe. S&K berlaku.",
+  "hashtag": [
+    "#rumahkarawang",
+    "#casagreenkarawang",
+    "#rumah2lantai",
+    "#rumahbaru",
+    "#kpr",
+    "#omahe"
+  ],
+  "link": "https://www.omahe.co.id/perumahan/casa-green-karawang/tipe/aster-grande?utm_source=instagram&utm_medium=social&utm_campaign=video-2026-11-08-casa-green-karawang",
+  "fakta": [
+    {
+      "klaim": "Harga mulai Rp600 juta (Aster Grande)",
+      "sumber": "API /public/perumahan/casa-green-karawang/tipe/aster-grande (hargaMin 600000000)"
+    },
+    {
+      "klaim": "3 KT, carport, LT 66 m², LB 47 m², 20 unit tersedia",
+      "sumber": "API tipe aster-grande"
+    },
+    {
+      "klaim": "2 lantai, 2 balkon, ±10 menit ke Tol Kalihurip, bonus SHM/smart home/CCTV/AC/kanopi",
+      "sumber": "deskripsi tipe dari developer (API)"
+    },
+    {
+      "klaim": "Kecamatan Purwasari, Kab. Karawang",
+      "sumber": "API perumahan.kecamatanNama"
+    },
+    {
+      "klaim": "Promo Omahe DP 0% + cashback Rp1 juta setelah akad, s.d. 31 Des 2026",
+      "sumber": "keputusan user 2026-11-08; API programOmahe.cashback=1000000 (dp0 masih false di API)"
+    }
+  ]
+}
