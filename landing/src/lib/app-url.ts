@@ -32,8 +32,30 @@ export function daftarPerusahaanUrl(sumber = 'omahe-gabung'): string {
 	return `${base()}/daftar/perusahaan?src=${sumber}`;
 }
 
+/** Form daftar mandiri agen Omahe (AGEN-OMAHE-10) + sponsor opsional. */
+export function daftarAgenUrl(sponsor?: string | null): string {
+	return urlDaftarAgen(base(), sponsor);
+}
+
 /**
- * Halaman masuk panel (`/login` app `perumahan`) — sekaligus pintu
+ * AGEN-OMAHE-10 — form daftar mandiri agen Omahe di app panel
+ * (`/daftar/agen`): cukup nomor WhatsApp (alur WA AUTH-08), gratis Rp0,
+ * langsung aktif. `sponsor` opsional = kode agen `OMHA-A…` dari link
+ * referral `https://www.omahe.co.id/gabung/agen?sponsor=…` — param
+ * `sponsor`, BUKAN `ref` (lihat `src/lib/sponsor-tersimpan.ts`).
+ *
+ * Fungsi MURNI (base dari argumen) supaya bisa diuji tanpa env; pemanggil
+ * di komponen memakai `daftarAgenUrl()` di atas.
+ */
+export function urlDaftarAgen(base: string, sponsor?: string | null): string {
+	const b = base.replace(/\/+$/, '');
+	const s = sponsor?.trim();
+	return s
+		? `${b}/daftar/agen?src=omahe-gabung&sponsor=${encodeURIComponent(s)}`
+		: `${b}/daftar/agen?src=omahe-gabung`;
+}
+
+/** Halaman masuk panel (`/login` app `perumahan`) — sekaligus pintu
  * pendaftaran (AUTH-08 "Masuk atau Daftar"). `null` bila
  * `PUBLIC_BOOKING_BASE_URL` belum di-set: tombol disembunyikan, jangan
  * menaut ke `/login` milik Omahe sendiri (tidak ada).

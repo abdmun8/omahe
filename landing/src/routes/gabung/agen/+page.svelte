@@ -1,30 +1,47 @@
 <!--
-	Gabung — Agen Omahe (omahe#3). Keuntungan member sesuai model AGEN-00
-	(repo `perumahan`, 2026-09-26): membership tahunan + token per
-	perumahan + komisi flat per booking sukses. PENDAFTARAN MASIH MANUAL —
-	kantor & anggota dibuat/disetujui superadmin (AGEN-OMAHE-01),
-	jadi CTA-nya hubungi tim Omahe, BUKAN form mandiri. Punya perumahan
-	sendiri → arahkan ke /gabung/perumahan (alur agen properti, AUTH-05).
+	Gabung — Agen Omahe (omahe#3). AGEN-OMAHE-10: pendaftaran kini
+	MANDIRI — CTA utama "Daftar Agen Sekarang — gratis" ke form
+	`/daftar/agen` app panel (alur WA AUTH-08: cukup nomor WhatsApp, langsung
+	aktif, Rp0). `?sponsor=OMHA-A…` (link referral agen, BUKAN `ref` pembeli)
+	disimpan 90 hari (`src/lib/sponsor-tersimpan.ts`) — dibaca HANYA di
+	browser via `$effect` supaya HTML SSR/cache edge tetap anonim (sponsor
+	pengguna A tidak boleh membeku di cache lalu disajikan ke pengguna B);
+	tautan SSR tanpa sponsor lalu diperbarui pasca-hidrasi. Punya perumahan
+	sendiri → /gabung/perumahan (alur agen properti, AUTH-05).
 -->
 <script lang="ts">
+	import { page } from '$app/state';
 	import BadgeProfesional from '$lib/components/badge-profesional.svelte';
 	import { SITE } from '$lib/config';
 	import { trackGabungClick } from '$lib/analytics';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
 	import Button from '$lib/components/ui/button.svelte';
+	import { daftarAgenUrl } from '$lib/app-url';
+	import { sponsorEfektif } from '$lib/sponsor-tersimpan';
+
+	// Sponsor efektif — `null` saat SSR/prerender (tautan anonim, lihat
+	// komentar file atas); terisi di browser: `?sponsor=` URL (LAST-TOUCH,
+	// sekaligus disimpan 90 hari) atau nilai tersimpan dari kunjungan lalu.
+	let sponsor = $state<string | null>(null);
+
+	$effect(() => {
+		sponsor = sponsorEfektif(page.url.searchParams.get('sponsor'));
+	});
+
+	const hrefDaftar = $derived(daftarAgenUrl(sponsor));
 
 	const KEUNTUNGAN = [
 		{
-			judul: 'Membership Omahe',
-			isi: 'Aktif tahunan dengan ID card ber-QR yang bisa diverifikasi publik — identitas agen Anda jadi lebih dipercaya calon pembeli.'
+			judul: 'Gratis & langsung aktif',
+			isi: 'Tanpa biaya bergabung. Begitu daftar, Anda mendapat kode agen dan ID card ber-QR yang bisa diverifikasi publik — identitas Anda lebih dipercaya calon pembeli.'
 		},
 		{
 			judul: 'Komisi penjualan',
-			isi: 'Komisi flat per perumahan, tercatat otomatis saat booking lewat referral Anda berstatus sukses.'
+			isi: 'Komisi dihitung dari harga jual saat pembeli yang Anda daftarkan akad — estimasinya tampil di panel agen Anda.'
 		},
 		{
 			judul: 'Banyak perumahan sekaligus',
-			isi: 'Pilih perumahan Omahe yang ingin Anda pasarkan per periode — tanpa perlu perjanjian terpisah dengan tiap pengembang.'
+			isi: 'Pasarkan perumahan yang tampil di Omahe — tanpa perlu perjanjian terpisah dengan tiap pengembang.'
 		},
 		{
 			judul: 'Calon pembeli jadi referral Anda',
@@ -34,15 +51,15 @@
 </script>
 
 <svelte:head>
-	<title>Jadi Agen Omahe — Membership, Komisi, Banyak Perumahan</title>
+	<title>Jadi Agen Omahe — Gratis, Langsung Aktif, Banyak Perumahan</title>
 	<meta
 		name="description"
-		content="Jual rumah dari banyak pengembang dalam satu jaringan: membership tahunan, ID card terverifikasi, komisi per booking sukses, dan calon pembeli Anda tercatat sebagai referral."
+		content="Jual rumah dari banyak pengembang dalam satu jaringan: daftar gratis lewat WhatsApp, langsung aktif, ID card terverifikasi, komisi saat akad, dan calon pembeli Anda tercatat atas nama Anda."
 	/>
 	<meta property="og:title" content="Jadi Agen Omahe" />
 	<meta
 		property="og:description"
-		content="Membership, komisi penjualan, dan banyak perumahan untuk dipasarkan dalam satu jaringan Omahe."
+		content="Daftar gratis, langsung aktif, dan pasarkan banyak perumahan dalam satu jaringan Omahe."
 	/>
 	<meta property="og:image" content={`${SITE.url}/omahe-logo.jpeg`} />
 </svelte:head>
@@ -54,6 +71,13 @@
 		Pasarkan rumah dari banyak pengembang sekaligus, dampingi calon pembeli sampai akad, dan panen
 		komisinya — semua dalam satu jaringan Omahe.
 	</p>
+	<a
+		href={hrefDaftar}
+		class="bg-primary hover:bg-primary-dark focus-visible:ring-primary/50 mt-5 inline-flex items-center justify-center rounded-xl px-6 py-3 text-base font-semibold text-white transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+		onclick={() => trackGabungClick('agen-daftar')}
+	>
+		Daftar Agen Sekarang — gratis
+	</a>
 
 	<ul class="mt-8 list-none space-y-4">
 		{#each KEUNTUNGAN as k (k.judul)}
@@ -80,13 +104,32 @@
 		</p>
 	</section>
 
-	<section class="bg-surface mt-8 rounded-2xl p-6 sm:p-8">
+	<section id="daftar" class="border-line mt-8 scroll-mt-24 rounded-2xl border bg-white p-6 sm:p-8">
 		<h2 class="font-display text-ink text-lg font-bold">Cara bergabung</h2>
 		<p class="text-muted mt-2 text-sm leading-relaxed">
-			Pendaftaran agen Omahe saat ini dibantu langsung tim kami: hubungi Omahe, kami siapkan
-			kantor/keanggotaan Anda, lalu aktivasi membership dan token bisa Anda kelola sendiri.
+			Daftar langsung dari HP Anda — <span class="text-ink font-medium">gratis Rp0</span>, tanpa
+			mengumpulkan dokumen, dan akun Anda <span class="text-ink font-medium">langsung aktif</span>:
+			cukup nomor WhatsApp yang bisa terima pesan. Setelah daftar Anda langsung masuk ke panel agen
+			dan mendapat kode agen untuk mulai memasarkan perumahan Omahe.
 		</p>
-		<div class="mt-4">
+		<div class="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+			<a
+				href={hrefDaftar}
+				class="bg-primary hover:bg-primary-dark focus-visible:ring-primary/50 inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-base font-semibold text-white transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+				onclick={() => trackGabungClick('agen-daftar')}
+			>
+				Daftar Agen Sekarang — gratis
+			</a>
+			{#if sponsor}
+				<p class="text-muted text-sm">
+					Kode sponsor: <span class="text-ink font-semibold tracking-wide">{sponsor}</span>
+				</p>
+			{/if}
+		</div>
+		<p class="text-muted mt-4 text-sm leading-relaxed">
+			Masih ingin tanya dulu? Tim kami siap membantu:
+		</p>
+		<div class="mt-3">
 			<ContactButtons konteks="gabung agen Omahe" size="md" />
 		</div>
 		<p class="text-muted mt-4 text-sm">
@@ -100,9 +143,9 @@
 	</section>
 
 	<p class="text-muted mt-6 text-xs leading-relaxed">
-		Program agen Omahe sedang disiapkan bertahap — rincian keanggotaan, harga token, dan skema
-		komisi akan dikonfirmasi tim Omahe saat pendaftaran. Informasi di halaman ini belum mengikat
-		sebagai penawaran.
+		Program agen Omahe sedang disiapkan bertahap — rincian keanggotaan dan skema komisi akan
+		dikonfirmasi tim Omahe seiring tersedianya data penjualan. Informasi di halaman ini belum
+		mengikat sebagai penawaran.
 	</p>
 
 	<div class="mt-6">

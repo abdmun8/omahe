@@ -18,7 +18,7 @@
 			judul: 'Agen Omahe',
 			ringkas: 'Jual rumah dari banyak pengembang, panen komisinya.',
 			keuntungan: [
-				'Membership tahunan dengan ID card terverifikasi',
+				'Daftar gratis, langsung aktif, ID card terverifikasi',
 				'Komisi penjualan tiap booking sukses',
 				'Pasarkan banyak perumahan sekaligus',
 				'Calon pembeli yang Anda bawa tercatat sebagai referral Anda'
@@ -53,7 +53,7 @@
 	<title>Gabung Jaringan Omahe — Agen, Mitra, Developer</title>
 	<meta
 		name="description"
-		content="Tiga cara bergabung dengan Omahe: jadi agen Omahe dengan membership dan komisi, mitra profesional properti, atau daftarkan perumahan Anda."
+		content="Tiga cara bergabung dengan Omahe: jadi agen Omahe (gratis, komisi saat akad), mitra profesional properti, atau daftarkan perumahan Anda."
 	/>
 	<meta property="og:title" content="Gabung Jaringan Omahe" />
 	<meta
