@@ -1,6 +1,9 @@
 <!--
 	Header mobile-first: nav penuh baru muncul di >=md; di bawah itu
-	hamburger (keputusan 2026-09-13 §Mobile-first).
+	hamburger yang membuka SIDEBAR dari kanan (2026-11-09: menu lipat di bawah
+	header menyulitkan pengguna — daftar mendorong konten & sulit ditutup).
+	Sidebar dirender DI LUAR <header>: `backdrop-blur` di header membuat elemen
+	`fixed` di dalamnya terkurung setinggi header.
 -->
 <script lang="ts">
 	import { page } from '$app/state';
@@ -17,6 +20,19 @@
 	$effect(() => {
 		page.url.pathname;
 		terbuka = false;
+	});
+
+	// Esc menutup; body tidak ikut menggulir selama sidebar terbuka.
+	$effect(() => {
+		if (!terbuka) return;
+		const tutupEsc = (e: KeyboardEvent) => e.key === 'Escape' && (terbuka = false);
+		const semula = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+		window.addEventListener('keydown', tutupEsc);
+		return () => {
+			document.body.style.overflow = semula;
+			window.removeEventListener('keydown', tutupEsc);
+		};
 	});
 
 	// Panel/akun di app `perumahan` (PUBLIC_BOOKING_BASE_URL); null → disembunyikan.
@@ -77,35 +93,63 @@
 		</button>
 	</div>
 
-	{#if terbuka}
-		<nav
-			id="nav-mobile"
-			class="border-line border-t bg-white md:hidden"
-			aria-label="Navigasi utama"
-		>
-			<ul class="mx-auto max-w-6xl px-4 py-2">
-				{#each NAV as item (item.href)}
-					<li>
-						<a
-							href={withRef(item.href, ref)}
-							class={cn(
-								'block rounded-lg px-3 py-3 text-base font-medium',
-								aktif(item.href) ? 'bg-surface text-primary' : 'text-ink'
-							)}
-							aria-current={aktif(item.href) ? 'page' : undefined}>{item.label}</a
-						>
-					</li>
-				{/each}
-				{#if urlMasuk}
-					<li class="pt-2 pb-1">
-						<a
-							href={urlMasuk}
-							class="bg-primary hover:bg-primary-dark block rounded-lg px-3 py-3 text-center text-base font-semibold text-white"
-							>Masuk</a
-						>
-					</li>
-				{/if}
-			</ul>
-		</nav>
-	{/if}
 </header>
+
+<!-- Sidebar mobile: selalu di DOM (transisi geser), inert saat tertutup. -->
+<div class="md:hidden" inert={!terbuka}>
+	<button
+		type="button"
+		tabindex="-1"
+		aria-label="Tutup menu"
+		class={cn(
+			'fixed inset-0 z-50 bg-black/40 transition-opacity duration-200',
+			terbuka ? 'opacity-100' : 'pointer-events-none opacity-0'
+		)}
+		onclick={() => (terbuka = false)}
+	></button>
+	<nav
+		id="nav-mobile"
+		aria-label="Navigasi utama"
+		class={cn(
+			'fixed inset-y-0 right-0 z-50 flex w-72 max-w-[85vw] flex-col bg-white shadow-xl transition-transform duration-200',
+			terbuka ? 'translate-x-0' : 'translate-x-full'
+		)}
+	>
+		<div class="border-line flex h-14 items-center justify-between border-b px-4">
+			<img src="/omahe-logo.jpeg" alt="Omahe" class="h-8 w-auto" width="32" height="32" />
+			<button
+				type="button"
+				class="text-primary inline-flex h-10 w-10 items-center justify-center rounded-lg"
+				aria-label="Tutup menu"
+				onclick={() => (terbuka = false)}
+			>
+				<svg viewBox="0 0 24 24" fill="none" class="h-6 w-6" aria-hidden="true">
+					<path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" />
+				</svg>
+			</button>
+		</div>
+		<ul class="flex-1 overflow-y-auto px-3 py-2">
+			{#each NAV as item (item.href)}
+				<li>
+					<a
+						href={withRef(item.href, ref)}
+						class={cn(
+							'block rounded-lg px-3 py-2 text-[15px] font-medium',
+							aktif(item.href) ? 'bg-surface text-primary' : 'text-ink hover:bg-surface'
+						)}
+						aria-current={aktif(item.href) ? 'page' : undefined}>{item.label}</a
+					>
+				</li>
+			{/each}
+		</ul>
+		{#if urlMasuk}
+			<div class="border-line border-t p-3">
+				<a
+					href={urlMasuk}
+					class="bg-primary hover:bg-primary-dark block rounded-lg px-3 py-2.5 text-center text-[15px] font-semibold text-white"
+					>Masuk</a
+				>
+			</div>
+		{/if}
+	</nav>
+</div>
