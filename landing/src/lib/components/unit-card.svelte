@@ -11,7 +11,7 @@
 	import { formatAngka, formatRentangHarga, formatRupiahPenuh } from '$lib/utils';
 	import { withRef } from '$lib/ref';
 	import ContactButtons from './contact-buttons.svelte';
-	import LeadFormDialog from './lead-form-dialog.svelte';
+	import MinatDialog from './minat-dialog.svelte';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
 	import PromosiBadge from './promosi-badge.svelte';
 	import Dp0Badge from './dp0-badge.svelte';
@@ -182,8 +182,10 @@
 			class="mt-3"
 		/>
 		<!-- sumber='card' (api-contract.md §8): tipe unit jadi prefill,
-		     `ref` dari URL ikut terkirim (atribusi mitra). -->
-		<LeadFormDialog
+		     `ref` dari URL ikut terkirim (atribusi mitra). SESI-OMAHE-01:
+		     MinatDialog memilih varian — agen aktif → dialog "Daftarkan
+		     Pembeli" (tanpa ref), selain itu LeadFormDialog LAMA apa adanya. -->
+		<MinatDialog
 			bind:open={formMinatTerbuka}
 			perumahanSlug={unit.perumahan.slug}
 			namaPerumahan={unit.perumahan.nama}

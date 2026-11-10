@@ -5,7 +5,7 @@
 	import { formatAngka, formatRupiah, formatRupiahPenuh } from '$lib/utils';
 	import { withRef } from '$lib/ref';
 	import ContactButtons from './contact-buttons.svelte';
-	import LeadFormDialog from './lead-form-dialog.svelte';
+	import MinatDialog from './minat-dialog.svelte';
 	import PhotoPlaceholder from './photo-placeholder.svelte';
 
 	let {
@@ -70,7 +70,9 @@
 			onFormMinat={() => (formMinatTerbuka = true)}
 			class="mt-4"
 		/>
-		<LeadFormDialog
+		<!-- SESI-OMAHE-01 — MinatDialog memilih varian (agen aktif → dialog
+		     "Daftarkan Pembeli"; selain itu LeadFormDialog lama apa adanya). -->
+		<MinatDialog
 			bind:open={formMinatTerbuka}
 			perumahanSlug={proyek.slug}
 			namaPerumahan={proyek.nama}

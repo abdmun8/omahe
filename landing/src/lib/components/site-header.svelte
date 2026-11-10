@@ -7,19 +7,45 @@
 -->
 <script lang="ts">
 	import { page } from '$app/state';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { NAV } from '$lib/config';
 	import { withRef } from '$lib/ref';
-	import { loginUrl } from '$lib/app-url';
+	import { loginUrl, logoutUrl } from '$lib/app-url';
+	import { sesiAgen } from '$lib/sesi-agen.svelte';
 	import { cn } from '$lib/utils';
 
 	let terbuka = $state(false);
+	/** SESI-OMAHE-01 — menu dropdown chip agen (desktop). */
+	let menuAgen = $state(false);
 	const ref = $derived(page.data.ref as string | null);
 
+	const urlMasuk = loginUrl();
+	const agen = $derived(sesiAgen.agen);
+	/** Nama pendek = kata pertama nama agen (chip header tidak muat nama panjang). */
+	const namaPendek = $derived(agen ? (agen.nama.trim().split(/\s+/)[0] || agen.nama) : '');
+	/** Inisial avatar: 2 huruf pertama kata-kata pertama (fallback kata pertama). */
+	const inisial = $derived(
+		agen
+		? agen.nama
+				.trim()
+				.split(/\s+/)
+				.slice(0, 2)
+				.map((k) => k[0]?.toUpperCase() ?? '')
+				.join('') || '?'
+			: ''
+	);
+	const urlKeluar = $derived(logoutUrl(page.url.href));
+
+	const aktif = (href: string) =>
+		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
+
 	// Tutup panel tiap kali rute berganti — tanpa ini panel menggantung
-	// terbuka di halaman baru setelah klik link.
+	// terbuka di halaman baru setelah klik link (menu agen ikut — URL
+	// keluar panel-nya dihitung dari halaman AKTIF saat dibuka).
 	$effect(() => {
 		page.url.pathname;
 		terbuka = false;
+		menuAgen = false;
 	});
 
 	// Esc menutup; body tidak ikut menggulir selama sidebar terbuka.
@@ -35,11 +61,23 @@
 		};
 	});
 
-	// Panel/akun di app `perumahan` (PUBLIC_BOOKING_BASE_URL); null → disembunyikan.
-	const urlMasuk = loginUrl();
+	// SESI-OMAHE-01 — menu agen desktop: Esc + klik di luar chip menutup.
+	$effect(() => {
+		if (!menuAgen) return;
+		const tutupEsc = (e: KeyboardEvent) => e.key === 'Escape' && (menuAgen = false);
+		const tutupKlik = (e: MouseEvent) => {
+			const target = e.target instanceof Element ? e.target : null;
+			if (!target || !target.closest('[data-menu-agen]')) menuAgen = false;
+		};
+		window.addEventListener('keydown', tutupEsc);
+		window.addEventListener('click', tutupKlik);
+		return () => {
+			window.removeEventListener('keydown', tutupEsc);
+			window.removeEventListener('click', tutupKlik);
+		};
+	});
 
-	const aktif = (href: string) =>
-		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
+	// Panel/akun di app `perumahan` (PUBLIC_BOOKING_BASE_URL); null → disembunyikan.
 </script>
 
 <header class="border-line sticky top-0 z-40 border-b bg-white/95 backdrop-blur">
@@ -66,7 +104,59 @@
 					aria-current={aktif(item.href) ? 'page' : undefined}>{item.label}</a
 				>
 			{/each}
-			{#if urlMasuk}
+			{#if agen}
+				<!-- SESI-OMAHE-01 — chip agen menggantikan tombol "Masuk": avatar
+			     (foto presign / inisial) + nama pendek → menu Panel Agen &
+			     Keluar (logout AUTH-11, kembali ke halaman ini). -->
+				<div class="relative ml-2" data-menu-agen>
+					<button
+						type="button"
+						class="border-line hover:border-primary/40 flex items-center gap-2 rounded-full border bg-white py-1 pr-2.5 pl-1 transition-colors"
+						aria-expanded={menuAgen}
+						aria-haspopup="menu"
+						aria-label="Menu agen {agen.nama}"
+						onclick={() => (menuAgen = !menuAgen)}
+					>
+						{#if agen.fotoUrl}
+							<img
+								src={agen.fotoUrl}
+								alt=""
+								class="bg-primary h-7 w-7 rounded-full object-cover"
+								loading="lazy"
+							/>
+						{:else}
+							<span
+								class="bg-primary flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
+								>{inisial}</span
+							>
+						{/if}
+						<span class="text-ink max-w-[8rem] truncate text-sm font-semibold">{namaPendek}</span>
+						<ChevronDown class="text-muted h-4 w-4" aria-hidden="true" />
+					</button>
+					{#if menuAgen}
+						<div
+							role="menu"
+							aria-label="Menu agen"
+							class="border-line absolute right-0 z-50 mt-2 w-52 rounded-xl border bg-white p-1 shadow-lg"
+						>
+							<a
+								role="menuitem"
+								href={agen.panelUrl}
+								class="text-ink hover:bg-surface block rounded-lg px-3 py-2 text-sm font-medium"
+								>Panel Agen</a
+							>
+							{#if urlKeluar}
+								<a
+									role="menuitem"
+									href={urlKeluar}
+									class="text-muted hover:bg-surface block rounded-lg px-3 py-2 text-sm font-medium"
+									>Keluar</a
+								>
+							{/if}
+						</div>
+					{/if}
+				</div>
+			{:else if urlMasuk}
 				<a
 					href={urlMasuk}
 					class="bg-primary hover:bg-primary-dark ml-2 rounded-lg px-4 py-2 text-sm font-semibold whitespace-nowrap text-white shadow-sm transition-colors"
@@ -142,7 +232,42 @@
 				</li>
 			{/each}
 		</ul>
-		{#if urlMasuk}
+		{#if agen}
+			<!-- SESI-OMAHE-01 — drawer mobile: blok agen menggantikan "Masuk". -->
+			<div class="border-line border-t p-3">
+				<div class="mb-2 flex items-center gap-2 px-1">
+					{#if agen.fotoUrl}
+						<img
+							src={agen.fotoUrl}
+							alt=""
+							class="bg-primary h-8 w-8 rounded-full object-cover"
+							loading="lazy"
+						/>
+					{:else}
+						<span
+							class="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+							>{inisial}</span
+						>
+					{/if}
+					<div class="min-w-0">
+						<p class="text-ink truncate text-sm font-semibold">{namaPendek}</p>
+						<p class="text-muted truncate text-xs">{agen.kodeAgen}</p>
+					</div>
+				</div>
+				<a
+					href={agen.panelUrl}
+					class="bg-primary hover:bg-primary-dark mb-2 block rounded-lg px-3 py-2.5 text-center text-[15px] font-semibold text-white"
+					>Panel Agen</a
+				>
+				{#if urlKeluar}
+					<a
+						href={urlKeluar}
+						class="border-line text-muted hover:bg-surface block rounded-lg border px-3 py-2.5 text-center text-[15px] font-medium"
+						>Keluar</a
+					>
+				{/if}
+			</div>
+		{:else if urlMasuk}
 			<div class="border-line border-t p-3">
 				<a
 					href={urlMasuk}

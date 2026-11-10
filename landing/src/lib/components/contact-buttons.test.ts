@@ -22,7 +22,7 @@
  * fallback `konteks` apa adanya kalau tidak (tanpa PII).
  */
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { SITE } from '$lib/config';
 import { normalisasiNomor } from '$lib/utils';
 import ContactButtons from './contact-buttons.svelte';
@@ -40,6 +40,16 @@ afterEach(() => {
 });
 
 describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
+	// SESI-OMAHE-01 — store sesi agen dinamis dalam describe ter-guard
+	// (pola `unit-card.test.ts`: `bun test` tidak boleh mengeksekusi runes).
+	let store: typeof import('../sesi-agen.svelte');
+	beforeAll(async () => {
+		store = await import('../sesi-agen.svelte');
+	});
+	afterEach(() => {
+		store?.resetSesiAgenUntukTes();
+	});
+
 	test('nomor default dari SITE ternormalisasi ke 62xxx', () => {
 		expect(wa).toMatch(/^62\d+$/);
 		expect(telepon).toMatch(/^62\d+$/);
@@ -123,5 +133,48 @@ describe.skipIf(typeof document === 'undefined')('ContactButtons', () => {
 		// Perilaku lama TIDAK berubah — pesan pembuka WA tetap memuat konteks.
 		const wa = screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` });
 		expect(wa.getAttribute('href')).toContain(encodeURIComponent(KONTEKS));
+	});
+
+	// SESI-OMAHE-01 — varian agen Omahe aktif: "Daftarkan Pembeli" (ikon
+	// user-plus, tetap hijau). TANPA sesi = markup lama persis (test-test
+	// "Hubungi via WhatsApp" di atas yang menguncinya).
+	test('sesi agen aktif + onFormMinat → tombol "Daftarkan pembeli", tanpa whatsapp_click', async () => {
+		const gtag = vi.fn();
+		vi.stubGlobal('gtag', gtag);
+		const onFormMinat = vi.fn();
+		store.sesiAgen.agen = {
+			kodeAgen: 'OMHA-A0001',
+			nama: 'Widya Pratama',
+			fotoUrl: null,
+			panelUrl: 'https://app.perumahan.test/agen-omahe'
+		};
+		store.sesiAgen.status = 'siap';
+		const { container } = render(ContactButtons, { konteks: KONTEKS, onFormMinat });
+
+		const tombol = screen.getByRole('button', { name: `Daftarkan pembeli untuk ${KONTEKS}` });
+		expect(container.querySelector('a[href*="wa.me"]')).toBeNull();
+
+		await fireEvent.click(tombol);
+
+		expect(onFormMinat).toHaveBeenCalledTimes(1);
+		// Bukan klik WA — event whatsapp_click tidak boleh terpicu.
+		expect(gtag).not.toHaveBeenCalled();
+	});
+
+	test('sesi agen aktif TAPI tanpa onFormMinat (kartu mitra/lelang/agen) → WA biasa, TIDAK berubah', async () => {
+		store.sesiAgen.agen = {
+			kodeAgen: 'OMHA-A0001',
+			nama: 'Widya Pratama',
+			fotoUrl: null,
+			panelUrl: 'https://app.perumahan.test/agen-omahe'
+		};
+		store.sesiAgen.status = 'siap';
+		render(ContactButtons, { konteks: KONTEKS });
+
+		// Kartu mitra/lelang/agen Omahe TIDAK diubah epic ini — tanpa
+		// `onFormMinat` tetap link wa.me langsung walau agennya masuk.
+		const tautan = screen.getByRole('link', { name: `Hubungi via WhatsApp tentang ${KONTEKS}` });
+		expect(tautan.getAttribute('href')).toContain(`https://wa.me/${wa}`);
+		expect(screen.queryByRole('button', { name: /^Daftarkan pembeli/ })).toBeNull();
 	});
 });

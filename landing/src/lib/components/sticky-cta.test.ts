@@ -23,7 +23,7 @@
  */
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { waitFor } from '@testing-library/dom';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import StickyCta from './sticky-cta.svelte';
 
 vi.mock('$lib/ref', () => ({
@@ -61,6 +61,16 @@ afterEach(() => {
 });
 
 describe.skipIf(typeof document === 'undefined')('StickyCta', () => {
+	// SESI-OMAHE-01 — store sesi agen dinamis dalam describe ter-guard
+	// (pola `unit-card.test.ts`: `bun test` tidak boleh mengeksekusi runes).
+	let store: typeof import('../sesi-agen.svelte');
+	beforeAll(async () => {
+		store = await import('../sesi-agen.svelte');
+	});
+	afterEach(() => {
+		store?.resetSesiAgenUntukTes();
+	});
+
 	test('klik "Ajukan" dengan ref → cta_ajukan { perumahan, ada_ref: true }, href bawa ?ref=', async () => {
 		const gtagMock = stubGtag();
 		render(StickyCta, { ...propsDasar(), ref: 'abc123' });
@@ -119,5 +129,35 @@ describe.skipIf(typeof document === 'undefined')('StickyCta', () => {
 		);
 		// CTA booking tetap ada di samping WA.
 		expect(screen.getByRole('link', { name: 'Ajukan' })).toBeInTheDocument();
+	});
+
+	// SESI-OMAHE-01 — varian agen Omahe aktif di sticky bar.
+	test('sesi agen aktif → tombol "Daftarkan Pembeli" + dialog agen, TANPA whatsapp_click', async () => {
+		const gtagMock = stubGtag();
+		store.sesiAgen.agen = {
+			kodeAgen: 'OMHA-A0001',
+			nama: 'Widya Pratama',
+			fotoUrl: null,
+			panelUrl: 'https://app.perumahan.test/agen-omahe'
+		};
+		store.sesiAgen.status = 'siap';
+		render(StickyCta, propsDasar());
+
+		// Varian lama tidak dirender; CTA "Ajukan" tetap utuh.
+		expect(screen.queryByRole('button', { name: 'WhatsApp' })).toBeNull();
+		expect(screen.getByRole('link', { name: 'Ajukan' })).toBeInTheDocument();
+
+		await fireEvent.click(screen.getByRole('button', { name: 'Daftarkan Pembeli' }));
+
+		// Dialog agen yang terbuka (bukan form minat lama).
+		expect(await screen.findByText('Daftarkan Pembeli — Griya Asri')).toBeInTheDocument();
+		expect(screen.queryByText('Minat — Griya Asri')).toBeNull();
+		// Varian agen BUKAN klik WA — tidak ada whatsapp_click.
+		expect(gtagMock).not.toHaveBeenCalledWith('event', 'whatsapp_click', expect.anything());
+		await waitFor(() =>
+			expect(gtagMock).toHaveBeenCalledWith('event', 'agen_lead_open', {
+				perumahan: 'Griya Asri'
+			})
+		);
 	});
 });

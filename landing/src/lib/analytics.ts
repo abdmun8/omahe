@@ -7,6 +7,8 @@
  *   - phone_click      — contact-buttons.svelte
  *   - lead_form_open   — lead-form-dialog.svelte (dialog dibuka)
  *   - lead_form_submit — lead-form-dialog.svelte (submit sukses)
+ *   - agen_lead_open   — agen-lead-dialog.svelte (dialog agen dibuka, SESI-OMAHE-01)
+ *   - agen_lead_submit — agen-lead-dialog.svelte (input pembeli sukses)
  *   - gabung_click     — banner homepage + halaman /gabung* (omahe#3)
  * (iterasi 2: kartu/slider/CTA lain menyusul dengan pola yang sama)
  *

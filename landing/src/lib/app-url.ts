@@ -64,3 +64,16 @@ export function loginUrl(): string | null {
 	const b = base();
 	return b ? `${b}/login` : null;
 }
+
+/**
+ * SESI-OMAHE-01 — halaman logout publik AUTH-11 (`/logout?redirect=`):
+ * JWT stateless + cookie `session` httpOnly hanya bisa dihapus lewat
+ * respons backend `perumahan`, jadi Omahe cukup mengarahkan browser ke
+ * sini. `redirect` = URL halaman Omahe saat ini — allowlist AUTH-10 di app
+ * menerima domain `*.omahe.co.id`, user kembali ke halaman yang sama.
+ * `null` bila base URL belum di-set (menu disembunyikan).
+ */
+export function logoutUrl(redirect: string): string | null {
+	const b = base();
+	return b ? `${b}/logout?redirect=${encodeURIComponent(redirect)}` : null;
+}

@@ -3,7 +3,7 @@
 	import BeaconKunjungan from '$lib/components/beacon-kunjungan.svelte';
 	import Maximize from '@lucide/svelte/icons/maximize';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
-	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
+	import MinatDialog from '$lib/components/minat-dialog.svelte';
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import StickyCta from '$lib/components/sticky-cta.svelte';
@@ -309,7 +309,10 @@
 	/>
 {/if}
 
-<LeadFormDialog
+<!-- SESI-OMAHE-01 — MinatDialog memilih varian (agen aktif → dialog
+     "Daftarkan Pembeli"; selain itu LeadFormDialog lama, tipe ini jadi
+     prefill, ref dari URL ikut terkirim). -->
+<MinatDialog
 	bind:open={formMinatTerbuka}
 	perumahanSlug={p.slug}
 	namaPerumahan={p.nama}

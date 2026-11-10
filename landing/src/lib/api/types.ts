@@ -702,6 +702,47 @@ export interface VerifikasiAgen {
 }
 
 // ---------------------------------------------------------------------------
+// SESI-OMAHE-01 — sesi agen Omahe di www.omahe.co.id
+// ---------------------------------------------------------------------------
+
+/**
+ * Agen Omahe aktif yang sedang masuk (proxy `/api/saya` → backend
+ * `GET /public/agen-omahe/saya`, sesi dari cookie `session`
+ * `Domain=omahe.co.id`). `null` = pengunjung anonim / sesi non-agen —
+ * kasus NORMAL, halaman publik tetap anonim & ter-cache.
+ */
+export interface AgenSaya {
+	/** Kode ID card `OMHA-A0001` (AGEN-OMAHE-05). */
+	kodeAgen: string;
+	nama: string;
+	/** Presigned; null → avatar inisial. */
+	fotoUrl: string | null;
+	/** URL absolut panel agen di app `perumahan` (`…/agen-omahe`). */
+	panelUrl: string;
+}
+
+/**
+ * AGEN-OMAHE-11 — body dialog "Daftarkan Pembeli" (proxy `/api/agen-lead`
+ * → `POST /public/agen-omahe/lead`). Agen ditetapkan backend dari SESI,
+ * bukan dari body/`ref` — jangan pernah mengirim `ref` di jalur ini.
+ * `tipeSlug` = slug tipe (aturan `slugifyTipe` backend), opsional.
+ */
+export interface InputLeadAgenBody {
+	slug: string;
+	namaPembeli: string;
+	whatsappPembeli: string;
+	tipeSlug?: string;
+	catatan?: string;
+}
+
+/** Respons sukses input lead agen — proteksi lead 60 hari (epic keputusan 3). */
+export interface HasilInputLeadAgen {
+	id: string;
+	perumahan: { slug: string; nama: string };
+	kunciSampai: string;
+}
+
+// ---------------------------------------------------------------------------
 // AGEN-OMAHE-03 — agen Omahe yang memasarkan perumahan (`GET /public/agen-omahe/perumahan/:slug?ref=`, api-contract §21)
 // ---------------------------------------------------------------------------
 

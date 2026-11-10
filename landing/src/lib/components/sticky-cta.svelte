@@ -13,9 +13,11 @@
 	perumahan. Pembeda partner berbayar tinggal badge "Promosi" di kartu.
 -->
 <script lang="ts">
+	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import { ajukanUrl } from '$lib/ref';
 	import { trackCtaAjukan, trackEvent } from '$lib/analytics';
-	import LeadFormDialog from './lead-form-dialog.svelte';
+	import { sesiAgen } from '$lib/sesi-agen.svelte';
+	import MinatDialog from './minat-dialog.svelte';
 	import Button from './ui/button.svelte';
 
 	let {
@@ -40,6 +42,12 @@
 
 	let formMinatTerbuka = $state(false);
 
+	// SESI-OMAHE-01 — agen Omahe aktif: tombol WhatsApp berganti "Daftarkan
+	// Pembeli" (dialog agen via MinatDialog); tanpa sesi = markup LAMA
+	// persis (dikunci test). Bukan klik WA → tanpa whatsapp_click; dialog
+	// agen memicu agen_lead_open sendiri.
+	const modeAgen = $derived(Boolean(sesiAgen.agen));
+
 	// Iterasi 2 GA4: CTA "Ajukan" + klik WA dilaporkan tanpa PII — nama
 	// perumahan + apakah kode referral masih menempel di URL. Tombol tetap
 	// link sungguhan, tracking tidak mencegat navigasi.
@@ -57,16 +65,22 @@
 >
 	<div class="mx-auto flex max-w-6xl gap-2">
 		<!-- LEAD-02 — tombol WhatsApp pembuka form, SATU untuk semua perumahan
-		     (cabang "Minat" emas partner berbayar dihapus 2026-10-23). -->
+		     (cabang "Minat" emas partner berbayar dihapus 2026-10-23).
+		     SESI-OMAHE-01 — varian agen: label/ikon berganti, warna tetap. -->
 		<Button
 			variant="whatsapp"
 			size="lg"
 			class="flex-1"
 			onclick={() => {
-				lacakWhatsapp();
+				if (!modeAgen) lacakWhatsapp();
 				formMinatTerbuka = true;
-			}}>WhatsApp</Button
+			}}
 		>
+			{#if modeAgen}
+				<UserPlus class="h-4 w-4 shrink-0" aria-hidden="true" />
+				<span class="text-[15px] whitespace-nowrap">Daftarkan Pembeli</span>
+			{:else}WhatsApp{/if}
+		</Button>
 		<Button
 			variant="primary"
 			size="lg"
@@ -77,7 +91,7 @@
 	</div>
 </div>
 
-<LeadFormDialog
+<MinatDialog
 	bind:open={formMinatTerbuka}
 	perumahanSlug={slug}
 	namaPerumahan={namaPerumahan ?? nama}

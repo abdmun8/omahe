@@ -29,8 +29,10 @@
 -->
 <script lang="ts">
 	import { page } from '$app/state';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import { trackEvent } from '$lib/analytics';
 	import { SITE, TAMPILKAN_TELEPON } from '$lib/config';
+	import { sesiAgen } from '$lib/sesi-agen.svelte';
 	import { telUrl, waUrl } from '$lib/utils';
 	import Button from './ui/button.svelte';
 
@@ -59,6 +61,12 @@
 		 * yang membuka LeadFormDialog (state dialognya milik pemanggil).
 		 * Null (default) = perilaku lama APA ADANYA — WA + Telepon (§Kontak
 		 * langsung di card); jangan diubah.
+		 *
+		 * SESI-OMAHE-01: bila yang membuka adalah AGEN OMAHE AKTIF
+		 * (`sesiAgen.agen`), pemanggil membuka dialog "Daftarkan Pembeli"
+		 * (agen-lead-dialog via minat-dialog) — label & ikon tombol ikut
+		 * berganti, warna tetap hijau WhatsApp. Tanpa sesi = markup LAMA
+		 * persis (dikunci test) — anonim tidak melihat apa pun berubah.
 		 */
 		onFormMinat?: (() => void) | null;
 		class?: string;
@@ -79,7 +87,22 @@
 </script>
 
 <div class="flex flex-wrap gap-2 {className}">
-	{#if onFormMinat}
+	{#if onFormMinat && sesiAgen.agen}
+		<!-- SESI-OMAHE-01 — varian agen Omahe: tombol pembuka dialog
+		     "Daftarkan Pembeli" (input lead atas nama pembeli). BUKAN klik WA
+		     — jangan laporkan whatsapp_click; dialog agen memicu
+		     agen_lead_open sendiri. Warna tetap hijau (keputusan epic #2). -->
+		<Button
+			variant="whatsapp"
+			{size}
+			onclick={() => onFormMinat?.()}
+			class="flex-1"
+			aria-label="Daftarkan pembeli untuk {konteks}"
+		>
+			<UserPlus class="h-4 w-4" aria-hidden="true" />
+			Daftarkan Pembeli
+		</Button>
+	{:else if onFormMinat}
 		<!-- LEAD-02 — tampil seperti WhatsApp, tapi form dulu (lead tercatat),
 		     baru lanjut WA ke nomor perumahan dari dialog. Partner berbayar
 		     TIDAK dibedakan lagi (tombol emas "Minat" dihapus 2026-10-23). -->

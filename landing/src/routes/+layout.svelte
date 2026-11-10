@@ -2,15 +2,28 @@
 	import '../app.css';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 	import { SITE } from '$lib/config';
 	import { trackPageView } from '$lib/analytics';
 	import { amankanJsonLd } from '$lib/jsonld';
 	import { normalisasiNomor } from '$lib/utils';
+	import { muatSesiAgen } from '$lib/sesi-agen.svelte';
 	import SiteFooter from '$lib/components/site-footer.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import MusikLatar from '$lib/components/musik-latar.svelte';
 
 	let { children } = $props();
+
+	// SESI-OMAHE-01 — cek sesi agen Omahe DI BROWSER setelah hydrate, SEKALI
+	// per muat halaman penuh (onMount layout root; layout persisten antar
+	// navigasi klien — bukan tiap navigasi). Proxy /api/saya meneruskan cookie
+	// ke backend; TANPA cookie session proxy tidak menyentuh backend sama
+	// sekali, jadi pengunjung anonim tidak menambah beban. Cookie TIDAK
+	// PERNAH dibaca di `load` halaman — halaman publik tetap anonim &
+	// ter-cache (epic §Desain teknis); logika `ref` di +layout.ts tak tersentuh.
+	onMount(() => {
+		void muatSesiAgen();
+	});
 
 	// Identitas situs untuk mesin pencari. Wajib lewat amankanJsonLd() sebelum
 	// {@html} — satu jalur escape untuk SEMUA JSON-LD, supaya saat nanti ada

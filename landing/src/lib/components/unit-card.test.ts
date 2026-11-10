@@ -14,7 +14,8 @@
  * isi fixture.
  */
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { waitFor } from '@testing-library/dom';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import type { UnitListing } from '$lib/api/types';
 import UnitCard from './unit-card.svelte';
 
@@ -83,6 +84,18 @@ function buatUnit(override: Partial<UnitListing> = {}): UnitListing {
 }
 
 describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
+	// SESI-OMAHE-01 — store sesi agen di-import DINAMIS di dalam describe
+	// yang ter-guard: `bun test` juga menjemput file ini, dan `$state` di
+	// modul runes meledak di runner itu walau test-nya di-skip (pola sama
+	// `agen-lead-dialog.test.ts`; hook dalam describe ter-skip tidak jalan).
+	let store: typeof import('../sesi-agen.svelte');
+	beforeAll(async () => {
+		store = await import('../sesi-agen.svelte');
+	});
+	afterEach(() => {
+		store?.resetSesiAgenUntukTes();
+	});
+
 	test('harga tunggal 385 jt tampil sebagai harga ringkas', () => {
 		// Diverifikasi dari src/lib/utils.ts sebelum menulis assert:
 		// formatRentangHarga(385e6, 385e6) → min === max → formatRupiah(385e6)
@@ -376,5 +389,49 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 			).toBeInTheDocument();
 			expect(screen.queryByRole('link', { name: `Telepon tentang ${konteks}` })).toBeNull();
 		}
+	});
+
+	// SESI-OMAHE-01 — varian tombol agen Omahe aktif: "Daftarkan Pembeli"
+	// (ikon user-plus, tetap hijau) membuka dialog agen, TANPA sesi =
+	// markup LAMA persis (dikunci test-test "Hubungi via WhatsApp" di atas).
+	const AGEN_AKTIF = {
+		kodeAgen: 'OMHA-A0001',
+		nama: 'Widya Pratama',
+		fotoUrl: null,
+		panelUrl: 'https://app.perumahan.test/agen-omahe'
+	};
+
+	test('sesi agen aktif → tombol "Daftarkan Pembeli" + dialog agen (bukan WA biasa)', async () => {
+		store.sesiAgen.agen = AGEN_AKTIF;
+		store.sesiAgen.status = 'siap';
+		render(UnitCard, { unit: buatUnit() });
+
+		const tombolAgen = screen.getByRole('button', {
+			name: 'Daftarkan pembeli untuk 36/72 di Griya Asri'
+		});
+		// Tombol WA lama TIDAK dirender sama sekali di varian ini.
+		expect(screen.queryByRole('button', { name: /^Hubungi via WhatsApp/ })).toBeNull();
+
+		await fireEvent.click(tombolAgen);
+
+		// Dialog agen (bukan form minat lama) — judul MinatDialog cabang agen.
+		expect(await screen.findByText('Daftarkan Pembeli — Griya Asri')).toBeInTheDocument();
+		expect(screen.queryByText('Minat — Griya Asri')).toBeNull();
+	});
+
+	test('sesi agen hilang (401) → tombol reaktif kembali "WhatsApp" varian lama', async () => {
+		store.sesiAgen.agen = AGEN_AKTIF;
+		store.sesiAgen.status = 'siap';
+		render(UnitCard, { unit: buatUnit() });
+		expect(screen.getByRole('button', { name: /^Daftarkan pembeli/ })).toBeInTheDocument();
+
+		store.setSesiAgenNull();
+
+		await waitFor(() =>
+			expect(
+				screen.getByRole('button', { name: 'Hubungi via WhatsApp tentang 36/72 di Griya Asri' })
+			).toBeInTheDocument()
+		);
+		expect(screen.queryByRole('button', { name: /^Daftarkan pembeli/ })).toBeNull();
 	});
 });

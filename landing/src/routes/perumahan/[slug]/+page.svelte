@@ -3,7 +3,7 @@
 	import BeaconKunjungan from '$lib/components/beacon-kunjungan.svelte';
 	import AgenPemasar from '$lib/components/agen-pemasar.svelte';
 	import LandingSections from '$lib/components/landing-sections.svelte';
-	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
+	import MinatDialog from '$lib/components/minat-dialog.svelte';
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import StickyCta from '$lib/components/sticky-cta.svelte';
@@ -477,8 +477,11 @@
 
 <!-- Dialog desktop/CTA kolom ringkasan — sticky-cta punya instance-nya
      sendiri (state terpisah). Dua-duanya tak mungkin terbuka bersamaan:
-     overlay modal menutupi tombol yang satu saat yang lain terbuka. -->
-<LeadFormDialog
+     overlay modal menutupi tombol yang satu saat yang lain terbuka.
+     SESI-OMAHE-01 — MinatDialog memilih varian: agen aktif → dialog
+     "Daftarkan Pembeli" (sesi, tanpa ref); selain itu LeadFormDialog
+     LAMA apa adanya. -->
+<MinatDialog
 	bind:open={formMinatTerbuka}
 	perumahanSlug={p.slug}
 	namaPerumahan={p.nama}

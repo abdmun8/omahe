@@ -15,6 +15,7 @@
  * masing-masing mendarat.
  */
 import { env } from '$env/dynamic/private';
+import { env as envPub } from '$env/dynamic/public';
 import { musikValid } from '$lib/musik';
 import { error } from '@sveltejs/kit';
 import { SITE } from '$lib/config';
@@ -51,6 +52,9 @@ import type {
 	AgenDirektori,
 	AgenDirektoriHasil,
 	AgenMinatInput,
+	AgenSaya,
+	InputLeadAgenBody,
+	HasilInputLeadAgen,
 	KartuNamaAgen,
 	DetailBayar,
 	PerumahanDirektori,
@@ -1242,6 +1246,160 @@ export async function kirimMinatAgen(fetchFn: Fetch, input: AgenMinatInput): Pro
 	const serverMessage = await pesanErrorBackend(res);
 	console.error(`[omahe:api] POST minat agen → ${res.status}`);
 	throw new ApiError(res.status, serverMessage ?? 'Pengiriman gagal. Coba lagi sebentar lagi.');
+}
+
+// Sesi agen Omahe + input lead semua perumahan (SESI-OMAHE-01/AGEN-OMAHE-11) ------
+
+/**
+ * Ambil HANYA nilai cookie `session` dari header `cookie` request.
+ * Cookie lain (analytics, dsb.) SENGAJA tidak diteruskan — backend cuma
+ * perlu sesi, dan mengecilkan permukaan data yang menyeberang antar-app.
+ * Nilai dikembalikan MENTAH apa adanya (tanpa decode/encode ulang) supaya
+ * bytes cookie yang sampai ke backend identik dengan yang dikirim browser.
+ */
+function ambilCookieSession(cookieHeader: string | null): string | null {
+	if (!cookieHeader) return null;
+	for (const bagian of cookieHeader.split(';')) {
+		const sama = bagian.trim().indexOf('=');
+		if (sama <= 0) continue;
+		if (bagian.trim().slice(0, sama) === 'session') return bagian.trim().slice(sama + 1);
+	}
+	return null;
+}
+
+/**
+ * Normalisasi bentuk `agen` dari respons `/saya` — field inti wajib string
+ * berisi (`fotoUrl` boleh null); selain itu null (body aneh = anonim,
+ * jangan pernah me-render "agen" setengah jadi di situs publik).
+ */
+function normalisasiAgenSaya(raw: unknown): AgenSaya | null {
+	if (!raw || typeof raw !== 'object') return null;
+	const a = raw as Record<string, unknown>;
+	if (typeof a.kodeAgen !== 'string' || !a.kodeAgen) return null;
+	if (typeof a.nama !== 'string' || !a.nama) return null;
+	if (typeof a.panelUrl !== 'string' || !a.panelUrl) return null;
+	return {
+		kodeAgen: a.kodeAgen,
+		nama: a.nama,
+		fotoUrl: typeof a.fotoUrl === 'string' && a.fotoUrl ? a.fotoUrl : null,
+		panelUrl: a.panelUrl
+	};
+}
+
+/** Agen contoh mode fixture (env `OMAHE_FIXTURE_AGEN=1`, non-produksi). */
+function agenSayaContoh(): AgenSaya {
+	return {
+		kodeAgen: 'OMHA-A0001',
+		nama: 'Agen Contoh',
+		fotoUrl: null,
+		panelUrl: `${envPub.PUBLIC_BOOKING_BASE_URL?.replace(/\/+$/, '') ?? ''}/agen-omahe`
+	};
+}
+
+/**
+ * SESI-OMAHE-01 — agen aktif dari sesi (`GET /public/agen-omahe/saya`).
+ * SELALU resolve: null bila tanpa cookie `session` (JANGAN sentuh backend —
+ * proxy `/api/saya` dipanggil tiap kunjungan halaman, pengunjung anonim
+ * adalah mayoritas absolut), gagal jaringan/body aneh → null (fail-soft —
+ * sesi itu aksesoris UI, bukan penentu hidup-mati halaman).
+ *
+ * `cookieHeader` = ISI header `cookie` request browser apa adanya; hanya
+ * nilai `session` yang diteruskan ke backend (`ambilCookieSession`).
+ */
+export async function getAgenSaya(
+	fetchFn: Fetch,
+	cookieHeader: string | null
+): Promise<AgenSaya | null> {
+	const session = ambilCookieSession(cookieHeader);
+	if (!session) return null;
+
+	if (!hasApi()) {
+		// Cara uji lokal tanpa backend: `OMAHE_FIXTURE_AGEN=1` (non-produksi,
+		// guard `PROD === true` pola `getVerifikasiAgen` — cabang ter-tree-shake
+		// di build produksi, tetap teruji di `bun test`). Produksi tanpa API
+		// → null jujur (tidak ada agen palsu di situs publik).
+		if (env.OMAHE_FIXTURE_AGEN === '1' && import.meta.env.PROD !== true) {
+			return agenSayaContoh();
+		}
+		return null;
+	}
+
+	try {
+		const res = await fetchFn(`${baseUrl()}/public/agen-omahe/saya`, {
+			headers: { accept: 'application/json', cookie: `session=${session}`, ...KONSUMEN },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+		if (!res.ok) {
+			// 401/403/non-200 dari backend = bukan agen aktif → anonim, bukan error.
+			console.error(`[omahe:api] GET /public/agen-omahe/saya → ${res.status} (anonim)`);
+			return null;
+		}
+		const body = (await res.json()) as ApiEnvelope<{ agen: unknown }>;
+		return normalisasiAgenSaya(body?.data?.agen);
+	} catch (err) {
+		console.error('[omahe:api] GET /public/agen-omahe/saya gagal — fail-soft null', err);
+		return null;
+	}
+}
+
+/** Pesan 401 backend (`PESAN_WAJIB_AGEN`) — dipakai proxy & fixture. */
+export const PESAN_WAJIB_AGEN = 'Masuk sebagai agen terlebih dahulu.';
+
+/**
+ * AGEN-OMAHE-11 — input lead atas nama pembeli (`POST /public/agen-omahe/lead`).
+ * Agen dari SESI (cookie `session`), bukan `ref`; tanpa cookie → 401 TANPA
+ * memanggil backend. Status & pesan error backend (400/401/404/409/429)
+ * diteruskan lewat `ApiError` pola `createLead`.
+ */
+export async function inputLeadAgen(
+	fetchFn: Fetch,
+	cookieHeader: string | null,
+	input: InputLeadAgenBody
+): Promise<HasilInputLeadAgen> {
+	const session = ambilCookieSession(cookieHeader);
+	if (!session) throw new ApiError(401, PESAN_WAJIB_AGEN);
+
+	if (!hasApi()) {
+		// Fixture non-produksi: sukses untuk semua nomor KECUALI nomor contoh
+		// khusus yang mensimulasikan proteksi 60 hari (agen lain lebih dulu).
+		if (import.meta.env.PROD === true) {
+			throw new ApiError(503, 'Layanan pendaftaran pembeli belum tersedia.');
+		}
+		if (input.whatsappPembeli === '081200000409') {
+			throw new ApiError(409, 'Pembeli ini sudah didaftarkan agen lain.');
+		}
+		const sampai = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000);
+		return {
+			id: `fixture-${Math.random().toString(36).slice(2, 10)}`,
+			perumahan: { slug: input.slug, nama: input.slug },
+			kunciSampai: sampai.toISOString()
+		};
+	}
+
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/agen-omahe/lead`, {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json',
+				accept: 'application/json',
+				cookie: `session=${session}`,
+				...KONSUMEN
+			},
+			body: JSON.stringify(input),
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	if (res.ok) {
+		const body = (await res.json().catch(() => null)) as ApiEnvelope<HasilInputLeadAgen> | null;
+		if (body?.data?.id) return body.data;
+		throw new ApiError(502, 'Pendaftaran gagal. Coba lagi sebentar lagi.');
+	}
+	const serverMessage = await pesanErrorBackend(res);
+	console.error(`[omahe:api] POST /public/agen-omahe/lead → ${res.status}`);
+	throw new ApiError(res.status, serverMessage ?? 'Pendaftaran gagal. Coba lagi sebentar lagi.');
 }
 
 // Kartu nama digital agen (AGEN-OMAHE-05) ------------------------------------------

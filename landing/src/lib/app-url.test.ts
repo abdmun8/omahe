@@ -18,3 +18,13 @@ describe('daftarPerusahaanUrl', () => {
 		expect(daftarPerusahaanUrl()).toBe('https://app.perumahan.test/daftar/perusahaan?src=omahe-gabung');
 	});
 });
+
+describe('logoutUrl (SESI-OMAHE-01)', () => {
+	test('mengarah ke /logout?redirect= AUTH-11 dengan URL halaman di-encode', async () => {
+		const { logoutUrl } = await import('./app-url');
+		expect(logoutUrl('https://www.omahe.co.id/perumahan/griya-asri?ref=abc')).toBe(
+			'https://app.perumahan.test/logout?redirect=' +
+				encodeURIComponent('https://www.omahe.co.id/perumahan/griya-asri?ref=abc')
+		);
+	});
+});
