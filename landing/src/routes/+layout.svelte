@@ -11,6 +11,7 @@
 	import SiteFooter from '$lib/components/site-footer.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import MusikLatar from '$lib/components/musik-latar.svelte';
+	import BannerAplikasi from '$lib/components/banner-aplikasi.svelte';
 
 	let { children } = $props();
 
@@ -111,6 +112,8 @@
 	>
 		Lewati ke konten
 	</a>
+	<!-- Banner pasang aplikasi Android (tampil setelah hydrate saja). -->
+	<BannerAplikasi />
 	<SiteHeader />
 	<main id="konten" class="flex-1">
 		{@render children()}

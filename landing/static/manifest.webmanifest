@@ -1,20 +1,33 @@
 {
-  "id": "/",
-  "name": "Omahe — Where your story begins",
-  "short_name": "Omahe",
-  "description": "Cari rumah baru, developer, agen & mitra properti, dan simulasi KPR di Omahe.",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#0B3D28",
-  "lang": "id",
-  "dir": "ltr",
-  "categories": ["lifestyle", "shopping", "business"],
-  "icons": [
-    { "src": "/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+	"id": "/",
+	"name": "Omahe — Where your story begins",
+	"short_name": "Omahe",
+	"description": "Cari rumah baru, developer, agen & mitra properti, dan simulasi KPR di Omahe.",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"orientation": "portrait",
+	"background_color": "#ffffff",
+	"theme_color": "#0B3D28",
+	"lang": "id",
+	"dir": "ltr",
+	"categories": ["lifestyle", "shopping", "business"],
+	"prefer_related_applications": true,
+	"related_applications": [
+		{
+			"platform": "play",
+			"id": "id.co.omahe.app.twa",
+			"url": "https://play.google.com/store/apps/details?id=id.co.omahe.app.twa"
+		}
+	],
+	"icons": [
+		{ "src": "/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+		{ "src": "/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+		{
+			"src": "/pwa/icon-maskable-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	]
 }
