@@ -55,6 +55,7 @@ import type {
 	AgenSaya,
 	InputLeadAgenBody,
 	HasilInputLeadAgen,
+	EstimasiKomisiAgen,
 	KartuNamaAgen,
 	DetailBayar,
 	PerumahanDirektori,
@@ -1400,6 +1401,78 @@ export async function inputLeadAgen(
 	const serverMessage = await pesanErrorBackend(res);
 	console.error(`[omahe:api] POST /public/agen-omahe/lead → ${res.status}`);
 	throw new ApiError(res.status, serverMessage ?? 'Pendaftaran gagal. Coba lagi sebentar lagi.');
+}
+
+/**
+ * Normalisasi estimasi komisi (KOMISI-AGEN-01) — bentuk tak dikenal → null
+ * (dialog menyembunyikan blok estimasi; jangan pernah menampilkan angka
+ * setengah jadi). Varian `dasar` asing dinormalkan ke `perumahan`.
+ */
+export function normalisasiEstimasiKomisi(raw: unknown): EstimasiKomisiAgen | null {
+	if (!raw || typeof raw !== 'object') return null;
+	const e = raw as Record<string, unknown>;
+	const angka = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+	switch (e.status) {
+		case 'menunggu_perjanjian':
+			return { status: 'menunggu_perjanjian' };
+		case 'flat':
+			return angka(e.nominal) && e.nominal > 0 ? { status: 'flat', nominal: e.nominal } : null;
+		case 'tanpa_harga':
+			return angka(e.persen) ? { status: 'tanpa_harga', persen: e.persen } : null;
+		case 'estimasi':
+			if (!angka(e.persen) || !angka(e.nominal)) return null;
+			return {
+				status: 'estimasi',
+				persen: e.persen,
+				nominal: e.nominal,
+				dasar: e.dasar === 'unit' || e.dasar === 'tipe' ? e.dasar : 'perumahan'
+			};
+		default:
+			return null;
+	}
+}
+
+/**
+ * KOMISI-AGEN-01 — estimasi komisi agen dari SESI untuk satu perumahan
+ * (`GET /public/agen-omahe/komisi`). Fail-soft null: tanpa cookie
+ * `session` (tanpa menyentuh backend), 401/404/gangguan, atau body aneh —
+ * estimasi itu pelengkap dialog, bukan syarat pendaftaran.
+ */
+export async function getEstimasiKomisiAgen(
+	fetchFn: Fetch,
+	cookieHeader: string | null,
+	slug: string,
+	tipeSlug?: string
+): Promise<EstimasiKomisiAgen | null> {
+	const session = ambilCookieSession(cookieHeader);
+	if (!session) return null;
+
+	if (!hasApi()) {
+		// Fixture non-produksi (`OMAHE_FIXTURE_AGEN=1`) — angka contoh
+		// 2,9% × Rp300 jt (agen bersponsor, program Omahe).
+		if (env.OMAHE_FIXTURE_AGEN === '1' && import.meta.env.PROD !== true) {
+			return { status: 'estimasi', persen: 2.9, nominal: 8_700_000, dasar: tipeSlug ? 'tipe' : 'perumahan' };
+		}
+		return null;
+	}
+
+	const qs = new URLSearchParams({ slug });
+	if (tipeSlug) qs.set('tipeSlug', tipeSlug);
+	try {
+		const res = await fetchFn(`${baseUrl()}/public/agen-omahe/komisi?${qs}`, {
+			headers: { accept: 'application/json', cookie: `session=${session}`, ...KONSUMEN },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+		if (!res.ok) {
+			console.error(`[omahe:api] GET /public/agen-omahe/komisi → ${res.status} (tanpa estimasi)`);
+			return null;
+		}
+		const body = (await res.json()) as ApiEnvelope<{ estimasi: unknown }>;
+		return normalisasiEstimasiKomisi(body?.data?.estimasi);
+	} catch (err) {
+		console.error('[omahe:api] GET /public/agen-omahe/komisi gagal — fail-soft null', err);
+		return null;
+	}
 }
 
 // Kartu nama digital agen (AGEN-OMAHE-05) ------------------------------------------

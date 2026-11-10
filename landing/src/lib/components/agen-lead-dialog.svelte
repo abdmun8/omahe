@@ -16,8 +16,10 @@
 	saat diklik — wrapper minat-dialog lalu beralih cabang ke form minat
 	biasa dengan status terbuka yang sama.
 
-	Estimasi komisi (KOMISI-AGEN-01) BELUM ada — slot di blok sukses
-	ditandai komentar, jangan menampilkan angka apa pun sebelum epic itu.
+	Estimasi komisi (KOMISI-AGEN-01) — setelah sukses, dialog mengambil
+	`/api/agen-komisi?slug=&tipeSlug=` (sesi agen) dan menampilkan
+	"± Rp… (x%)" berlabel estimasi / "menunggu perjanjian perumahan".
+	Gagal/null → blok tidak tampil (pendaftaran tetap sukses).
 
 	Pola visual/struktur: `lead-form-dialog.svelte` (bits-ui Dialog,
 	mobile-first, token yang ada).
@@ -26,7 +28,8 @@
 	import { Dialog } from 'bits-ui';
 	import X from '@lucide/svelte/icons/x';
 	import UserPlus from '@lucide/svelte/icons/user-plus';
-	import type { HasilInputLeadAgen } from '$lib/api/types';
+	import type { EstimasiKomisiAgen, HasilInputLeadAgen } from '$lib/api/types';
+	import { teksEstimasiKomisi } from '$lib/komisi-agen';
 	import { trackEvent } from '$lib/analytics';
 	import { sesiAgen, setSesiAgenNull } from '$lib/sesi-agen.svelte';
 	import Button from './ui/button.svelte';
@@ -60,6 +63,9 @@
 
 	let proses = $state(false);
 	let sukses = $state<HasilInputLeadAgen | null>(null);
+	/** KOMISI-AGEN-01 — estimasi komisi lead yang baru didaftarkan. */
+	let estimasi = $state<EstimasiKomisiAgen | null>(null);
+	const teksEstimasi = $derived(teksEstimasiKomisi(estimasi));
 	let pesanError = $state<string | null>(null);
 	/** 401 dari proxy — sesi agen sudah mati. */
 	let sesiHabis = $state(false);
@@ -78,6 +84,7 @@
 		}
 		if (sukses) {
 			sukses = null;
+			estimasi = null;
 			pesanError = null;
 			sesiHabis = false;
 			namaPembeli = '';
@@ -163,6 +170,7 @@
 			}
 			const body = (await res.json()) as { data?: HasilInputLeadAgen };
 			sukses = body.data ?? null;
+			if (sukses) void muatEstimasi(tipe && tipeDikenal(tipe) ? slugTipe(tipe) : undefined);
 			// GA4 — submit SUKSES. TANPA PII: nama & nomor WA PEMBELI tidak
 			// pernah masuk params (aturan ToS, src/lib/analytics.ts).
 			trackEvent('agen_lead_submit', {
@@ -177,9 +185,25 @@
 		}
 	}
 
+	/** Estimasi komisi (fail-soft: gagal = blok tidak tampil). */
+	async function muatEstimasi(tipeSlug: string | undefined) {
+		estimasi = null;
+		try {
+			const qs = new URLSearchParams({ slug: perumahanSlug });
+			if (tipeSlug) qs.set('tipeSlug', tipeSlug);
+			const res = await fetch(`/api/agen-komisi?${qs}`);
+			if (!res.ok) return;
+			const body = (await res.json()) as { estimasi?: EstimasiKomisiAgen | null };
+			estimasi = body?.estimasi && typeof body.estimasi === 'object' && 'status' in body.estimasi ? body.estimasi : null;
+		} catch {
+			estimasi = null;
+		}
+	}
+
 	/** "Daftarkan pembeli lain" — form kosong lagi, dialog tetap terbuka. */
 	function ulang() {
 		sukses = null;
+		estimasi = null;
 		pesanError = null;
 		sesiHabis = false;
 		namaPembeli = '';
@@ -238,10 +262,14 @@
 						Pembeli akan menerima WhatsApp konfirmasi bahwa Anda mendaftarkannya. Data pembeli
 						dilindungi 60 hari untuk Anda.
 					</p>
-					<!-- KOMISI-AGEN-01 (menyusul) — estimasi komisi "± Rp… jika sampai
-					     akad" dari endpoint privat /public/agen-omahe/komisi. JANGAN
-					     tampilkan angka apa pun sebelum epic itu; slot ini titik
-					     sisipnya. -->
+					{#if teksEstimasi}
+						<!-- KOMISI-AGEN-01 — estimasi komisi agen (privat, no-store). -->
+						<div class="bg-surface rounded-lg px-3 py-2" data-testid="estimasi-komisi">
+							<p class="text-muted text-xs">Estimasi komisi Anda bila sampai akad</p>
+							<p class="text-ink text-sm font-semibold">{teksEstimasi.utama}</p>
+							<p class="text-muted mt-0.5 text-xs leading-relaxed">{teksEstimasi.catatan}</p>
+						</div>
+					{/if}
 					{#if sesiAgen.agen}
 						<Button
 							variant="primary"

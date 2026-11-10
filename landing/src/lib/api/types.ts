@@ -742,6 +742,19 @@ export interface HasilInputLeadAgen {
 	kunciSampai: string;
 }
 
+/**
+ * KOMISI-AGEN-01 — estimasi komisi agen untuk satu perumahan (`GET
+ * /public/agen-omahe/komisi?slug=&tipeSlug=`, sesi agen, no-store).
+ * `persen`/`nominal` = bagian agen PENJUAL (sudah dikurangi bagian sponsor).
+ * `menunggu_perjanjian` = perumahan belum ikut Program Omahe (tanpa angka);
+ * `flat` = perumahan mengatur komisi agen nominal tetap sendiri.
+ */
+export type EstimasiKomisiAgen =
+	| { status: 'estimasi'; persen: number; nominal: number; dasar: 'unit' | 'tipe' | 'perumahan' }
+	| { status: 'menunggu_perjanjian' }
+	| { status: 'flat'; nominal: number }
+	| { status: 'tanpa_harga'; persen: number };
+
 // ---------------------------------------------------------------------------
 // AGEN-OMAHE-03 — agen Omahe yang memasarkan perumahan (`GET /public/agen-omahe/perumahan/:slug?ref=`, api-contract §21)
 // ---------------------------------------------------------------------------

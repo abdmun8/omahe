@@ -91,6 +91,57 @@ describe.skipIf(typeof document === 'undefined')('AgenLeadDialog', () => {
 		);
 	});
 
+	test('KOMISI-AGEN-01: sukses → ambil /api/agen-komisi (tipeSlug) & tampilkan estimasi', async () => {
+		store.sesiAgen.agen = AGEN;
+		store.sesiAgen.status = 'siap';
+		stubGtag();
+		const fetchMock = vi.fn(async (url: string) => {
+			if (String(url).startsWith('/api/agen-komisi')) {
+				return {
+					ok: true,
+					status: 200,
+					json: async () => ({ estimasi: { status: 'estimasi', persen: 2.9, nominal: 8_700_000, dasar: 'tipe' } })
+				} as Response;
+			}
+			return {
+				ok: true,
+				status: 201,
+				json: async () => ({
+					success: true,
+					data: { id: 'lead-k', perumahan: { slug: 'griya-asri', nama: 'Griya Asri' }, kunciSampai: '2027-01-08T00:00:00.000Z' }
+				})
+			} as Response;
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		render(AgenLeadDialog, {
+			props: { perumahanSlug: 'griya-asri', namaPerumahan: 'Griya Asri', opsiTipe: ['Tipe 36/72'], open: true }
+		});
+		fireEvent.change(screen.getByLabelText(/Tipe diminati/), { target: { value: 'Tipe 36/72' } });
+		isiDanSubmit();
+		const blok = await screen.findByTestId('estimasi-komisi');
+		expect(blok.textContent).toMatch(/8\.700\.000/);
+		expect(blok.textContent).toContain('2,9%');
+		expect(String(fetchMock.mock.calls[1]?.[0])).toBe('/api/agen-komisi?slug=griya-asri&tipeSlug=tipe-36-72');
+	});
+
+	test('KOMISI-AGEN-01: estimasi null/gagal → blok tidak tampil, sukses tetap', async () => {
+		store.sesiAgen.agen = AGEN;
+		store.sesiAgen.status = 'siap';
+		stubGtag();
+		stubFetch({
+			ok: true,
+			status: 201,
+			json: async () => ({
+				success: true,
+				data: { id: 'lead-n', perumahan: { slug: 'griya-asri', nama: 'Griya Asri' }, kunciSampai: '2027-01-08T00:00:00.000Z' }
+			})
+		});
+		render(AgenLeadDialog, { props: { perumahanSlug: 'griya-asri', namaPerumahan: 'Griya Asri', open: true } });
+		isiDanSubmit();
+		await screen.findByText(/Pembeli terdaftar ✓/);
+		expect(screen.queryByTestId('estimasi-komisi')).toBeNull();
+	});
+
 	test('tipe ketik bebas (tidak dikenal) → masuk catatan, bukan tipeSlug', async () => {
 		store.sesiAgen.agen = AGEN;
 		store.sesiAgen.status = 'siap';

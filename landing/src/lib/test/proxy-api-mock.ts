@@ -11,7 +11,8 @@
  * Karena itu mock ini WAJIB mengeksport SEMUA nama yang dipakai handler
  * mana pun (`createLead` + `kirimMinatAgen` + `ApiError`, + `getKerjasamaQr`
  * untuk route `/q/[kode]` — KERJASAMA-02; + `getAgenSaya`/`inputLeadAgen`
- * untuk proxy `/api/saya` & `/api/agen-lead` — SESI-OMAHE-01) — file test
+ * untuk proxy `/api/saya` & `/api/agen-lead` — SESI-OMAHE-01; + `getEstimasiKomisiAgen`
+ * untuk `/api/agen-komisi` — KOMISI-AGEN-01) — file test
  * baru yang butuh nama lain HARUS ditambahkan ke sini, bukan membuat
  * mock.module sendiri. Kelas
  * `ApiErrorTiruan` dibagikan supaya cek `err instanceof ApiError` di handler
@@ -56,6 +57,11 @@ export const inputLeadAgenMock = mock<
 	(fetchFn: typeof fetch, cookieHeader: string | null, input: unknown) => Promise<unknown>
 >(async () => ({}));
 
+/** KOMISI-AGEN-01 — estimasi komisi agen untuk proxy `/api/agen-komisi`. */
+export const getEstimasiKomisiAgenMock = mock<
+	(fetchFn: typeof fetch, cookieHeader: string | null, slug: string, tipeSlug?: string) => Promise<unknown>
+>(async () => null);
+
 /** Pasang mock `$lib/api` — panggil SEBELUM `await import('./+server')`. */
 export function pasangMockLibApi(): void {
 	mock.module('$lib/api', () => ({
@@ -64,6 +70,7 @@ export function pasangMockLibApi(): void {
 		kirimMinatAgen: kirimMinatAgenMock,
 		getKerjasamaQr: getKerjasamaQrMock,
 		getAgenSaya: getAgenSayaMock,
-		inputLeadAgen: inputLeadAgenMock
+		inputLeadAgen: inputLeadAgenMock,
+		getEstimasiKomisiAgen: getEstimasiKomisiAgenMock
 	}));
 }
