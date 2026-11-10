@@ -65,6 +65,13 @@ describe('ajukanUrl', () => {
 		);
 	});
 
+	test('REF-AGEN-01 — kode agen pribadi terbawa seperti ref lain (atribusi agen)', async () => {
+		const { ajukanUrl } = await import('./ref');
+		expect(ajukanUrl('griya-asri-bogor', 'OMHA-A0001')).toBe(
+			'https://app.perumahan.test/ajukan/griya-asri-bogor?src=omahe&ref=OMHA-A0001'
+		);
+	});
+
 	test('tanpa ref tetap valid — booking langsung tanpa mitra juga sah', async () => {
 		const { ajukanUrl } = await import('./ref');
 		expect(ajukanUrl('griya-asri-bogor', null)).toBe(

@@ -15,6 +15,47 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// REF-AGEN-01 — nama agen pemilik ref GLOBAL kode pribadi diambil CLIENT-SIDE
+	// lewat proxy `/api/agen-nama/:kode` (client.ts server-only; anti-spoof: nama
+	// TIDAK pernah dari query string). SSR/prerender tetap anonim — `data.refGlobalAgen`
+	// null saat SSR, terisi pasca-hidrasi (universal load layout re-run di browser).
+	let namaAgen = $state<string | null>(null);
+
+	$effect(() => {
+		const kode = data.refGlobalAgen;
+		if (!kode) {
+			namaAgen = null;
+			return;
+		}
+		let batal = false;
+		fetch(`/api/agen-nama/${encodeURIComponent(kode)}`)
+			.then((res) => (res.ok ? (res.json() as Promise<{ data?: { nama?: unknown } }>) : null))
+			.then((body) => {
+				if (!batal && typeof body?.data?.nama === 'string' && body.data.nama.trim()) {
+					namaAgen = body.data.nama.trim();
+				} else if (!batal) {
+					namaAgen = null;
+				}
+			})
+			.catch(() => {
+				if (!batal) namaAgen = null; // proxy/backend gagal → banner disembunyikan saja
+			});
+		return () => {
+			batal = true;
+		};
+	});
+
+	// KERJASAMA-03 + REF-AGEN-01 — banner homepage: nama mitra (OP-…) dari data
+	// layout, nama agen dari fetch di atas. Null → banner tidak dirender sama
+	// sekali (fail-soft; ref tetap mengalir ke CTA lewat `page.data.ref`).
+	const banner = $derived(
+		data.refGlobalNama
+			? { nama: data.refGlobalNama, varian: 'mitra' as const }
+			: namaAgen
+				? { nama: namaAgen, varian: 'agen' as const }
+				: null
+	);
+
 	// ADMIN-06 — teks hero dari admin (layout server), fallback bawaan `SITE`.
 	const teks = $derived(
 		data.teks ?? {
@@ -64,11 +105,12 @@
 	</section>
 {/if}
 
-<!-- KERJASAMA-03 — banner "Rekomendasi dari <nama mitra>" bila ref GLOBAL
-     (QR kerjasama Omahe×perusahaan) aktif; nama dari resolve `/q/:kode`,
-     bukan dari URL bebas. Bisa ditutup — ref tetap. -->
-{#if data.refGlobalNama}
-	<BannerRekomendasi nama={data.refGlobalNama} />
+<!-- KERJASAMA-03 + REF-AGEN-01 — banner "Rekomendasi dari <nama>" bila ref
+     GLOBAL aktif: mitra (OP-…) pakai nama dari resolve `/q/:kode`; kode agen
+     pribadi pakai nama dari endpoint nama agen (fetch client-side). Bisa
+     ditutup — ref tetap. -->
+{#if banner}
+	<BannerRekomendasi nama={banner.nama} varian={banner.varian} />
 {/if}
 
 <!-- Hero + pencarian. Padding vertikal lebih ramping di mobile (default)

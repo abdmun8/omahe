@@ -13,7 +13,8 @@
  * untuk route `/q/[kode]` — KERJASAMA-02; + `getAgenSaya`/`inputLeadAgen`
  * untuk proxy `/api/saya` & `/api/agen-lead` — SESI-OMAHE-01; + `getEstimasiKomisiAgen`
  * untuk `/api/agen-komisi` — KOMISI-AGEN-01; + `getUnitTersediaAgen`/`inputBookingAgen`
- * untuk `/api/agen-unit` & `/api/agen-booking` — AGEN-OMAHE-11) — file test
+ * untuk `/api/agen-unit` & `/api/agen-booking` — AGEN-OMAHE-11; + `getNamaAgenPribadi`
+ * untuk `/api/agen-nama/[kode]` — REF-AGEN-01) — file test
  * baru yang butuh nama lain HARUS ditambahkan ke sini, bukan membuat
  * mock.module sendiri. Kelas
  * `ApiErrorTiruan` dibagikan supaya cek `err instanceof ApiError` di handler
@@ -76,6 +77,11 @@ export const inputBookingAgenMock = mock<
 	(fetchFn: typeof fetch, cookieHeader: string | null, input: unknown) => Promise<unknown>
 >(async () => ({}));
 
+/** REF-AGEN-01 — nama agen pribadi untuk proxy `/api/agen-nama/[kode]` (fail-soft null). */
+export const getNamaAgenPribadiMock = mock<
+	(fetchFn: typeof fetch, kode: string) => Promise<string | null>
+>(async () => null);
+
 /** Pasang mock `$lib/api` — panggil SEBELUM `await import('./+server')`. */
 export function pasangMockLibApi(): void {
 	mock.module('$lib/api', () => ({
@@ -87,6 +93,7 @@ export function pasangMockLibApi(): void {
 		inputLeadAgen: inputLeadAgenMock,
 		getEstimasiKomisiAgen: getEstimasiKomisiAgenMock,
 		getUnitTersediaAgen: getUnitTersediaAgenMock,
-		inputBookingAgen: inputBookingAgenMock
+		inputBookingAgen: inputBookingAgenMock,
+		getNamaAgenPribadi: getNamaAgenPribadiMock
 	}));
 }

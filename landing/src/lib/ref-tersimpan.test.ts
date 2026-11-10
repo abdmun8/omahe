@@ -223,7 +223,12 @@ describe('pilihRefEfektif (KERJASAMA-03 — LAST-TOUCH lintas per-slug vs global
 		simpanRef('griya-asri', REF, T0);
 		simpanRefGlobal(REF_OP, 'PT Contoh', T0 + HARI);
 		expect(
-			pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 + 2 * HARI })
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 2 * HARI
+			})
 		).toBe(REF_OP);
 	});
 
@@ -231,14 +236,24 @@ describe('pilihRefEfektif (KERJASAMA-03 — LAST-TOUCH lintas per-slug vs global
 		simpanRefGlobal(REF_OP, 'PT Contoh', T0);
 		simpanRef('griya-asri', REF, T0 + HARI); // t lebih baru
 		expect(
-			pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 + 2 * HARI })
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 2 * HARI
+			})
 		).toBe(REF);
 
 		// tepat sama (tie) → per-slug.
 		simpanRef('griya-asri', 'X'.repeat(64), T0 + 3 * HARI);
 		simpanRefGlobal(REF_OP, 'PT Contoh', T0 + 3 * HARI);
 		expect(
-			pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 + 4 * HARI })
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 4 * HARI
+			})
 		).toBe('X'.repeat(64));
 	});
 
@@ -249,19 +264,126 @@ describe('pilihRefEfektif (KERJASAMA-03 — LAST-TOUCH lintas per-slug vs global
 		);
 		simpanRefGlobal(REF_OP, 'PT Contoh', T0 + HARI);
 		expect(
-			pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 + 2 * HARI })
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 2 * HARI
+			})
 		).toBe(REF_OP);
 	});
 
 	test('tanpa ref URL di halaman lain (homepage/dll) → ref global', () => {
 		simpanRefGlobal(REF_OP, 'PT Contoh', T0);
 		simpanRef('griya-asri', REF, T0 + HARI); // per-slug diabaikan di luar rute perumahan
-		expect(pilihRefEfektif({ refUrl: null, slug: null, diRutePerumahan: false, now: T0 + 2 * HARI })).toBe(
-			REF_OP
-		);
+		expect(
+			pilihRefEfektif({ refUrl: null, slug: null, diRutePerumahan: false, now: T0 + 2 * HARI })
+		).toBe(REF_OP);
 	});
 
 	test('tanpa apa pun → null', () => {
-		expect(pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 })).toBeNull();
+		expect(
+			pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 })
+		).toBeNull();
+	});
+});
+
+// ---------------------------------------------------------------------------
+// REF-AGEN-01 — kode agen pribadi (`OMHA-…` baru / `OMH-…` lama) diperlakukan
+// seperti `OP-…`: ref GLOBAL 90 hari, LAST-TOUCH, dari halaman mana pun.
+// ---------------------------------------------------------------------------
+
+const KODE_BARU = 'OMHA-A0001';
+const KODE_LAMA = 'OMH-K7M2QX';
+
+describe('kode agen pribadi → ref GLOBAL (REF-AGEN-01)', () => {
+	test('kode baru disimpan GLOBAL UPPERCASE tanpa nama (nama tidak pernah dari URL)', () => {
+		simpanRefGlobal(KODE_BARU, 'Nama Dari URL Harus Diabaikan', T0);
+		expect(simpanan.get('omahe:ref:_global')).toBe(
+			JSON.stringify({ ref: KODE_BARU, exp: T0 + 90 * HARI, t: T0 })
+		);
+		expect(ambilRefGlobal(T0 + HARI)).toEqual({ ref: KODE_BARU, nama: null });
+	});
+
+	test('kode lama OMH-XXXXXX ikut diterima sebagai GLOBAL', () => {
+		simpanRefGlobal(KODE_LAMA, null, T0);
+		expect(ambilRefGlobal(T0 + HARI)).toEqual({ ref: KODE_LAMA, nama: null });
+	});
+
+	test('input huruf kecil dinormalisasi UPPERCASE', () => {
+		simpanRefGlobal('omha-b0002', null, T0);
+		expect(ambilRefGlobal(T0)?.ref).toBe('OMHA-B0002');
+	});
+
+	test('kode bukan agen pribadi tetap ditolak GLOBAL (AO- ber-token, bentuk meleset)', () => {
+		simpanRefGlobal('AO-K7M2QX', null, T0);
+		simpanRefGlobal('OMHA-A000', null, T0); // 3 digit
+		simpanRefGlobal('OMH-A2', null, T0); // terlalu pendek
+		expect(ambilRefGlobal(T0)).toBeNull();
+	});
+
+	test('LAST-TOUCH `OP-…` vs kode agen — yang disimpan terakhir menang (dua arah)', () => {
+		simpanRefGlobal(REF_OP, 'PT Contoh', T0);
+		simpanRefGlobal(KODE_BARU, null, T0 + HARI);
+		expect(ambilRefGlobal(T0 + 2 * HARI)).toEqual({ ref: KODE_BARU, nama: null });
+
+		simpanRefGlobal(REF_OP, 'PT Baru', T0 + 3 * HARI);
+		expect(ambilRefGlobal(T0 + 4 * HARI)).toEqual({ ref: REF_OP, nama: 'PT Baru' });
+	});
+
+	test('pilihRefEfektif: URL kode agen huruf kecil di homepage → GLOBAL uppercase jadi ref efektif', () => {
+		expect(
+			pilihRefEfektif({ refUrl: 'omha-a0001', slug: null, diRutePerumahan: false, now: T0 })
+		).toBe(KODE_BARU);
+		expect(ambilRefGlobal(T0 + HARI)?.ref).toBe(KODE_BARU);
+		// TIDAK tersimpan per slug.
+		expect(ambilRef('griya-asri', T0 + HARI)).toBeNull();
+	});
+
+	test('pilihRefEfektif: URL kode agen di rute perumahan → TETAP GLOBAL, bukan per slug', () => {
+		expect(
+			pilihRefEfektif({ refUrl: KODE_LAMA, slug: 'griya-asri', diRutePerumahan: true, now: T0 })
+		).toBe(KODE_LAMA);
+		expect(ambilRef('griya-asri', T0 + HARI)).toBeNull();
+		expect(ambilRefGlobal(T0 + HARI)?.ref).toBe(KODE_LAMA);
+	});
+
+	test('pilihRefEfektif tanpa ref URL → kode agen global dipakai di halaman mana pun', () => {
+		simpanRefGlobal(KODE_BARU, null, T0);
+		expect(
+			pilihRefEfektif({ refUrl: null, slug: null, diRutePerumahan: false, now: T0 + HARI })
+		).toBe(KODE_BARU);
+	});
+
+	test('pilihRefEfektif tanpa ref URL di rute perumahan — global kode agen lebih baru menang', () => {
+		simpanRef('griya-asri', REF, T0);
+		simpanRefGlobal(KODE_BARU, null, T0 + HARI);
+		expect(
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 2 * HARI
+			})
+		).toBe(KODE_BARU);
+
+		// kebalikan: per-slug lebih baru → per-slug (perilaku KERJASAMA-03 tetap).
+		simpanRef('griya-asri', REF, T0 + 3 * HARI);
+		expect(
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 4 * HARI
+			})
+		).toBe(REF);
+	});
+
+	test('ref per-slug KERJASAMA-02 tetap bekerja di samping kode agen global', () => {
+		simpanRefGlobal(KODE_BARU, null, T0);
+		simpanRef('griya-asri', REF, T0); // tie → per-slug (lebih spesifik)
+		expect(
+			pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 + HARI })
+		).toBe(REF);
 	});
 });

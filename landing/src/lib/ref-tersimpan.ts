@@ -24,7 +24,12 @@
  * halaman TIDAK BOLEH jatuh.
  */
 import { REF_PATTERN } from './ref';
-import { bersihkanNamaMitra, REF_OMAHE_PATTERN } from './ref-pola';
+import {
+	bersihkanNamaMitra,
+	normalisasiRefAgenPribadi,
+	REF_AGEN_PRIBADI_PATTERN,
+	REF_OMAHE_PATTERN
+} from './ref-pola';
 
 /** Masa simpan 90 hari (bukan 30: siklus putus-cek pembeli sering lebih panjang). */
 const MASA_MS = 90 * 24 * 60 * 60 * 1000;
@@ -120,12 +125,19 @@ export function ambilRef(slug: string, now: number = Date.now()): string | null 
  * atribusi tetap dari `ref`. Bila `nama` kosong/undefined: nama lama DIPERTAHANKAN
  * hanya bila ref yang tersimpan sudah sama (hindari nama mitra lama menempel
  * ke kode mitra lain).
+ *
+ * REF-AGEN-01 — kode agen pribadi (`OMHA-…`/`OMH-…`, dinormalisasi UPPERCASE)
+ * juga diterima sebagai ref GLOBAL (link pribadi agen dua fungsi: atribusi
+ * pembeli & sponsor calon agen). Untuk kode agen `nama` TIDAK PERNAH dari URL
+ * (anti-spoof — nama diambil client-side dari endpoint nama agen), jadi arg
+ * `nama` diabaikan dan nama mitra lama tidak ikut terbawa (ref beda bentuk).
  */
-export function simpanRefGlobal(
-	ref: string,
-	nama?: string | null,
-	now: number = Date.now()
-): void {
+export function simpanRefGlobal(ref: string, nama?: string | null, now: number = Date.now()): void {
+	const kodeAgen = normalisasiRefAgenPribadi(ref);
+	if (kodeAgen) {
+		tulisMeta(KUNCI_GLOBAL, { ref: kodeAgen, exp: now + MASA_MS, t: now });
+		return;
+	}
 	if (!REF_OMAHE_PATTERN.test(ref)) return;
 	let namaFinal: string | null = null;
 	if (nama && nama.trim()) {
@@ -145,12 +157,17 @@ export function simpanRefGlobal(
 }
 
 /**
- * Ambil ref GLOBAL — `{ref, nama}` (nama `null` bila tidak pernah diketahui);
- * `null` bila tidak ada/kedaluwarsa/rusak (entri basi dihapus).
+ * Ambil ref GLOBAL — `{ref, nama}` (nama `null` bila tidak pernah diketahui —
+ * selalu `null` untuk kode agen pribadi, REF-AGEN-01); `null` bila tidak
+ * ada/kedaluwarsa/rusak (entri basi dihapus). Ref sah: `OP-…` (KERJASAMA-03)
+ * atau kode agen pribadi (REF-AGEN-01).
  */
-export function ambilRefGlobal(now: number = Date.now()): { ref: string; nama: string | null } | null {
+export function ambilRefGlobal(
+	now: number = Date.now()
+): { ref: string; nama: string | null } | null {
 	const meta = bacaMeta(KUNCI_GLOBAL, now);
-	if (!meta || !REF_OMAHE_PATTERN.test(meta.ref)) return null;
+	if (!meta) return null;
+	if (!REF_OMAHE_PATTERN.test(meta.ref) && !REF_AGEN_PRIBADI_PATTERN.test(meta.ref)) return null;
 	return { ref: meta.ref, nama: typeof meta.nama === 'string' ? meta.nama : null };
 }
 
@@ -165,11 +182,15 @@ export function ambilRefGlobal(now: number = Date.now()): { ref: string; nama: s
  *   - `refUrl` berbentuk `OP-…` → simpan sebagai ref GLOBAL di halaman mana
  *     pun; `nama` diambil dari `?mitra=` URL (dibersihkan) — label tampilan
  *     saja, atribusi tetap dari ref yang divalidasi backend.
+ *   - `refUrl` berbentuk kode agen pribadi (`OMHA-…`/`OMH-…`, REF-AGEN-01)
+ *     → juga ref GLOBAL di halaman mana pun, UPPERCASE, tanpa nama.
  *   - `refUrl` lain di rute `/perumahan/[slug]…` → simpan per slug.
  *   - Tanpa `refUrl`: rute perumahan → yang `t`-nya terbaru antara per-slug
  *     vs global; halaman lain → global (link kartu `withRef` ikut membawa).
  *   - `refGlobalNama` = nama perusahaan pada ref global (untuk banner
- *     homepage), null bila tidak ada/tanpa nama.
+ *     homepage), null bila tidak ada/tanpa nama/kode agen.
+ *   - `refGlobalAgen` = kode agen pribadi pada ref global (banner homepage
+ *     ambil nama client-side dari endpoint nama agen), null bila bukan.
  * Tanpa browser (SSR/prerender) → murni passthrough `refUrl`.
  */
 export function hitungRefLayout(opts: {
@@ -179,9 +200,10 @@ export function hitungRefLayout(opts: {
 	diRutePerumahan: boolean;
 	url: URL;
 	now?: number;
-}): { ref: string | null; refGlobalNama: string | null } {
+}): { ref: string | null; refGlobalNama: string | null; refGlobalAgen: string | null } {
 	let ref = opts.refUrl;
 	let refGlobalNama: string | null = null;
+	let refGlobalAgen: string | null = null;
 
 	if (opts.browser) {
 		const now = opts.now ?? Date.now();
@@ -195,17 +217,22 @@ export function hitungRefLayout(opts: {
 					: null,
 			now
 		});
-		refGlobalNama = ambilRefGlobal(now)?.nama ?? null;
+		const global = ambilRefGlobal(now);
+		refGlobalNama = global?.nama ?? null;
+		refGlobalAgen = global && REF_AGEN_PRIBADI_PATTERN.test(global.ref) ? global.ref : null;
 	}
-	return { ref, refGlobalNama };
+	return { ref, refGlobalNama, refGlobalAgen };
 }
 
 /**
- * LAST-TOUCH lintas per-slug & global (KEPUTUSAN KERJASAMA-03, dipanggil
- * `hitungRefLayout` — yang dijalankan `routes/+layout.ts`, browser saja):
+ * LAST-TOUCH lintas per-slug & global (KEPUTUSAN KERJASAMA-03 + REF-AGEN-01,
+ * dipanggil `hitungRefLayout` — yang dijalankan `routes/+layout.ts`, browser
+ * saja):
  *   - `refUrl` berbentuk `OP-…` → simpan sebagai ref GLOBAL (di halaman
  *     mana pun, termasuk homepage); `namaMitra` dari `?mitra=` ikut disimpan
  *     bila ada (sudah dibersihkan pemanggil).
+ *   - `refUrl` berbentuk kode agen pribadi (`OMHA-…`/`OMH-…`) → juga ref
+ *     GLOBAL, dinormalisasi UPPERCASE (nilai yang dikembalikan), tanpa nama.
  *   - `refUrl` lain di rute `/perumahan/[slug]…` → simpan per slug (perilaku
  *     KERJASAMA-02).
  *   - Tanpa `refUrl`: di rute perumahan → ref dengan `t` PALING BARU antara
@@ -222,6 +249,12 @@ export function pilihRefEfektif(opts: {
 }): string | null {
 	const now = opts.now ?? Date.now();
 	if (opts.refUrl) {
+		// REF-AGEN-01 — link pribadi agen di halaman mana pun → ref GLOBAL.
+		const kodeAgen = normalisasiRefAgenPribadi(opts.refUrl);
+		if (kodeAgen) {
+			simpanRefGlobal(kodeAgen, null, now);
+			return kodeAgen;
+		}
 		if (REF_OMAHE_PATTERN.test(opts.refUrl)) {
 			simpanRefGlobal(opts.refUrl, opts.namaMitra ?? null, now);
 			return opts.refUrl;
@@ -231,13 +264,16 @@ export function pilihRefEfektif(opts: {
 	}
 
 	const metaGlobal = bacaMeta(KUNCI_GLOBAL, now);
-	const metaSlug =
-		opts.diRutePerumahan && opts.slug ? bacaMeta(kunci(opts.slug), now) : null;
+	const metaSlug = opts.diRutePerumahan && opts.slug ? bacaMeta(kunci(opts.slug), now) : null;
 	if (metaSlug && metaGlobal) {
 		// Bentuk lama tanpa `t` dianggap `t = 0` — selalu kalah dari yang punya `t`.
 		return (metaSlug.t ?? 0) >= (metaGlobal.t ?? 0) ? metaSlug.ref : metaGlobal.ref;
 	}
 	if (metaSlug) return metaSlug.ref;
-	if (metaGlobal && REF_OMAHE_PATTERN.test(metaGlobal.ref)) return metaGlobal.ref;
+	if (
+		metaGlobal &&
+		(REF_OMAHE_PATTERN.test(metaGlobal.ref) || REF_AGEN_PRIBADI_PATTERN.test(metaGlobal.ref))
+	)
+		return metaGlobal.ref;
 	return null;
 }

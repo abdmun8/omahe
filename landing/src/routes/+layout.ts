@@ -27,12 +27,13 @@ export const load: LayoutLoad = ({ data, url, params, route }) => {
 		refUrl = null;
 	}
 
-	// KERJASAMA-02/03 — seluruh logika pemilihan & penyimpanan ref (per-slug
-	// vs GLOBAL `OP-…`, LAST-TOUCH, nama `?mitra=`) diekstrak ke
-	// `hitungRefLayout()` di `src/lib/ref-tersimpan.ts` supaya bisa diuji —
-	// shim natif `$app/environment` di bun test tidak bisa di-mock dari file
-	// proyek. Di sini tinggal wiring tipis; URL bar tidak diubah.
-	const { ref, refGlobalNama } = hitungRefLayout({
+	// KERJASAMA-02/03 + REF-AGEN-01 — seluruh logika pemilihan & penyimpanan
+	// ref (per-slug vs GLOBAL `OP-…`/kode agen pribadi, LAST-TOUCH, nama
+	// `?mitra=`) diekstrak ke `hitungRefLayout()` di `src/lib/ref-tersimpan.ts`
+	// supaya bisa diuji — shim natif `$app/environment` di bun test tidak bisa
+	// di-mock dari file proyek. Di sini tinggal wiring tipis; URL bar tidak
+	// diubah.
+	const { ref, refGlobalNama, refGlobalAgen } = hitungRefLayout({
 		browser,
 		refUrl,
 		slug: params.slug ?? null,
@@ -43,5 +44,7 @@ export const load: LayoutLoad = ({ data, url, params, route }) => {
 	// `data` = hasil `+layout.server.ts` (kontak Omahe, ADMIN-05) — WAJIB
 	// diteruskan, kalau tidak `page.data.kontak` jadi undefined di seluruh
 	// halaman dan semua komponen diam-diam mundur ke fallback `SITE.*`.
-	return { ...data, ref, refGlobalNama };
+	// `refGlobalNama` = nama mitra (banner OP-…); `refGlobalAgen` = kode agen
+	// pribadi (REF-AGEN-01 — banner homepage mengambil nama client-side).
+	return { ...data, ref, refGlobalNama, refGlobalAgen };
 };

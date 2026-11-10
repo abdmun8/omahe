@@ -6,7 +6,10 @@
 	disimpan 90 hari (`src/lib/sponsor-tersimpan.ts`) — dibaca HANYA di
 	browser via `$effect` supaya HTML SSR/cache edge tetap anonim (sponsor
 	pengguna A tidak boleh membeku di cache lalu disajikan ke pengguna B);
-	tautan SSR tanpa sponsor lalu diperbarui pasca-hidrasi. Punya perumahan
+	tautan SSR tanpa sponsor lalu diperbarui pasca-hidrasi. REF-AGEN-01:
+	tanpa `?sponsor=`/simpanan, kode agen pribadi pada ref GLOBAL
+	(`?ref=OMHA-…` — link pribadi dua fungsi) dipakai sebagai fallback
+	sponsor; `?sponsor=` tetap menang. Punya perumahan
 	sendiri → /gabung/perumahan (alur agen properti, AUTH-05).
 -->
 <script lang="ts">
@@ -21,7 +24,9 @@
 
 	// Sponsor efektif — `null` saat SSR/prerender (tautan anonim, lihat
 	// komentar file atas); terisi di browser: `?sponsor=` URL (LAST-TOUCH,
-	// sekaligus disimpan 90 hari) atau nilai tersimpan dari kunjungan lalu.
+	// sekaligus disimpan 90 hari), nilai tersimpan dari kunjungan lalu, atau
+	// REF-AGEN-01 — fallback ref GLOBAL kode agen pribadi (`?sponsor=` tetap
+	// menang).
 	let sponsor = $state<string | null>(null);
 
 	$effect(() => {

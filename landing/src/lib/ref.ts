@@ -34,7 +34,9 @@ export const REF_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 export {
 	REF_OMAHE_PATTERN,
 	KODE_REFERRAL_PATTERN,
-	bersihkanNamaMitra
+	REF_AGEN_PRIBADI_PATTERN,
+	bersihkanNamaMitra,
+	normalisasiRefAgenPribadi
 } from './ref-pola';
 
 /** Ambil `ref` dari URL. Nilai yang bentuknya tidak masuk akal dibuang. */

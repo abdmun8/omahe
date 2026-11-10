@@ -481,3 +481,25 @@ describe('getKerjasamaQr (KERJASAMA-02/03, mode fixture)', () => {
 			expect(await getKerjasamaQr(fetchDummy, salah)).toBeNull();
 	});
 });
+
+// REF-AGEN-01 — nama agen pribadi (mode fixture, env kosong): satu agen
+// contoh supaya banner homepage bisa direview lokal/tanpa API; kode lain →
+// null (banner disembunyikan), pola tak sah ditolak tanpa fetch.
+describe('getNamaAgenPribadi (REF-AGEN-01, mode fixture)', () => {
+	test('kode fixture OMHA-A0001 (input kecil semua) → "Widya Pratama"', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		expect(await getNamaAgenPribadi(fetchDummy, 'omha-a0001')).toBe('Widya Pratama');
+	});
+
+	test('kode rapi lain (termasuk kode lama sah tapi tak terdaftar) → null', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		expect(await getNamaAgenPribadi(fetchDummy, 'OMHA-Z9999')).toBeNull();
+		expect(await getNamaAgenPribadi(fetchDummy, 'OMH-K7M2QX')).toBeNull();
+	});
+
+	test('kode tak sesuai pola → null TANPA fetch sama sekali', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		for (const salah of ['', 'abc', 'OP-QA7MPN', 'OMHA-A000', 'OMH-A2', '../etc/passwd'])
+			expect(await getNamaAgenPribadi(fetchDummy, salah)).toBeNull();
+	});
+});

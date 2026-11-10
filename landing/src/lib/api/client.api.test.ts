@@ -611,7 +611,12 @@ describe('getKerjasamaQr (KERJASAMA-02/03, jalur API asli)', () => {
 		});
 
 		const fKosong = (async () =>
-			envelope({ jenis: 'omahe', perumahanSlug: null, ref: 'OP-QA7MPN', namaPerusahaan: '   ' })) as unknown as typeof fetch;
+			envelope({
+				jenis: 'omahe',
+				perumahanSlug: null,
+				ref: 'OP-QA7MPN',
+				namaPerusahaan: '   '
+			})) as unknown as typeof fetch;
 		expect(await getKerjasamaQr(fKosong, 'QA7MPN')).toEqual({
 			jenis: 'omahe',
 			perumahanSlug: null,
@@ -683,5 +688,60 @@ describe('getKerjasamaQr (KERJASAMA-02/03, jalur API asli)', () => {
 		}) as unknown as typeof fetch;
 		for (const salah of ['', 'k7m2q', 'K7M2QXX', 'K7M2OX', '../etc/passwd'])
 			expect(await getKerjasamaQr(f, salah)).toBeNull();
+	});
+});
+
+describe('getNamaAgenPribadi (REF-AGEN-01, jalur API asli)', () => {
+	test('200 nama → di-trim; kode dinormalisasi uppercase di URL; header konsumen Omahe', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		const urls: string[] = [];
+		const heads: Headers[] = [];
+		const f = (async (input: RequestInfo | URL, init?: RequestInit) => {
+			urls.push(String(input));
+			heads.push(new Headers(init?.headers));
+			return envelope({ nama: '  Widya Pratama  ' });
+		}) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(f, ' omha-a0001 ')).toBe('Widya Pratama');
+		expect(urls).toEqual([`${API}/public/agen-omahe/nama/OMHA-A0001`]);
+		expect(heads[0]?.get('accept')).toBe('application/json');
+		expect(heads[0]?.get('x-konsumen')).toBe('omahe');
+	});
+
+	test('kode lama OMH-XXXXXX juga diterima', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		const f = (async () => envelope({ nama: 'Rina Agen' })) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(f, 'OMH-K7M2QX')).toBe('Rina Agen');
+	});
+
+	test('404 (kode asing/nonaktif) → null — bukan layanan error', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		const f = (async () => new Response('Not Found', { status: 404 })) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(f, 'OMHA-Z9999')).toBeNull();
+	});
+
+	test('500 / jaringan / body aneh / nama bukan string → null (fail-soft kosmetik banner)', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		const fGagal = (async () => new Response('boom', { status: 500 })) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(fGagal, 'OMHA-A0001')).toBeNull();
+		const fLempar = (async () => {
+			throw new Error('network down');
+		}) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(fLempar, 'OMHA-A0001')).toBeNull();
+		const fHtml = (async () =>
+			new Response('<html>err</html>', { status: 200 })) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(fHtml, 'OMHA-A0001')).toBeNull();
+		const fNamaAneh = (async () => envelope({ nama: 42 })) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(fNamaAneh, 'OMHA-A0001')).toBeNull();
+		const fNamaKosong = (async () => envelope({ nama: '   ' })) as unknown as typeof fetch;
+		expect(await getNamaAgenPribadi(fNamaKosong, 'OMHA-A0001')).toBeNull();
+	});
+
+	test('kode tak sesuai pola agen pribadi → null TANPA fetch sama sekali', async () => {
+		const { getNamaAgenPribadi } = await import('./client');
+		const f = (async () => {
+			throw new Error('TIDAK BOLEH di-fetch');
+		}) as unknown as typeof fetch;
+		for (const salah of ['', 'xx', 'OP-QA7MPN', 'OMHA-A000', 'OMH-A2', 'AO-K7M2QX', '../etc'])
+			expect(await getNamaAgenPribadi(f, salah)).toBeNull();
 	});
 });

@@ -180,6 +180,50 @@ describe('sponsorEfektif (logika halaman /gabung/agen)', () => {
 	});
 });
 
+// REF-AGEN-01 — fallback TERAKHIR: ref GLOBAL berbentuk kode agen pribadi
+// (link pribadi dua fungsi). `?sponsor=` & sponsor tersimpan TETAP menang;
+// ref global HANYA dibaca (tidak dikopi ke kunci `omahe:sponsor`).
+describe('sponsorEfektif — fallback ref GLOBAL kode agen pribadi (REF-AGEN-01)', () => {
+	const SET_GLOBAL = (ref: string) =>
+		simpanan.set('omahe:ref:_global', JSON.stringify({ ref, exp: T0 + HARI, t: T0 }));
+
+	test('tanpa URL & simpanan → ref global kode agen pribadi jadi sponsor', () => {
+		SET_GLOBAL('OMHA-A0001');
+		expect(sponsorEfektif(null, T0)).toBe('OMHA-A0001');
+	});
+
+	test('kode agen lama OMH-XXXXXX pada ref global juga dipakai', () => {
+		SET_GLOBAL('OMH-K7M2QX');
+		expect(sponsorEfektif(null, T0)).toBe('OMH-K7M2QX');
+	});
+
+	test('`?sponsor=` di URL tetap MENANG atas ref global', () => {
+		SET_GLOBAL('OMHA-A0001');
+		expect(sponsorEfektif('OMHA-Z0009', T0)).toBe('OMHA-Z0009');
+	});
+
+	test('sponsor tersimpan juga menang atas ref global', () => {
+		simpanSponsor('OMHA-B0002', T0 - HARI);
+		SET_GLOBAL('OMHA-A0001');
+		expect(sponsorEfektif(null, T0)).toBe('OMHA-B0002');
+	});
+
+	test('ref global OP-… / hex / tidak ada → null (bukan sponsor)', () => {
+		simpanan.set(
+			'omahe:ref:_global',
+			JSON.stringify({ ref: 'OP-QA7MPN', exp: T0 + HARI, t: T0, nama: 'PT Contoh' })
+		);
+		expect(sponsorEfektif(null, T0)).toBeNull();
+		expect(sponsorEfektif(null, T0 + 2 * HARI)).toBeNull(); // global basi → terhapus
+	});
+
+	test('fallback TIDAK menulis kunci `omahe:sponsor` (ref global tetap milik layout)', () => {
+		SET_GLOBAL('OMHA-A0001');
+		sponsorEfektif(null, T0);
+		expect(simpanan.has(KUNCI)).toBe(false);
+	});
+});
+
 describe('urlDaftarAgen (pembentuk URL CTA)', () => {
 	test('tanpa sponsor → /daftar/agen tanpa param sponsor', () => {
 		expect(urlDaftarAgen('https://app.omahe.co.id')).toBe(

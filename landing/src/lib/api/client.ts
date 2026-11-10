@@ -20,7 +20,7 @@ import { musikValid } from '$lib/musik';
 import { error } from '@sveltejs/kit';
 import { SITE } from '$lib/config';
 import { TOKEN_BAYAR_PATTERN, pdfInvoiceContoh } from '$lib/bayar';
-import { REF_OMAHE_PATTERN, REF_PATTERN } from '$lib/ref';
+import { REF_AGEN_PRIBADI_PATTERN, REF_OMAHE_PATTERN, REF_PATTERN } from '$lib/ref';
 import * as fixtures from './fixtures';
 import { parseUrutan, urutkanUnitFixture } from '$lib/urutan-unit';
 import { HARGA_TERJANGKAU } from '$lib/config';
@@ -185,21 +185,13 @@ function normalisasiUnit(u: RawUnitListing): UnitListing {
 function filterFixtureUnits(query: UnitQuery & { page: number; pageSize: number }) {
 	// UNIT-10 — kata kunci dipecah per kata; SETIAP kata wajib cocok di
 	// SALAH SATU kolom (AND antar-kata, OR antar-kolom) — cermin backend.
-	const kata = (query.q ?? '')
-		.trim()
-		.toLowerCase()
-		.split(/\s+/)
-		.filter(Boolean)
-		.slice(0, 6);
+	const kata = (query.q ?? '').trim().toLowerCase().split(/\s+/).filter(Boolean).slice(0, 6);
 	const cocok = fixtures.UNIT_LISTINGS.filter((u) => {
 		if (query.regionKode && u.perumahan.regionKode !== query.regionKode) return false;
 		if (query.perumahanSlug && u.perumahan.slug !== query.perumahanSlug) return false;
 		if (query.developerSlug && u.developer?.slug !== query.developerSlug) return false;
 		if (query.tipe && !u.tipe.toLowerCase().includes(query.tipe.toLowerCase())) return false;
-		if (
-			query.kecamatanKode &&
-			fixtures.kecamatanKode(u.perumahan.slug) !== query.kecamatanKode
-		)
+		if (query.kecamatanKode && fixtures.kecamatanKode(u.perumahan.slug) !== query.kecamatanKode)
 			return false;
 		// UNIT-10 — kamar min: tipe TANPA data kamar tidak lolos (null !== n).
 		const tidur = u.kamarTidur ?? null;
@@ -845,9 +837,7 @@ export async function getKerjasamaQr(fetchFn: Fetch, kodeRaw: string): Promise<K
 		if (data.jenis === 'omahe') {
 			if (!REF_OMAHE_PATTERN.test(data.ref)) return null;
 			const nama =
-				typeof data.namaPerusahaan === 'string'
-					? data.namaPerusahaan.trim().slice(0, 120)
-					: '';
+				typeof data.namaPerusahaan === 'string' ? data.namaPerusahaan.trim().slice(0, 120) : '';
 			return {
 				jenis: 'omahe',
 				perumahanSlug: null,
@@ -860,6 +850,59 @@ export async function getKerjasamaQr(fetchFn: Fetch, kodeRaw: string): Promise<K
 		return { jenis: 'perumahan', perumahanSlug: data.perumahanSlug, ref: data.ref };
 	} catch (err) {
 		console.error('[omahe:api] GET /public/kerjasama/q — body bukan JSON', err);
+		return null;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Nama agen pribadi (REF-AGEN-01, api-contract §40)
+// ---------------------------------------------------------------------------
+
+/**
+ * Nama agen pemilik kode pribadi (`GET /public/agen-omahe/nama/:kode`,
+ * `{success, data:{nama}}`; kode asing/nonaktif → 404) — untuk banner
+ * homepage "Rekomendasi dari <nama agen>" saat ref GLOBAL berbentuk kode
+ * agen pribadi (`?ref=OMHA-…`/`OMH-…`, REF-AGEN-01).
+ *
+ * Pola `getKerjasamaQr` tapi lebih ketat FAIL-SOFT: nama ini murni kosmetik
+ * banner — SETIAP kegagalan (kode tak lolos pola, 404, error jaringan, body
+ * aneh) → `null` tanpa melempar; pemanggil (proxy `/api/agen-nama`) cukup
+ * membalas 404 dan banner disembunyikan. Kode dinormalisasi trim+uppercase
+ * di sini (pemanggil proxy sudah menormalkan juga — belt & braces).
+ */
+export async function getNamaAgenPribadi(fetchFn: Fetch, kodeRaw: string): Promise<string | null> {
+	const kode = kodeRaw.trim().toUpperCase();
+	if (!REF_AGEN_PRIBADI_PATTERN.test(kode)) return null;
+
+	if (!hasSearchApi()) {
+		// Fixture HANYA non-produksi (pola `getKerjasamaQr`): satu agen contoh
+		// supaya banner bisa direview lokal/tanpa API. Produksi tanpa API
+		// jujur `null` → banner tidak tampil, bukan nama palsu.
+		if (import.meta.env.PROD === true) return null;
+		return kode === 'OMHA-A0001' ? 'Widya Pratama' : null;
+	}
+
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/agen-omahe/nama/${encodeURIComponent(kode)}`, {
+			headers: { accept: 'application/json', ...KONSUMEN },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch (err) {
+		console.error('[omahe:api] GET /public/agen-omahe/nama gagal — fail-soft null', err);
+		return null;
+	}
+	if (res.status === 404) return null; // kode asing/nonaktif — bukan layanan error
+	if (!res.ok) {
+		console.error(`[omahe:api] GET /public/agen-omahe/nama → ${res.status}`);
+		return null;
+	}
+	try {
+		const body = (await res.json()) as ApiEnvelope<{ nama?: unknown }>;
+		const nama = body?.data?.nama;
+		return typeof nama === 'string' && nama.trim() ? nama.trim().slice(0, 120) : null;
+	} catch (err) {
+		console.error('[omahe:api] GET /public/agen-omahe/nama — body bukan JSON', err);
 		return null;
 	}
 }
@@ -1408,15 +1451,34 @@ export async function inputLeadAgen(
 
 /** Unit contoh mode fixture (non-produksi) untuk dialog booking agen. */
 const UNIT_FIXTURE_AGEN: UnitTersediaAgen[] = [
-	{ id: '00000000-0000-4000-8000-0000000000a1', blok: 'A', nomor: '12', tipe: 'Tipe 36/72', harga: 385_000_000 },
-	{ id: '00000000-0000-4000-8000-0000000000a2', blok: 'A', nomor: '14', tipe: 'Tipe 36/72', harga: 385_000_000 },
-	{ id: '00000000-0000-4000-8000-0000000000b1', blok: 'B', nomor: '3', tipe: 'Tipe 45/90', harga: null }
+	{
+		id: '00000000-0000-4000-8000-0000000000a1',
+		blok: 'A',
+		nomor: '12',
+		tipe: 'Tipe 36/72',
+		harga: 385_000_000
+	},
+	{
+		id: '00000000-0000-4000-8000-0000000000a2',
+		blok: 'A',
+		nomor: '14',
+		tipe: 'Tipe 36/72',
+		harga: 385_000_000
+	},
+	{
+		id: '00000000-0000-4000-8000-0000000000b1',
+		blok: 'B',
+		nomor: '3',
+		tipe: 'Tipe 45/90',
+		harga: null
+	}
 ];
 
 /** Normalisasi satu baris unit — baris rusak dibuang (bukan menggagalkan daftar). */
 export function normalisasiUnitTersediaAgen(raw: unknown): UnitTersediaAgen[] {
 	if (!Array.isArray(raw)) return [];
-	const teks = (v: unknown) => (typeof v === 'string' ? v : typeof v === 'number' ? String(v) : null);
+	const teks = (v: unknown) =>
+		typeof v === 'string' ? v : typeof v === 'number' ? String(v) : null;
 	const hasil: UnitTersediaAgen[] = [];
 	for (const r of raw) {
 		if (!r || typeof r !== 'object') continue;
@@ -1425,7 +1487,8 @@ export function normalisasiUnitTersediaAgen(raw: unknown): UnitTersediaAgen[] {
 		const blok = teks(u.blok);
 		const nomor = teks(u.nomor);
 		if (!id || blok === null || nomor === null) continue;
-		const harga = typeof u.harga === 'number' && Number.isFinite(u.harga) && u.harga > 0 ? u.harga : null;
+		const harga =
+			typeof u.harga === 'number' && Number.isFinite(u.harga) && u.harga > 0 ? u.harga : null;
 		hasil.push({ id, blok, nomor, tipe: teks(u.tipe) ?? '', harga });
 	}
 	return hasil;
@@ -1466,7 +1529,10 @@ export async function getUnitTersediaAgen(
 	}
 	const serverMessage = await pesanErrorBackend(res);
 	console.error(`[omahe:api] GET /public/agen-omahe/unit → ${res.status}`);
-	throw new ApiError(res.status, serverMessage ?? 'Daftar unit gagal dimuat. Coba lagi sebentar lagi.');
+	throw new ApiError(
+		res.status,
+		serverMessage ?? 'Daftar unit gagal dimuat. Coba lagi sebentar lagi.'
+	);
 }
 
 /**
@@ -1572,7 +1638,12 @@ export async function getEstimasiKomisiAgen(
 		// Fixture non-produksi (`OMAHE_FIXTURE_AGEN=1`) — angka contoh
 		// 2,9% × Rp300 jt (agen bersponsor, program Omahe).
 		if (env.OMAHE_FIXTURE_AGEN === '1' && import.meta.env.PROD !== true) {
-			return { status: 'estimasi', persen: 2.9, nominal: 8_700_000, dasar: tipeSlug ? 'tipe' : 'perumahan' };
+			return {
+				status: 'estimasi',
+				persen: 2.9,
+				nominal: 8_700_000,
+				dasar: tipeSlug ? 'tipe' : 'perumahan'
+			};
 		}
 		return null;
 	}

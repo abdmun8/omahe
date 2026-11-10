@@ -953,3 +953,39 @@ request API dari Omahe tanpa header ini.
   LABEL TAMPILAN SAJA (anti-spoof: tidak pernah dibaca dari `?dari=`/`?mitra=` bebas di URL biasa);
   atribusi tetap dari `ref` yang divalidasi backend. Tutup banner hanya menyembunyikan banner.
 - Fixture non-prod: kode `QA7MPN` → `{jenis:'omahe', ref:'OP-QA7MPN', namaPerusahaan:'PT Contoh Mitra'}`.
+
+## §40 — Link pribadi agen: nama agen & ref agen pribadi (REF-AGEN-01, 2026-11-10)
+
+- `GET /public/agen-omahe/nama/:kode` (repo `perumahan`, publik tanpa auth) → 200
+  `{ success: true, data: { nama: string } }`; kode asing/agen nonaktif → 404. `kode` =
+  kode agen pribadi `OMHA-[A-Z]\d{4}` (baru, AGEN-OMAHE-05) atau kode lama `OMH-XXXXXX`
+  (alias `kode_agen_lama`); backend menormalisasi trim + uppercase. Untuk banner Omahe
+  "Rekomendasi dari <nama agen>" — cache publik pendek.
+- **Kode agen pribadi di `?ref=` diperlakukan seperti ref mitra `OP-…` di sisi Omahe**:
+  link pribadi `https://www.omahe.co.id/?ref=OMHA-A0001` dua fungsi —
+  - **pembeli**: form minat (`POST /public/leads`, body `ref`) & booking
+    (`/ajukan/:slug?ref=OMHA-…`) → atribusi lead/booking ke agen itu (backend, kunci 60
+    hari pola `AO-…`; `ref` diteruskan apa adanya via `page.data.ref` —
+    `pilihRefEfektif` tetap satu-satunya sumber);
+  - **calon agen**: `/gabung/agen` memakai kode itu sebagai sponsor efektif — fallback
+    TERAKHIR setelah `?sponsor=` (tetap menang) & sponsor tersimpan
+    (`src/lib/sponsor-tersimpan.ts`, ref global HANYA dibaca, tidak dikopi ke kunci
+    `omahe:sponsor`).
+- **Ref GLOBAL** (`ref-tersimpan.ts`): kode agen pribadi (input URL case-insensitive →
+  disimpan UPPERCASE) disimpan di kunci `omahe:ref:_global` yang sama dengan `OP-…`
+  (90 hari, LAST-TOUCH, dari halaman mana pun; nama `?mitra=` diabaikan untuk kode
+  agen). `?sponsor=` lama tetap berlaku; ref per-slug hex (KERJASAMA-02) tetap.
+  Layout kini juga mengekspos `refGlobalAgen` (kode agen pribadi pada ref global,
+  `null` di SSR/prerender & bila ref global bukan kode agen).
+- Sisi Omahe: `getNamaAgenPribadi()` (`client.ts`, fail-soft `null` — kode tak lolos
+  pola ditolak lokal; 404/error/body aneh → `null`) + proxy `routes/api/agen-nama/[kode]/+server.ts`
+  (GET; validasi pola LOKAL dengan `normalisasiRefAgenPribadi`, salah → 404 tanpa
+  backend; sukses → `{success, data:{nama}}` + `cache-control: public, max-age=300`;
+  tidak di-prerender).
+- Banner homepage (komponen `banner-rekomendasi.svelte` yang sama) kini dua varian:
+  `mitra` (nama dari `refGlobalNama`, perilaku KERJASAMA-03) dan `agen` — nama agen
+  diambil CLIENT-SIDE lewat proxy `/api/agen-nama/:kode` (nama TIDAK pernah dari
+  query string, anti-spoof) + tautan kecil "Mau jadi agen juga? Daftar gratis" →
+  `/gabung/agen` (hanya varian agen). Tutup banner hanya menyembunyikan banner; ref
+  tetap mengalir ke `ajukanUrl()` & form minat.
+- Fixture non-prod: kode `OMHA-A0001` → nama `"Widya Pratama"`; kode agen lain → `null`.

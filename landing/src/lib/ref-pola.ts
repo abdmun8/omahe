@@ -25,6 +25,30 @@ export const REF_OMAHE_PATTERN = /^OP-[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/;
 export const KODE_REFERRAL_PATTERN = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/;
 
 /**
+ * REF-AGEN-01 — kode agen pribadi (`agen_anggota.kode_agen`, link pribadi
+ * `https://www.omahe.co.id/?ref=<kode>`): baru berurutan `OMHA-{huruf}{4 digit}`
+ * (mis. `OMHA-A0001`, AGEN-OMAHE-05) ATAU kode acak lama `OMH-XXXXXX`
+ * (alias `kode_agen_lama`). Pola TEGAS UPPERCASE — input dari URL
+ * dinormalisasi dulu lewat `normalisasiRefAgenPribadi` (trim + uppercase,
+ * "simpan UPPERCASE"); `REF_PATTERN` memang membiarkan huruf kecil lewat
+ * `readRef`, jadi normalisasi di sini yang menjaga bentuk tersimpan/terkirim.
+ */
+export const REF_AGEN_PRIBADI_PATTERN = /^(?:OMHA-[A-Z]\d{4}|OMH-[A-Z0-9]{6})$/;
+
+/**
+ * REF-AGEN-01 — normalisasi kode agen pribadi dari URL/input: trim +
+ * uppercase, lalu HARUS lolos penuh `REF_AGEN_PRIBADI_PATTERN`. Selain itu
+ * (spasi di tengah, karakter aneh, panjang meleset) → `null` / diabaikan —
+ * nilai URL tidak pernah dipercaya dan tidak boleh menyelundupkan apa pun
+ * ke tautan tujuan (`withRef`/`ajukanUrl`/body `/api/lead`).
+ */
+export function normalisasiRefAgenPribadi(raw: string | null | undefined): string | null {
+	if (typeof raw !== 'string') return null;
+	const rapi = raw.trim().toUpperCase();
+	return REF_AGEN_PRIBADI_PATTERN.test(rapi) ? rapi : null;
+}
+
+/**
  * KERJASAMA-03 — nama mitra dari `?mitra=` di redirect `/q/:kode` adalah
  * LABEL TAMPILAN SAJA (banner "Rekomendasi dari …"); atribusi tetap dari
  * `ref` yang divalidasi backend. Nilai dari URL tidak dipercaya: tag HTML
@@ -46,6 +70,11 @@ export function bersihkanNamaMitra(raw: string | null): string | null {
 	if (!bersih) return null;
 	if (/\d{4,}/.test(bersih)) return null;
 	if (/(https?|www|\.(com|id|net|org|co|me|ly)\b)/i.test(bersih)) return null;
-	if (/\b(transfer|rekening|rek|bayar|dp|hubungi|whatsapp|wa|telp|telepon|klik|promo|gratis)\b/i.test(bersih)) return null;
+	if (
+		/\b(transfer|rekening|rek|bayar|dp|hubungi|whatsapp|wa|telp|telepon|klik|promo|gratis)\b/i.test(
+			bersih
+		)
+	)
+		return null;
 	return bersih;
 }

@@ -191,6 +191,20 @@ describe.skipIf(typeof document === 'undefined')('LeadFormDialog', () => {
 		});
 	});
 
+	test('REF-AGEN-01 — ref kode agen pribadi diteruskan utuh ke body /api/lead', async () => {
+		const fetchMock = stubFetch({ ok: true, status: 200, json: async () => ({ ok: true }) });
+		render(LeadFormDialog, { props: { ...propsDasar(), ref: 'OMHA-A0001' } });
+
+		// Ref terisi (atribusi agen dari ref GLOBAL) → kolom "Kode referral"
+		// tetap TIDAK tampil — aturan KERJASAMA-03 berlaku apa pun bentuk ref.
+		expect(screen.queryByLabelText(/^Kode referral/)).toBeNull();
+
+		isiWajibDanSubmit();
+		await screen.findByText('Terima kasih, tim Griya Asri akan menghubungi Anda.');
+
+		expect(JSON.parse(fetchMock.mock.calls[0][1]?.body as string).ref).toBe('OMHA-A0001');
+	});
+
 	test('honeypot terisi (bot) → tetap dikirim APA ADANYA, UI tetap sukses', async () => {
 		// Keputusan §8: keputusan honeypot ada di SERVER, respons sukses & honeypot
 		// SAMA sehingga tidak ada yang bisa dibedakan bot — komponen hanya
@@ -269,7 +283,9 @@ describe.skipIf(typeof document === 'undefined')('LeadFormDialog', () => {
 
 		isiWajibDanSubmit();
 
-		expect(await screen.findByText('Terima kasih, agen Rina Agen akan menghubungi Anda.')).toBeInTheDocument();
+		expect(
+			await screen.findByText('Terima kasih, agen Rina Agen akan menghubungi Anda.')
+		).toBeInTheDocument();
 		// POST ke proxy minat agen, bukan /api/lead.
 		expect(fetchMock.mock.calls[0][0]).toBe('/api/agen-minat');
 		const wa = screen.getByRole('link', { name: 'Lanjut ke WhatsApp' });

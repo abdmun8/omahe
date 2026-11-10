@@ -61,7 +61,7 @@ describe('hitungRefLayout — browser:true (jalur browser nyata)', () => {
 			url: new URL(`https://www.omahe.co.id/?ref=${REF_OP}&mitra=PT%20Contoh%20Mitra`),
 			now: T0
 		});
-		expect(res).toEqual({ ref: REF_OP, refGlobalNama: 'PT Contoh Mitra' });
+		expect(res).toEqual({ ref: REF_OP, refGlobalNama: 'PT Contoh Mitra', refGlobalAgen: null });
 		expect(simpanan.get('omahe:ref:_global')).toBe(
 			JSON.stringify({ ref: REF_OP, exp: T0 + 90 * HARI, t: T0, nama: 'PT Contoh Mitra' })
 		);
@@ -80,7 +80,39 @@ describe('hitungRefLayout — browser:true (jalur browser nyata)', () => {
 			url: new URL('https://www.omahe.co.id/'),
 			now: T0
 		});
-		expect(res).toEqual({ ref: REF_OP, refGlobalNama: 'PT Contoh Mitra' });
+		expect(res).toEqual({ ref: REF_OP, refGlobalNama: 'PT Contoh Mitra', refGlobalAgen: null });
+	});
+
+	test('REF-AGEN-01 — homepage ?ref=OMHA-… → ref GLOBAL kode agen UPPERCASE, tanpa nama', () => {
+		const res = hitungRefLayout({
+			browser: true,
+			refUrl: 'omha-a0001',
+			slug: null,
+			diRutePerumahan: false,
+			url: new URL('https://www.omahe.co.id/?ref=omha-a0001&mitra=Bot'),
+			now: T0
+		});
+		expect(res).toEqual({ ref: 'OMHA-A0001', refGlobalNama: null, refGlobalAgen: 'OMHA-A0001' });
+		// `?mitra=` diabaikan untuk kode agen (anti-spoof — nama dari endpoint nama agen).
+		expect(simpanan.get('omahe:ref:_global')).toBe(
+			JSON.stringify({ ref: 'OMHA-A0001', exp: T0 + 90 * HARI, t: T0 })
+		);
+	});
+
+	test('REF-AGEN-01 — LAST-TOUCH: kode agen lebih baru mengganti OP-… (banner ganti varian)', () => {
+		simpanan.set(
+			'omahe:ref:_global',
+			JSON.stringify({ ref: REF_OP, exp: T0 + 90 * HARI, t: T0 - HARI, nama: 'PT Contoh Mitra' })
+		);
+		const res = hitungRefLayout({
+			browser: true,
+			refUrl: 'OMHA-B0002',
+			slug: null,
+			diRutePerumahan: false,
+			url: new URL('https://www.omahe.co.id/?ref=OMHA-B0002'),
+			now: T0
+		});
+		expect(res).toEqual({ ref: 'OMHA-B0002', refGlobalNama: null, refGlobalAgen: 'OMHA-B0002' });
 	});
 
 	test('halaman perumahan memilih ref dengan `t` terbaru antara per-slug vs global', () => {
@@ -100,7 +132,7 @@ describe('hitungRefLayout — browser:true (jalur browser nyata)', () => {
 				url,
 				now: T0 + HARI
 			})
-		).toEqual({ ref: REF, refGlobalNama: 'PT Contoh' });
+		).toEqual({ ref: REF, refGlobalNama: 'PT Contoh', refGlobalAgen: null });
 
 		// global disimpan LEBIH BARU → global (OP-…) menang di halaman perumahan.
 		simpanan.set(
@@ -157,7 +189,7 @@ describe('hitungRefLayout — browser:false (SSR/prerender) → passthrough murn
 			url: new URL(`https://www.omahe.co.id/perumahan/griya-asri?ref=${REF_OP}&mitra=Bot`),
 			now: T0
 		});
-		expect(res).toEqual({ ref: REF_OP, refGlobalNama: null });
+		expect(res).toEqual({ ref: REF_OP, refGlobalNama: null, refGlobalAgen: null });
 		expect(simpanan.size).toBe(0);
 	});
 });

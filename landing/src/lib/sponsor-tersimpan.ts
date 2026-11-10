@@ -18,6 +18,8 @@
  * tersimpan. Semua akses localStorage dalam try/catch (mode privat/Safari
  * terblokir → sponsor hilang, halaman tidak boleh jatuh).
  */
+import { REF_AGEN_PRIBADI_PATTERN } from './ref-pola';
+import { ambilRefGlobal } from './ref-tersimpan';
 
 /** Masa simpan 90 hari — sama dengan ref (KERJASAMA-02). */
 const MASA_MS = 90 * 24 * 60 * 60 * 1000;
@@ -101,8 +103,16 @@ export function ambilSponsor(now: number = Date.now()): string | null {
 /**
  * Logika halaman `/gabung/agen` (browser saja, dipanggil dalam `$effect`):
  * LAST-TOUCH — `?sponsor=` di URL (setelah dinormalisasi) menimpa nilai
- * tersimpan; tanpa sponsor di URL → pakai yang tersimpan. Diekstrak supaya
- * bisa diuji langsung tanpa jsdom.
+ * tersimpan; tanpa sponsor di URL → pakai yang tersimpan.
+ *
+ * REF-AGEN-01 — fallback TERAKHIR: ref GLOBAL berbentuk kode agen pribadi
+ * (link pribadi `?ref=OMHA-…` dua fungsi — pembeli & calon agen). Urutan
+ * prioritas: `?sponsor=` > sponsor tersimpan > ref global kode agen; dua
+ * yang pertama TETAP menang (link `?sponsor=` yang sudah tersebar tidak
+ * berubah perilaku). Ref global HANYA dibaca — tidak dikopi ke kunci
+ * `omahe:sponsor` (modul ini tetap tidak menulis kunci `omahe:ref:*`),
+ * jadi sponsor efektif mengikuti last-touch ref global secara alami.
+ * Diekstrak supaya bisa diuji langsung tanpa jsdom.
  */
 export function sponsorEfektif(
 	sponsorUrl: string | null | undefined,
@@ -113,5 +123,9 @@ export function sponsorEfektif(
 		simpanSponsor(dariUrl, now);
 		return dariUrl;
 	}
-	return ambilSponsor(now);
+	const tersimpan = ambilSponsor(now);
+	if (tersimpan) return tersimpan;
+	const global = ambilRefGlobal(now);
+	if (global && REF_AGEN_PRIBADI_PATTERN.test(global.ref)) return global.ref;
+	return null;
 }

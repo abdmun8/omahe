@@ -23,4 +23,21 @@ describe.skipIf(typeof document === 'undefined')('BannerRekomendasi', () => {
 		await waitFor(() => expect(screen.queryByRole('region')).toBeNull());
 		expect(screen.queryByText('PT Contoh Mitra')).toBeNull();
 	});
+
+	test('REF-AGEN-01 — varian agen: tautan "Mau jadi agen juga? Daftar gratis" → /gabung/agen', () => {
+		render(BannerRekomendasi, { props: { nama: 'Widya Pratama', varian: 'agen' } });
+		expect(screen.getByRole('region', { name: 'Rekomendasi dari agen Omahe' })).toBeInTheDocument();
+		const link = screen.getByRole('link', { name: 'Mau jadi agen juga? Daftar gratis' });
+		// Href polos tanpa param — halaman tujuan memakai kode agen pada ref
+		// global sebagai sponsor (fallback REF-AGEN-01 di sponsor-tersimpan).
+		expect(link).toHaveAttribute('href', '/gabung/agen');
+	});
+
+	test('varian mitra (bawaan) — tanpa tautan daftar agen (hanya varian agen)', () => {
+		render(BannerRekomendasi, { props: { nama: 'PT Contoh Mitra', varian: 'mitra' } });
+		expect(
+			screen.getByRole('region', { name: 'Rekomendasi dari mitra Omahe' })
+		).toBeInTheDocument();
+		expect(screen.queryByRole('link')).toBeNull();
+	});
 });
