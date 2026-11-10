@@ -54,6 +54,9 @@ import type {
 	AgenMinatInput,
 	AgenSaya,
 	InputLeadAgenBody,
+	InputBookingAgenBody,
+	HasilBookingAgen,
+	UnitTersediaAgen,
 	HasilInputLeadAgen,
 	EstimasiKomisiAgen,
 	KartuNamaAgen,
@@ -1401,6 +1404,124 @@ export async function inputLeadAgen(
 	const serverMessage = await pesanErrorBackend(res);
 	console.error(`[omahe:api] POST /public/agen-omahe/lead → ${res.status}`);
 	throw new ApiError(res.status, serverMessage ?? 'Pendaftaran gagal. Coba lagi sebentar lagi.');
+}
+
+/** Unit contoh mode fixture (non-produksi) untuk dialog booking agen. */
+const UNIT_FIXTURE_AGEN: UnitTersediaAgen[] = [
+	{ id: '00000000-0000-4000-8000-0000000000a1', blok: 'A', nomor: '12', tipe: 'Tipe 36/72', harga: 385_000_000 },
+	{ id: '00000000-0000-4000-8000-0000000000a2', blok: 'A', nomor: '14', tipe: 'Tipe 36/72', harga: 385_000_000 },
+	{ id: '00000000-0000-4000-8000-0000000000b1', blok: 'B', nomor: '3', tipe: 'Tipe 45/90', harga: null }
+];
+
+/** Normalisasi satu baris unit — baris rusak dibuang (bukan menggagalkan daftar). */
+export function normalisasiUnitTersediaAgen(raw: unknown): UnitTersediaAgen[] {
+	if (!Array.isArray(raw)) return [];
+	const teks = (v: unknown) => (typeof v === 'string' ? v : typeof v === 'number' ? String(v) : null);
+	const hasil: UnitTersediaAgen[] = [];
+	for (const r of raw) {
+		if (!r || typeof r !== 'object') continue;
+		const u = r as Record<string, unknown>;
+		const id = teks(u.id);
+		const blok = teks(u.blok);
+		const nomor = teks(u.nomor);
+		if (!id || blok === null || nomor === null) continue;
+		const harga = typeof u.harga === 'number' && Number.isFinite(u.harga) && u.harga > 0 ? u.harga : null;
+		hasil.push({ id, blok, nomor, tipe: teks(u.tipe) ?? '', harga });
+	}
+	return hasil;
+}
+
+/**
+ * AGEN-OMAHE-11 iterasi 3 — unit tersedia satu perumahan untuk agen dari
+ * SESI (`GET /public/agen-omahe/unit?slug=`). BUKAN fail-soft: 401 (sesi
+ * mati) & 404 (perumahan tidak boleh di-input) diteruskan lewat `ApiError`
+ * supaya dialog bisa menampilkan pesan yang tepat. Tanpa cookie → 401
+ * tanpa menyentuh backend.
+ */
+export async function getUnitTersediaAgen(
+	fetchFn: Fetch,
+	cookieHeader: string | null,
+	slug: string
+): Promise<UnitTersediaAgen[]> {
+	const session = ambilCookieSession(cookieHeader);
+	if (!session) throw new ApiError(401, PESAN_WAJIB_AGEN);
+
+	if (!hasApi()) {
+		if (import.meta.env.PROD === true) throw new ApiError(503, 'Layanan booking belum tersedia.');
+		return UNIT_FIXTURE_AGEN;
+	}
+
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/agen-omahe/unit?${new URLSearchParams({ slug })}`, {
+			headers: { accept: 'application/json', cookie: `session=${session}`, ...KONSUMEN },
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	if (res.ok) {
+		const body = (await res.json().catch(() => null)) as ApiEnvelope<unknown> | null;
+		return normalisasiUnitTersediaAgen(body?.data);
+	}
+	const serverMessage = await pesanErrorBackend(res);
+	console.error(`[omahe:api] GET /public/agen-omahe/unit → ${res.status}`);
+	throw new ApiError(res.status, serverMessage ?? 'Daftar unit gagal dimuat. Coba lagi sebentar lagi.');
+}
+
+/**
+ * AGEN-OMAHE-11 iterasi 3 — booking unit atas nama pembeli
+ * (`POST /public/agen-omahe/booking`). Agen dari SESI; status & pesan
+ * backend (400/401/404/409/429) diteruskan lewat `ApiError`.
+ */
+export async function inputBookingAgen(
+	fetchFn: Fetch,
+	cookieHeader: string | null,
+	input: InputBookingAgenBody
+): Promise<HasilBookingAgen> {
+	const session = ambilCookieSession(cookieHeader);
+	if (!session) throw new ApiError(401, PESAN_WAJIB_AGEN);
+
+	if (!hasApi()) {
+		if (import.meta.env.PROD === true) throw new ApiError(503, 'Layanan booking belum tersedia.');
+		if (input.whatsappPembeli === '081200000409') {
+			throw new ApiError(409, 'Pembeli ini sudah didaftarkan agen lain.');
+		}
+		const unit = UNIT_FIXTURE_AGEN.find((u) => u.id === input.unitId);
+		if (!unit) throw new ApiError(409, 'Unit sudah tidak tersedia. Pilih unit lain.');
+		return {
+			bookingId: `fixture-${Math.random().toString(36).slice(2, 10)}`,
+			leadId: `fixture-${Math.random().toString(36).slice(2, 10)}`,
+			leadBaru: true,
+			perumahan: { slug: input.slug, nama: input.slug },
+			unit: { blok: unit.blok, nomor: unit.nomor, tipe: unit.tipe }
+		};
+	}
+
+	let res: Response;
+	try {
+		res = await fetchFn(`${baseUrl()}/public/agen-omahe/booking`, {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json',
+				accept: 'application/json',
+				cookie: `session=${session}`,
+				...KONSUMEN
+			},
+			body: JSON.stringify(input),
+			signal: AbortSignal.timeout(TIMEOUT_MS)
+		});
+	} catch {
+		throw new ApiError(502, 'Tidak bisa menghubungi server. Coba lagi sebentar lagi.');
+	}
+	if (res.ok) {
+		const body = (await res.json().catch(() => null)) as ApiEnvelope<HasilBookingAgen> | null;
+		if (body?.data?.bookingId) return body.data;
+		throw new ApiError(502, 'Booking gagal. Coba lagi sebentar lagi.');
+	}
+	const serverMessage = await pesanErrorBackend(res);
+	console.error(`[omahe:api] POST /public/agen-omahe/booking → ${res.status}`);
+	throw new ApiError(res.status, serverMessage ?? 'Booking gagal. Coba lagi sebentar lagi.');
 }
 
 /**

@@ -17,7 +17,13 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { env } from '$env/dynamic/private';
 import type { AgenSaya } from './types';
-import { ApiError, PESAN_WAJIB_AGEN, getAgenSaya, inputLeadAgen } from './client';
+import {
+	ApiError,
+	PESAN_WAJIB_AGEN,
+	getAgenSaya,
+	inputLeadAgen,
+	normalisasiUnitTersediaAgen
+} from './client';
 
 const API = 'https://api.perumahan.test';
 
@@ -243,6 +249,47 @@ describe('API asli — inputLeadAgen', () => {
 		await expect(inputLeadAgen(aneh, 'session=a', { ...bodyValid })).rejects.toMatchObject({
 			status: 502
 		});
+	});
+});
+
+describe('normalisasiUnitTersediaAgen (AGEN-OMAHE-11 iterasi 3)', () => {
+	test('bukan array → [] (fail-soft, tidak lempar)', () => {
+		expect(normalisasiUnitTersediaAgen(null)).toEqual([]);
+		expect(normalisasiUnitTersediaAgen(undefined)).toEqual([]);
+		expect(normalisasiUnitTersediaAgen({})).toEqual([]);
+		expect(normalisasiUnitTersediaAgen('unit')).toEqual([]);
+	});
+
+	test('baris rusak dibuang — daftar tetap hidup, bukan gagal total', () => {
+		const hasil = normalisasiUnitTersediaAgen([
+			null,
+			'rusak',
+			42,
+			{},
+			{ id: 'u1', blok: 'A', nomor: '1', tipe: 'Tipe 36/72', harga: 100 },
+			{ blok: 'B', nomor: '2' }, // tanpa id
+			{ id: 'u3', nomor: '3' }, // tanpa blok
+			{ id: 'u4', blok: 'C' } // tanpa nomor
+		]);
+		expect(hasil).toEqual([{ id: 'u1', blok: 'A', nomor: '1', tipe: 'Tipe 36/72', harga: 100 }]);
+	});
+
+	test('harga 0 / negatif / non-angka → null (tanpa harga = boleh)', () => {
+		const hasil = normalisasiUnitTersediaAgen([
+			{ id: 'a', blok: 'A', nomor: '1', harga: 0 },
+			{ id: 'b', blok: 'A', nomor: '2', harga: -5 },
+			{ id: 'c', blok: 'B', nomor: '1', harga: '100' },
+			{ id: 'd', blok: 'B', nomor: '2', harga: Number.NaN },
+			{ id: 'e', blok: 'B', nomor: '3', harga: Number.POSITIVE_INFINITY },
+			{ id: 'f', blok: 'C', nomor: '4' }
+		]);
+		expect(hasil.map((u) => u.harga)).toEqual([null, null, null, null, null, null]);
+	});
+
+	test('bentuk normal: id angka → string, tipe absen → string kosong', () => {
+		expect(normalisasiUnitTersediaAgen([{ id: 7, blok: 'C', nomor: 9, tipe: null }])).toEqual([
+			{ id: '7', blok: 'C', nomor: '9', tipe: '', harga: null }
+		]);
 	});
 });
 

@@ -12,7 +12,8 @@
  * mana pun (`createLead` + `kirimMinatAgen` + `ApiError`, + `getKerjasamaQr`
  * untuk route `/q/[kode]` — KERJASAMA-02; + `getAgenSaya`/`inputLeadAgen`
  * untuk proxy `/api/saya` & `/api/agen-lead` — SESI-OMAHE-01; + `getEstimasiKomisiAgen`
- * untuk `/api/agen-komisi` — KOMISI-AGEN-01) — file test
+ * untuk `/api/agen-komisi` — KOMISI-AGEN-01; + `getUnitTersediaAgen`/`inputBookingAgen`
+ * untuk `/api/agen-unit` & `/api/agen-booking` — AGEN-OMAHE-11) — file test
  * baru yang butuh nama lain HARUS ditambahkan ke sini, bukan membuat
  * mock.module sendiri. Kelas
  * `ApiErrorTiruan` dibagikan supaya cek `err instanceof ApiError` di handler
@@ -59,8 +60,21 @@ export const inputLeadAgenMock = mock<
 
 /** KOMISI-AGEN-01 — estimasi komisi agen untuk proxy `/api/agen-komisi`. */
 export const getEstimasiKomisiAgenMock = mock<
-	(fetchFn: typeof fetch, cookieHeader: string | null, slug: string, tipeSlug?: string) => Promise<unknown>
+	(
+		fetchFn: typeof fetch,
+		cookieHeader: string | null,
+		slug: string,
+		tipeSlug?: string
+	) => Promise<unknown>
 >(async () => null);
+
+/** AGEN-OMAHE-11 iterasi 3 — unit tersedia & booking agen (`/api/agen-unit`, `/api/agen-booking`). */
+export const getUnitTersediaAgenMock = mock<
+	(fetchFn: typeof fetch, cookieHeader: string | null, slug: string) => Promise<unknown>
+>(async () => []);
+export const inputBookingAgenMock = mock<
+	(fetchFn: typeof fetch, cookieHeader: string | null, input: unknown) => Promise<unknown>
+>(async () => ({}));
 
 /** Pasang mock `$lib/api` — panggil SEBELUM `await import('./+server')`. */
 export function pasangMockLibApi(): void {
@@ -71,6 +85,8 @@ export function pasangMockLibApi(): void {
 		getKerjasamaQr: getKerjasamaQrMock,
 		getAgenSaya: getAgenSayaMock,
 		inputLeadAgen: inputLeadAgenMock,
-		getEstimasiKomisiAgen: getEstimasiKomisiAgenMock
+		getEstimasiKomisiAgen: getEstimasiKomisiAgenMock,
+		getUnitTersediaAgen: getUnitTersediaAgenMock,
+		inputBookingAgen: inputBookingAgenMock
 	}));
 }

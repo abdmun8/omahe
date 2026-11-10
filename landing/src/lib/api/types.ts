@@ -743,6 +743,38 @@ export interface HasilInputLeadAgen {
 }
 
 /**
+ * AGEN-OMAHE-11 iterasi 3 — unit berstatus `tersedia` untuk dialog booking
+ * agen (`GET /public/agen-omahe/unit?slug=`, sesi agen, no-store).
+ * `harga` null = harga unit belum diisi perumahan.
+ */
+export interface UnitTersediaAgen {
+	id: string;
+	blok: string;
+	nomor: string;
+	tipe: string;
+	harga: number | null;
+}
+
+/** Body booking unit agen (proxy `/api/agen-booking` → `POST /public/agen-omahe/booking`).
+ *  Agen dari SESI — sama seperti lead, `ref` TIDAK pernah dikirim. */
+export interface InputBookingAgenBody {
+	slug: string;
+	unitId: string;
+	namaPembeli: string;
+	whatsappPembeli: string;
+	catatan?: string;
+}
+
+/** Respons sukses booking unit agen. */
+export interface HasilBookingAgen {
+	bookingId: string;
+	leadId: string;
+	leadBaru: boolean;
+	perumahan: { slug: string; nama: string };
+	unit: { blok: string; nomor: string; tipe: string };
+}
+
+/**
  * KOMISI-AGEN-01 — estimasi komisi agen untuk satu perumahan (`GET
  * /public/agen-omahe/komisi?slug=&tipeSlug=`, sesi agen, no-store).
  * `persen`/`nominal` = bagian agen PENJUAL (sudah dikurangi bagian sponsor).

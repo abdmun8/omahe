@@ -21,6 +21,14 @@
 	"± Rp… (x%)" berlabel estimasi / "menunggu perjanjian perumahan".
 	Gagal/null → blok tidak tampil (pendaftaran tetap sukses).
 
+	Mode "Booking unit" (AGEN-OMAHE-11 iterasi 3) — dua tombol pilihan
+	(aria-pressed, pola panel agen) Lead / Booking unit. Booking memuat
+	unit `tersedia` dari `/api/agen-unit?slug=` saat mode dipilih, agen
+	memilih unit (dikelompokkan per tipe; tipe kartu didahulukan), lalu
+	`POST /api/agen-booking`. 409 (unit keburu dipesan / pembeli milik agen
+	lain) → pesan backend apa adanya + daftar unit dimuat ulang. Unit kosong
+	→ arahan "daftarkan sebagai lead".
+
 	Pola visual/struktur: `lead-form-dialog.svelte` (bits-ui Dialog,
 	mobile-first, token yang ada).
 -->
@@ -28,7 +36,13 @@
 	import { Dialog } from 'bits-ui';
 	import X from '@lucide/svelte/icons/x';
 	import UserPlus from '@lucide/svelte/icons/user-plus';
-	import type { EstimasiKomisiAgen, HasilInputLeadAgen } from '$lib/api/types';
+	import type {
+		EstimasiKomisiAgen,
+		HasilBookingAgen,
+		HasilInputLeadAgen,
+		UnitTersediaAgen
+	} from '$lib/api/types';
+	import { formatRupiah } from '$lib/utils';
 	import { teksEstimasiKomisi } from '$lib/komisi-agen';
 	import { trackEvent } from '$lib/analytics';
 	import { sesiAgen, setSesiAgenNull } from '$lib/sesi-agen.svelte';
@@ -63,6 +77,13 @@
 
 	let proses = $state(false);
 	let sukses = $state<HasilInputLeadAgen | null>(null);
+	/** AGEN-OMAHE-11 iterasi 3 — mode form & state booking unit. */
+	let mode = $state<'lead' | 'booking'>('lead');
+	let suksesBooking = $state<HasilBookingAgen | null>(null);
+	let daftarUnit = $state<UnitTersediaAgen[] | null>(null);
+	let memuatUnit = $state(false);
+	let errorUnit = $state<string | null>(null);
+	let unitId = $state('');
 	/** KOMISI-AGEN-01 — estimasi komisi lead yang baru didaftarkan. */
 	let estimasi = $state<EstimasiKomisiAgen | null>(null);
 	const teksEstimasi = $derived(teksEstimasiKomisi(estimasi));
@@ -82,8 +103,11 @@
 			sesiHabis = false;
 			pesanError = null;
 		}
-		if (sukses) {
+		if (sukses || suksesBooking) {
 			sukses = null;
+			suksesBooking = null;
+			daftarUnit = null;
+			unitId = '';
 			estimasi = null;
 			pesanError = null;
 			sesiHabis = false;
@@ -185,6 +209,108 @@
 		}
 	}
 
+	/** Unit dikelompokkan per tipe; tipe kartu/halaman (`tipeAwal`) di atas. */
+	const grupUnit = $derived.by(() => {
+		const peta = new Map<string, UnitTersediaAgen[]>();
+		for (const u of daftarUnit ?? []) {
+			const k = u.tipe || 'Tanpa tipe';
+			peta.set(k, [...(peta.get(k) ?? []), u]);
+		}
+		const awal = tipeAwal.trim();
+		return [...peta.entries()].sort(([a], [b]) => Number(b === awal) - Number(a === awal));
+	});
+
+	function labelUnit(u: UnitTersediaAgen): string {
+		const harga = u.harga ? ` · ${formatRupiah(u.harga)}` : '';
+		return `Blok ${u.blok} No. ${u.nomor}${harga}`;
+	}
+
+	async function muatUnit() {
+		memuatUnit = true;
+		errorUnit = null;
+		try {
+			const res = await fetch(`/api/agen-unit?${new URLSearchParams({ slug: perumahanSlug })}`);
+			const body = (await res.json().catch(() => null)) as {
+				unit?: UnitTersediaAgen[];
+				message?: string;
+			} | null;
+			if (!res.ok) {
+				if (res.status === 401) {
+					sesiHabis = true;
+					errorUnit = 'Sesi berakhir, silakan masuk lagi.';
+				} else {
+					errorUnit = body?.message || 'Daftar unit gagal dimuat. Coba lagi sebentar lagi.';
+				}
+				daftarUnit = null;
+				return;
+			}
+			daftarUnit = Array.isArray(body?.unit) ? body.unit : [];
+			if (!daftarUnit.some((u) => u.id === unitId)) unitId = '';
+		} catch {
+			errorUnit = 'Daftar unit gagal dimuat. Coba lagi sebentar lagi.';
+		} finally {
+			memuatUnit = false;
+		}
+	}
+
+	function pilihMode(m: 'lead' | 'booking') {
+		mode = m;
+		pesanError = null;
+		if (m === 'booking' && daftarUnit === null && !memuatUnit) void muatUnit();
+	}
+
+	async function kirimBooking(e: SubmitEvent) {
+		e.preventDefault();
+		if (proses) return;
+		if (!unitId) {
+			pesanError = 'Pilih unit terlebih dahulu.';
+			return;
+		}
+		proses = true;
+		pesanError = null;
+		try {
+			const res = await fetch('/api/agen-booking', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({
+					slug: perumahanSlug,
+					unitId,
+					namaPembeli: namaPembeli.trim(),
+					whatsappPembeli: whatsapp.trim(),
+					catatan: catatan.trim() || undefined
+				})
+			});
+			if (!res.ok) {
+				let teks = 'Booking gagal. Coba lagi sebentar lagi.';
+				try {
+					const body = await res.json();
+					if (typeof body?.message === 'string' && body.message) teks = body.message;
+				} catch {
+					// body bukan JSON — pesan generik.
+				}
+				if (res.status === 401) {
+					sesiHabis = true;
+					teks = 'Sesi berakhir, silakan masuk lagi.';
+				}
+				// 409 bisa berarti unit keburu dipesan — segarkan daftar unit.
+				if (res.status === 409) void muatUnit();
+				throw new Error(teks);
+			}
+			const body = (await res.json()) as { data?: HasilBookingAgen };
+			suksesBooking = body.data ?? null;
+			if (suksesBooking) void muatEstimasi(slugTipe(suksesBooking.unit.tipe) || undefined);
+			// GA4 — TANPA PII (nama/WA pembeli & id unit tidak dikirim).
+			trackEvent('agen_booking_submit', {
+				perumahan: namaPerumahan,
+				tipe_minat: suksesBooking?.unit.tipe || undefined
+			});
+		} catch (err) {
+			pesanError = err instanceof Error ? err.message : 'Booking gagal. Coba lagi sebentar lagi.';
+		} finally {
+			proses = false;
+		}
+	}
+
 	/** Estimasi komisi (fail-soft: gagal = blok tidak tampil). */
 	async function muatEstimasi(tipeSlug: string | undefined) {
 		estimasi = null;
@@ -194,7 +320,10 @@
 			const res = await fetch(`/api/agen-komisi?${qs}`);
 			if (!res.ok) return;
 			const body = (await res.json()) as { estimasi?: EstimasiKomisiAgen | null };
-			estimasi = body?.estimasi && typeof body.estimasi === 'object' && 'status' in body.estimasi ? body.estimasi : null;
+			estimasi =
+				body?.estimasi && typeof body.estimasi === 'object' && 'status' in body.estimasi
+					? body.estimasi
+					: null;
 		} catch {
 			estimasi = null;
 		}
@@ -203,6 +332,11 @@
 	/** "Daftarkan pembeli lain" — form kosong lagi, dialog tetap terbuka. */
 	function ulang() {
 		sukses = null;
+		if (suksesBooking) {
+			suksesBooking = null;
+			unitId = '';
+			void muatUnit();
+		}
 		estimasi = null;
 		pesanError = null;
 		sesiHabis = false;
@@ -252,16 +386,29 @@
 				</Dialog.Close>
 			</div>
 
-			{#if sukses}
+			{#if sukses || suksesBooking}
 				<div role="status" class="flex flex-col gap-4">
-					<p class="text-ink text-sm leading-relaxed">
-						Pembeli terdaftar ✓ — terlindungi s.d.
-						{#if tanggalLindung}<span class="font-semibold">{tanggalLindung}</span>{/if}.
-					</p>
-					<p class="text-muted text-xs leading-relaxed">
-						Pembeli akan menerima WhatsApp konfirmasi bahwa Anda mendaftarkannya. Data pembeli
-						dilindungi 60 hari untuk Anda.
-					</p>
+					{#if suksesBooking}
+						<p class="text-ink text-sm leading-relaxed">
+							Booking tercatat ✓ — <span class="font-semibold"
+								>Blok {suksesBooking.unit.blok} No. {suksesBooking.unit.nomor}</span
+							>{#if suksesBooking.unit.tipe}
+								({suksesBooking.unit.tipe}){/if}.
+						</p>
+						<p class="text-muted text-xs leading-relaxed">
+							Pembeli menerima WhatsApp berisi tautan status booking. Admin perumahan akan memproses
+							kelengkapan berkasnya — pantau di Panel Agen.
+						</p>
+					{:else}
+						<p class="text-ink text-sm leading-relaxed">
+							Pembeli terdaftar ✓ — terlindungi s.d.
+							{#if tanggalLindung}<span class="font-semibold">{tanggalLindung}</span>{/if}.
+						</p>
+						<p class="text-muted text-xs leading-relaxed">
+							Pembeli akan menerima WhatsApp konfirmasi bahwa Anda mendaftarkannya. Data pembeli
+							dilindungi 60 hari untuk Anda.
+						</p>
+					{/if}
 					{#if teksEstimasi}
 						<!-- KOMISI-AGEN-01 — estimasi komisi agen (privat, no-store). -->
 						<div class="bg-surface rounded-lg px-3 py-2" data-testid="estimasi-komisi">
@@ -284,7 +431,26 @@
 					<Button variant="outline" size="lg" onclick={ulang}>Daftarkan pembeli lain</Button>
 				</div>
 			{:else}
-				<form class="flex flex-col gap-3" onsubmit={kirim}>
+				<!-- AGEN-OMAHE-11 iterasi 3 — pilihan mode (pola panel agen). -->
+				<div
+					class="bg-surface grid grid-cols-2 gap-1 rounded-lg p-1"
+					role="group"
+					aria-label="Jenis pendaftaran"
+				>
+					{#each [['lead', 'Lead'], ['booking', 'Booking unit']] as const as [nilai, label] (nilai)}
+						<button
+							type="button"
+							aria-pressed={mode === nilai}
+							onclick={() => pilihMode(nilai)}
+							class="h-9 rounded-md text-sm font-semibold transition-colors {mode === nilai
+								? 'text-ink bg-white shadow-sm'
+								: 'text-muted hover:text-ink'}"
+						>
+							{label}
+						</button>
+					{/each}
+				</div>
+				<form class="flex flex-col gap-3" onsubmit={mode === 'booking' ? kirimBooking : kirim}>
 					<div>
 						<label for="{uid}-nama" class="text-ink mb-1 block text-sm font-medium">
 							Nama pembeli
@@ -320,30 +486,87 @@
 						/>
 					</div>
 
-					<div>
-						<label for="{uid}-tipe" class="text-ink mb-1 block text-sm font-medium">
-							Tipe diminati <span class="text-muted font-normal">(opsional)</span>
-						</label>
-						{#if opsiTipe && opsiTipe.length > 0}
-							<!-- Daftar tipe dari pemanggil (detail perumahan/kartu) → select. -->
-							<select id="{uid}-tipe" name="tipeSlug" bind:value={tipeDiminati} class={kelasField}>
-								<option value="">Belum tahu</option>
-								{#each opsiTipe as tipe (tipe)}
-									<option value={tipe}>{tipe}</option>
-								{/each}
-							</select>
-						{:else}
-							<input
-								id="{uid}-tipe"
-								name="tipeBebas"
-								type="text"
-								maxlength="50"
-								placeholder="mis. Tipe 36/72"
-								bind:value={tipeDiminati}
-								class={kelasField}
-							/>
-						{/if}
-					</div>
+					{#if mode === 'booking'}
+						<div>
+							<label for="{uid}-unit" class="text-ink mb-1 block text-sm font-medium">Unit</label>
+							{#if memuatUnit}
+								<p class="text-muted text-sm" role="status">Memuat unit tersedia…</p>
+							{:else if errorUnit}
+								<p class="text-sm text-red-700" role="alert">{errorUnit}</p>
+								{#if !sesiHabis}
+									<button
+										type="button"
+										class="text-primary mt-1 text-sm font-semibold"
+										onclick={muatUnit}
+									>
+										Coba lagi
+									</button>
+								{/if}
+							{:else if daftarUnit && daftarUnit.length === 0}
+								<p class="text-muted text-sm">
+									Belum ada unit tersedia di perumahan ini.
+									<button
+										type="button"
+										class="text-primary font-semibold"
+										onclick={() => pilihMode('lead')}
+									>
+										Daftarkan sebagai lead
+									</button>
+									saja — admin perumahan akan menghubungi pembeli.
+								</p>
+							{:else if daftarUnit}
+								<select
+									id="{uid}-unit"
+									name="unitId"
+									required
+									bind:value={unitId}
+									class={kelasField}
+								>
+									<option value="">Pilih unit…</option>
+									{#each grupUnit as [tipe, units] (tipe)}
+										<optgroup label={tipe}>
+											{#each units as u (u.id)}
+												<option value={u.id}>{labelUnit(u)}</option>
+											{/each}
+										</optgroup>
+									{/each}
+								</select>
+								<p class="text-muted mt-1 text-xs">
+									Unit tetap tersedia sampai admin perumahan memprosesnya.
+								</p>
+							{/if}
+						</div>
+					{:else}
+						<div>
+							<label for="{uid}-tipe" class="text-ink mb-1 block text-sm font-medium">
+								Tipe diminati <span class="text-muted font-normal">(opsional)</span>
+							</label>
+							{#if opsiTipe && opsiTipe.length > 0}
+								<!-- Daftar tipe dari pemanggil (detail perumahan/kartu) → select. -->
+								<select
+									id="{uid}-tipe"
+									name="tipeSlug"
+									bind:value={tipeDiminati}
+									class={kelasField}
+								>
+									<option value="">Belum tahu</option>
+									{#each opsiTipe as tipe (tipe)}
+										<option value={tipe}>{tipe}</option>
+									{/each}
+								</select>
+							{:else}
+								<input
+									id="{uid}-tipe"
+									name="tipeBebas"
+									type="text"
+									maxlength="50"
+									placeholder="mis. Tipe 36/72"
+									bind:value={tipeDiminati}
+									class={kelasField}
+								/>
+							{/if}
+						</div>
+					{/if}
 
 					<div>
 						<label for="{uid}-catatan" class="text-ink mb-1 block text-sm font-medium">
@@ -360,8 +583,13 @@
 					</div>
 
 					<p class="text-muted text-xs leading-relaxed">
-						Pembeli akan menerima WhatsApp konfirmasi bahwa Anda mendaftarkannya. Data pembeli
-						dilindungi 60 hari untuk Anda.
+						{#if mode === 'booking'}
+							Pembeli akan menerima WhatsApp berisi tautan status booking. Pembeli terlindungi 60
+							hari untuk Anda.
+						{:else}
+							Pembeli akan menerima WhatsApp konfirmasi bahwa Anda mendaftarkannya. Data pembeli
+							dilindungi 60 hari untuk Anda.
+						{/if}
 					</p>
 
 					{#if pesanError}
@@ -380,9 +608,19 @@
 						</Button>
 					{/if}
 
-					<Button type="submit" variant="whatsapp" size="lg" class="w-full" disabled={proses}>
+					<Button
+						type="submit"
+						variant="whatsapp"
+						size="lg"
+						class="w-full"
+						disabled={proses || (mode === 'booking' && (!daftarUnit || daftarUnit.length === 0))}
+					>
 						<UserPlus class="h-4 w-4" aria-hidden="true" />
-						{proses ? 'Mendaftarkan…' : 'Daftarkan Pembeli'}
+						{#if mode === 'booking'}
+							{proses ? 'Membuat booking…' : 'Booking Unit'}
+						{:else}
+							{proses ? 'Mendaftarkan…' : 'Daftarkan Pembeli'}
+						{/if}
 					</Button>
 				</form>
 			{/if}
