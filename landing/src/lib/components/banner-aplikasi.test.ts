@@ -29,6 +29,8 @@ describe.skipIf(typeof document === 'undefined')('BannerAplikasi', () => {
 	beforeEach(() => {
 		localStorage.clear();
 		sessionStorage.clear();
+		// Varian acak dikunci per tes (lihat `pilihVarian`).
+		sessionStorage.setItem('omahe:banner-aplikasi:varian', 'pembeli');
 		aturTerpasang(undefined);
 	});
 	afterEach(() => {
@@ -74,5 +76,16 @@ describe.skipIf(typeof document === 'undefined')('BannerAplikasi', () => {
 		render(BannerAplikasi);
 		await new Promise((r) => setTimeout(r, 0));
 		expect(screen.queryByRole('region')).toBeNull();
+	});
+
+	test('varian agen → teks rekrutmen & tombol Daftar ke /gabung/agen (tab yang sama)', async () => {
+		aturUa(UA_ANDROID);
+		sessionStorage.setItem('omahe:banner-aplikasi:varian', 'agen_komisi');
+		render(BannerAplikasi);
+		const daftar = await screen.findByRole('link', { name: 'Daftar' });
+		expect(daftar.getAttribute('href')).toBe('/gabung/agen');
+		expect(daftar.getAttribute('target')).toBeNull();
+		expect(screen.getByText('Komisi hingga 3% per rumah')).toBeInTheDocument();
+		expect(screen.getByText('Jadi agen Omahe, gratis')).toBeInTheDocument();
 	});
 });

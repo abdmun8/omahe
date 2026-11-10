@@ -15,13 +15,18 @@
 		cekTerpasang,
 		diDalamAplikasi,
 		halamanTanpaBanner,
+		hrefVarian,
 		masihDitutup,
+		pilihVarian,
 		simpanDitutup,
-		urlPasang
+		type VarianBanner
 	} from '$lib/banner-aplikasi';
 
 	let tampil = $state(false);
-	const href = urlPasang(SITE.playStoreUrl);
+	// Varian dipilih sekali per muat (acak per sesi, lihat `pilihVarian`).
+	let varian = $state<VarianBanner | null>(null);
+	const href = $derived(varian ? hrefVarian(varian, SITE.playStoreUrl) : '#');
+	const keluar = $derived(varian?.tujuan === 'play');
 
 	function storageAman(jenis: 'local' | 'session'): Storage | null {
 		try {
@@ -50,8 +55,9 @@
 				return;
 			if (masihDitutup(storageAman('local'), Date.now())) return;
 			if ((await cekTerpasang(navigator as never)) === true) return;
+			varian = pilihVarian(page.url.pathname, Math.random, storageAman('session'));
 			tampil = true;
-			trackEvent('app_banner_view');
+			trackEvent('app_banner_view', { varian: varian.id });
 		})();
 
 		return () => window.removeEventListener('beforeinstallprompt', tahanPromptBawaan);
@@ -60,11 +66,11 @@
 	function tutup() {
 		tampil = false;
 		simpanDitutup(storageAman('local'), Date.now());
-		trackEvent('app_banner_dismiss');
+		trackEvent('app_banner_dismiss', { varian: varian?.id ?? '' });
 	}
 </script>
 
-{#if tampil && !halamanTanpaBanner(page.url.pathname)}
+{#if tampil && varian && !halamanTanpaBanner(page.url.pathname)}
 	<div class="bg-surface border-line border-b" role="region" aria-label="Pasang aplikasi Omahe">
 		<div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2">
 			<button
@@ -83,17 +89,17 @@
 				class="h-10 w-10 shrink-0 rounded-xl"
 			/>
 			<div class="min-w-0 flex-1">
-				<p class="text-ink truncate text-sm font-semibold">Aplikasi Omahe</p>
-				<p class="text-muted truncate text-xs">Gratis di Google Play</p>
+				<p class="text-ink line-clamp-2 text-sm leading-snug font-semibold">{varian.judul}</p>
+				<p class="text-muted truncate text-xs">{varian.sub}</p>
 			</div>
 			<a
 				{href}
-				target="_blank"
-				rel="noopener noreferrer"
+				target={keluar ? '_blank' : undefined}
+				rel={keluar ? 'noopener noreferrer' : undefined}
 				class="bg-primary hover:bg-primary-dark shrink-0 rounded-lg px-3 py-1.5 text-sm font-semibold text-white transition-colors"
-				onclick={() => trackEvent('app_banner_click')}
+				onclick={() => trackEvent('app_banner_click', { varian: varian?.id ?? '' })}
 			>
-				Pasang
+				{varian.tombol}
 			</a>
 		</div>
 	</div>

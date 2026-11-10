@@ -110,3 +110,78 @@ export function urlPasang(playStoreUrl: string): string {
 	);
 	return url.toString();
 }
+
+/**
+ * Varian teks banner — dipilih ACAK per sesi kunjungan (tetap sama selama
+ * sesi, bisa berganti di kunjungan berikutnya). Varian dicatat di event GA4
+ * (`varian`) supaya varian yang paling banyak diklik bisa dibandingkan.
+ * Varian agen mengarah ke pendaftaran agen (rekrutmen), varian pembeli ke
+ * Play Store. Klaim komisi WAJIB "hingga" (3% tanpa sponsor, 2,9% bersponsor,
+ * hanya perumahan Program Omahe — KOMISI-AGEN-01).
+ */
+export type VarianBanner = {
+	id: 'pembeli' | 'agen_uang' | 'agen_komisi';
+	judul: string;
+	sub: string;
+	tombol: string;
+	tujuan: 'play' | 'gabung_agen';
+};
+
+export const VARIAN_BANNER: readonly VarianBanner[] = [
+	{
+		id: 'pembeli',
+		judul: 'Aplikasi Omahe',
+		sub: 'Gratis di Google Play',
+		tombol: 'Pasang',
+		tujuan: 'play'
+	},
+	{
+		id: 'agen_uang',
+		judul: 'Mau dapat uang dari properti?',
+		sub: 'Jadi agen Omahe, gratis',
+		tombol: 'Daftar',
+		tujuan: 'gabung_agen'
+	},
+	{
+		id: 'agen_komisi',
+		judul: 'Komisi hingga 3% per rumah',
+		sub: 'Jadi agen Omahe, gratis',
+		tombol: 'Daftar',
+		tujuan: 'gabung_agen'
+	}
+];
+
+const KUNCI_VARIAN = 'omahe:banner-aplikasi:varian';
+
+/**
+ * Pilih varian: di halaman `/gabung…` selalu varian pembeli (pengunjung
+ * sudah di halaman pendaftaran — ajakan "jadi agen" berulang tidak berguna);
+ * selain itu varian sesi tersimpan, atau acak baru bila belum ada/rusak.
+ */
+export function pilihVarian(
+	pathname: string,
+	acak: () => number,
+	storage: Pick<Storage, 'getItem' | 'setItem'> | null | undefined
+): VarianBanner {
+	const pembeli = VARIAN_BANNER[0]!;
+	if (pathname === '/gabung' || pathname.startsWith('/gabung/')) return pembeli;
+	try {
+		const tersimpan = VARIAN_BANNER.find((v) => v.id === storage?.getItem(KUNCI_VARIAN));
+		if (tersimpan) return tersimpan;
+	} catch {
+		// Storage diblokir — acak untuk muatan ini saja.
+	}
+	const idx = Math.min(VARIAN_BANNER.length - 1, Math.floor(acak() * VARIAN_BANNER.length));
+	const varian = VARIAN_BANNER[Math.max(0, idx)]!;
+	try {
+		storage?.setItem(KUNCI_VARIAN, varian.id);
+	} catch {
+		// abaikan
+	}
+	return varian;
+}
+
+/** Tujuan tombol per varian. */
+export function hrefVarian(varian: VarianBanner, playStoreUrl: string): string {
+	return varian.tujuan === 'play' ? urlPasang(playStoreUrl) : '/gabung/agen';
+}

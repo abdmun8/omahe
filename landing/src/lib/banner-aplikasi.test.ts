@@ -10,9 +10,12 @@ import {
 	cekTerpasang,
 	diDalamAplikasi,
 	halamanTanpaBanner,
+	hrefVarian,
 	masihDitutup,
+	pilihVarian,
 	simpanDitutup,
-	urlPasang
+	urlPasang,
+	VARIAN_BANNER
 } from './banner-aplikasi';
 
 function stubStorage() {
@@ -150,5 +153,39 @@ describe('halamanTanpaBanner & urlPasang', () => {
 		expect(u.searchParams.get('referrer')).toBe(
 			'utm_source=omahe.co.id&utm_medium=banner&utm_campaign=pasang_aplikasi'
 		);
+	});
+});
+
+describe('pilihVarian / hrefVarian', () => {
+	test('acak memilih varian sesuai indeks & disimpan untuk sesi', () => {
+		const s = stubStorage();
+		expect(pilihVarian('/', () => 0, s).id).toBe('pembeli');
+		// Sudah tersimpan → acak berikutnya tidak mengubah varian sesi ini.
+		expect(pilihVarian('/cari', () => 0.99, s).id).toBe('pembeli');
+		expect(pilihVarian('/', () => 0.5, stubStorage()).id).toBe('agen_uang');
+		expect(pilihVarian('/', () => 0.99, stubStorage()).id).toBe('agen_komisi');
+		expect(pilihVarian('/', () => 1, stubStorage()).id).toBe('agen_komisi');
+	});
+
+	test('halaman /gabung… selalu varian pembeli', () => {
+		expect(pilihVarian('/gabung', () => 0.99, stubStorage()).id).toBe('pembeli');
+		expect(pilihVarian('/gabung/agen', () => 0.99, stubStorage()).id).toBe('pembeli');
+		expect(pilihVarian('/gabungan', () => 0.99, stubStorage()).id).toBe('agen_komisi');
+	});
+
+	test('nilai tersimpan rusak / storage terblokir → acak tanpa error', () => {
+		const s = stubStorage();
+		s.m.set('omahe:banner-aplikasi:varian', 'tidak-dikenal');
+		expect(pilihVarian('/', () => 0.5, s).id).toBe('agen_uang');
+		expect(pilihVarian('/', () => 0.5, terblokir).id).toBe('agen_uang');
+	});
+
+	test('varian agen → /gabung/agen; pembeli → Play Store; klaim komisi memakai "hingga"', () => {
+		const play = `https://play.google.com/store/apps/details?id=${PAKET_APLIKASI}`;
+		const [pembeli, uang, komisi] = VARIAN_BANNER;
+		expect(hrefVarian(pembeli!, play)).toContain('play.google.com');
+		expect(hrefVarian(uang!, play)).toBe('/gabung/agen');
+		expect(hrefVarian(komisi!, play)).toBe('/gabung/agen');
+		expect(komisi!.judul).toContain('hingga');
 	});
 });
