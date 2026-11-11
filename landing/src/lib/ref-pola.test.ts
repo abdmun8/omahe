@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 import {
+	adalahRefAgenPilihan,
 	bersihkanNamaMitra,
 	normalisasiRefAgenPribadi,
+	REF_AGEN_PILIHAN_PATTERN,
 	REF_AGEN_PRIBADI_PATTERN
 } from './ref-pola';
 
@@ -64,5 +66,41 @@ describe('REF_AGEN_PRIBADI_PATTERN + normalisasiRefAgenPribadi', () => {
 		expect(normalisasiRefAgenPribadi(undefined)).toBeNull();
 		expect(normalisasiRefAgenPribadi('OMHA-A0001?x=1')).toBeNull();
 		expect(normalisasiRefAgenPribadi('<script>')).toBeNull();
+	});
+});
+
+// AGEN-OMAHE-13 — kode `?ref=` PILIHAN agen atas satu perumahan (`AO-…`,
+// backend `buatKodeRef`/`adalahKodeRefAgen`). Dipakai server load detail
+// perumahan untuk memutuskan memanggil `getAgenPemasar` atau tidak.
+describe('REF_AGEN_PILIHAN_PATTERN + adalahRefAgenPilihan', () => {
+	it('kode pilihan sah lolos (fixture AO-K2269F4X/AO-M7RQ3HZA, rentang 4–17)', () => {
+		expect(REF_AGEN_PILIHAN_PATTERN.test('AO-K2269F4X')).toBe(true);
+		expect(REF_AGEN_PILIHAN_PATTERN.test('AO-M7RQ3HZA')).toBe(true);
+		expect(REF_AGEN_PILIHAN_PATTERN.test('AO-7KQ2')).toBe(true); // batas bawah
+		expect(REF_AGEN_PILIHAN_PATTERN.test('AO-' + 'A2'.repeat(8) + 'A')).toBe(true); // 17 char
+	});
+
+	it('bentuk salah ditolak (pendek/panjang, prefiks lain, pemisah)', () => {
+		expect(REF_AGEN_PILIHAN_PATTERN.test('AO-K22')).toBe(false); // di bawah 4
+		expect(REF_AGEN_PILIHAN_PATTERN.test('AO-' + 'A2'.repeat(9))).toBe(false); // 18 char
+		expect(REF_AGEN_PILIHAN_PATTERN.test('OP-QA7MPN')).toBe(false); // kerjasama perusahaan
+		expect(REF_AGEN_PILIHAN_PATTERN.test('OMHA-A0001')).toBe(false); // agen pribadi
+		expect(REF_AGEN_PILIHAN_PATTERN.test('AO-K226 9F4X')).toBe(false); // spasi di tengah
+		expect(REF_AGEN_PILIHAN_PATTERN.test('K2269F4X')).toBe(false); // tanpa prefiks
+	});
+
+	it('adalahRefAgenPilihan — trim + uppercase sebelum uji (backend sama)', () => {
+		expect(adalahRefAgenPilihan('  ao-k2269f4x ')).toBe(true);
+		expect(adalahRefAgenPilihan('AO-K2269F4X')).toBe(true);
+	});
+
+	it('adalahRefAgenPilihan — non-string/salah → false (ref lain tetap passthrough)', () => {
+		expect(adalahRefAgenPilihan(null)).toBe(false);
+		expect(adalahRefAgenPilihan(undefined)).toBe(false);
+		expect(adalahRefAgenPilihan('')).toBe(false);
+		expect(
+			adalahRefAgenPilihan('a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2')
+		).toBe(false);
+		expect(adalahRefAgenPilihan('OMHA-A0001')).toBe(false);
 	});
 });

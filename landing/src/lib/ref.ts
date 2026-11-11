@@ -35,6 +35,8 @@ export {
 	REF_OMAHE_PATTERN,
 	KODE_REFERRAL_PATTERN,
 	REF_AGEN_PRIBADI_PATTERN,
+	REF_AGEN_PILIHAN_PATTERN,
+	adalahRefAgenPilihan,
 	bersihkanNamaMitra,
 	normalisasiRefAgenPribadi
 } from './ref-pola';

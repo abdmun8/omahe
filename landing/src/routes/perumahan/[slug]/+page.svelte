@@ -1,7 +1,7 @@
 <script lang="ts">
 	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
 	import BeaconKunjungan from '$lib/components/beacon-kunjungan.svelte';
-	import AgenPemasar from '$lib/components/agen-pemasar.svelte';
+	import BlokAgenPemasar from '$lib/components/blok-agen-pemasar.svelte';
 	import LandingSections from '$lib/components/landing-sections.svelte';
 	import MinatDialog from '$lib/components/minat-dialog.svelte';
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
@@ -270,8 +270,18 @@
 
 	<!-- Konten -->
 	<div class="mt-8 space-y-10">
-		<!-- AGEN-OMAHE-03 — agen Omahe yang memasarkan (form minat per agen). -->
-		<AgenPemasar agen={data.agen} perumahanSlug={p.slug} namaPerumahan={p.nama} {opsiTipe} />
+		<!-- AGEN-OMAHE-13 — `?ref=AO-…` → kartu agen pemilik ref (form minat);
+		     selain itu blok ringkas "semua agen Omahe" + link /mitra?tab=agen
+		     (daftar penuh tidak dirender di sini lagi). Perumahan milik agen
+		     properti (p.agen) tanpa blok umum. -->
+		<BlokAgenPemasar
+			agen={data.agen}
+			ref={data.ref}
+			perumahanSlug={p.slug}
+			namaPerumahan={p.nama}
+			{opsiTipe}
+			agenProperti={p.agen ?? null}
+		/>
 
 		{#if adaKontak}
 			<section class="border-line rounded-xl border p-5">

@@ -89,3 +89,15 @@ describe('ajukanUrl + tipe (UNIT-09)', () => {
 		expect(ajukanUrl('griya-asri', null, '  ')).not.toContain('tipe=');
 	});
 });
+
+// AGEN-OMAHE-13 — re-export pola kode pilihan agen dari `$lib/ref`: pemakai
+// server-side import dari sini (bukan langsung ref-pola), jadi re-export-nya
+// harus benar-benar ada.
+describe('re-export AGEN-OMAHE-13 dari $lib/ref', () => {
+	test('adalahRefAgenPilihan + REF_AGEN_PILIHAN_PATTERN ter-expose', async () => {
+		const modul = await import('./ref');
+		expect(modul.adalahRefAgenPilihan('AO-K2269F4X')).toBe(true);
+		expect(modul.adalahRefAgenPilihan('abc')).toBe(false);
+		expect(modul.REF_AGEN_PILIHAN_PATTERN.test('AO-K2269F4X')).toBe(true);
+	});
+});

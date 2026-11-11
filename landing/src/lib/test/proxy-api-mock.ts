@@ -14,7 +14,8 @@
  * untuk proxy `/api/saya` & `/api/agen-lead` — SESI-OMAHE-01; + `getEstimasiKomisiAgen`
  * untuk `/api/agen-komisi` — KOMISI-AGEN-01; + `getUnitTersediaAgen`/`inputBookingAgen`
  * untuk `/api/agen-unit` & `/api/agen-booking` — AGEN-OMAHE-11; + `getNamaAgenPribadi`
- * untuk `/api/agen-nama/[kode]` — REF-AGEN-01) — file test
+ * untuk `/api/agen-nama/[kode]` — REF-AGEN-01; + `getPerumahan`/`getUnits`/`getAgenPemasar`
+ * untuk server load `routes/perumahan/[slug]` — AGEN-OMAHE-13) — file test
  * baru yang butuh nama lain HARUS ditambahkan ke sini, bukan membuat
  * mock.module sendiri. Kelas
  * `ApiErrorTiruan` dibagikan supaya cek `err instanceof ApiError` di handler
@@ -82,6 +83,22 @@ export const getNamaAgenPribadiMock = mock<
 	(fetchFn: typeof fetch, kode: string) => Promise<string | null>
 >(async () => null);
 
+/**
+ * AGEN-OMAHE-13 — detail perumahan, unit per slug & agen pemasar untuk test
+ * server load `routes/perumahan/[slug]/+page.server.ts` (pola `/q/[kode]`:
+ * route bukan proxy, tapi tetap memakai mock bersama ini). Tipe kembalian
+ * longgar — shape `PerumahanDetail` asli dikunci `client.test.ts`.
+ */
+export const getPerumahanMock = mock<(fetchFn: typeof fetch, slug: string) => Promise<unknown>>(
+	async () => ({})
+);
+export const getUnitsMock = mock<(fetchFn: typeof fetch, query: unknown) => Promise<unknown>>(
+	async () => ({ items: [], total: 0 })
+);
+export const getAgenPemasarMock = mock<
+	(fetchFn: typeof fetch, slug: string, ref: string | null) => Promise<unknown>
+>(async () => []);
+
 /** Pasang mock `$lib/api` — panggil SEBELUM `await import('./+server')`. */
 export function pasangMockLibApi(): void {
 	mock.module('$lib/api', () => ({
@@ -94,6 +111,9 @@ export function pasangMockLibApi(): void {
 		getEstimasiKomisiAgen: getEstimasiKomisiAgenMock,
 		getUnitTersediaAgen: getUnitTersediaAgenMock,
 		inputBookingAgen: inputBookingAgenMock,
-		getNamaAgenPribadi: getNamaAgenPribadiMock
+		getNamaAgenPribadi: getNamaAgenPribadiMock,
+		getPerumahan: getPerumahanMock,
+		getUnits: getUnitsMock,
+		getAgenPemasar: getAgenPemasarMock
 	}));
 }

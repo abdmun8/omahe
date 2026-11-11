@@ -607,6 +607,20 @@ dibandingkan case-insensitive). Respons `data`:
   gate partner berbayar dan tercatat untuk agen itu (WA ke agen).
 - Form minat per agen: `LeadFormDialog` dengan `ref={kodeRef}` +
   `namaAgen` (deskripsi dialog "agen X akan menghubungi Anda").
+- **Catatan tampilan Omahe (2026-11-11, menyusul AGEN-OMAHE-13 "Aktifkan
+  semua"):** satu agen kini bisa mengaktifkan SEMUA perumahan sekaligus,
+  jadi daftar balikan endpoint ini bisa puluhan — Omahe tidak merender
+  daftar itu lagi di `/perumahan/:slug`. Blok diganti ringkasan
+  "Dipasarkan oleh semua agen Omahe" + link `/mitra?tab=agen` (`?ref=`
+  passthrough tetap lewat `withRef`), dan `getAgenPemasar` HANYA dipanggil
+  bila `ref` berpola kode pilihan agen `AO-…` (`REF_AGEN_PILIHAN_PATTERN`
+  = `/^AO-[A-Z0-9]{4,17}$/`, normalisasi trim+uppercase sama dengan
+  `adalahKodeRefAgen`) — dan hanya dirender kartu bila daftar balikan
+  benar-benar pemilik `ref` (`kodeRef` = `ref`; AO yang tidak dikenal
+  perumahan itu dibalas daftar terpotong maks 6 agen lain, `batasiAgenPemasar`
+  sisi backend → blok umum, bukan kartu). Perumahan milik agen properti (field `agen`
+  detail, "Dipasarkan oleh …") tidak menampilkan blok umum. Kontrak
+  endpoint TIDAK berubah.
 - Diverifikasi E2E 2026-09-27: Omahe dev → backend lokal + DB dev (dua agen
   tampil, `?ref` agen B → hanya B + CTA ajukan membawa ref B, link
   verifikasi), data uji dibersihkan.

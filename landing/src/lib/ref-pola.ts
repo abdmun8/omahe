@@ -49,6 +49,29 @@ export function normalisasiRefAgenPribadi(raw: string | null | undefined): strin
 }
 
 /**
+ * AGEN-OMAHE-13 (2026-11-11) — kode `?ref=` PILIHAN agen Omahe atas satu
+ * perumahan (`agen_omahe_pilihan.kode_ref`, dibuat backend `buatKodeRef`):
+ * `AO-` + 4–17 karakter alfanumerik backend. Pola & normalisasi mengikuti
+ * `adalahKodeRefAgen` repo `perumahan` (trim + uppercase di sisi sana) —
+ * jangan diketatkan tanpa koordinasi. Menandai pengunjung datang lewat
+ * link pribadi agen → halaman detail perumahan menampilkan KARTU agen itu
+ * (bukan blok umum "semua agen Omahe"), dan server load hanya dipanggil
+ * `getAgenPemasar` bila ref berpola ini (hemat panggilan backend).
+ */
+export const REF_AGEN_PILIHAN_PATTERN = /^AO-[A-Z0-9]{4,17}$/;
+
+/**
+ * AGEN-OMAHE-13 — `ref` dari URL adalah kode pilihan agen (`AO-…`)?
+ * Normalisasi trim + uppercase SAMA dengan backend (`adalahKodeRefAgen`),
+ * karena `readRef` membiarkan huruf kecil lewat passthrough apa adanya.
+ * Selain itu (null, hex kerjasama, `OP-…`, kode pribadi agen) → `false`.
+ */
+export function adalahRefAgenPilihan(raw: string | null | undefined): boolean {
+	if (typeof raw !== 'string') return false;
+	return REF_AGEN_PILIHAN_PATTERN.test(raw.trim().toUpperCase());
+}
+
+/**
  * KERJASAMA-03 — nama mitra dari `?mitra=` di redirect `/q/:kode` adalah
  * LABEL TAMPILAN SAJA (banner "Rekomendasi dari …"); atribusi tetap dari
  * `ref` yang divalidasi backend. Nilai dari URL tidak dipercaya: tag HTML
