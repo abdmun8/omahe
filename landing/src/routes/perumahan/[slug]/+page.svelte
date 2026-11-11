@@ -13,7 +13,7 @@
 	import { SITE } from '$lib/config';
 	import { amankanJsonLd } from '$lib/jsonld';
 	import { renderMarkdown, cuplikanDeskripsi } from '$lib/markdown';
-	import { ajukanUrl, withRef } from '$lib/ref';
+	import { ajukanUrl, refTanpaCashback, withRef } from '$lib/ref';
 	import {
 		formatAngka,
 		formatLokasi,
@@ -26,6 +26,8 @@
 	let { data }: { data: PageData } = $props();
 
 	const p = $derived(data.perumahan);
+	// KOMISI-OMAHE-02 — cashback hanya untuk booking langsung lewat Omahe.
+	const cashbackTampil = $derived(!!p.programOmahe?.cashback && !refTanpaCashback(data.ref));
 	/** null = perumahan belum pakai section builder → render mode LEGACY. */
 	const pakaiBuilder = $derived(p.sections !== null && p.sections.length > 0);
 	const punyaHeroSection = $derived(p.sections?.some((s) => s.type === 'hero') ?? false);
@@ -256,13 +258,18 @@
 		</div>
 	</div>
 
-	{#if p.programOmahe && (p.programOmahe.dp0 || p.programOmahe.cashback)}
-		<!-- KOMISI-OMAHE-01 — program Omahe: promo DP 0% & cashback pembeli. -->
-		<section class="border-primary/30 bg-primary/5 mt-6 rounded-xl border p-4" data-testid="program-omahe">
+	{#if p.programOmahe && (p.programOmahe.dp0 || cashbackTampil)}
+		<!-- KOMISI-OMAHE-01 — program Omahe: promo DP 0% & cashback pembeli.
+		     KOMISI-OMAHE-02 — cashback hanya booking langsung: disembunyikan bila
+		     pengunjung membawa ref agen (AO-/OMHA-/OMH-) atau mitra (OP-). -->
+		<section
+			class="border-primary/30 bg-primary/5 mt-6 rounded-xl border p-4"
+			data-testid="program-omahe"
+		>
 			<p class="font-display text-ink text-base font-bold">Program khusus pembeli lewat Omahe</p>
 			<ul class="text-ink mt-1 space-y-0.5 text-sm">
 				{#if p.programOmahe.dp0}<li>✓ Promo DP 0%* bersama bank mitra</li>{/if}
-				{#if p.programOmahe.cashback}<li>✓ Cashback {formatRupiahPenuh(p.programOmahe.cashback)}</li>{/if}
+				{#if cashbackTampil}<li>✓ Cashback {formatRupiahPenuh(p.programOmahe.cashback)}</li>{/if}
 			</ul>
 			<p class="text-muted mt-2 text-xs">*{p.programOmahe.teksSyarat}</p>
 		</section>

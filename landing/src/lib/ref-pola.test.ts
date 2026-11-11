@@ -4,7 +4,8 @@ import {
 	bersihkanNamaMitra,
 	normalisasiRefAgenPribadi,
 	REF_AGEN_PILIHAN_PATTERN,
-	REF_AGEN_PRIBADI_PATTERN
+	REF_AGEN_PRIBADI_PATTERN,
+	refTanpaCashback
 } from './ref-pola';
 
 // Review KERJASAMA-03 tahap 5 — `?mitra=` bisa dibuat siapa pun; teks yang
@@ -102,5 +103,24 @@ describe('REF_AGEN_PILIHAN_PATTERN + adalahRefAgenPilihan', () => {
 			adalahRefAgenPilihan('a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2')
 		).toBe(false);
 		expect(adalahRefAgenPilihan('OMHA-A0001')).toBe(false);
+	});
+});
+
+// KOMISI-OMAHE-02 — cashback hanya booking langsung lewat Omahe.
+describe('refTanpaCashback', () => {
+	it('ref agen pilihan, agen pribadi & mitra OP → tanpa cashback', () => {
+		expect(refTanpaCashback('AO-ABCD1234')).toBe(true);
+		expect(refTanpaCashback('ao-abcd1234')).toBe(true);
+		expect(refTanpaCashback('OMHA-A0001')).toBe(true);
+		expect(refTanpaCashback('omh-ab12cd')).toBe(true);
+		expect(refTanpaCashback('OP-QA7MPN')).toBe(true);
+	});
+
+	it('tanpa ref, hex kerjasama lama, atau ref aneh → cashback tetap', () => {
+		expect(refTanpaCashback(null)).toBe(false);
+		expect(refTanpaCashback(undefined)).toBe(false);
+		expect(refTanpaCashback('')).toBe(false);
+		expect(refTanpaCashback('a'.repeat(64))).toBe(false);
+		expect(refTanpaCashback('OP-000000')).toBe(false);
 	});
 });

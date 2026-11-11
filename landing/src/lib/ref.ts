@@ -38,7 +38,8 @@ export {
 	REF_AGEN_PILIHAN_PATTERN,
 	adalahRefAgenPilihan,
 	bersihkanNamaMitra,
-	normalisasiRefAgenPribadi
+	normalisasiRefAgenPribadi,
+	refTanpaCashback
 } from './ref-pola';
 
 /** Ambil `ref` dari URL. Nilai yang bentuknya tidak masuk akal dibuang. */

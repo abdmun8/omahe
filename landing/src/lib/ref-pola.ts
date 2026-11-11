@@ -101,3 +101,22 @@ export function bersihkanNamaMitra(raw: string | null): string | null {
 		return null;
 	return bersih;
 }
+
+/**
+ * KOMISI-OMAHE-02 (2026-11-11) — cashback pembeli hanya untuk booking
+ * LANGSUNG lewat Omahe. Pengunjung yang membawa ref agen (`AO-…`, link
+ * pribadi `OMHA-…`/`OMH-…`) atau ref mitra perusahaan (`OP-…`) tidak
+ * mendapat cashback (backend men-snapshot `cashback: 0` untuk sumber
+ * `agen_omahe`/`kerjasama_omahe`) → blok program di detail perumahan
+ * menyembunyikan baris cashback. DP 0% tetap tampil. Ref hex kerjasama
+ * lama & tanpa ref → cashback tetap ditampilkan seperti biasa.
+ */
+export function refTanpaCashback(raw: string | null | undefined): boolean {
+	if (typeof raw !== 'string') return false;
+	const rapi = raw.trim().toUpperCase();
+	return (
+		REF_AGEN_PILIHAN_PATTERN.test(rapi) ||
+		REF_AGEN_PRIBADI_PATTERN.test(rapi) ||
+		REF_OMAHE_PATTERN.test(rapi)
+	);
+}

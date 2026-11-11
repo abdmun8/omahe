@@ -895,6 +895,8 @@ request API dari Omahe tanpa header ini.
 - `ajukanUrl()` selalu menambah `src=omahe` — app `perumahan` mencatat booking sebagai
   "dari Omahe" (atribusi komisi Omahe saat akad). `ref` tetap terbawa apa adanya.
 
+**Update 2026-11-11 (KOMISI-OMAHE-02)**: cashback pembeli hanya untuk booking LANGSUNG lewat Omahe — backend men-snapshot `cashback: 0` untuk sumber agen (`AO-…`, `OMHA-…`/`OMH-…`) & mitra perusahaan (`OP-…`). Omahe menyembunyikan baris cashback di blok program `/perumahan/:slug` bila `page.data.ref` berpola itu (`refTanpaCashback()` di `ref-pola.ts`); DP 0% tetap tampil. Field `programOmahe.cashback` di respons publik tidak berubah.
+
 ## §37 — Kata kunci, kecamatan & kamar di pencarian publik (UNIT-10, 2026-11-03)
 
 - `GET /public/units` param BARU: `q` (kata kunci — nama perumahan/tipe/developer aktif/
