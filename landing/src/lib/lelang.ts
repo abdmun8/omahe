@@ -1,6 +1,7 @@
 /**
  * LELANG-01 — format & teks tetap rumah lelang (dipakai kartu & detail).
  */
+import { formatRupiahPenuh } from './utils';
 
 /** "Selasa, 10 November 2026 · 10.00 WIB". */
 /** LELANG-02 — label untuk aset tanpa tanggal lelang. */
@@ -85,4 +86,32 @@ export function sisaQueryLelang(url: URL): string {
 	for (const [k, v] of [...sp]) if (v === '') sp.delete(k);
 	const qs = sp.toString();
 	return qs ? `?${qs}` : '';
+}
+
+/**
+ * Pesan WhatsApp minat rumah lelang ke principal. Selain judul & kode lot,
+ * ikut alamat & nilai limit supaya principal langsung tahu rumah yang
+ * ditanyakan tanpa membuka situs (permintaan user 2026-11-12).
+ */
+export function pesanWaMinatLelang(d: {
+	nama: string;
+	/** Nomor peminat, format internasional (62…). */
+	telepon: string;
+	judul: string;
+	kodeLot?: string | null;
+	/** Alamat lengkap (alamat, kecamatan, kab/kota, provinsi); kosong = dilewati. */
+	lokasi?: string | null;
+	nilaiLimit?: number | null;
+	pesan?: string | null;
+}): string {
+	const baris = [
+		`Halo, saya ${d.nama.trim()} (${d.telepon}).`,
+		`Saya tertarik dengan rumah lelang "${d.judul}"${d.kodeLot ? ` (kode lot ${d.kodeLot})` : ''} yang saya lihat di Omahe.`
+	];
+	if (d.lokasi?.trim()) baris.push(`Alamat: ${d.lokasi.trim()}`);
+	if (d.nilaiLimit !== null && d.nilaiLimit !== undefined) {
+		baris.push(`Nilai limit: ${formatRupiahPenuh(d.nilaiLimit)}`);
+	}
+	if (d.pesan?.trim()) baris.push('', d.pesan.trim());
+	return baris.join('\n');
 }

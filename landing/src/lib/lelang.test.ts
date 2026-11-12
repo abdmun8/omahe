@@ -4,8 +4,42 @@ import {
 	formatJadwalLelang,
 	formatTanggalRingkas,
 	hargaOriginalTampil,
+	pesanWaMinatLelang,
 	sisaQueryLelang
 } from './lelang';
+
+describe('pesanWaMinatLelang', () => {
+	const dasar = { nama: ' Budi ', telepon: '6281200000000', judul: 'Rumah Cikampek' };
+
+	test('memuat judul, kode lot, alamat, nilai limit, dan pesan', () => {
+		const t = pesanWaMinatLelang({
+			...dasar,
+			kodeLot: 'LOT-7',
+			lokasi: 'Jl. Melati 3, Cikampek, Kab. Karawang, Jawa Barat',
+			nilaiLimit: 350_000_000,
+			pesan: ' Bisa KPR? '
+		});
+		const baris = t.split('\n');
+		expect(baris[0]).toBe('Halo, saya Budi (6281200000000).');
+		expect(baris[1]).toBe(
+			'Saya tertarik dengan rumah lelang "Rumah Cikampek" (kode lot LOT-7) yang saya lihat di Omahe.'
+		);
+		expect(baris[2]).toBe('Alamat: Jl. Melati 3, Cikampek, Kab. Karawang, Jawa Barat');
+		expect(baris[3]).toMatch(/^Nilai limit: Rp\s?350\.000\.000$/);
+		expect(baris.slice(4)).toEqual(['', 'Bisa KPR?']);
+	});
+
+	test('alamat/nilai limit/pesan kosong → baris dilewati', () => {
+		const t = pesanWaMinatLelang({ ...dasar, lokasi: '  ', nilaiLimit: null, pesan: '' });
+		expect(t.split('\n')).toHaveLength(2);
+		expect(t).not.toContain('Alamat');
+		expect(t).not.toContain('Nilai limit');
+	});
+
+	test('nilai limit 0 tetap ditampilkan', () => {
+		expect(pesanWaMinatLelang({ ...dasar, nilaiLimit: 0 })).toContain('Nilai limit:');
+	});
+});
 
 describe('format jadwal lelang (WIB)', () => {
 	test('jadwal lengkap memakai zona WIB', () => {
