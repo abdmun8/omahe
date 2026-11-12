@@ -272,4 +272,11 @@
 </div>
 
 <GaleriLightbox urls={fotoUrls} bind:indeks bind:terbuka />
-<LelangMinatDialog bind:open={minatTerbuka} slug={r.slug} judul={r.judul} kodeLot={r.kodeLot} />
+<LelangMinatDialog
+	bind:open={minatTerbuka}
+	slug={r.slug}
+	judul={r.judul}
+	kodeLot={r.kodeLot}
+	{lokasi}
+	nilaiLimit={r.nilaiLimit}
+/>

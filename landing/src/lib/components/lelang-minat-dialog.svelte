@@ -11,14 +11,26 @@
 	import { trackEvent } from '$lib/analytics';
 	import { SITE } from '$lib/config';
 	import { nomorInternasional, waUrl } from '$lib/utils';
+	import { pesanWaMinatLelang } from '$lib/lelang';
 	import Button from './ui/button.svelte';
 
 	let {
 		slug,
 		judul,
 		kodeLot = null,
+		lokasi = null,
+		nilaiLimit = null,
 		open = $bindable(false)
-	}: { slug: string; judul: string; kodeLot?: string | null; open?: boolean } = $props();
+	}: {
+		slug: string;
+		judul: string;
+		kodeLot?: string | null;
+		/** Alamat lengkap rumah (ikut pesan WA ke principal). */
+		lokasi?: string | null;
+		/** Nilai limit lelang (ikut pesan WA ke principal). */
+		nilaiLimit?: number | null;
+		open?: boolean;
+	} = $props();
 
 	const uid = $props.id();
 	let nama = $state('');
@@ -70,12 +82,16 @@
 				}
 				throw new Error(teks);
 			}
-			const baris = [
-				`Halo, saya ${nama.trim()} (${nomorInternasional(telepon)}).`,
-				`Saya tertarik dengan rumah lelang "${judul}"${kodeLot ? ` (kode lot ${kodeLot})` : ''} yang saya lihat di Omahe.`
-			];
-			if (pesan.trim()) baris.push('', pesan.trim());
-			waLanjut = waUrl(page.data.kontak?.whatsapp ?? SITE.whatsapp, baris.join('\n'));
+			const isiPesan = pesanWaMinatLelang({
+				nama,
+				telepon: nomorInternasional(telepon),
+				judul,
+				kodeLot,
+				lokasi,
+				nilaiLimit,
+				pesan
+			});
+			waLanjut = waUrl(page.data.kontak?.whatsapp ?? SITE.whatsapp, isiPesan);
 			trackEvent('lead_form_submit', { perumahan: `lelang:${slug}`, sumber: 'lelang' });
 		} catch (err) {
 			pesanError =
