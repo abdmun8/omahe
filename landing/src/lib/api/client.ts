@@ -1200,7 +1200,7 @@ function normalisasiPrioritasAgen(agen: AgenDirektori): AgenDirektori {
  */
 export async function getDirektoriAgen(
 	fetchFn: Fetch,
-	opsi: { q?: string; halaman?: number } = {}
+	opsi: { q?: string; halaman?: number; perHalaman?: number } = {}
 ): Promise<AgenDirektoriHasil> {
 	const kosong: AgenDirektoriHasil = {
 		items: [],
@@ -1222,13 +1222,14 @@ export async function getDirektoriAgen(
 				)
 			: fixtures.DIREKTORI_AGEN;
 		const total = saringan.length;
-		const totalHalaman = Math.max(1, Math.ceil(total / 24));
+		const per = opsi.perHalaman ?? 24;
+		const totalHalaman = Math.max(1, Math.ceil(total / per));
 		const halaman = Math.min(Math.max(1, opsi.halaman ?? 1), totalHalaman);
 		return {
-			items: saringan.slice((halaman - 1) * 24, halaman * 24).map(normalisasiPrioritasAgen),
+			items: saringan.slice((halaman - 1) * per, halaman * per).map(normalisasiPrioritasAgen),
 			total,
 			halaman,
-			perHalaman: 24,
+			perHalaman: per,
 			totalHalaman
 		};
 	}
@@ -1236,6 +1237,7 @@ export async function getDirektoriAgen(
 		const params = new URLSearchParams();
 		if (opsi.q?.trim()) params.set('q', opsi.q.trim());
 		if (opsi.halaman && opsi.halaman > 1) params.set('halaman', String(opsi.halaman));
+		if (opsi.perHalaman) params.set('perHalaman', String(opsi.perHalaman));
 		const qs = params.toString();
 		const data = await apiGet<AgenDirektoriHasil | AgenDirektori[]>(
 			fetchFn,

@@ -1,4 +1,11 @@
 import { getDirektoriAgen, getKategoriMitra, getMitra } from '$lib/api';
+import {
+	benihHarian,
+	COOKIE_ACAK,
+	CUPLIKAN_PER_BAGIAN,
+	cuplikanAcak,
+	POLA_ID_ACAK
+} from '$lib/acak-harian';
 import type { AgenDirektoriHasil } from '$lib/api/types';
 import { kategoriChips, urutkanMitraPerKategori } from '$lib/mitra';
 import type { PageServerLoad } from './$types';
@@ -19,7 +26,11 @@ import type { PageServerLoad } from './$types';
  * `?kategori=` valid bila ada di chip — kategori master tanpa mitra pun
  * sah dipilih.
  */
-export const load: PageServerLoad = async ({ fetch, url }) => {
+/** 2026-11-14 — kumpulan agen yang diacak untuk cuplikan tab "Semua" =
+ *  48 teratas (batas backend), promo tetap didahulukan. */
+const KUMPULAN_AGEN = 48;
+
+export const load: PageServerLoad = async ({ fetch, url, cookies }) => {
 	// AGEN-OMAHE-04 — tab "Agen Omahe" (`?tab=agen`): direktori agen, chip
 	// kategori tetap tampil (satu fetch mitra tetap dibutuhkan untuk chip).
 	const tabAgen = url.searchParams.get('tab') === 'agen';
@@ -43,7 +54,11 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 	const [semua, master, agenSemua] = await Promise.all([
 		getMitra(fetch),
 		getKategoriMitra(fetch),
-		butuhAgen ? getDirektoriAgen(fetch, { q: qAgen, halaman: halamanAgen }) : Promise.resolve(agenKosong)
+		tabAgen
+			? getDirektoriAgen(fetch, { q: qAgen, halaman: halamanAgen })
+			: butuhAgen
+				? getDirektoriAgen(fetch, { perHalaman: KUMPULAN_AGEN })
+				: Promise.resolve(agenKosong)
 	]);
 	const chips = kategoriChips(semua, master);
 	// Null/undefined = "Semua"; hanya nilai yang BENAR-BENAR ada di chip yang
@@ -52,10 +67,35 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 	// `?kategori=` tak dikenal = tampilan "Semua" juga (sertakan agen bila
 	// sudah dimuat).
 	const agen = tabAgen || !kategori ? agenSemua : agenKosong;
+	const tabSemua = !tabAgen && !kategori;
+
+	// 2026-11-14 — tab "Semua": tiap bagian hanya CUPLIKAN_PER_BAGIAN kartu,
+	// diacak harian per pengunjung (cookie id acak, lihat `acak-harian.ts`).
+	// Urutan penuh/terurut tetap di tab masing-masing ("Lihat semua").
+	let benih = 0;
+	if (tabSemua) {
+		let id = cookies.get(COOKIE_ACAK);
+		if (!id || !POLA_ID_ACAK.test(id)) {
+			id = crypto.randomUUID();
+			cookies.set(COOKIE_ACAK, id, {
+				path: '/',
+				maxAge: 60 * 60 * 24 * 365,
+				httpOnly: true,
+				sameSite: 'lax'
+			});
+		}
+		benih = benihHarian(id, new Date());
+	}
+	const mitraTampil = kategori
+		? semua.filter((m) => m.kategori === kategori)
+		: urutkanMitraPerKategori(semua, chips);
 	return {
-		mitra: kategori
-			? semua.filter((m) => m.kategori === kategori)
-			: urutkanMitraPerKategori(semua, chips),
+		mitra: mitraTampil,
+		/** Tab "Semua" saja: cuplikan agen acak (promo didahulukan) + total. */
+		cuplikanAgen: tabSemua
+			? cuplikanAcak(agen.items, CUPLIKAN_PER_BAGIAN, benih, (a) => a.prioritas > 0)
+			: [],
+		benihSemua: benih,
 		kategori: tabAgen ? undefined : kategori,
 		chips,
 		tabAgen,

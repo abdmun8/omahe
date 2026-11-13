@@ -567,6 +567,16 @@ describe('getDirektoriAgen (jalur API asli) — prioritas AGEN-OMAHE-08', () => 
 		expect(hasil.items[0]?.prioritas).toBe(0);
 		expect(hasil.totalHalaman).toBe(1);
 	});
+
+	test('perHalaman diteruskan ke backend (cuplikan acak tab Semua /mitra)', async () => {
+		let dipanggil = '';
+		const f = (async (u: string) => {
+			dipanggil = String(u);
+			return envelope([], { total: 0 });
+		}) as unknown as typeof fetch;
+		await getDirektoriAgen(f, { perHalaman: 48 });
+		expect(dipanggil).toContain('/public/agen-omahe?perHalaman=48');
+	});
 });
 
 describe('getKerjasamaQr (KERJASAMA-02/03, jalur API asli)', () => {

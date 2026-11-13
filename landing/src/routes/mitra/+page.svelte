@@ -15,6 +15,7 @@
 	import MitraCard from '$lib/components/mitra-card.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import Pagination from '$lib/components/pagination.svelte';
+	import { benihBagian, CUPLIKAN_PER_BAGIAN, cuplikanAcak } from '$lib/acak-harian';
 	import { formatAngka } from '$lib/utils';
 	import type { PublicMitra } from '$lib/api/types';
 	import type { PageData } from './$types';
@@ -38,30 +39,50 @@
 			perKategori.set(m.kategori, lama);
 		}
 		const chips = data.chips.filter((c) => c.nilai !== null);
-		const hasil: Array<{ slug: string | null; label: string; mitra: PublicMitra[] }> = [];
+		// 2026-11-14 — tiap kategori hanya CUPLIKAN_PER_BAGIAN kartu, diacak
+		// harian per pengunjung (benih dari server); sisanya via "Lihat semua".
+		const potong = (slug: string, isi: PublicMitra[]) =>
+			cuplikanAcak(isi, CUPLIKAN_PER_BAGIAN, benihBagian(data.benihSemua, slug));
+		const hasil: Array<{
+			slug: string | null;
+			label: string;
+			mitra: PublicMitra[];
+			total: number;
+		}> = [];
 		const terpakai = new Set<string>();
 		for (const c of chips) {
 			const isi = perKategori.get(c.nilai!) ?? [];
 			if (isi.length === 0) continue;
-			hasil.push({ slug: c.nilai, label: c.label, mitra: isi });
+			hasil.push({
+				slug: c.nilai,
+				label: c.label,
+				mitra: potong(c.nilai!, isi),
+				total: isi.length
+			});
 			terpakai.add(c.nilai!);
 		}
 		const sisa = data.mitra.filter((m) => !terpakai.has(m.kategori));
-		if (sisa.length > 0) hasil.push({ slug: null, label: 'Lainnya', mitra: sisa });
+		if (sisa.length > 0)
+			hasil.push({
+				slug: null,
+				label: 'Lainnya',
+				mitra: potong('lainnya', sisa),
+				total: sisa.length
+			});
 		return hasil;
 	});
 </script>
 
 <svelte:head>
-	<title>Mitra Profesional — KJPP &amp; Notaris · Omahe</title>
+	<title>Mitra Profesional — Agen, KJPP, Notaris &amp; lainnya · Omahe</title>
 	<meta
 		name="description"
-		content="Direktori mitra profesional properti terverifikasi: Kantor Jasa Penilai Publik (KJPP) dan Notaris/PPAT — siap membantu penilaian hingga akad jual beli Anda."
+		content="Direktori agen properti Omahe dan mitra profesional — KJPP, Notaris/PPAT, dan jasa properti lain — yang membantu dari mencari rumah, penilaian harga, hingga akad jual beli."
 	/>
 	<meta property="og:title" content="Mitra Profesional · Omahe" />
 	<meta
 		property="og:description"
-		content="Direktori KJPP & Notaris — mitra profesional untuk penilaian dan legalitas properti Anda."
+		content="Agen properti & mitra profesional — dari mencari rumah hingga akad jual beli."
 	/>
 </svelte:head>
 
@@ -69,8 +90,9 @@
 	<header class="max-w-2xl">
 		<h1 class="font-display text-ink text-2xl font-extrabold sm:text-3xl">Mitra Profesional</h1>
 		<p class="text-muted mt-2 leading-relaxed">
-			Kantor Jasa Penilai Publik (KJPP) dan Notaris/PPAT dalam satu direktori — dari penilaian harga
-			hingga akad jual beli, didampingi profesional yang tepat.
+			Agen properti Omahe dan mitra profesional — KJPP, Notaris/PPAT, hingga jasa properti lainnya —
+			dalam satu direktori. Dari mencari rumah, penilaian harga, sampai akad jual beli, didampingi
+			profesional yang tepat.
 		</p>
 	</header>
 
@@ -186,36 +208,67 @@
 	{:else}
 		<!-- 2026-10-08 — tab "Semua" DIPISAH PER KATEGORI: tiap kategori punya
 		     section berjudul sendiri (urut master), Agen Omahe tetap pertama. -->
-		{#if data.agen.items.length > 0}
+		{#if data.cuplikanAgen.length > 0}
 			<section aria-labelledby="semua-agen-omahe" class="mt-8">
-				<div class="flex items-baseline justify-between gap-4">
-					<h2 id="semua-agen-omahe" class="font-display text-ink text-lg font-bold">Agen Omahe</h2>
-					<a
-						href="/mitra?tab=agen"
-						class="text-primary shrink-0 text-sm font-medium hover:underline">Lihat semua agen</a
-					>
-				</div>
+				{@render judulBagian('semua-agen-omahe', 'Agen Omahe', data.agen.total, '/mitra?tab=agen')}
 				<ul class="mt-4 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-					{#each data.agen.items as a (a.kodeAgen)}
+					{#each data.cuplikanAgen as a (a.kodeAgen)}
 						<li><AgenOmaheCard agen={a} /></li>
 					{/each}
 				</ul>
+				{@render lihatSemua(
+					data.agen.total,
+					data.cuplikanAgen.length,
+					'agen Omahe',
+					'/mitra?tab=agen'
+				)}
 			</section>
 		{/if}
 		{#each kelompokSemua as kelompok (kelompok.label)}
-			<section aria-labelledby="semua-{kelompok.slug ?? 'lainnya'}" class="mt-8">
-				<h2 id="semua-{kelompok.slug ?? 'lainnya'}" class="font-display text-ink text-lg font-bold">
-					{kelompok.label}
-					<span class="text-muted ml-1 text-sm font-medium"
-						>({formatAngka(kelompok.mitra.length)})</span
-					>
-				</h2>
+			{@const id = `semua-${kelompok.slug ?? 'lainnya'}`}
+			{@const href = kelompok.slug ? `/mitra?kategori=${kelompok.slug}` : null}
+			<section aria-labelledby={id} class="mt-10">
+				{@render judulBagian(id, kelompok.label, kelompok.total, href)}
 				<ul class="mt-4 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 					{#each kelompok.mitra as mitra (mitra.id)}
 						<li><MitraCard {mitra} /></li>
 					{/each}
 				</ul>
+				{#if href}
+					{@render lihatSemua(kelompok.total, kelompok.mitra.length, kelompok.label, href)}
+				{/if}
 			</section>
 		{/each}
 	{/if}
 </div>
+
+<!-- 2026-11-14 — judul bagian tab "Semua": label + jumlah total + tautan
+     "Lihat semua" di kanan (selalu tampil bila ada tab tujuannya). -->
+{#snippet judulBagian(id: string, label: string, total: number, href: string | null)}
+	<div class="flex items-baseline justify-between gap-4">
+		<h2 {id} class="font-display text-ink text-lg font-bold">
+			{label}
+			<span class="text-muted ml-1 text-sm font-medium">({formatAngka(total)})</span>
+		</h2>
+		{#if href}
+			<a {href} class="text-primary shrink-0 text-sm font-semibold hover:underline">Lihat semua →</a
+			>
+		{/if}
+	</div>
+{/snippet}
+
+<!-- Tombol lebar di bawah cuplikan — supaya pengunjung sadar masih ada
+     N lainnya (hanya bila memang ada yang tersembunyi). -->
+{#snippet lihatSemua(total: number, tampil: number, label: string, href: string)}
+	{#if total > tampil}
+		<a
+			{href}
+			class="border-line text-primary hover:border-primary/40 hover:bg-surface mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed bg-white px-4 py-3 text-sm font-semibold transition-colors"
+		>
+			Lihat semua {formatAngka(total)}
+			{label}
+			<span class="text-muted font-normal">(+{formatAngka(total - tampil)} lainnya)</span>
+			<span aria-hidden="true">→</span>
+		</a>
+	{/if}
+{/snippet}
