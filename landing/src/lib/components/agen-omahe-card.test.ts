@@ -59,10 +59,8 @@ describe.skipIf(typeof document === 'undefined')('AgenOmaheCard', () => {
 			screen.getByRole('button', { name: /^Agen Profesional Terverifikasi/ })
 		).toBeInTheDocument();
 		expect(screen.queryByText(/Agen resmi/)).toBeNull();
-		expect(screen.getByRole('link', { name: /Cek ID card agen/ })).toHaveAttribute(
-			'href',
-			'/verifikasi/OMHA-A0001'
-		);
+		// Tautan "Cek ID card" dihapus dari kartu — sudah ada di profil agen.
+		expect(screen.queryByText(/Cek ID card/)).toBeNull();
 	});
 
 	test('hanya terverifikasi → lencana hijau saja', () => {

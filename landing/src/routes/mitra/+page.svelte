@@ -100,8 +100,8 @@
 	{#if data.tabAgen}
 		<p class="text-muted mt-4 max-w-2xl text-sm leading-relaxed">
 			Agen Omahe Premium — lencana hijau berarti identitas (KTP) sudah diverifikasi, centang biru
-			berarti agen profesional. Keaslian ID card bisa dicek lewat tautan verifikasi. Tinggalkan
-			kontak Anda, agen akan membantu mencarikan rumah yang pas.
+			berarti agen profesional. Keaslian ID card bisa dicek di profil agen. Tinggalkan kontak Anda,
+			agen akan membantu mencarikan rumah yang pas.
 		</p>
 
 		<!-- 2026-10-08 — pencarian direktori agen: GET form (tanpa JS tetap

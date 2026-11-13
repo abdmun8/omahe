@@ -8,7 +8,6 @@
 	untuk agen, WA ke agen). Nomor HP agen sengaja tidak ditampilkan.
 -->
 <script lang="ts">
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import BadgeProfesional from './badge-profesional.svelte';
 	import BadgeTerverifikasi from './badge-terverifikasi.svelte';
 	import type { AgenDirektori } from '$lib/api/types';
@@ -75,12 +74,6 @@
 		<!-- AGEN-OMAHE-05 — kode agen publik (sama dengan ID card). -->
 		<p class="text-accent-dark font-mono text-xs font-semibold">{agen.kodeAgen}</p>
 		<p class="text-muted text-sm">{agen.kantorNama}</p>
-		<a
-			href={`/verifikasi/${encodeURIComponent(agen.kodeAgen)}`}
-			class="text-primary mt-1 inline-flex items-center gap-1 text-xs font-medium hover:underline"
-		>
-			<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Cek ID card agen
-		</a>
 
 		<div class="mt-auto flex w-full flex-col gap-2 pt-4">
 			<Button variant="primary" size="sm" class="w-full" onclick={hubungi}>Hubungi Agen</Button>
