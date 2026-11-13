@@ -49,6 +49,29 @@ describe.skipIf(typeof document === 'undefined')('AgenOmaheCard', () => {
 		expect(screen.getByText('OMHA-A0001')).toBeInTheDocument();
 	});
 
+	// AGEN-OMAHE-16 — lencana hijau "Terverifikasi" (KTP) independen dari
+	// centang biru Profesional; sebutan "Agen resmi Omahe" dihapus.
+	test('terverifikasi & profesional → dua lencana; tanpa sebutan "Agen resmi"', () => {
+		render(AgenOmaheCard, { agen: buatAgen({ terverifikasi: true, profesional: true }) });
+
+		expect(screen.getByRole('button', { name: /^Agen Terverifikasi/ })).toBeInTheDocument();
+		expect(
+			screen.getByRole('button', { name: /^Agen Profesional Terverifikasi/ })
+		).toBeInTheDocument();
+		expect(screen.queryByText(/Agen resmi/)).toBeNull();
+		expect(screen.getByRole('link', { name: /Cek ID card agen/ })).toHaveAttribute(
+			'href',
+			'/verifikasi/OMHA-A0001'
+		);
+	});
+
+	test('hanya terverifikasi → lencana hijau saja', () => {
+		render(AgenOmaheCard, { agen: buatAgen({ terverifikasi: true }) });
+
+		expect(screen.getByRole('button', { name: /^Agen Terverifikasi/ })).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: /^Agen Profesional/ })).toBeNull();
+	});
+
 	test('tombol "Hubungi Agen" tidak dibedakan — satu tombol utama untuk semua agen', () => {
 		render(AgenOmaheCard, { agen: buatAgen({ prioritas: 80 }) });
 

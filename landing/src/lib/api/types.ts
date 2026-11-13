@@ -699,6 +699,10 @@ export interface VerifikasiAgen {
 	fotoUrl: string | null;
 	status: 'aktif' | 'tidak_aktif';
 	berlakuSampai: string | null;
+	/** AGEN-OMAHE-07 — centang biru. Opsional. */
+	profesional?: boolean;
+	/** AGEN-OMAHE-16 — badge hijau muda "Terverifikasi" (KTP dicek tim Omahe; independen dari profesional). Opsional: backend lama tidak mengirim. */
+	terverifikasi?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -815,6 +819,8 @@ export interface AgenPemasar {
 	kodeRef: string;
 	/** AGEN-OMAHE-07 — centang biru (terverifikasi profesional & membership aktif). Opsional: backend lama tidak mengirim. */
 	profesional?: boolean;
+	/** AGEN-OMAHE-16 — badge hijau muda "Terverifikasi" (KTP dicek tim Omahe; independen dari profesional). Opsional: backend lama tidak mengirim. */
+	terverifikasi?: boolean;
 }
 
 /** AGEN-OMAHE-04 — agen di tab "Agen Omahe" halaman Mitra (`GET /public/agen-omahe`, api-contract §23). */
@@ -826,6 +832,8 @@ export interface AgenDirektori {
 	kodeAgen: string;
 	/** AGEN-OMAHE-07 — centang biru (opsional, backend lama tidak mengirim). */
 	profesional?: boolean;
+	/** AGEN-OMAHE-16 — badge hijau muda "Terverifikasi" (KTP dicek tim Omahe; independen dari profesional). Opsional: backend lama tidak mengirim. */
+	terverifikasi?: boolean;
 	/** AGEN-OMAHE-08 — prioritas promosi efektif 0–100 (0 = tidak promosi;
 	 *  masa promo habis otomatis turun ke 0, pola MONET-01). Backend lama
 	 *  tanpa field → dinormalisasi ke 0 di `client.ts`. */
@@ -879,6 +887,8 @@ export interface KartuNamaAgen {
 	/** AGEN-OMAHE-07 — centang biru + sejak kapan (ISO). Opsional. */
 	profesional?: boolean;
 	profesionalSejak?: string | null;
+	/** AGEN-OMAHE-16 — badge hijau muda "Terverifikasi" (KTP dicek tim Omahe; independen dari profesional). Opsional: backend lama tidak mengirim. */
+	terverifikasi?: boolean;
 }
 
 // ---------------------------------------------------------------------------

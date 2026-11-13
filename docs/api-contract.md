@@ -1032,3 +1032,16 @@ request API dari Omahe tanpa header ini.
   (panel agen saja). Fixture `OMAHE_FIXTURE_AGEN=1`: agen contoh memilih
   `griya-asri-bogor` saja.
 
+
+## §42 — Status agen Terverifikasi (KTP) (AGEN-OMAHE-16, 2026-11-13)
+
+- Field aditif `terverifikasi: boolean` (KTP agen disetujui superadmin) di
+  `GET /public/agen-omahe` (direktori), `GET /public/agen-omahe/perumahan/:slug`
+  (agen pemasar), kartu nama `GET /public/agen-omahe/kartu/:kode`, dan verifikasi ID card
+  `GET /public/agen-omahe/verifikasi/:kode` (verifikasi kini juga membawa `profesional`).
+  Independen dari `profesional` (centang biru) — dua lencana bisa tampil bersamaan.
+  Backend lama tanpa field → dianggap `false`. File/URL KTP tidak pernah di respons publik.
+- Omahe: `badge-terverifikasi.svelte` (lencana hijau muda `#34C77B`, popover →
+  `/gabung/agen#terverifikasi`) di kartu direktori, blok agen pemasar, kartu nama,
+  halaman verifikasi; `badge-profesional` kini membungkus `badge-lencana.svelte` (generik).
+  Sebutan "Agen resmi Omahe" dihapus dari website (diganti "Cek ID card").

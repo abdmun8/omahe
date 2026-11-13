@@ -11,6 +11,7 @@
 <script lang="ts">
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import BadgeProfesional from './badge-profesional.svelte';
+	import BadgeTerverifikasi from './badge-terverifikasi.svelte';
 	import type { AgenPemasar } from '$lib/api/types';
 	import { trackEvent } from '$lib/analytics';
 	import LeadFormDialog from './lead-form-dialog.svelte';
@@ -57,7 +58,7 @@
 			{agen.length === 1 ? 'Agen yang memasarkan' : 'Agen yang memasarkan perumahan ini'}
 		</h2>
 		<p class="text-muted mt-1 text-sm">
-			Agen resmi Omahe — identitasnya bisa Anda cek lewat tautan verifikasi.
+			Agen Omahe — keaslian ID card-nya bisa Anda cek lewat tautan verifikasi.
 		</p>
 		<ul class="mt-4 grid list-none gap-3 sm:grid-cols-2">
 			{#each agen as a (a.kodeRef)}
@@ -77,16 +78,16 @@
 					{/if}
 					<div class="min-w-0 flex-1">
 						<p class="text-ink flex items-center gap-1 font-semibold">
-							<span class="truncate">{a.nama}</span>{#if a.profesional}<BadgeProfesional
+							<span class="truncate">{a.nama}</span>{#if a.terverifikasi}<BadgeTerverifikasi
 									class="shrink-0"
-								/>{/if}
+								/>{/if}{#if a.profesional}<BadgeProfesional class="shrink-0" />{/if}
 						</p>
 						<p class="text-muted truncate text-sm">{a.kantorNama}</p>
 						<a
 							href={`/verifikasi/${encodeURIComponent(a.kodeAgen)}`}
 							class="text-primary mt-0.5 inline-flex items-center gap-1 text-xs font-medium hover:underline"
 						>
-							<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen resmi · {a.kodeAgen}
+							<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Cek ID card · {a.kodeAgen}
 						</a>
 					</div>
 					<Button variant="outline" size="sm" class="shrink-0" onclick={() => hubungi(a)}>

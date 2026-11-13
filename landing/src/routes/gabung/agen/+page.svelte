@@ -15,6 +15,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import BadgeProfesional from '$lib/components/badge-profesional.svelte';
+	import BadgeTerverifikasi from '$lib/components/badge-terverifikasi.svelte';
 	import { SITE } from '$lib/config';
 	import { trackGabungClick } from '$lib/analytics';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
@@ -104,8 +105,23 @@
 		<p class="text-muted mt-2 text-sm leading-relaxed">
 			Centang biru menandakan agen Omahe yang kompetensi &amp; pengalamannya sudah diverifikasi
 			langsung oleh tim Omahe. Tanda ini hanya tampil selama keanggotaan agen aktif, dan bisa
-			dicabut bila agen tidak lagi memenuhi standar kami. Setiap agen Omahe tetap merupakan
-			<span class="text-ink font-medium">agen resmi</span> — keaslian ID card bisa dicek lewat kodenya.
+			dicabut bila agen tidak lagi memenuhi standar kami. Keaslian ID card setiap agen Omahe bisa
+			dicek lewat kodenya.
+		</p>
+	</section>
+
+	<!-- AGEN-OMAHE-16 — penjelasan lencana hijau muda (tujuan "Apa artinya?"). -->
+	<section
+		id="terverifikasi"
+		class="border-line mt-8 scroll-mt-24 rounded-2xl border bg-white p-6 sm:p-8"
+	>
+		<h2 class="font-display text-ink flex items-center gap-2 text-lg font-bold">
+			Lencana hijau <BadgeTerverifikasi /> Agen Terverifikasi
+		</h2>
+		<p class="text-muted mt-2 text-sm leading-relaxed">
+			Lencana hijau menandakan identitas agen sudah dicocokkan dengan KTP oleh tim Omahe. Agen cukup
+			mengunggah foto KTP dari Profil di panel agen; foto KTP hanya dilihat tim Omahe untuk
+			verifikasi dan tidak pernah ditampilkan di website.
 		</p>
 	</section>
 

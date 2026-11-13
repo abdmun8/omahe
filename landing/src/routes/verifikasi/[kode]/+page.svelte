@@ -10,6 +10,8 @@
 	sampai backend AGEN-OMAHE-01 di-deploy, lalu nyala otomatis.
 -->
 <script lang="ts">
+	import BadgeProfesional from '$lib/components/badge-profesional.svelte';
+	import BadgeTerverifikasi from '$lib/components/badge-terverifikasi.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -67,7 +69,7 @@
 						/>
 					</svg>
 				</span>
-				<h1 class="font-display text-ink mt-4 text-xl font-bold">Agen Omahe terverifikasi</h1>
+				<h1 class="font-display text-ink mt-4 text-xl font-bold">ID card agen Omahe asli</h1>
 			{:else}
 				<span
 					class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-700"
@@ -102,7 +104,14 @@
 				>
 			{/if}
 
-			<p class="font-display text-ink mt-4 text-lg font-bold">{agen.nama}</p>
+			<p class="font-display text-ink mt-4 text-lg font-bold">
+				{agen.nama}{#if agen.terverifikasi}<BadgeTerverifikasi
+						class="ml-1"
+					/>{/if}{#if agen.profesional}<BadgeProfesional class="ml-1" />{/if}
+			</p>
+			{#if agen.terverifikasi}
+				<p class="mt-0.5 text-xs font-medium text-[#1F9A5B]">Identitas (KTP) terverifikasi Omahe</p>
+			{/if}
 			<p class="text-muted mt-0.5 text-sm">{agen.kantorNama}</p>
 			<p class="text-muted mt-3 font-mono text-xs tracking-wider">{agen.kodeAgen}</p>
 
@@ -163,6 +172,6 @@
 	</div>
 
 	<p class="text-muted mt-6 text-center text-xs">
-		Verifikasi agen resmi Omahe hanya melalui tautan/QR pada ID card agen — bukan tautan lain.
+		Verifikasi agen Omahe hanya melalui tautan/QR pada ID card agen — bukan tautan lain.
 	</p>
 </div>

@@ -12,6 +12,7 @@
 <script lang="ts">
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import BadgeProfesional from '$lib/components/badge-profesional.svelte';
+	import BadgeTerverifikasi from '$lib/components/badge-terverifikasi.svelte';
 	import LeadFormDialog from '$lib/components/lead-form-dialog.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import { SITE } from '$lib/config';
@@ -62,7 +63,7 @@
 	<title>{k.nama} — Agen Omahe {k.kodeAgen}</title>
 	<meta
 		name="description"
-		content={`Kartu nama digital ${k.nama}, agen resmi Omahe (${k.kantorNama}).`}
+		content={`Kartu nama digital ${k.nama}, agen Omahe (${k.kantorNama}).`}
 	/>
 	<!-- Data personal agen — dibagikan lewat link, tidak untuk diindeks. -->
 	<meta name="robots" content="noindex" />
@@ -94,8 +95,13 @@
 		{/if}
 		<div class="flex flex-col items-center px-6 py-6 text-center">
 			<h1 class="font-display text-ink mt-2 text-xl font-extrabold">
-				{k.nama}{#if k.profesional}<BadgeProfesional class="ml-1" />{/if}
+				{k.nama}{#if k.terverifikasi}<BadgeTerverifikasi
+						class="ml-1"
+					/>{/if}{#if k.profesional}<BadgeProfesional class="ml-1" />{/if}
 			</h1>
+			{#if k.terverifikasi}
+				<p class="mt-1 text-xs font-medium text-[#1F9A5B]">Identitas (KTP) terverifikasi Omahe</p>
+			{/if}
 			{#if k.profesional}
 				<p class="mt-1 text-xs font-medium text-[#1D9BF0]">
 					Agen Profesional Terverifikasi Omahe{profesionalSejak
@@ -111,7 +117,7 @@
 					href={`/verifikasi/${encodeURIComponent(k.kodeAgen)}`}
 					class="text-primary mt-2 inline-flex items-center gap-1 text-xs font-medium hover:underline"
 				>
-					<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Agen resmi Omahe{berlaku
+					<ShieldCheck class="h-3.5 w-3.5" aria-hidden="true" /> Cek ID card{berlaku
 						? ` · berlaku s/d ${berlaku}`
 						: ''}
 				</a>

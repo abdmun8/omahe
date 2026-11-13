@@ -99,8 +99,9 @@
 
 	{#if data.tabAgen}
 		<p class="text-muted mt-4 max-w-2xl text-sm leading-relaxed">
-			Agen resmi Omahe dengan keanggotaan aktif — identitasnya bisa dicek lewat tautan verifikasi.
-			Tinggalkan kontak Anda, agen akan membantu mencarikan rumah yang pas.
+			Agen Omahe Premium — lencana hijau berarti identitas (KTP) sudah diverifikasi, centang biru
+			berarti agen profesional. Keaslian ID card bisa dicek lewat tautan verifikasi. Tinggalkan
+			kontak Anda, agen akan membantu mencarikan rumah yang pas.
 		</p>
 
 		<!-- 2026-10-08 — pencarian direktori agen: GET form (tanpa JS tetap
@@ -189,8 +190,9 @@
 			<section aria-labelledby="semua-agen-omahe" class="mt-8">
 				<div class="flex items-baseline justify-between gap-4">
 					<h2 id="semua-agen-omahe" class="font-display text-ink text-lg font-bold">Agen Omahe</h2>
-					<a href="/mitra?tab=agen" class="text-primary shrink-0 text-sm font-medium hover:underline"
-						>Lihat semua agen</a
+					<a
+						href="/mitra?tab=agen"
+						class="text-primary shrink-0 text-sm font-medium hover:underline">Lihat semua agen</a
 					>
 				</div>
 				<ul class="mt-4 grid list-none grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -202,10 +204,7 @@
 		{/if}
 		{#each kelompokSemua as kelompok (kelompok.label)}
 			<section aria-labelledby="semua-{kelompok.slug ?? 'lainnya'}" class="mt-8">
-				<h2
-					id="semua-{kelompok.slug ?? 'lainnya'}"
-					class="font-display text-ink text-lg font-bold"
-				>
+				<h2 id="semua-{kelompok.slug ?? 'lainnya'}" class="font-display text-ink text-lg font-bold">
 					{kelompok.label}
 					<span class="text-muted ml-1 text-sm font-medium"
 						>({formatAngka(kelompok.mitra.length)})</span
