@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { NAV, SITE } from '$lib/config';
+	import { NAV, NAV_FOOTER_EKSTRA, SITE } from '$lib/config';
 	import { withRef } from '$lib/ref';
 	import { page } from '$app/state';
 	import GooglePlayBadge from '$lib/components/google-play-badge.svelte';
@@ -31,13 +31,7 @@
 	<div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
 		<div class="sm:col-span-2 lg:col-span-2">
 			<!-- DASH — logo gambar menggantikan teks (omahe-logo.jpeg). -->
-			<img
-				src="/omahe-logo.jpeg"
-				alt="Omahe"
-				class="h-10 w-auto"
-				width="40"
-				height="40"
-			/>
+			<img src="/omahe-logo.jpeg" alt="Omahe" class="h-10 w-auto" width="40" height="40" />
 			<p class="font-display text-accent-dark mt-1 text-sm">{tagline}</p>
 			<p class="text-muted mt-3 max-w-sm text-sm leading-relaxed">{SITE.deskripsi}</p>
 			{#if situs.alamatKantor}
@@ -65,7 +59,7 @@
 		<div>
 			<h2 class="text-ink text-sm font-semibold">Jelajahi</h2>
 			<ul class="text-muted mt-3 space-y-2 text-sm">
-				{#each NAV as item (item.href)}
+				{#each [...NAV, ...NAV_FOOTER_EKSTRA] as item (item.href)}
 					<li><a href={withRef(item.href, ref)} class="hover:text-primary">{item.label}</a></li>
 				{/each}
 				<!-- PROMO-02 — di footer (bukan nav utama): daftar promo bisa kosong. -->

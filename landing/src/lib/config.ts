@@ -36,13 +36,22 @@ export const SITE = {
 	email: 'halo@omahe.co.id'
 } as const;
 
+/**
+ * Nav utama (header desktop + menu HP) — urut niat pengunjung (2026-11-14):
+ * listing dulu (Cari Rumah, Lelang, Developer), lalu bantuan orang (Agen &
+ * Mitra), lalu alat & konten. Tentang/Kontak hanya di footer (`NAV_FOOTER_EKSTRA`).
+ */
 export const NAV = [
 	{ href: '/cari', label: 'Cari Rumah' },
-	{ href: '/developer', label: 'Developer' },
-	{ href: '/kpr', label: 'Simulasi KPR' },
-	{ href: '/artikel', label: 'Artikel' },
 	{ href: '/lelang', label: 'Lelang' },
-	{ href: '/mitra', label: 'Mitra' },
+	{ href: '/developer', label: 'Developer' },
+	{ href: '/mitra', label: 'Agen & Mitra' },
+	{ href: '/kpr', label: 'Simulasi KPR' },
+	{ href: '/artikel', label: 'Artikel' }
+] as const;
+
+/** Tautan footer "Jelajahi" setelah `NAV` — tidak di header. */
+export const NAV_FOOTER_EKSTRA = [
 	{ href: '/tentang', label: 'Tentang' },
 	{ href: '/kontak', label: 'Kontak' }
 ] as const;

@@ -74,12 +74,12 @@
 </script>
 
 <svelte:head>
-	<title>Mitra Profesional — Agen, KJPP, Notaris &amp; lainnya · Omahe</title>
+	<title>Agen &amp; Mitra — Agen Properti, KJPP, Notaris &amp; lainnya · Omahe</title>
 	<meta
 		name="description"
 		content="Direktori agen properti Omahe dan mitra profesional — KJPP, Notaris/PPAT, dan jasa properti lain — yang membantu dari mencari rumah, penilaian harga, hingga akad jual beli."
 	/>
-	<meta property="og:title" content="Mitra Profesional · Omahe" />
+	<meta property="og:title" content="Agen & Mitra · Omahe" />
 	<meta
 		property="og:description"
 		content="Agen properti & mitra profesional — dari mencari rumah hingga akad jual beli."
@@ -88,7 +88,7 @@
 
 <div class="mx-auto max-w-6xl px-4 py-8">
 	<header class="max-w-2xl">
-		<h1 class="font-display text-ink text-2xl font-extrabold sm:text-3xl">Mitra Profesional</h1>
+		<h1 class="font-display text-ink text-2xl font-extrabold sm:text-3xl">Agen &amp; Mitra</h1>
 		<p class="text-muted mt-2 leading-relaxed">
 			Agen properti Omahe dan mitra profesional — KJPP, Notaris/PPAT, hingga jasa properti lainnya —
 			dalam satu direktori. Dari mencari rumah, penilaian harga, sampai akad jual beli, didampingi
