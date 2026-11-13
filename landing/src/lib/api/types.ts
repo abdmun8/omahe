@@ -719,6 +719,12 @@ export interface AgenSaya {
 	fotoUrl: string | null;
 	/** URL absolut panel agen di app `perumahan` (`…/agen-omahe`). */
 	panelUrl: string;
+	/**
+	 * AGEN-OMAHE-15 — slug perumahan pilihan AKTIF agen (api-contract §41).
+	 * `null` = backend lama tanpa field → tombol agen tidak digerbangi
+	 * (backend tetap otoritatif lewat 403 BELUM_PILIH_PERUMAHAN).
+	 */
+	perumahanSlugs: string[] | null;
 }
 
 /**

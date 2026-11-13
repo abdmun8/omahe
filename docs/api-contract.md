@@ -607,6 +607,14 @@ dibandingkan case-insensitive). Respons `data`:
   gate partner berbayar dan tercatat untuk agen itu (WA ke agen).
 - Form minat per agen: `LeadFormDialog` dengan `ref={kodeRef}` +
   `namaAgen` (deskripsi dialog "agen X akan menghubungi Anda").
+- **Revisi 2026-11-13 (AGEN-OMAHE-15):** "Aktifkan semua" DIHAPUS backend —
+  agen memilih perumahan sendiri (belum Premium maks 10), dan endpoint ini hanya
+  membalas agen PREMIUM (urut prioritas, maks 6 tanpa ref). Daftar agen
+  DIKEMBALIKAN: `getAgenPemasar` SELALU dipanggil (ref diteruskan HANYA bila
+  berpola `AO-…`, selain itu `null`); blok merender kartu pemilik ref AO, atau
+  daftar agen + link "Lihat semua agen Omahe"; daftar kosong → blok ringkas
+  "Agen Omahe" + link `/mitra?tab=agen`. Catatan 2026-11-11 di bawah tinggal
+  sejarah.
 - **Catatan tampilan Omahe (2026-11-11, menyusul AGEN-OMAHE-13 "Aktifkan
   semua"):** satu agen kini bisa mengaktifkan SEMUA perumahan sekaligus,
   jadi daftar balikan endpoint ini bisa puluhan — Omahe tidak merender
@@ -1005,3 +1013,22 @@ request API dari Omahe tanpa header ini.
   `/gabung/agen` (hanya varian agen). Tutup banner hanya menyembunyikan banner; ref
   tetap mengalir ke `ajukanUrl()` & form minat.
 - Fixture non-prod: kode `OMHA-A0001` → nama `"Widya Pratama"`; kode agen lain → `null`.
+
+## §41 — Pilihan aktif agen di sesi & gerbang input (AGEN-OMAHE-15, 2026-11-13)
+
+- `GET /public/agen-omahe/saya` (SESI-OMAHE-01): `agen` kini memuat
+  `perumahanSlugs: string[]` — slug perumahan pilihan AKTIF agen (`sampai >= now`).
+  Omahe menormalisasi ke `AgenSaya.perumahanSlugs` (absen di backend lama → `null`
+  = tidak digerbangi).
+- Omahe: agen login melihat tombol "Daftarkan Pembeli" ABU-ABU (tetap bisa diklik)
+  di perumahan yang bukan pilihannya (`agenTerdaftarDi(slug)` di `sesi-agen.svelte.ts`);
+  klik → `agen-belum-terdaftar-dialog` "Anda belum terdaftar sebagai agen perumahan
+  ini. Silakan tambahkan perumahan terlebih dahulu." + tombol ke
+  `<panelUrl>/perumahan#pilih-perumahan`.
+- Backend otoritatif: input lead/booking/unit agen ke perumahan bukan pilihan aktif →
+  403 `{error, code:'BELUM_PILIH_PERUMAHAN'}` (pesan sama; proxy meneruskan apa
+  adanya lewat `pesanErrorBackend()`). Atribusi `OMHA-…` hanya ke pilihan aktif.
+- Pilih perumahan ke-(N+1) oleh agen belum Premium → 409 `{code:'BATAS_PILIHAN', batas}`
+  (panel agen saja). Fixture `OMAHE_FIXTURE_AGEN=1`: agen contoh memilih
+  `griya-asri-bogor` saja.
+

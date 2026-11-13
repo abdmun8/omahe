@@ -398,7 +398,8 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		kodeAgen: 'OMHA-A0001',
 		nama: 'Widya Pratama',
 		fotoUrl: null,
-		panelUrl: 'https://app.perumahan.test/agen-omahe'
+		panelUrl: 'https://app.perumahan.test/agen-omahe',
+		perumahanSlugs: null
 	};
 
 	test('sesi agen aktif → tombol "Daftarkan Pembeli" + dialog agen (bukan WA biasa)', async () => {
@@ -417,6 +418,46 @@ describe.skipIf(typeof document === 'undefined')('UnitCard', () => {
 		// Dialog agen (bukan form minat lama) — judul MinatDialog cabang agen.
 		expect(await screen.findByText('Daftarkan Pembeli — Griya Asri')).toBeInTheDocument();
 		expect(screen.queryByText('Minat — Griya Asri')).toBeNull();
+	});
+
+	// AGEN-OMAHE-15 keputusan 5 — perumahan bukan pilihan aktif agen: tombol
+	// abu-abu tapi tetap bisa diklik → alert "belum terdaftar" + tautan panel.
+	test('agen belum memilih perumahan ini → tombol abu-abu, klik → alert tambah perumahan', async () => {
+		store.sesiAgen.agen = { ...AGEN_AKTIF, perumahanSlugs: ['perumahan-lain'] };
+		store.sesiAgen.status = 'siap';
+		render(UnitCard, { unit: buatUnit() });
+
+		const tombol = screen.getByRole('button', {
+			name: 'Daftarkan pembeli untuk 36/72 di Griya Asri'
+		});
+		expect(tombol).toHaveAttribute('data-agen-belum-terdaftar');
+		expect(tombol).not.toBeDisabled();
+
+		await fireEvent.click(tombol);
+
+		expect(
+			await screen.findByText(
+				'Anda belum terdaftar sebagai agen perumahan ini. Silakan tambahkan perumahan terlebih dahulu.'
+			)
+		).toBeInTheDocument();
+		expect(screen.getByRole('link', { name: 'Tambahkan perumahan' })).toHaveAttribute(
+			'href',
+			'https://app.perumahan.test/agen-omahe/perumahan#pilih-perumahan'
+		);
+		expect(screen.queryByText('Daftarkan Pembeli — Griya Asri')).toBeNull();
+	});
+
+	test('agen sudah memilih perumahan ini → tombol normal + dialog agen', async () => {
+		store.sesiAgen.agen = { ...AGEN_AKTIF, perumahanSlugs: [buatUnit().perumahan.slug] };
+		store.sesiAgen.status = 'siap';
+		render(UnitCard, { unit: buatUnit() });
+
+		const tombol = screen.getByRole('button', {
+			name: 'Daftarkan pembeli untuk 36/72 di Griya Asri'
+		});
+		expect(tombol).not.toHaveAttribute('data-agen-belum-terdaftar');
+		await fireEvent.click(tombol);
+		expect(await screen.findByText('Daftarkan Pembeli — Griya Asri')).toBeInTheDocument();
 	});
 
 	test('sesi agen hilang (401) → tombol reaktif kembali "WhatsApp" varian lama', async () => {

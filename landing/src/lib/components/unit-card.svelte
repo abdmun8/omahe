@@ -95,7 +95,10 @@
 		{/if}
 		{#if unit.programOmahe?.dp0}
 			<!-- KOMISI-OMAHE-01 — program DP 0% perumahan induk (kanan atas). -->
-			<Dp0Badge syarat={unit.programOmahe.teksSyarat} class="pointer-events-none absolute top-1.5 right-1.5" />
+			<Dp0Badge
+				syarat={unit.programOmahe.teksSyarat}
+				class="pointer-events-none absolute top-1.5 right-1.5"
+			/>
 		{/if}
 	</div>
 
@@ -178,6 +181,7 @@
 		<ContactButtons
 			konteks="{unit.tipe} di {unit.perumahan.nama}"
 			entitas={unit.perumahan.nama}
+			perumahanSlug={unit.perumahan.slug}
 			onFormMinat={() => (formMinatTerbuka = true)}
 			class="mt-3"
 		/>

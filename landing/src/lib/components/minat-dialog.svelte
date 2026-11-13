@@ -1,6 +1,8 @@
 <!--
 	Pemilih dialog minat SESI-OMAHE-01 — TITIK TUNGGAL varian tombol → dialog:
 
+	  - agen aktif tapi perumahan BUKAN pilihan aktifnya (AGEN-OMAHE-15) →
+	    `agen-belum-terdaftar-dialog` (alert + tautan tambah perumahan);
 	  - `sesiAgen.agen` ada (agen Omahe aktif) → `agen-lead-dialog` dialog
 	    "Daftarkan Pembeli" (input lead atas nama pembeli, AGEN-OMAHE-11);
 	  - selain itu (anonim / sesi non-agen / belum selesai memuat) →
@@ -14,7 +16,8 @@
 -->
 <script lang="ts">
 	import type { LeadSumber } from '$lib/api/types';
-	import { sesiAgen } from '$lib/sesi-agen.svelte';
+	import { agenTerdaftarDi, sesiAgen } from '$lib/sesi-agen.svelte';
+	import AgenBelumTerdaftarDialog from './agen-belum-terdaftar-dialog.svelte';
 	import AgenLeadDialog from './agen-lead-dialog.svelte';
 	import LeadFormDialog from './lead-form-dialog.svelte';
 
@@ -37,7 +40,10 @@
 	} = $props();
 </script>
 
-{#if sesiAgen.agen}
+{#if sesiAgen.agen && !agenTerdaftarDi(perumahanSlug)}
+	<!-- AGEN-OMAHE-15 — perumahan bukan pilihan aktif agen: alert dulu. -->
+	<AgenBelumTerdaftarDialog bind:open {namaPerumahan} />
+{:else if sesiAgen.agen}
 	<!-- Varian agen — TANPA `ref` (atribusi dari sesi, epic §Desain teknis). -->
 	<AgenLeadDialog bind:open {perumahanSlug} {namaPerumahan} tipeAwal={tipeMinatAwal} {opsiTipe} />
 {:else}

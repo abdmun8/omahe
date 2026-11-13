@@ -34,7 +34,8 @@ const AGEN = {
 	kodeAgen: 'OMHA-A0001',
 	nama: 'Agen Contoh',
 	fotoUrl: null,
-	panelUrl: 'https://app.perumahan.test/agen-omahe'
+	panelUrl: 'https://app.perumahan.test/agen-omahe',
+	perumahanSlugs: null
 };
 
 beforeEach(() => {

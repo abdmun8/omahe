@@ -138,7 +138,8 @@ describe.skipIf(typeof document === 'undefined')('StickyCta', () => {
 			kodeAgen: 'OMHA-A0001',
 			nama: 'Widya Pratama',
 			fotoUrl: null,
-			panelUrl: 'https://app.perumahan.test/agen-omahe'
+			panelUrl: 'https://app.perumahan.test/agen-omahe',
+			perumahanSlugs: null
 		};
 		store.sesiAgen.status = 'siap';
 		render(StickyCta, propsDasar());

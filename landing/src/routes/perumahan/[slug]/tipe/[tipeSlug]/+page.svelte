@@ -256,6 +256,7 @@
 					konteks="{t.nama} di {p.nama}"
 					entitas={p.nama}
 					size="md"
+					perumahanSlug={p.slug}
 					onFormMinat={() => (formMinatTerbuka = true)}
 				/>
 			</div>

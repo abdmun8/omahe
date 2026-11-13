@@ -4,10 +4,10 @@
  * BERSAMA dari `$lib/test/proxy-api-mock.ts` (`mock.module` bocor antar
  * file test — JANGAN pernah me-mock `$lib/api` sendiri di sini).
  *
- * Yang dikunci: `getAgenPemasar` HANYA dipanggil bila `ref` berpola kode
- * pilihan agen `AO-…` (backend "Aktifkan semua" bisa membalas puluhan agen
- * — daftar itu tidak diambil lagi per view); selain itu `agen: []` tanpa
- * panggilan. `getPerumahan`/`getUnits` selalu dipanggil & datanya mengalir.
+ * Yang dikunci (AGEN-OMAHE-15 merevisi AGEN-OMAHE-13): `getAgenPemasar`
+ * SELALU dipanggil (daftar agen premium dikembalikan); `ref` hanya
+ * diteruskan bila berpola kode pilihan agen `AO-…`, selain itu `null`.
+ * `getPerumahan`/`getUnits` selalu dipanggil & datanya mengalir.
  */
 import { beforeEach, describe, expect, test } from 'bun:test';
 import {
@@ -71,35 +71,31 @@ beforeEach(() => {
 	getAgenPemasarMock.mockImplementation(async () => AGEN);
 });
 
-describe('load /perumahan/[slug] (AGEN-OMAHE-13)', () => {
-	test('tanpa ?ref → getAgenPemasar TIDAK dipanggil, agen []', async () => {
+describe('load /perumahan/[slug] (AGEN-OMAHE-15)', () => {
+	test('tanpa ?ref → getAgenPemasar dipanggil tanpa ref, daftarnya mengalir', async () => {
 		const data = await muat();
 		expect(getPerumahanMock).toHaveBeenCalledTimes(1);
 		expect(getUnitsMock).toHaveBeenCalledWith(expect.anything(), {
 			perumahanSlug: SLUG,
 			pageSize: 48
 		});
-		expect(getAgenPemasarMock).not.toHaveBeenCalled();
-		expect(data.agen).toEqual([]);
+		expect(getAgenPemasarMock).toHaveBeenCalledWith(expect.anything(), SLUG, null);
+		expect(data.agen).toEqual(AGEN);
 		expect(data.perumahan).toEqual(DETAIL);
 		expect(data.tipeUnit).toEqual([]);
 	});
 
-	test('ref hex kerjasama (bukan AO) → getAgenPemasar TIDAK dipanggil, agen []', async () => {
-		const data = await muat('a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2');
-		expect(getAgenPemasarMock).not.toHaveBeenCalled();
-		expect(data.agen).toEqual([]);
-	});
-
-	test('ref OP-… kerjasama perusahaan → getAgenPemasar TIDAK dipanggil', async () => {
-		await muat('OP-QA7MPN');
-		expect(getAgenPemasarMock).not.toHaveBeenCalled();
-	});
-
-	test('ref kode pribadi agen OMHA-… → getAgenPemasar TIDAK dipanggil', async () => {
-		await muat('OMHA-A0001');
-		expect(getAgenPemasarMock).not.toHaveBeenCalled();
-	});
+	for (const [label, ref] of [
+		['hex kerjasama', 'a1b2c3d4e5f60718a9b0c1d2e3f40516a7b8c9d0e1f20314a5b6c7d8e9f0a1b2'],
+		['OP-… kerjasama perusahaan', 'OP-QA7MPN'],
+		['kode pribadi agen OMHA-…', 'OMHA-A0001']
+	] as const) {
+		test(`ref ${label} → getAgenPemasar dipanggil TANPA ref`, async () => {
+			await muat(ref);
+			expect(getAgenPemasarMock).toHaveBeenCalledTimes(1);
+			expect(getAgenPemasarMock).toHaveBeenCalledWith(expect.anything(), SLUG, null);
+		});
+	}
 
 	test('ref AO-… → getAgenPemasar dipanggil dengan ref apa adanya, datanya mengalir', async () => {
 		const data = await muat('AO-K2269F4X');

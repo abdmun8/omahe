@@ -1329,7 +1329,11 @@ function normalisasiAgenSaya(raw: unknown): AgenSaya | null {
 		kodeAgen: a.kodeAgen,
 		nama: a.nama,
 		fotoUrl: typeof a.fotoUrl === 'string' && a.fotoUrl ? a.fotoUrl : null,
-		panelUrl: a.panelUrl
+		panelUrl: a.panelUrl,
+		// AGEN-OMAHE-15 — slug pilihan aktif; backend lama tanpa field → null.
+		perumahanSlugs: Array.isArray(a.perumahanSlugs)
+			? a.perumahanSlugs.filter((s): s is string => typeof s === 'string')
+			: null
 	};
 }
 
@@ -1339,7 +1343,9 @@ function agenSayaContoh(): AgenSaya {
 		kodeAgen: 'OMHA-A0001',
 		nama: 'Agen Contoh',
 		fotoUrl: null,
-		panelUrl: `${envPub.PUBLIC_BOOKING_BASE_URL?.replace(/\/+$/, '') ?? ''}/agen-omahe`
+		panelUrl: `${envPub.PUBLIC_BOOKING_BASE_URL?.replace(/\/+$/, '') ?? ''}/agen-omahe`,
+		// AGEN-OMAHE-15 — satu perumahan terdaftar, sisanya tombol abu-abu.
+		perumahanSlugs: ['griya-asri-bogor']
 	};
 }
 

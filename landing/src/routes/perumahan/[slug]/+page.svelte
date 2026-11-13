@@ -254,7 +254,12 @@
 			>
 				Ajukan Unit Ini
 			</Button>
-			<ContactButtons konteks={p.nama} size="md" onFormMinat={() => (formMinatTerbuka = true)} />
+			<ContactButtons
+				konteks={p.nama}
+				size="md"
+				perumahanSlug={p.slug}
+				onFormMinat={() => (formMinatTerbuka = true)}
+			/>
 		</div>
 	</div>
 

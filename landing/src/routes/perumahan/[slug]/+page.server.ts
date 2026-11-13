@@ -7,15 +7,14 @@ export const load: PageServerLoad = async ({ params, fetch, setHeaders, url }) =
 	// Detail dulu — kalau slug-nya 404, tidak perlu menunggu query unit.
 	const perumahan = await getPerumahan(fetch, params.slug);
 	const ref = readRef(url);
-	// AGEN-OMAHE-13 — "Aktifkan semua" bisa membuat puluhan agen memilih satu
-	// perumahan, jadi daftar lengkap tidak pernah diambil di sini lagi.
-	// `getAgenPemasar` HANYA bila `ref` kode pilihan agen (`AO-…`) — backend
-	// membalas agen pemilik ref itu saja → kartu agen tunggal di halaman.
-	// Tanpa AO → `agen: []` (blok ringkas "semua agen Omahe" + link /mitra).
-	// Fail-soft: gagal backend → `[]`, halaman tidak ikut jatuh.
+	// AGEN-OMAHE-15 — agen kini memilih perumahan SENDIRI (tombol "Aktifkan
+	// semua" dihapus), jadi daftar agen pemasar dikembalikan: backend hanya
+	// membalas agen PREMIUM yang memilih perumahan ini (urut prioritas, maks
+	// 6 tanpa ref; dengan `?ref=AO-…` pemilik ref saja). `ref` non-AO tidak
+	// diteruskan. Fail-soft: gagal backend → `[]`, halaman tidak ikut jatuh.
 	const [unit, agen] = await Promise.all([
 		getUnits(fetch, { perumahanSlug: params.slug, pageSize: 48 }),
-		adalahRefAgenPilihan(ref) ? getAgenPemasar(fetch, params.slug, ref) : Promise.resolve([])
+		getAgenPemasar(fetch, params.slug, adalahRefAgenPilihan(ref) ? ref : null)
 	]);
 
 	cacheKonten(setHeaders);

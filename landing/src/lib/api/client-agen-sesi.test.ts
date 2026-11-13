@@ -37,7 +37,8 @@ const AGEN: AgenSaya = {
 	kodeAgen: 'OMHA-A0001',
 	nama: 'Widya Pratama',
 	fotoUrl: 'https://img.test/foto.jpg',
-	panelUrl: 'https://app.perumahan.test/agen-omahe'
+	panelUrl: 'https://app.perumahan.test/agen-omahe',
+	perumahanSlugs: null
 };
 
 const bodyValid = {
@@ -145,6 +146,17 @@ describe('API asli — getAgenSaya', () => {
 			'session=a'
 		);
 		expect(pincang).toBeNull();
+	});
+
+	test('AGEN-OMAHE-15 perumahanSlugs: array disaring string; absen (backend lama) → null', async () => {
+		const dasar = { kodeAgen: 'OMHA-A0001', nama: 'X', panelUrl: 'https://x/agen-omahe' };
+		const baru = await getAgenSaya(
+			fetchDengan(envelope({ agen: { ...dasar, perumahanSlugs: ['griya-asri', 7] } })),
+			'session=a'
+		);
+		expect(baru?.perumahanSlugs).toEqual(['griya-asri']);
+		const lama = await getAgenSaya(fetchDengan(envelope({ agen: dasar })), 'session=a');
+		expect(lama?.perumahanSlugs).toBeNull();
 	});
 
 	test('backend 500 / jaringan lempar → null (fail-soft, tidak pernah throw)', async () => {

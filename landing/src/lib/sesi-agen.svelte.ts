@@ -35,9 +35,27 @@ function normalisasiAgen(raw: unknown): AgenSaya | null {
 		kodeAgen: a.kodeAgen,
 		nama: a.nama,
 		fotoUrl: typeof a.fotoUrl === 'string' && a.fotoUrl ? a.fotoUrl : null,
-		panelUrl: a.panelUrl
+		panelUrl: a.panelUrl,
+		perumahanSlugs: Array.isArray(a.perumahanSlugs)
+			? a.perumahanSlugs.filter((s): s is string => typeof s === 'string')
+			: null
 	};
 }
+
+/**
+ * AGEN-OMAHE-15 — agen sesi ini memasarkan perumahan `slug`? `true` bila
+ * tidak ada sesi agen / backend lama (tanpa daftar) — gerbang hanya
+ * tampilan; backend tetap otoritatif.
+ */
+export function agenTerdaftarDi(slug: string | null | undefined): boolean {
+	const daftar = sesiAgen.agen?.perumahanSlugs;
+	if (!sesiAgen.agen || !daftar || !slug) return true;
+	return daftar.includes(slug);
+}
+
+/** Pesan seragam keputusan 5 epic AGEN-OMAHE-15 (sama dengan backend). */
+export const PESAN_BELUM_TERDAFTAR_AGEN =
+	'Anda belum terdaftar sebagai agen perumahan ini. Silakan tambahkan perumahan terlebih dahulu.';
 
 /**
  * Ambil status sesi dari `/api/saya` — idempoten (pemanggil ganda dalam

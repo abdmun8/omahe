@@ -14,7 +14,8 @@ const AGEN: AgenSaya = {
 	kodeAgen: 'OMHA-A0001',
 	nama: 'Widya Pratama',
 	fotoUrl: null,
-	panelUrl: 'https://app.perumahan.test/agen-omahe'
+	panelUrl: 'https://app.perumahan.test/agen-omahe',
+	perumahanSlugs: null
 };
 
 const AGEN_BERPOTO: AgenSaya = { ...AGEN, fotoUrl: 'https://img.test/f.jpg' };
@@ -27,8 +28,8 @@ describe.skipIf(typeof document === 'undefined')('sesiAgen (store SESI-OMAHE-01)
 	test('muatSesiAgen → fetch /api/saya sekali, agen terisi + status siap', async () => {
 		const { sesiAgen, resetSesiAgenUntukTes } = await import('../sesi-agen.svelte');
 		resetSesiAgenUntukTes();
-		const fetchMock = vi.fn(
-			async (_url: string | URL | Request, _init?: RequestInit) => Response.json({ agen: AGEN_BERPOTO })
+		const fetchMock = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) =>
+			Response.json({ agen: AGEN_BERPOTO })
 		);
 		vi.stubGlobal('fetch', fetchMock);
 

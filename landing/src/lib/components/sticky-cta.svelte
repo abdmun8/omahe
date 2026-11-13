@@ -16,7 +16,7 @@
 	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import { ajukanUrl } from '$lib/ref';
 	import { trackCtaAjukan, trackEvent } from '$lib/analytics';
-	import { sesiAgen } from '$lib/sesi-agen.svelte';
+	import { agenTerdaftarDi, sesiAgen } from '$lib/sesi-agen.svelte';
 	import MinatDialog from './minat-dialog.svelte';
 	import Button from './ui/button.svelte';
 
@@ -47,6 +47,9 @@
 	// persis (dikunci test). Bukan klik WA → tanpa whatsapp_click; dialog
 	// agen memicu agen_lead_open sendiri.
 	const modeAgen = $derived(Boolean(sesiAgen.agen));
+	// AGEN-OMAHE-15 — perumahan bukan pilihan aktif agen → tombol abu-abu
+	// (tetap bisa diklik; MinatDialog menampilkan "belum terdaftar").
+	const agenBelumTerdaftar = $derived(modeAgen && !agenTerdaftarDi(slug));
 
 	// Iterasi 2 GA4: CTA "Ajukan" + klik WA dilaporkan tanpa PII — nama
 	// perumahan + apakah kode referral masih menempel di URL. Tombol tetap
@@ -70,7 +73,7 @@
 		<Button
 			variant="whatsapp"
 			size="lg"
-			class="flex-1"
+			class="flex-1 {agenBelumTerdaftar ? 'opacity-50 grayscale' : ''}"
 			onclick={() => {
 				if (!modeAgen) lacakWhatsapp();
 				formMinatTerbuka = true;

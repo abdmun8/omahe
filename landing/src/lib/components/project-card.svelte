@@ -67,6 +67,7 @@
 		<ContactButtons
 			konteks={proyek.nama}
 			entitas={proyek.nama}
+			perumahanSlug={proyek.slug}
 			onFormMinat={() => (formMinatTerbuka = true)}
 			class="mt-4"
 		/>

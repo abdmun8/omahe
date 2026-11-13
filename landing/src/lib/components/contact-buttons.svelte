@@ -32,7 +32,7 @@
 	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import { trackEvent } from '$lib/analytics';
 	import { SITE, TAMPILKAN_TELEPON } from '$lib/config';
-	import { sesiAgen } from '$lib/sesi-agen.svelte';
+	import { agenTerdaftarDi, sesiAgen } from '$lib/sesi-agen.svelte';
 	import { telUrl, waUrl } from '$lib/utils';
 	import Button from './ui/button.svelte';
 
@@ -43,6 +43,7 @@
 		nomorTelepon = page.data.kontak?.telepon ?? SITE.telepon,
 		size = 'sm',
 		onFormMinat = null,
+		perumahanSlug = null,
 		class: className = ''
 	}: {
 		/** Nama properti/developer yang ditanyakan — masuk ke pesan pembuka WA. */
@@ -69,8 +70,16 @@
 		 * persis (dikunci test) — anonim tidak melihat apa pun berubah.
 		 */
 		onFormMinat?: (() => void) | null;
+		/**
+		 * AGEN-OMAHE-15 — slug perumahan CTA ini: varian agen tampil abu-abu
+		 * (tetap bisa diklik → dialog "belum terdaftar") bila perumahan bukan
+		 * pilihan aktif agen. Absen = tidak digerbangi.
+		 */
+		perumahanSlug?: string | null;
 		class?: string;
 	} = $props();
+
+	const agenBelumTerdaftar = $derived(!agenTerdaftarDi(perumahanSlug));
 
 	const pesan = $derived(`Halo, saya ingin tanya tentang ${konteks} yang saya lihat di Omahe.`);
 
@@ -96,8 +105,9 @@
 			variant="whatsapp"
 			{size}
 			onclick={() => onFormMinat?.()}
-			class="flex-1"
+			class="flex-1 {agenBelumTerdaftar ? 'opacity-50 grayscale' : ''}"
 			aria-label="Daftarkan pembeli untuk {konteks}"
+			data-agen-belum-terdaftar={agenBelumTerdaftar ? '' : undefined}
 		>
 			<UserPlus class="h-4 w-4" aria-hidden="true" />
 			Daftarkan Pembeli

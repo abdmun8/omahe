@@ -1,20 +1,17 @@
 <!--
-	Blok agen pemasar di detail perumahan (AGEN-OMAHE-13, 2026-11-11).
+	Blok agen pemasar di detail perumahan (AGEN-OMAHE-15, 2026-11-13 —
+	merevisi AGEN-OMAHE-13). Agen kini memilih perumahan SENDIRI (tombol
+	"Aktifkan semua" dihapus), jadi daftar agen dikembalikan:
 
-	Sejak backend "Aktifkan semua" (satu agen bisa memilih SEMUA perumahan
-	sekaligus), daftar agen per perumahan bisa puluhan — daftar lengkap itu
-	tidak dirender lagi di sini, melainkan tinggal di tab Agen `/mitra?tab=agen`:
-
-	  - Pengunjung datang lewat `?ref=` kode pilihan agen (`AO-…`) DAN daftar
-	    balikan benar-benar pemilik `ref` (`kodeRef` = `ref` — backend membalas
-	    HANYA agen itu) → kartu `AgenPemasar` asli (satu agen + form minat).
-	    Ref AO yang tidak dikenal perumahan ini dibalas daftar terpotong maks
-	    6 agen LAIN (backend AGEN-OMAHE-13) — itu TIDAK boleh dirender kartu.
-	  - Selain itu, dan perumahan BUKAN milik agen properti → blok ringkas
-	    "Dipasarkan oleh semua agen Omahe" + link ke `/mitra?tab=agen`
-	    (tanpa daftar agen).
+	  - Pengunjung lewat `?ref=AO-…` DAN daftar balikan benar-benar pemilik
+	    `ref` → kartu `AgenPemasar` agen itu saja (+ form minat).
+	  - Selain itu, daftar agen PREMIUM yang memilih perumahan ini (backend:
+	    urut prioritas, maks 6) → kartu `AgenPemasar` + link "Lihat semua
+	    agen" ke `/mitra?tab=agen`.
+	  - Daftar kosong & perumahan BUKAN milik agen properti → blok ringkas
+	    + link `/mitra?tab=agen`.
 	  - Perumahan milik agen properti ("Dipasarkan oleh …" di ringkasan atas)
-	    → tidak ada blok sama sekali — pemasarnya bukan agen Omahe.
+	    → tidak ada blok umum.
 
 	`ref` diteruskan ke link via `withRef()` — passthrough `?ref=` WAJIB
 	(CLAUDE.md §Redirect `/p/:slug`).
@@ -32,7 +29,7 @@
 		opsiTipe = null,
 		agenProperti = null
 	}: {
-		/** Non-empty HANYA bila `ref` kode pilihan agen & backend membalikkannya. */
+		/** Agen premium pemasar (pemilik `?ref=AO-…` saja bila cocok). */
 		agen: TipeAgenPemasar[];
 		ref: string | null;
 		perumahanSlug: string;
@@ -56,12 +53,23 @@
 {#if agen.length > 0 && pemilikRef}
 	<!-- AGEN-OMAHE-02/03 — kartu agen pemilik `?ref=AO-…` (satu-satunya di daftar). -->
 	<AgenPemasar {agen} {perumahanSlug} {namaPerumahan} {opsiTipe} />
+{:else if agen.length > 0}
+	<!-- AGEN-OMAHE-15 — daftar agen premium yang memasarkan perumahan ini. -->
+	<div>
+		<AgenPemasar {agen} {perumahanSlug} {namaPerumahan} {opsiTipe} />
+		<a
+			href={withRef('/mitra?tab=agen', ref)}
+			class="text-primary mt-3 inline-flex items-center gap-1 text-sm font-semibold hover:underline"
+		>
+			Lihat semua agen Omahe <span aria-hidden="true">→</span>
+		</a>
+	</div>
 {:else if !agenProperti}
 	<section aria-labelledby="agen-omahe-umum-judul">
-		<h2 id="agen-omahe-umum-judul" class="font-display text-ink text-xl font-bold">
-			Dipasarkan oleh semua agen Omahe
-		</h2>
-		<p class="text-muted mt-1 text-sm">Perumahan ini bisa Anda tanyakan ke agen Omahe mana pun.</p>
+		<h2 id="agen-omahe-umum-judul" class="font-display text-ink text-xl font-bold">Agen Omahe</h2>
+		<p class="text-muted mt-1 text-sm">
+			Butuh bantuan membeli perumahan ini? Hubungi agen Omahe pilihan Anda.
+		</p>
 		<a
 			href={withRef('/mitra?tab=agen', ref)}
 			class="text-primary mt-2 inline-flex items-center gap-1 text-sm font-semibold hover:underline"
