@@ -42,7 +42,7 @@ Ini sudut pandang yang harus muncul di hampir setiap konten.
 - Tulis **"DP 0%\*"** / **"DP mulai 0%"** dan selalu sertakan *"\*S&K berlaku, tergantung persetujuan bank & program developer"*. Kita **mengusahakan** DP 0%, bukan menjamin. Klaim mutlak yang gagal dipenuhi akan berubah jadi komplain dan ulasan buruk.
 - **Jangan** pakai kata "pasti ACC", "tanpa BI checking", atau "tanpa syarat". Ini menyesatkan (UU Perlindungan Konsumen) dan sering ditolak kebijakan iklan Meta/TikTok.
 - Jujur soal **biaya di luar DP**: biaya akad, BPHTB, asuransi, provisi (ada yang disubsidi developer, ada yang tidak). Sebutkan kisarannya per perumahan. Lead yang kaget soal biaya di akhir proses akan batal; lead yang tahu sejak awal sudah lebih matang.
-- Cashback Rp1 juta: tulis **kapan cair** (mis. "setelah akad kredit & dana dari developer diterima Omahe, maks. 30 hari") dan **syaratnya** (booking lewat Omahe). Buat halaman S&K tertulis sebelum promo pertama tayang.
+- Cashback Rp1 juta: tulis **kapan cair** (mis. "setelah akad kredit & dana dari developer diterima Omahe, maks. 30 hari") dan **syaratnya**: booking **langsung** lewat Omahe (form minat / tombol Ajukan). **Tidak berlaku** untuk pembeli lewat agen (link/kode agen). Lewat QR perusahaan mitra ("Benefit Karyawan") baru berlaku setelah epic `KOMISI-OMAHE-04` rilis di repo `perumahan` — sampai itu jangan dijanjikan. Teks S&K yang sedang berlaku ada di Pengaturan Program Omahe. Buat halaman S&K tertulis sebelum promo pertama tayang.
 
 ---
 
@@ -62,6 +62,8 @@ Konten & iklan default membidik **Persona A**. Volumenya paling besar dan pesan 
 ## 3. Unit ekonomi: berapa yang boleh dibelanjakan per penjualan
 
 Pendapatan = **fee 3%** dari harga rumah, dikurangi **cashback Rp1 juta**.
+
+> **Catatan 2026-11-15:** angka di bawah memakai fee 3% (nilai lama). Strategi terbaru memakai fee ≥ 5% dan dasar hitung harga jual − SBUM untuk rumah FLPP, dengan margin per jalur (langsung/agen/QR perusahaan) di `perumahan/docs/STRATEGI-MARKETING.md` — pakai tabel itu sebagai acuan.
 
 | Contoh harga rumah | Fee 3% | − Cashback | **Fee bersih** | Batas biaya akuisisi (≤30% fee bersih) |
 |---|---|---|---|---|
