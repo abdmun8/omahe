@@ -3,6 +3,8 @@
 Corporate website & property marketplace portal (referensi: mybeyond.co.id, brighton.co.id, rumah123.com).
 Tagline: "Where your story begins".
 
+Gambaran bisnis & alur lintas aplikasi (dokumen hidup): `~/projects/perumahan/docs/OVERVIEW-BISNIS.md`.
+
 ## Status
 
 Skeleton app SvelteKit sudah berdiri di `landing/` — seluruh route site map di bawah sudah dirender, lengkap dengan design token, passthrough `?ref=`, dan kalkulator KPR. Peralihan fixture→API asli diatur env, per-endpoint, tanpa mengubah komponen — lihat `landing/README.md`.
