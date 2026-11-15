@@ -30,7 +30,16 @@
 		<div class="mx-auto flex max-w-6xl items-center justify-center gap-2 px-4 py-2">
 			<p class="text-ink text-center text-sm">
 				Rekomendasi dari <span class="font-semibold">{nama}</span>
-				<span class="text-muted"> — pilih perumahan favorit Anda</span>
+				{#if varian === 'mitra'}
+					<!-- KOMISI-OMAHE-04 — Benefit Karyawan Mitra Omahe: cashback berlaku
+					     di perumahan Program Omahe (nominal per perumahan tampil di
+					     halaman detail), konsultasi KPR gratis. -->
+					<span class="text-muted">
+						— benefit karyawan: cashback &amp; konsultasi KPR gratis di perumahan Program Omahe</span
+					>
+				{:else}
+					<span class="text-muted"> — pilih perumahan favorit Anda</span>
+				{/if}
 				{#if varian === 'agen'}
 					<!-- REF-AGEN-01 — tautan kecil khusus varian agen: link yang sama
 					     juga jalan sebagai link sponsor calon agen (fallback ref global

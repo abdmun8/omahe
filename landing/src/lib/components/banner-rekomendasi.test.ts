@@ -10,10 +10,19 @@ import { describe, expect, test } from 'vitest';
 import BannerRekomendasi from './banner-rekomendasi.svelte';
 
 describe.skipIf(typeof document === 'undefined')('BannerRekomendasi', () => {
-	test('nama mitra tampil; teks sesuai copy KERJASAMA-03', () => {
+	test('nama mitra tampil + benefit karyawan (KOMISI-OMAHE-04)', () => {
 		render(BannerRekomendasi, { props: { nama: 'PT Contoh Mitra' } });
 		expect(screen.getByText('PT Contoh Mitra')).toBeInTheDocument();
+		expect(
+			screen.getByText(/benefit karyawan: cashback & konsultasi KPR gratis/)
+		).toBeInTheDocument();
+		expect(screen.queryByText(/pilih perumahan favorit Anda/)).toBeNull();
+	});
+
+	test('varian agen tetap "pilih perumahan favorit" — tanpa klaim cashback', () => {
+		render(BannerRekomendasi, { props: { nama: 'Widya Pratama', varian: 'agen' } });
 		expect(screen.getByText(/pilih perumahan favorit Anda/)).toBeInTheDocument();
+		expect(screen.queryByText(/cashback/)).toBeNull();
 	});
 
 	test('tutup → banner hilang SAJA (ref tetap di luar tanggung jawab komponen)', async () => {

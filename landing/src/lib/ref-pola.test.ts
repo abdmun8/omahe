@@ -106,14 +106,18 @@ describe('REF_AGEN_PILIHAN_PATTERN + adalahRefAgenPilihan', () => {
 	});
 });
 
-// KOMISI-OMAHE-02 — cashback hanya booking langsung lewat Omahe.
+// KOMISI-OMAHE-02/04 — cashback tidak berlaku lewat agen; mitra OP- dapat.
 describe('refTanpaCashback', () => {
-	it('ref agen pilihan, agen pribadi & mitra OP → tanpa cashback', () => {
+	it('ref agen pilihan & agen pribadi → tanpa cashback', () => {
 		expect(refTanpaCashback('AO-ABCD1234')).toBe(true);
 		expect(refTanpaCashback('ao-abcd1234')).toBe(true);
 		expect(refTanpaCashback('OMHA-A0001')).toBe(true);
 		expect(refTanpaCashback('omh-ab12cd')).toBe(true);
-		expect(refTanpaCashback('OP-QA7MPN')).toBe(true);
+	});
+
+	it('KOMISI-OMAHE-04 — ref mitra perusahaan OP- → cashback tetap', () => {
+		expect(refTanpaCashback('OP-QA7MPN')).toBe(false);
+		expect(refTanpaCashback('op-qa7mpn')).toBe(false);
 	});
 
 	it('tanpa ref, hex kerjasama lama, atau ref aneh → cashback tetap', () => {

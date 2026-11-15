@@ -26,7 +26,8 @@
 	let { data }: { data: PageData } = $props();
 
 	const p = $derived(data.perumahan);
-	// KOMISI-OMAHE-02 — cashback hanya untuk booking langsung lewat Omahe.
+	// KOMISI-OMAHE-02/04 — cashback untuk booking langsung & lewat QR perusahaan
+	// mitra (`OP-…`); tidak lewat agen.
 	const cashbackTampil = $derived(!!p.programOmahe?.cashback && !refTanpaCashback(data.ref));
 	/** null = perumahan belum pakai section builder → render mode LEGACY. */
 	const pakaiBuilder = $derived(p.sections !== null && p.sections.length > 0);
@@ -265,8 +266,8 @@
 
 	{#if p.programOmahe && (p.programOmahe.dp0 || cashbackTampil)}
 		<!-- KOMISI-OMAHE-01 — program Omahe: promo DP 0% & cashback pembeli.
-		     KOMISI-OMAHE-02 — cashback hanya booking langsung: disembunyikan bila
-		     pengunjung membawa ref agen (AO-/OMHA-/OMH-) atau mitra (OP-). -->
+		     KOMISI-OMAHE-02/04 — cashback disembunyikan bila pengunjung membawa
+		     ref agen (AO-/OMHA-/OMH-); ref mitra perusahaan (OP-) tetap dapat. -->
 		<section
 			class="border-primary/30 bg-primary/5 mt-6 rounded-xl border p-4"
 			data-testid="program-omahe"
