@@ -1,6 +1,7 @@
 <script lang="ts">
 	import GaleriLightbox from '$lib/components/galeri-lightbox.svelte';
 	import BeaconKunjungan from '$lib/components/beacon-kunjungan.svelte';
+	import BlokAgenPemasar from '$lib/components/blok-agen-pemasar.svelte';
 	import Maximize from '@lucide/svelte/icons/maximize';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
 	import MinatDialog from '$lib/components/minat-dialog.svelte';
@@ -277,6 +278,20 @@
 			</p>
 		{/if}
 	</section>
+
+	<!-- AGEN-OMAHE-18 — agen Premium yang memasarkan perumahan ini (hanya bila
+	     ada; tanpa blok umum "Agen Omahe" di halaman tipe). -->
+	{#if data.agen.length > 0}
+		<div class="mt-10 max-w-3xl">
+			<BlokAgenPemasar
+				agen={data.agen}
+				ref={data.ref}
+				perumahanSlug={p.slug}
+				namaPerumahan={p.nama}
+				opsiTipe={[t.nama]}
+			/>
+		</div>
+	{/if}
 
 	<!-- LOKASI-03 — peta dari data perumahan (tidak ada builder di halaman ini). -->
 	{#if p.mapsEmbedUrl}
