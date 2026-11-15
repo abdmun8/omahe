@@ -95,6 +95,10 @@ export const getPerumahanMock = mock<(fetchFn: typeof fetch, slug: string) => Pr
 export const getUnitsMock = mock<(fetchFn: typeof fetch, query: unknown) => Promise<unknown>>(
 	async () => ({ items: [], total: 0 })
 );
+/** AGEN-OMAHE-18 — detail tipe untuk test server load halaman tipe. */
+export const getTipeDetailMock = mock<
+	(fetchFn: typeof fetch, slug: string, tipeSlug: string) => Promise<unknown>
+>(async () => ({}));
 export const getAgenPemasarMock = mock<
 	(fetchFn: typeof fetch, slug: string, ref: string | null) => Promise<unknown>
 >(async () => []);
@@ -114,6 +118,7 @@ export function pasangMockLibApi(): void {
 		getNamaAgenPribadi: getNamaAgenPribadiMock,
 		getPerumahan: getPerumahanMock,
 		getUnits: getUnitsMock,
-		getAgenPemasar: getAgenPemasarMock
+		getAgenPemasar: getAgenPemasarMock,
+		getTipeDetail: getTipeDetailMock
 	}));
 }
