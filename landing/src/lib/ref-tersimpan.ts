@@ -17,6 +17,14 @@
  * URL bar TIDAK diubah (tanpa history spam; Google tetap melihat URL
  * bersih).
  *
+ * KOMISI-OMAHE-04 langkah 2 — PENGECUALIAN first-touch: ref GLOBAL
+ * perusahaan `OP-…` yang masih berlaku (kunci 90 hari sejak pindai
+ * pertama, Keputusan 8) TIDAK BISA ditimpa — bukan oleh kode agen
+ * (`OMHA-…`/`OMH-…`, `AO-…`) dan bukan oleh QR perusahaan lain
+ * (perusahaan pertama menang, Keputusan 13). Backend `perumahan` yang
+ * menegakkan kunci ini otoritatif per nomor WA pembeli; di sini kunci
+ * hanya menjaga perjalanan pembeli konsisten mengirim ref `OP-…`.
+ *
  * KEAMANAN bentuk: pola ref sama dengan passthrough `?ref=` (`REF_PATTERN`
  * di `src/lib/ref.ts`) — nilai yang bisa menyelundupkan sesuatu ke URL
  * tujuan tidak pernah disimpan/dipakai ulang. Semua akses localStorage di
@@ -25,13 +33,20 @@
  */
 import { REF_PATTERN } from './ref';
 import {
+	adalahRefAgenPilihan,
 	bersihkanNamaMitra,
 	normalisasiRefAgenPribadi,
+	REF_AGEN_PILIHAN_PATTERN,
 	REF_AGEN_PRIBADI_PATTERN,
 	REF_OMAHE_PATTERN
 } from './ref-pola';
 
-/** Masa simpan 90 hari (bukan 30: siklus putus-cek pembeli sering lebih panjang). */
+/**
+ * Masa simpan 90 hari (bukan 30: siklus putus-cek pembeli sering lebih
+ * panjang) — sekaligus masa KUNCI QR perusahaan `OP-…` (KOMISI-OMAHE-04
+ * Keputusan 8): 90 hari dihitung dari pindai PERTAMA, pindai ulang tidak
+ * memperpanjang.
+ */
 const MASA_MS = 90 * 24 * 60 * 60 * 1000;
 
 const kunci = (slug: string) => `omahe:ref:${slug}`;
@@ -131,22 +146,54 @@ export function ambilRef(slug: string, now: number = Date.now()): string | null 
  * pembeli & sponsor calon agen). Untuk kode agen `nama` TIDAK PERNAH dari URL
  * (anti-spoof — nama diambil client-side dari endpoint nama agen), jadi arg
  * `nama` diabaikan dan nama mitra lama tidak ikut terbawa (ref beda bentuk).
+ *
+ * KOMISI-OMAHE-04 langkah 2 — kunci first-touch `OP-…` ditegakkan DI SINI
+ * juga (guard ganda dengan `pilihRefEfektif`), supaya modul tetap aman
+ * dipanggil langsung:
+ *   - kode agen pribadi saat ref global `OP-…` masih berlaku → diabaikan
+ *     (TIDAK menimpa); setelah 90 hari entri OP gugur, agen diterima lagi.
+ *   - `OP-…` lain saat `OP-…` lain masih berlaku → diabaikan (perusahaan
+ *     pertama menang, Keputusan 13) — `nama` OP lama tetap.
+ *   - `OP-…` yang SAMA (pindai ulang) → `exp` & `t` ASLI dipertahankan (90
+ *     hari dihitung dari pindai pertama, tidak diperpanjang — Keputusan 8);
+ *     hanya `nama` yang diperbarui bila ada nama baru non-kosong.
+ *   - tanpa `OP-…` aktif tersimpan → perilaku LAST-TOUCH lama utuh, termasuk
+ *     kode agen global yang BOLEH ditimpa `OP-…` baru (kunci hanya melindungi
+ *     ref perusahaan).
  */
 export function simpanRefGlobal(ref: string, nama?: string | null, now: number = Date.now()): void {
 	const kodeAgen = normalisasiRefAgenPribadi(ref);
+	const lama = bacaMeta(KUNCI_GLOBAL, now);
+
 	if (kodeAgen) {
+		// KOMISI-OMAHE-04 — kunci `OP-…` aktif → sentuhan agen diabaikan diam-diam.
+		if (lama && REF_OMAHE_PATTERN.test(lama.ref)) return;
 		tulisMeta(KUNCI_GLOBAL, { ref: kodeAgen, exp: now + MASA_MS, t: now });
 		return;
 	}
 	if (!REF_OMAHE_PATTERN.test(ref)) return;
+	if (lama && REF_OMAHE_PATTERN.test(lama.ref)) {
+		if (ref !== lama.ref) return; // OP lain — perusahaan pertama menang (Keputusan 13).
+		// Pindai ulang OP yang sama: exp & t asli, hanya nama boleh berganti.
+		const namaFinal =
+			nama && nama.trim()
+				? nama.trim().slice(0, 120)
+				: typeof lama.nama === 'string' && lama.nama
+					? lama.nama
+					: null;
+		tulisMeta(KUNCI_GLOBAL, {
+			ref: lama.ref,
+			exp: lama.exp,
+			t: lama.t,
+			...(namaFinal ? { nama: namaFinal } : {})
+		});
+		return;
+	}
 	let namaFinal: string | null = null;
 	if (nama && nama.trim()) {
 		namaFinal = nama.trim().slice(0, 120);
-	} else {
-		const lama = bacaMeta(KUNCI_GLOBAL, now);
-		if (lama && lama.ref === ref && typeof lama.nama === 'string' && lama.nama) {
-			namaFinal = lama.nama;
-		}
+	} else if (lama && lama.ref === ref && typeof lama.nama === 'string' && lama.nama) {
+		namaFinal = lama.nama;
 	}
 	tulisMeta(KUNCI_GLOBAL, {
 		ref,
@@ -191,6 +238,9 @@ export function ambilRefGlobal(
  *     homepage), null bila tidak ada/tanpa nama/kode agen.
  *   - `refGlobalAgen` = kode agen pribadi pada ref global (banner homepage
  *     ambil nama client-side dari endpoint nama agen), null bila bukan.
+ * KOMISI-OMAHE-04 — saat kunci `OP-…` aktif, ref global tetap entri OP
+ * (lihat `pilihRefEfektif`), jadi `refGlobalNama` tetap nama perusahaan dan
+ * `refGlobalAgen` null → banner homepage PASTI varian mitra, bukan agen.
  * Tanpa browser (SSR/prerender) → murni passthrough `refUrl`.
  */
 export function hitungRefLayout(opts: {
@@ -227,7 +277,7 @@ export function hitungRefLayout(opts: {
 /**
  * LAST-TOUCH lintas per-slug & global (KEPUTUSAN KERJASAMA-03 + REF-AGEN-01,
  * dipanggil `hitungRefLayout` — yang dijalankan `routes/+layout.ts`, browser
- * saja):
+ * saja), DENGAN pengecualian first-touch `OP-…` (KOMISI-OMAHE-04 langkah 2):
  *   - `refUrl` berbentuk `OP-…` → simpan sebagai ref GLOBAL (di halaman
  *     mana pun, termasuk homepage); `namaMitra` dari `?mitra=` ikut disimpan
  *     bila ada (sudah dibersihkan pemanggil).
@@ -238,6 +288,26 @@ export function hitungRefLayout(opts: {
  *   - Tanpa `refUrl`: di rute perumahan → ref dengan `t` PALING BARU antara
  *     per-slug dan global (tie → per-slug, lebih spesifik); halaman lain →
  *     ref global (link kartu `withRef` otomatis membawanya).
+ *
+ * KOMISI-OMAHE-04 langkah 2 — selama ref global `OP-X` masih berlaku (90
+ * hari sejak pindai pertama, Keputusan 8) ia TIDAK BISA ditimpa:
+ *   1. `refUrl` kode agen pribadi (`OMHA-…`/`OMH-…`) di halaman mana pun →
+ *      global tidak ditimpa; ref efektif = `OP-X`.
+ *   2. `refUrl` kode pilihan agen (`AO-…`) di rute perumahan → TIDAK
+ *      disimpan per slug; ref efektif = `OP-X`.
+ *   3. `refUrl` `OP-Y` berbeda → tidak menimpa (perusahaan pertama menang,
+ *      Keputusan 13); ref efektif = `OP-X`, nama lama tetap.
+ *   4. `refUrl` `OP-X` sama (pindai ulang) → `exp`/`t` ASLI (tidak
+ *      diperpanjang), `nama` diperbarui bila ada yang baru; efektif `OP-X`.
+ *   5. `refUrl` lain (hex kerjasama per-perumahan) → perilaku lama utuh:
+ *      disimpan per slug & dikembalikan apa adanya.
+ *   6. Tanpa `refUrl` di rute perumahan: ref per-slug berbentuk kode agen
+ *      (`AO-…`; simpanan dari sebelum langkah ini) kalah dari `OP-X` apa
+ *      pun `t`-nya — ref hex per-slug tetap aturan `t`-terbaru lama.
+ *   7. Tanpa `OP-…` aktif tersimpan → semuanya seperti dulu (LAST-TOUCH;
+ *      kode agen global BOLEH ditimpa `OP-…` baru).
+ * Kunci yang otoritatif ada di backend `perumahan` (per nomor WA pembeli);
+ * di sini kunci hanya menjaga perjalanan pembeli konsisten mengirim `OP-X`.
  * `page.data.ref` tetap satu-satunya sumber untuk `ajukanUrl()` & form minat.
  */
 export function pilihRefEfektif(opts: {
@@ -249,6 +319,25 @@ export function pilihRefEfektif(opts: {
 }): string | null {
 	const now = opts.now ?? Date.now();
 	if (opts.refUrl) {
+		const metaGlobal = bacaMeta(KUNCI_GLOBAL, now);
+		const terkunci = metaGlobal && REF_OMAHE_PATTERN.test(metaGlobal.ref) ? metaGlobal : null;
+		if (terkunci) {
+			// (1) kode agen pribadi di halaman mana pun → global tidak ditimpa
+			// (`simpanRefGlobal` juga menolak — guard ganda), efektif tetap OP.
+			if (normalisasiRefAgenPribadi(opts.refUrl)) return terkunci.ref;
+			// (2) kode pilihan agen di rute perumahan → tidak disimpan per slug,
+			// efektif OP. Di halaman lain AO tetap passthrough apa adanya.
+			if (opts.diRutePerumahan && adalahRefAgenPilihan(opts.refUrl)) return terkunci.ref;
+			if (REF_OMAHE_PATTERN.test(opts.refUrl)) {
+				// (3) OP lain tidak menimpa (no-op di dalam `simpanRefGlobal`);
+				// (4) OP sama → exp/t asli dipertahankan, nama boleh diperbarui.
+				simpanRefGlobal(opts.refUrl, opts.namaMitra ?? null, now);
+				return terkunci.ref;
+			}
+			// (5) ref lain (hex kerjasama per-perumahan) → perilaku lama utuh.
+			if (opts.diRutePerumahan && opts.slug) simpanRef(opts.slug, opts.refUrl, now);
+			return opts.refUrl;
+		}
 		// REF-AGEN-01 — link pribadi agen di halaman mana pun → ref GLOBAL.
 		const kodeAgen = normalisasiRefAgenPribadi(opts.refUrl);
 		if (kodeAgen) {
@@ -266,6 +355,10 @@ export function pilihRefEfektif(opts: {
 	const metaGlobal = bacaMeta(KUNCI_GLOBAL, now);
 	const metaSlug = opts.diRutePerumahan && opts.slug ? bacaMeta(kunci(opts.slug), now) : null;
 	if (metaSlug && metaGlobal) {
+		// (6) kunci `OP-…` aktif → ref per-slug berbentuk kode agen kalah apa
+		// pun `t`-nya; ref hex per-slug tetap aturan `t`-terbaru di bawah.
+		if (REF_OMAHE_PATTERN.test(metaGlobal.ref) && adalahRefAgenTersimpan(metaSlug.ref))
+			return metaGlobal.ref;
 		// Bentuk lama tanpa `t` dianggap `t = 0` — selalu kalah dari yang punya `t`.
 		return (metaSlug.t ?? 0) >= (metaGlobal.t ?? 0) ? metaSlug.ref : metaGlobal.ref;
 	}
@@ -276,4 +369,16 @@ export function pilihRefEfektif(opts: {
 	)
 		return metaGlobal.ref;
 	return null;
+}
+
+/**
+ * Ref tersimpan per slug berbentuk kode AGEN (`AO-…` pilihan agen, atau
+ * `OMHA-…` pribadi — yang kedua sebenarnya tidak pernah disimpan per slug,
+ * dijaga defensif) → kalah dari kunci `OP-…` (KOMISI-OMAHE-04 langkah 2,
+ * aturan 6). Pola pilihan & pribadi tegas UPPERCASE — simpanan lama bisa
+ * huruf kecil (passthrough `?ref=` tidak menormalisasi), jadi rapikan dulu.
+ */
+function adalahRefAgenTersimpan(ref: string): boolean {
+	const rapi = ref.trim().toUpperCase();
+	return REF_AGEN_PILIHAN_PATTERN.test(rapi) || REF_AGEN_PRIBADI_PATTERN.test(rapi);
 }

@@ -972,6 +972,15 @@ request API dari Omahe tanpa header ini.
   per slug; tanpa ref di URL → halaman perumahan memakai yang `t`-nya terbaru antara per-slug vs
   global, halaman lain memakai global (link kartu `withRef` ikut membawa). `page.data.ref` tetap
   satu-satunya sumber untuk `ajukanUrl()` & form minat.
+- **KOMISI-OMAHE-04 langkah 2 (2026-11-15) — pengecualian first-touch untuk `OP-…`**: selama ref
+  global `OP-X` masih berlaku (90 hari dari pindai PERTAMA; pindai ulang tidak memperpanjang `exp`,
+  hanya `nama` yang boleh diperbarui), ia tidak bisa ditimpa — kode agen (`OMHA-…`/`OMH-…` di
+  halaman mana pun, `AO-…` di rute perumahan tidak disimpan) maupun `OP-…` perusahaan lain
+  (perusahaan pertama menang, Keputusan 13) → ref efektif tetap `OP-X` dan banner tetap varian
+  mitra. Ref hex kerjasama per-perumahan tetap perilaku lama (disimpan per slug, aturan `t`-terbaru
+  saat dibaca). Tanpa `OP-…` aktif tersimpan semuanya LAST-TOUCH seperti dulu (kode agen global
+  boleh ditimpa `OP-…` baru). Kunci otoritatif di backend `perumahan` per nomor WA pembeli; sisi
+  Omahe hanya menjaga perjalanan pembeli konsisten mengirim `OP-X`.
 - Banner homepage "Rekomendasi dari <nama>" — hanya bila ref global aktif & ada nama (dari resolve
   `/q/:kode` via `?mitra=`, dibersihkan & hanya disimpan bila ref di URL memang `OP-…`). Nama adalah
   LABEL TAMPILAN SAJA (anti-spoof: tidak pernah dibaca dari `?dari=`/`?mitra=` bebas di URL biasa);

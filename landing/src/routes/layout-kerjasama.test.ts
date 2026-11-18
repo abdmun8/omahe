@@ -99,7 +99,7 @@ describe('hitungRefLayout — browser:true (jalur browser nyata)', () => {
 		);
 	});
 
-	test('REF-AGEN-01 — LAST-TOUCH: kode agen lebih baru mengganti OP-… (banner ganti varian)', () => {
+	test('KOMISI-OMAHE-04 — kunci OP-… aktif: link agen TIDAK mengganti banner (tetap varian mitra)', () => {
 		simpanan.set(
 			'omahe:ref:_global',
 			JSON.stringify({ ref: REF_OP, exp: T0 + 90 * HARI, t: T0 - HARI, nama: 'PT Contoh Mitra' })
@@ -112,7 +112,18 @@ describe('hitungRefLayout — browser:true (jalur browser nyata)', () => {
 			url: new URL('https://www.omahe.co.id/?ref=OMHA-B0002'),
 			now: T0
 		});
-		expect(res).toEqual({ ref: 'OMHA-B0002', refGlobalNama: null, refGlobalAgen: 'OMHA-B0002' });
+		// First-touch (Keputusan 2/8): ref efektif tetap OP-…, entri global utuh
+		// → refGlobalNama tetap terisi (varian mitra) dan refGlobalAgen null
+		// (varian agen tidak mungkin tampil selama kunci aktif).
+		expect(res).toEqual({ ref: REF_OP, refGlobalNama: 'PT Contoh Mitra', refGlobalAgen: null });
+		expect(simpanan.get('omahe:ref:_global')).toBe(
+			JSON.stringify({
+				ref: REF_OP,
+				exp: T0 + 90 * HARI,
+				t: T0 - HARI,
+				nama: 'PT Contoh Mitra'
+			})
+		);
 	});
 
 	test('halaman perumahan memilih ref dengan `t` terbaru antara per-slug vs global', () => {
