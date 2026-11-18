@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import {
 	ambilRef,
 	ambilRefGlobal,
+	hitungRefLayout,
 	pilihRefEfektif,
 	simpanRef,
 	simpanRefGlobal
@@ -173,13 +174,19 @@ describe('simpanRefGlobal + ambilRefGlobal (KERJASAMA-03)', () => {
 		expect(simpanan.has('omahe:ref:_global')).toBe(false);
 	});
 
-	test('tanpa nama → nama lama dipertahankan hanya bila ref sama; ref ganti → nama hilang', () => {
+	test('tanpa nama → nama lama dipertahankan hanya bila ref sama', () => {
 		simpanRefGlobal(REF_OP, 'PT Contoh Mitra', T0);
 		simpanRefGlobal(REF_OP, undefined, T0 + HARI); // masuk ulang tanpa ?mitra=
 		expect(ambilRefGlobal(T0 + 2 * HARI)?.nama).toBe('PT Contoh Mitra');
 
-		simpanRefGlobal('OP-7Q2MNP', undefined, T0 + 3 * HARI); // mitra lain
-		expect(ambilRefGlobal(T0 + 3 * HARI)).toEqual({ ref: 'OP-7Q2MNP', nama: null });
+		// KOMISI-OMAHE-04 — OP lain saat kunci aktif diabaikan (nama OP lama tetap).
+		simpanRefGlobal('OP-7Q2MNP', undefined, T0 + 3 * HARI);
+		expect(ambilRefGlobal(T0 + 3 * HARI)).toEqual({ ref: REF_OP, nama: 'PT Contoh Mitra' });
+
+		// Setelah kunci gugur, OP lain diterima lagi (LAST-TOUCH) dan nama mitra
+		// lama tidak ikut terbawa ke kode mitra lain.
+		simpanRefGlobal('OP-7Q2MNP', undefined, T0 + 91 * HARI);
+		expect(ambilRefGlobal(T0 + 91 * HARI)).toEqual({ ref: 'OP-7Q2MNP', nama: null });
 	});
 
 	test('nama dipotong 120 karakter', () => {
@@ -322,13 +329,21 @@ describe('kode agen pribadi → ref GLOBAL (REF-AGEN-01)', () => {
 		expect(ambilRefGlobal(T0)).toBeNull();
 	});
 
-	test('LAST-TOUCH `OP-…` vs kode agen — yang disimpan terakhir menang (dua arah)', () => {
+	test('KOMISI-OMAHE-04 — kode agen TIDAK lagi menimpa OP-… aktif (first-touch), setelah 90 hari diterima lagi', () => {
 		simpanRefGlobal(REF_OP, 'PT Contoh', T0);
+		// Selama kunci OP aktif: sentuhan agen diabaikan — entri global UTUH
+		// (exp & t asli, nama tetap).
 		simpanRefGlobal(KODE_BARU, null, T0 + HARI);
-		expect(ambilRefGlobal(T0 + 2 * HARI)).toEqual({ ref: KODE_BARU, nama: null });
+		expect(simpanan.get('omahe:ref:_global')).toBe(
+			JSON.stringify({ ref: REF_OP, exp: T0 + 90 * HARI, t: T0, nama: 'PT Contoh' })
+		);
 
-		simpanRefGlobal(REF_OP, 'PT Baru', T0 + 3 * HARI);
-		expect(ambilRefGlobal(T0 + 4 * HARI)).toEqual({ ref: REF_OP, nama: 'PT Baru' });
+		// Kunci HANYA melindungi ref perusahaan: tanpa OP tersimpan, kode agen
+		// tetap ditimpa OP baru (LAST-TOUCH lama, aturan 7).
+		simpanan.clear();
+		simpanRefGlobal(KODE_BARU, null, T0);
+		simpanRefGlobal(REF_OP, 'PT Baru', T0 + HARI);
+		expect(ambilRefGlobal(T0 + 2 * HARI)).toEqual({ ref: REF_OP, nama: 'PT Baru' });
 	});
 
 	test('pilihRefEfektif: URL kode agen huruf kecil di homepage → GLOBAL uppercase jadi ref efektif', () => {
@@ -385,5 +400,222 @@ describe('kode agen pribadi → ref GLOBAL (REF-AGEN-01)', () => {
 		expect(
 			pilihRefEfektif({ refUrl: null, slug: 'griya-asri', diRutePerumahan: true, now: T0 + HARI })
 		).toBe(REF);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// KOMISI-OMAHE-04 langkah 2 — kunci QR perusahaan (first-touch): ref global
+// `OP-…` yang masih berlaku (90 hari sejak pindai PERTAMA) tidak bisa
+// ditimpa — bukan oleh kode agen, bukan oleh perusahaan lain. Backend
+// `perumahan` yang menegakkan kunci otoritatif per nomor WA; di sini hanya
+// menjaga perjalanan pembeli konsisten mengirim ref `OP-…`.
+// ---------------------------------------------------------------------------
+
+const KODE_AO = 'AO-K7M2QX';
+
+describe('kunci QR perusahaan OP-… (KOMISI-OMAHE-04 langkah 2)', () => {
+	/** Kunci global dengan OP-… pada T0. */
+	const kunciOP = () => simpanRefGlobal(REF_OP, 'PT Contoh Mitra', T0);
+	const entriGlobal = () => simpanan.get('omahe:ref:_global') ?? null;
+	const EOP = JSON.stringify({ ref: REF_OP, exp: T0 + 90 * HARI, t: T0, nama: 'PT Contoh Mitra' });
+
+	test('(1) URL kode agen pribadi (halaman mana pun) → global tidak ditimpa, efektif OP-…', () => {
+		kunciOP();
+		// homepage & rute perumahan; bentuk baru, lama, dan huruf kecil:
+		expect(
+			pilihRefEfektif({ refUrl: KODE_BARU, slug: null, diRutePerumahan: false, now: T0 + HARI })
+		).toBe(REF_OP);
+		expect(
+			pilihRefEfektif({
+				refUrl: 'omha-b0002',
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 2 * HARI
+			})
+		).toBe(REF_OP);
+		expect(
+			pilihRefEfektif({ refUrl: KODE_LAMA, slug: null, diRutePerumahan: false, now: T0 + 3 * HARI })
+		).toBe(REF_OP);
+		// entri global UTUH — exp & t asli, sentuhan agen tidak menggeser apa pun.
+		expect(entriGlobal()).toBe(EOP);
+		// kode agen juga tidak bocor ke simpanan per slug.
+		expect(ambilRef('griya-asri', T0 + 3 * HARI)).toBeNull();
+	});
+
+	test('(2) URL kode pilihan AO-… di rute perumahan → tidak disimpan, efektif OP-…', () => {
+		kunciOP();
+		expect(
+			pilihRefEfektif({
+				refUrl: KODE_AO,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + HARI
+			})
+		).toBe(REF_OP);
+		expect(ambilRef('griya-asri', T0 + HARI)).toBeNull();
+		expect(entriGlobal()).toBe(EOP);
+	});
+
+	test('(2b) AO-… di halaman lain tetap passthrough (tidak disimpan di mana pun)', () => {
+		kunciOP();
+		expect(
+			pilihRefEfektif({ refUrl: KODE_AO, slug: null, diRutePerumahan: false, now: T0 + HARI })
+		).toBe(KODE_AO);
+		expect(entriGlobal()).toBe(EOP);
+		expect(ambilRef('griya-asri', T0 + HARI)).toBeNull();
+	});
+
+	test('(3) OP lain tidak menimpa — perusahaan pertama menang, nama lama tetap (Keputusan 13)', () => {
+		kunciOP();
+		expect(
+			pilihRefEfektif({
+				refUrl: 'OP-7Q2MNP',
+				slug: null,
+				diRutePerumahan: false,
+				namaMitra: 'PT Lain',
+				now: T0 + HARI
+			})
+		).toBe(REF_OP);
+		expect(entriGlobal()).toBe(EOP);
+		// lewat simpanRefGlobal langsung pun sama.
+		simpanRefGlobal('OP-7Q2MNP', 'PT Lain', T0 + 2 * HARI);
+		expect(entriGlobal()).toBe(EOP);
+	});
+
+	test('(4) pindai ulang OP sama → exp & t ASLI, nama diperbarui hanya bila ada yang baru', () => {
+		kunciOP();
+		simpanRefGlobal(REF_OP, 'PT Nama Baru', T0 + 85 * HARI);
+		expect(entriGlobal()).toBe(
+			JSON.stringify({ ref: REF_OP, exp: T0 + 90 * HARI, t: T0, nama: 'PT Nama Baru' })
+		);
+		// pindai ulang tanpa ?mitra= → nama terakhir dipertahankan.
+		simpanRefGlobal(REF_OP, null, T0 + 86 * HARI);
+		expect(ambilRefGlobal(T0 + 86 * HARI)?.nama).toBe('PT Nama Baru');
+		// lewat pilihRefEfektif (jalur layout) pun sama.
+		expect(
+			pilihRefEfektif({
+				refUrl: REF_OP,
+				slug: null,
+				diRutePerumahan: false,
+				namaMitra: 'PT Lagi',
+				now: T0 + 87 * HARI
+			})
+		).toBe(REF_OP);
+		expect(ambilRefGlobal(T0 + 87 * HARI)?.nama).toBe('PT Lagi');
+	});
+
+	test('(4b) pindai ulang TIDAK memperpanjang kunci — exp tetap 90 hari dari pindai pertama', () => {
+		kunciOP();
+		simpanRefGlobal(REF_OP, 'PT Nama Baru', T0 + 85 * HARI);
+		// exp TIDAK bergeser: tepat hari ke-90 entri sudah gugur.
+		expect(ambilRefGlobal(T0 + 90 * HARI)).toBeNull();
+		expect(simpanan.has('omahe:ref:_global')).toBe(false);
+	});
+
+	test('(5) hex kerjasama per-perumahan tetap disimpan & dikembalikan apa adanya', () => {
+		kunciOP();
+		expect(
+			pilihRefEfektif({ refUrl: REF, slug: 'griya-asri', diRutePerumahan: true, now: T0 + HARI })
+		).toBe(REF);
+		expect(ambilRef('griya-asri', T0 + 2 * HARI)).toBe(REF);
+		expect(ambilRefGlobal(T0 + 2 * HARI)?.ref).toBe(REF_OP);
+	});
+
+	test('(6) tanpa ref URL: per-slug kode AO-… kalah dari OP-… apa pun t-nya', () => {
+		kunciOP(); // t global = T0
+		simpanRef('griya-asri', KODE_AO, T0 + 5 * HARI); // per-slug lebih BARU
+		expect(
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 6 * HARI
+			})
+		).toBe(REF_OP);
+		// bentuk lama KERJASAMA-02 tanpa `t` (dianggap t=0) juga kalah.
+		simpanan.set('omahe:ref:griya-asri', JSON.stringify({ ref: KODE_AO, exp: T0 + 90 * HARI }));
+		expect(
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 6 * HARI
+			})
+		).toBe(REF_OP);
+	});
+
+	test('(6b) tanpa ref URL: per-slug HEX lebih baru tetap menang (aturan t-terbaru lama)', () => {
+		kunciOP();
+		simpanRef('griya-asri', REF, T0 + 5 * HARI);
+		expect(
+			pilihRefEfektif({
+				refUrl: null,
+				slug: 'griya-asri',
+				diRutePerumahan: true,
+				now: T0 + 6 * HARI
+			})
+		).toBe(REF);
+	});
+
+	test('(7) tanpa OP aktif: kode agen global tetap ditimpa OP baru (LAST-TOUCH seperti dulu)', () => {
+		simpanRefGlobal(KODE_BARU, null, T0);
+		expect(
+			pilihRefEfektif({
+				refUrl: REF_OP,
+				slug: null,
+				diRutePerumahan: false,
+				namaMitra: 'PT Contoh',
+				now: T0 + HARI
+			})
+		).toBe(REF_OP);
+		expect(ambilRefGlobal(T0 + 2 * HARI)).toEqual({ ref: REF_OP, nama: 'PT Contoh' });
+	});
+
+	test('kedaluwarsa kunci: hari ke-89 masih terkunci, hari ke-90 agen diterima lagi', () => {
+		kunciOP();
+		expect(
+			pilihRefEfektif({
+				refUrl: KODE_BARU,
+				slug: null,
+				diRutePerumahan: false,
+				now: T0 + 89 * HARI
+			})
+		).toBe(REF_OP);
+		expect(
+			pilihRefEfektif({
+				refUrl: KODE_BARU,
+				slug: null,
+				diRutePerumahan: false,
+				now: T0 + 90 * HARI
+			})
+		).toBe(KODE_BARU);
+		expect(ambilRefGlobal(T0 + 90 * HARI)?.ref).toBe(KODE_BARU);
+	});
+
+	test('kedaluwarsa kunci: OP lain juga diterima lagi setelah entri gugur', () => {
+		kunciOP();
+		expect(
+			pilihRefEfektif({
+				refUrl: 'OP-7Q2MNP',
+				slug: null,
+				diRutePerumahan: false,
+				namaMitra: 'PT Lain',
+				now: T0 + 90 * HARI
+			})
+		).toBe('OP-7Q2MNP');
+		expect(ambilRefGlobal(T0 + 90 * HARI)).toEqual({ ref: 'OP-7Q2MNP', nama: 'PT Lain' });
+	});
+
+	test('hitungRefLayout: kunci aktif + link agen → banner tetap varian mitra (nama perusahaan, bukan agen)', () => {
+		kunciOP();
+		const res = hitungRefLayout({
+			browser: true,
+			refUrl: KODE_BARU,
+			slug: null,
+			diRutePerumahan: false,
+			url: new URL(`https://www.omahe.co.id/?ref=${KODE_BARU}`),
+			now: T0 + HARI
+		});
+		expect(res).toEqual({ ref: REF_OP, refGlobalNama: 'PT Contoh Mitra', refGlobalAgen: null });
 	});
 });
