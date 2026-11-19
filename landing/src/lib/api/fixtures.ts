@@ -25,6 +25,7 @@ import type {
 	DeveloperDetail,
 	DeveloperSummary,
 	PerumahanDetail,
+	PromoAktif,
 	PublicSlider,
 	RegionOption,
 	UnitListing,
@@ -126,6 +127,10 @@ interface FixtureProject {
 	/** UNIT-10 — kode kecamatan Kemendagri contoh (untuk filter
 	 *  `kecamatanKode`; pasangan `kecamatan` di `REGIONS` di atas). */
 	kecamatanKode?: string;
+	/** SHARE-02 — poin keunggulan contoh untuk pratinjau tautan (absen = []). */
+	keunggulan?: string[];
+	/** SHARE-02 — promo aktif contoh; satu contoh per `sumber` ada di bawah. */
+	promoAktif?: PromoAktif[];
 }
 
 const PROJECTS: FixtureProject[] = [
@@ -138,6 +143,13 @@ const PROJECTS: FixtureProject[] = [
 		alamat: 'Jl. Raya Tajur No. 88, Ciawi, Kab. Bogor',
 		kecamatanNama: 'Ciawi',
 		kecamatanKode: '32.01.11',
+		// SHARE-02 — contoh lengkap: keunggulan + promo dua sumber (omahe &
+		// perumahan) supaya pratinjau tautan/gambar OG terlihat saat dev fixture.
+		keunggulan: ['SHM', '5 menit pintu tol Ciawi', 'Free biaya KPR'],
+		promoAktif: [
+			{ judul: 'Diskon Rp10 jt akhir tahun', sumber: 'omahe', slug: 'promo-akhir-tahun' },
+			{ judul: 'Gratis biaya AKD & BPHTB', sumber: 'perumahan', slug: null }
+		],
 		deskripsi:
 			'Hunian keluarga di kaki Gunung Salak, 10 menit dari pintu tol Ciawi. Cluster tertutup dengan one gate system, taman bermain, dan jalur pedestrian di seluruh area.',
 		tipe: [
@@ -155,6 +167,9 @@ const PROJECTS: FixtureProject[] = [
 		alamat: 'Jl. Kenanga Raya No. 12, Tanah Sareal, Kota Bogor',
 		kecamatanNama: 'Tanah Sareal',
 		kecamatanKode: '32.71.05',
+		// SHARE-02 — contoh keunggulan TANPA promo (badge hanya DP 0%/cashback
+		// kalau programOmahe ikut; fixture ini tidak ikut).
+		keunggulan: ['5 menit Stasiun Bogor', 'Kawasan RSS'],
 		deskripsi:
 			'Rumah dua lantai di tengah kota Bogor, berjarak 5 menit dari Stasiun Bogor. Cocok untuk komuter yang tetap ingin akses sekolah dan rumah sakit dalam radius 2 km.',
 		tipe: [
@@ -171,6 +186,8 @@ const PROJECTS: FixtureProject[] = [
 		alamat: 'Jl. Setiabudi Atas KM 12, Ledeng, Kota Bandung',
 		kecamatanNama: 'Cidadap',
 		kecamatanKode: '32.73.03',
+		// SHARE-02 — tanpa keunggulan: pratinjau jatuh ke fallback 3 label
+		// section Fasilitas builder (proyek ini pakai builder).
 		deskripsi:
 			'Cluster berkontur di Bandung utara dengan pemandangan lembah. Setiap unit menghadap taman linier; akses ke kawasan pendidikan Setiabudi 15 menit.',
 		tipe: [
@@ -377,6 +394,10 @@ export function perumahanDetail(slug: string): PerumahanDetail | null {
 		// MONET-01 — cermin prioritas proyek (Griya Asri Bogor = 50) supaya
 		// gate LeadFormDialog terlihat saat dev pakai fixture.
 		prioritas: p.prioritas,
+		// SHARE-02 — fixture selalu mengirim dua field ini (bentuk normal
+		// client.getPerumahan) supaya jalur dev sama dengan produksi.
+		keunggulan: p.keunggulan ?? [],
+		promoAktif: p.promoAktif ?? [],
 		sections: pakaiBuilder
 			? [
 					{

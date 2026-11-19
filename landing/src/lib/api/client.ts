@@ -36,6 +36,7 @@ import type {
 	PageMeta,
 	Paginated,
 	PerumahanDetail,
+	PromoAktif,
 	PublicSlider,
 	RegionOption,
 	UnitListing,
@@ -420,6 +421,31 @@ export async function getAgen(fetchFn: Fetch, slug: string): Promise<AgenDetail>
 // Detail perumahan (LANDING-01 + LANDING-02 — endpoint SUDAH ADA)
 // ---------------------------------------------------------------------------
 
+/**
+ * SHARE-02 — `keunggulan` & `promoAktif` field aditif backend (api-contract
+ * §43): backend lama tidak mengirimnya → normalkan ke `[]` supaya komponen
+ * (halaman detail, pratinjau tautan, gambar OG) tidak pernah membaca
+ * `undefined`. Sampingan: nilai aneh dari backend (bukan string / tanpa
+ * judul) dibuang, kap 3 sesuai kontrak.
+ */
+function normalkanShare02(detail: PerumahanDetail): PerumahanDetail {
+	return {
+		...detail,
+		keunggulan: Array.isArray(detail.keunggulan)
+			? detail.keunggulan
+					.filter((x): x is string => typeof x === 'string')
+					.map((x) => x.trim())
+					.filter(Boolean)
+					.slice(0, 3)
+			: [],
+		promoAktif: Array.isArray(detail.promoAktif)
+			? detail.promoAktif
+					.filter((x): x is PromoAktif => !!x && typeof x.judul === 'string' && !!x.judul.trim())
+					.slice(0, 3)
+			: []
+	};
+}
+
 export async function getPerumahan(fetchFn: Fetch, slug: string): Promise<PerumahanDetail> {
 	if (hasApi()) {
 		// `?full=1` (epic `LANDING-06`, repo `perumahan`, done 2026-09-15) —
@@ -429,15 +455,16 @@ export async function getPerumahan(fetchFn: Fetch, slug: string): Promise<Peruma
 		// boleh andalkan default skip-resolve, karena dia redirect duluan
 		// dan tidak pernah render datanya) — justru tenant itu yang paling
 		// butuh profil lengkap di sini.
-		return apiGet<PerumahanDetail>(
+		const detail = await apiGet<PerumahanDetail>(
 			fetchFn,
 			`/public/perumahan/${encodeURIComponent(slug)}`,
 			new URLSearchParams({ full: '1' })
 		);
+		return normalkanShare02(detail);
 	}
 	const detail = fixtures.perumahanDetail(slug);
 	if (!detail) error(404, 'Perumahan tidak ditemukan.');
-	return detail;
+	return normalkanShare02(detail);
 }
 
 // ---------------------------------------------------------------------------

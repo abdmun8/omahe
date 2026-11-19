@@ -7,12 +7,14 @@
 	import PetaLokasi from '$lib/components/peta-lokasi.svelte';
 	import PhotoPlaceholder from '$lib/components/photo-placeholder.svelte';
 	import StickyCta from '$lib/components/sticky-cta.svelte';
+	import Check from '@lucide/svelte/icons/check';
 	import Badge from '$lib/components/ui/badge.svelte';
 	import Button from '$lib/components/ui/button.svelte';
 	import ContactButtons from '$lib/components/contact-buttons.svelte';
 	import { SITE } from '$lib/config';
 	import { amankanJsonLd } from '$lib/jsonld';
 	import { renderMarkdown, cuplikanDeskripsi } from '$lib/markdown';
+	import { ogImageUrl, susunPratinjauPerumahan } from '$lib/pratinjau-perumahan';
 	import { ajukanUrl, refTanpaCashback, withRef } from '$lib/ref';
 	import {
 		formatAngka,
@@ -57,6 +59,18 @@
 	const tampilPetaData = $derived(!punyaSectionLokasi && !!p.mapsEmbedUrl);
 
 	const urlHalaman = $derived(`${SITE.url}/perumahan/${p.slug}`);
+
+	/**
+	 * SHARE-02 — pratinjau tautan (og:title/description + kartu gambar OG):
+	 * promo dulu, lalu keunggulan, lalu jumlah unit — SATU pintu bersama
+	 * route `/perumahan/<slug>/og.jpg` supaya meta & gambar tidak pernah beda.
+	 * Cashback tetap disembunyikan untuk ref agen via helper (`refTanpaCashback`).
+	 */
+	const pratinjau = $derived(
+		susunPratinjauPerumahan({ perumahan: p, tipeUnit: data.tipeUnit, ref: data.ref })
+	);
+	/** og:image — ref hanya diteruskan bila ref agen (gambar tanpa cashback). */
+	const urlGambarOg = $derived(ogImageUrl({ slug: p.slug, ref: data.ref }));
 
 	/**
 	 * LEAD-02: CTA kontak (desktop + sticky) SELALU "WhatsApp" yang membuka
@@ -147,17 +161,34 @@
 
 <svelte:head>
 	<title>{p.nama}{p.regionNama ? ` — ${p.regionNama}` : ''} · Omahe</title>
+	<!-- SHARE-02 — deskripsi pratinjau (promo → keunggulan → unit); kalau
+	     benar-benar kosong (tanpa unit/promo/keunggulan/deskripsi) pakai
+	     fallback lama agar meta tidak pernah blank. -->
 	<meta
 		name="description"
-		content={deskripsiPolos ??
+		content={pratinjau.deskripsi ||
+			deskripsiPolos ||
 			`${p.nama}: ${formatAngka(totalUnit)} unit tersedia mulai ${formatRupiah(hargaMulai)}.`}
 	/>
 	{#if p.tayangOmahe === false}
 		<!-- TAYANG-01 — belum tayang di daftar Omahe: halaman tetap terbuka untuk QR/ref, tidak diindeks. -->
 		<meta name="robots" content="noindex, follow" />
 	{/if}
-	<meta property="og:title" content={p.nama} />
-	{#if fotoUtama}<meta property="og:image" content={fotoUtama} />{/if}
+	<!-- SHARE-02 — pratinjau tautan lengkap; gambar = kartu otomatis (foto
+	     presign kedaluwarsa, jadi og:image menunjuk route og.jpg yang stabil). -->
+	<!-- og:url kanonikal TANPA ?ref — atribusi untuk pengunjung, bukan mesin pencari. -->
+	<meta property="og:url" content={urlHalaman} />
+	<meta property="og:title" content={pratinjau.judul} />
+	<meta property="og:description" content={pratinjau.deskripsi} />
+	<meta property="og:image" content={urlGambarOg} />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content={pratinjau.judul} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={pratinjau.judul} />
+	<meta name="twitter:description" content={pratinjau.deskripsi} />
+	<meta name="twitter:image" content={urlGambarOg} />
 	<!-- Tag <script> utuh lewat {@html} — Svelte 5 menolak <script> non-JS di
 	     level komponen (`script_duplicate`); isinya tetap JSON yang sudah
 	     di-escape (src/lib/jsonld.ts). -->
@@ -244,6 +275,20 @@
 				{formatRupiah(hargaMulai)}
 			</p>
 			<p class="text-muted mt-1 text-xs">{formatAngka(totalUnit)} unit tersedia</p>
+			{#if p.keunggulan?.length}
+				<!-- SHARE-02 — keunggulan admin (bukan fallback Fasilitas) ikut
+				     tampil di halaman, konsisten dengan pratinjau tautan. -->
+				<ul class="mt-3 flex flex-wrap gap-2" data-testid="keunggulan">
+					{#each p.keunggulan as poin (poin)}
+						<li>
+							<Badge variant="accent" class="gap-1.5">
+								<Check class="size-3.5" aria-hidden="true" />
+								{poin}
+							</Badge>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 		</div>
 
 		<div class="flex shrink-0 flex-col gap-2 sm:w-64">
