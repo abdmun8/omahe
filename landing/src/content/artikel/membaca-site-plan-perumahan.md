@@ -13,8 +13,10 @@ penulis: 'Tim Omahe'
 Site plan (master plan) adalah peta seluruh kawasan perumahan: posisi
 kaveling/unit, jalan, fasilitas, dan area komersial. Kebanyakan pembeli
 hanya melihat "rumah saya di mana" — padahal site plan menjawab banyak
-pertanyaan masa depan yang tidak dijawab brosur. Ini tujuh yang wajib
-dicari.
+pertanyaan masa depan yang tidak dijawab brosur. Di Omahe, gambar proyek
+bisa Anda pelajari dulu dari halamannya — [contoh: Mercu Raya
+City](/perumahan/mercu-raya-city) — sebelum membaca lebih dalam di lapangan.
+Ini tujuh yang wajib dicari.
 
 ## 1. Posisi unit terhadap jalan utama dan gerbang
 
@@ -68,9 +70,17 @@ harus menunggu — dan berapa lama.
 Bawa daftar ini saat survei: "Unit ini kaveling berapa, hadap ke mana,
 kapan fase ini diserahterimakan, fasos di mana tahap berapa, dan adakah
 rencana jalan/akses baru?" Jawaban yang baik spesifik dan tertulis;
-jawaban yang mengambang adalah sinyal untuk mencari alternatif — mulai
-dari [daftar perumahan beserta tipe dan harganya](/cari), lalu uji
-cicilannya di [simulasi KPR](/kpr).
+jawaban yang mengambang adalah sinyal untuk mencari alternatif — kenali
+dulu [developernya lewat direktori Omahe](/developer), lalu bandingkan
+proyek lain dari [daftar perumahan beserta tipe dan harganya](/cari), dan
+uji cicilannya di [simulasi KPR](/kpr).
+
+## Langkah berikutnya di Omahe
+
+- [Contoh halaman proyek: Mercu Raya City](/perumahan/mercu-raya-city) — pelajari gambar kawasan dan tipe sebelum survei.
+- [Direktori developer](/developer) — cek pengembang dan proyek lain yang pernah dibangun.
+- [Daftar perumahan](/cari) — bandingkan posisi, tipe, dan harga mulai antarproyek.
+- [Simulasi KPR](/kpr) — pastikan unit pilihan Anda tetap masuk rasio cicilan sehat.
 
 ---
 

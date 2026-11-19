@@ -108,7 +108,8 @@ tidak, rencana Anda tidak runtuh.
    berikutnya).
 5. **Anggarkan biaya transaksi yang tetap jadi tanggungan pembeli** —
    insentif PPN tidak menghapus BPHTB, PNBP, dan biaya notaris/PPAT;
-   rinciannya ada di
+   [estimasi biaya legalitasnya](/mitra?kategori=notaris) bisa diminta ke
+   mitra notaris/PPAT, dan rinciannya ada di
    [biaya jual beli: siapa bayar apa](/artikel/bphtb-pnbp-biaya-jual-beli).
 6. **Siapkan rencana B kalau tidak sempat.** Bila serah terima nyata
    tidak mungkin terjadi di 2026, hitung ulang harga dengan PPN penuh
@@ -117,7 +118,15 @@ tidak, rencana Anda tidak runtuh.
 
 Insentif seperti ini adalah diskon yang punya jam. Ia menguntungkan yang
 persiapannya rapi sejak November, dan merugikan yang menunda semua urusan
-ke pekan terakhir Desember.
+ke pekan terakhir Desember — pantau juga [promo perumahan yang sedang
+tayang di Omahe](/promo) agar program lain tidak luput dari hitungan.
+
+## Langkah berikutnya di Omahe
+
+- [Daftar pencarian](/cari) — bandingkan unit siap huni yang masih realistis masuk tenggat.
+- [Promo berjalan](/promo) — program perumahan lain yang sedang tayang.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — estimasi biaya transaksi yang tetap ditanggung pembeli.
+- [Contoh proyek: Royal Golden City](/perumahan/royal-golden-city) — cek bentuk data tipe dan harga satu proyek.
 
 ## Sumber
 

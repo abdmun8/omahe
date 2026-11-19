@@ -102,7 +102,9 @@ di atas rata-rata nasional bisa terlalu optimis satu-dua juta rupiah.
    bukan angka tahun lalu.
 3. **Uji ulang rasio cicilan** dengan pengeluaran baru di
    [simulasi KPR](/kpr); kalau menembus 35%, turunkan target harga rumah
-   atau perbesar DP — jangan perbesar tenor semata.
+   atau perbesar DP — jangan perbesar tenor semata; sisi lainnya adalah
+   menambah arus kas, misalnya lewat [jalur jasa jadi agen
+   Omahe](/gabung/agen) yang tidak menuntut modal rumah sendiri.
 4. **Bandingkan harga unit nyata** di [daftar pencarian](/cari) untuk
    menahan rencana tetap realistis — juga dengan perbandingan
    [cicilan vs sewa](/artikel/cicilan-vs-sewa-hitungan-5-tahun) bila
@@ -110,6 +112,13 @@ di atas rata-rata nasional bisa terlalu optimis satu-dua juta rupiah.
 
 Inflasi yang naik bukan alasan membatalkan rencana rumah — ia alasan
 rencananya dihitung dengan angka hari ini, bukan angka setahun lalu.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — uji rasio cicilan dengan pengeluaran dan bunga yang sudah naik.
+- [Gabung jadi agen Omahe](/gabung/agen) — tambah arus kas dari jalur jasa tanpa modal rumah.
+- [Daftar pencarian](/cari) — target harga rumah dari unit nyata hari ini.
+- [Promo berjalan](/promo) — program yang bisa menekan biaya masuk di tengah inflasi.
 
 ## Sumber
 

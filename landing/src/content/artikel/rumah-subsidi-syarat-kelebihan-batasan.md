@@ -36,7 +36,9 @@ yang mengikat. Ini panduan menilai apakah Anda lolos dan cocok.
 
 Kalau dua syarat pertama tidak terpenuhi, jalur subsidi tertutup — dan
 memaksakan lewat "titipan nama" berbahaya secara hukum. Lanjut ke
-perbandingan rumah komersial di [daftar pencarian](/cari) saja.
+perbandingan rumah komersial di [daftar pencarian](/cari) — saring dulu
+[unit di bawah Rp300 juta](/cari?hargaMax=300000000) supaya pembandingnya
+sekelas dengan plafon subsidi.
 
 ## Kelebihan nyata
 
@@ -65,7 +67,9 @@ perbandingan rumah komersial di [daftar pencarian](/cari) saja.
 2. Siapkan dokumen: KTP, KK, buku nikah/cerai, slip penghasilan/PKB,
    NPWP.
 3. Pilih proyek dari developer berizin (selebihnya sama seperti memilih
-   perumahan biasa — baca [cara membaca site plan](/artikel/membaca-site-plan-perumahan)).
+   perumahan biasa — baca [cara membaca site plan](/artikel/membaca-site-plan-perumahan);
+   [daftar developer di direktori Omahe](/developer) memudahkan cek
+   proyek apa saja yang pernah mereka bangun).
 4. Uji cicilan terhadap penghasilan — walau ringan, tetap masukkan ke
    anggaran bulanan; latih polanya juga di [simulasi KPR](/kpr) supaya
    siap naik kelas kelak.
@@ -73,6 +77,12 @@ perbandingan rumah komersial di [daftar pencarian](/cari) saja.
 Subsidi adalah pintu masuk kepemilikan yang sah dan murah — untuk profil
 yang tepat. Untuk yang tidak lolos, rumah komersial kecil dengan cicilan
 sehat tetap jalan terbaik berikutnya.
+
+## Langkah berikutnya di Omahe
+
+- [Rumah di bawah Rp300 juta](/cari?hargaMax=300000000) — pembanding sekelas plafon subsidi, lengkap dengan harga mulai.
+- [Direktori developer](/developer) — pastikan proyeknya memang dari developer berizin.
+- [Simulasi KPR](/kpr) — latih pola cicilan sejak sekarang, siap naik kelas kelak.
 
 ---
 

@@ -127,7 +127,9 @@ Yang bisa Anda cek sebelum memilih:
 Daftar periksa lingkungan yang lebih lengkap ada di
 [menilai lingkungan perumahan](/artikel/menilai-lingkungan-perumahan).
 Untuk membandingkan harga unit di beberapa lokasi sekaligus, mulai dari
-[pencarian Omahe](/cari).
+[pencarian Omahe](/cari) — misalnya [Karawang dan sekitarnya](/cari?regionKode=32.15)
+untuk kota-kota selatan Jakarta — supaya ongkos jalan ikut masuk
+hitungan, bukan cuma harganya.
 
 ## Menjelang RDG BI 17–18 November
 
@@ -150,6 +152,12 @@ Kami tidak memprediksi hasilnya. Yang perlu dicermati calon debitur:
 Bagi yang masih menimbang antara membeli atau tetap menyewa, angka
 inflasi bulan ini tidak mengubah logika dasarnya; perbandingan lengkapnya
 ada di [cicilan vs sewa: hitungan 5 tahun](/artikel/cicilan-vs-sewa-hitungan-5-tahun).
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — uji rasio cicilan dengan sisa uang yang sudah tergerus inflasi.
+- [Karawang & sekitarnya](/cari?regionKode=32.15) — bandingkan harga unit sekaligus jarak tempuhnya.
+- [Promo berjalan](/promo) — biaya masuk yang bisa ditekan di tengah biaya hidup yang naik.
 
 ## Sumber
 

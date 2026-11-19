@@ -16,6 +16,16 @@ rencana editorial manual. Jalan di server `hadirapp01` via cron user `abdul`.
 4. **Publikasi**: `landing/scripts/ambil-gambar-artikel.ts` (cover + CREDITS.md),
    `validasi.ts`, commit + push ke `main` → Vercel deploy otomatis.
 
+Setiap artikel WAJIB menghubungkan pembaca ke fitur Omahe (aturan 2026-11-19):
+≥ 2 tautan ke route fitur (BUKAN `/artikel/…`) yang relevan dengan topik, plus
+bagian `## Langkah berikutnya di Omahe` (2–4 butir ber-tautan) sebelum `## Sumber`.
+Sebelum riset, `jalankan.sh` mengambil daftar slug NYATA dari API publik produksi
+(perumahan, promo, kategori mitra, region — timeout 8 dtk per endpoint) dan
+menyuntikkannya ke ketiga prompt sebagai `{{DAFTAR_FITUR_OMAHE}}`; bila API down,
+daftar kosong dan penulis hanya memakai route statis (`/cari`, `/kpr`, `/promo`,
+`/mitra`, `/lelang`, `/developer`, `/gabung` + sub-rutenya). Peta topik → fitur
+ada di `prompt-tulis.md`.
+
 Pengaman: lock (`flock`), idempoten per tanggal WIB (artikel bertanggal hari ini
 sudah ada → keluar), menunggu CI runner selesai & RAM ≥ 900 MB (maks 2 jam), clone
 terpisah `~/projects/omahe-artikel-bot` (repo kerja tidak disentuh), commit ditolak
@@ -40,8 +50,19 @@ otomatis keluar bila slot pertama sudah menerbitkan.
 ## Validasi (`validasi.ts`)
 
 `bun ops/artikel-otomatis/validasi.ts <artikel.md> <YYYY-MM-DD>` — frontmatter
-(`parseFrontmatterArtikel`), tanggal, slug & cover unik, 700–1700 kata, ≥ 2 tautan
-internal valid (tidak ke artikel yang belum tayang), bagian `## Sumber` ≥ 2 URL.
+(`parseFrontmatterArtikel`), tanggal, slug & cover unik, ≥ 2 tautan internal valid
+(tidak ke artikel yang belum tayang), **≥ 2 tautan fitur Omahe (non-`/artikel`)**,
+**bagian `## Langkah berikutnya di Omahe`** (2–4 butir, tiap butir ber-tautan,
+sebelum `## Sumber`), bagian `## Sumber` ≥ 2 URL, dan panjang 700–1700 kata.
+
+Slug dinamis (`/perumahan/<slug>`, `/promo/<slug>`, `/developer/<slug>`,
+`/mitra?kategori=<slug>`) divalidasi ke API publik produksi — di-fetch sekali per
+run (timeout 5 dtk, bisa dioverride `OMAHE_API_BASE_URL`); API tidak terjangkau →
+slug diterima dengan warning, publikasi tidak diblokir.
+
+Artikel evergreen pra-pipeline (tanggal < 2026-10-18 — sebelum pipeline berita
+berjalan) di-grandfather dari cek panjang & `## Sumber`: tidak pernah diikat
+aturan itu dan tidak akan ditulis ulang demi memenuhinya.
 
 ## Catatan
 

@@ -87,7 +87,9 @@ sendiri — di situ risiko biaya material Anda tanggung sepenuhnya.
    mekanisme yang jelas (denda, opsi batal, atau alternatif unit).
 4. **Spesifikasi terkunci.** Naiknya biaya bisa "dibayar" developer
    lewat penurunan spesifikasi diam-diam. Merek/grade material utama
-   sebaiknya tercantum di kontrak — daftar pemeriksaannya ada di
+   sebaiknya tercantum di kontrak — kalau bahasa materialnya sulit
+   Anda nilai, [mitra kontraktor](/mitra?kategori=kontraktor) bisa
+   diajak menilai — daftar pemeriksaannya ada di
    [spesifikasi bangunan yang sering dikecilkan](/artikel/spesifikasi-bangunan-yang-sering-dikecilkan).
 
 ## Sisi pembeli: ruang negosiasi yang muncul
@@ -124,12 +126,20 @@ benar, sebagian alat closing. Cara memisahkannya:
   orang lain. Panik yang ditanam marketing hampir selalu lebih mahal
   daripada kenaikan harganya sendiri.
 
-Kalau angka cicilan di penawaran masih masuk rasio yang sehat dan unitnya
+Kalau angka cicilan di penawaran masih masuk rasio yang sehat — uji
+dulu di [simulasi KPR](/kpr) — dan unitnya
 memang cocok, kenaikan biaya hanya memperkuat keputusan yang sudah benar.
 Kalau tidak, tidak ada berita kurs yang mengubahnya menjadi benar.
 
 Mulailah dari membandingkan unit dan harga nyata hari ini di
 [daftar pencarian](/cari), baru saring penawaran yang menyertai berita.
+
+## Langkah berikutnya di Omahe
+
+- [Daftar pencarian](/cari) — bandingkan unit dan harga nyata sebelum berita memandu keputusan.
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — menilai grade material yang seharusnya Anda terima.
+- [Simulasi KPR](/kpr) — pastikan cicilan penawaran masih masuk rasio sehat.
+- [Direktori developer](/developer) — kontrak material besar membuat developer besar lebih tahan terhadap kenaikan biaya.
 
 ## Sumber
 

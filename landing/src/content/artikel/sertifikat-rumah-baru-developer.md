@@ -27,7 +27,8 @@ bulan-tahun, bukan "mengikuti proses".
 
 Balik nama, PBG kawasan (lihat [IMB/PBG](/artikel/imb-pbg-izin-bangun)),
 PNBP — developer tanggung atau pembeli? Semua harus tertulis di lampiran
-surat pesanan.
+surat pesanan; untuk jasa balik nama, [biaya mitra notaris/PPAT](/mitra?kategori=notaris)
+bisa Anda pakai pembanding.
 
 ## 3. Apakah tanah kawasan sudah bersih?
 
@@ -37,7 +38,8 @@ pengadaan/girik? Tanah belum bersih = risiko jadwal terpanjang.
 ## 4. Rekam jejak developer di proyek sebelumnya?
 
 Tanya nama proyek sebelumnya, lalu tanya penduduknya: sertifikat sudah
-serah berapa tahun setelah kunci? Ini data paling jujur yang tidak bisa
+serah berapa tahun setelah kunci? [Direktori developer Omahe](/developer)
+memudahkan menemukan proyek-proyek lainnya. Ini data paling jujur yang tidak bisa
 dihias brosur.
 
 ## 5. Bagaimana bila terlambat?
@@ -72,6 +74,12 @@ menjawab sendiri.
 Setelah dokumen aman, kembali ke keputusan yang menyenangkan:
 [bandingkan perumahan & unit tersedia](/cari) dan uji cicilannya di
 [simulasi KPR](/kpr).
+
+## Langkah berikutnya di Omahe
+
+- [Direktori developer](/developer) — temukan proyek sebelumnya sebagai bukti rekam jejak.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — pembanding biaya balik nama dan pengikatan.
+- [Perumahan & unit tersedia](/cari) — keputusan yang menyenangkan, dengan data yang jelas.
 
 ---
 

@@ -162,6 +162,12 @@ Untuk membandingkan hunian kota, mulai dari
 [katalog pencarian Omahe](/cari); bila unit pilihan Anda siap akad,
 cek [hak milik satuan rumah susun](/artikel/hak-milik-satuan-rumah-susun).
 
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — bandingkan cicilan tenor 20, 30, dan 40 tahun.
+- [Rumah di bawah Rp300 juta](/cari?hargaMax=300000000) — pembanding rumah tapak dengan anggaran serupa.
+- [Agen Omahe](/mitra?tab=agen) — bantuan memilih unit dan menyiapkan berkas pengajuan.
+
 ## Sumber
 
 - https://jdih.pkp.go.id/produk-hukum/file/2026kptsmpkp1721_1786327657.pdf

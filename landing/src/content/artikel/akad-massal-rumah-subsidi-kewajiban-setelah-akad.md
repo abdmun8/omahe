@@ -140,7 +140,8 @@ dengan jujur:
    booking](/artikel/menilai-lingkungan-perumahan).
 3. **Sudahkah Anda membaca perjanjian kredit?** Di sanalah kewajiban
    penghunian dan larangan pengalihan dirinci, termasuk surat
-   pernyataan saat akad. Tanda tangani setelah paham isinya, bukan
+   pernyataan saat akad — bila perlu, [mitra notaris/PPAT](/mitra?kategori=notaris)
+   bisa dibantu membedah dokumennya. Tanda tangani setelah paham isinya, bukan
    setelah lelah antre.
 4. **Sehatkah anggaran Anda?** Subsidi menurunkan bunga, bukan
    menggantikan kesiapan finansial — cek dulu [syarat, kelebihan, dan
@@ -167,9 +168,18 @@ Kebutuhan hunian Indonesia dikerjakan lewat banyak pintu sekaligus —
 [program 3 juta rumah yang progresnya
 kami tulis 24 Oktober](/artikel/program-3-juta-rumah-progres-oktober-2026)
 salah satunya, dan pasar rumah komersial jauh lebih lebar. Telusuri
-pilihan lewat [pencarian properti Omahe](/cari), bandingkan dengan
+pilihan lewat [pencarian properti Omahe](/cari) — [saring pembanding
+sekelas subsidi di bawah Rp400 juta](/cari?hargaMax=400000000) —
+bandingkan dengan
 skema subsidi di zona Anda, lalu pilih yang cocok dengan rencana hidup
 lima tahun ke depan, bukan sekadar cicilan terkecil.
+
+## Langkah berikutnya di Omahe
+
+- [Pembanding di bawah Rp400 juta](/cari?hargaMax=400000000) — unit komersial sekelas subsidi untuk yang tidak cocok terikat 5 tahun.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — bedah perjanjian kredit dan surat pernyataan sebelum tanda tangan.
+- [Simulasi KPR](/kpr) — lihat sendiri selisih cicilan subsidi vs tarif komersial.
+- [Pencarian properti](/cari) — semua pintu hunian dalam satu daftar.
 
 ## Sumber
 

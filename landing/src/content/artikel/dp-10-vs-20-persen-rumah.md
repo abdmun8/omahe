@@ -61,13 +61,20 @@ Pertanyaannya bukan "DP berapa persen yang bagus", tapi tiga ini berurutan:
 3. **Apa arah harga di lokasi target?** Naik cepat → kecepatan (DP kecil)
    berharga; stagnan → tidak ada buru-buru, perbesar DP.
 
-Yang jangan dilakukan: mengambil DP kecil HANYA karena promo "tanpa DP
-sampai serah terima", tanpa menghitung cicilan setelahnya. Promo membantu
+Yang jangan dilakukan: mengambil DP kecil HANYA karena [promo tanpa DP](/promo)
+yang sedang tayang, tanpa menghitung cicilan setelahnya. Promo membantu
 masuk; cicilan yang menentukan bertahan.
 
 Langkah berikutnya setelah memutuskan: [bandingkan unit yang benar-benar
 tersedia](/cari) dengan harga dan tipe sesuai budget Anda — jangan dari
-brosur saja.
+brosur saja; [contoh halaman proyek](/perumahan/bumi-indah-proklamasi)
+menampilkan tipe dan harga mulai yang bisa langsung Anda pakai membandingkan.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — hitung sendiri selisih cicilan DP 10% vs 20% dengan angka Anda.
+- [Promo berjalan](/promo) — cek program DP dan cashback yang sedang tayang sebelum memutuskan.
+- [Contoh proyek: Bumi Indah Proklamasi](/perumahan/bumi-indah-proklamasi) — tipe, harga mulai, dan program perumahan dalam satu halaman.
 
 ---
 

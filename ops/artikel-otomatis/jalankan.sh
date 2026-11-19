@@ -81,6 +81,60 @@ done | sort -r | head -40)"
 RENDER_TAG_TERAKHIR="$(echo "$RENDER_DAFTAR_ARTIKEL" | head -2 | awk -F ' · ' '{print $2}' | xargs)"
 export RENDER_DAFTAR_ARTIKEL RENDER_TAG_TERAKHIR
 
+# --- daftar fitur Omahe: slug NYATA dari API publik produksi (fail-soft) ---
+# Disuntikkan ke prompt riset/tulis/cek ({{DAFTAR_FITUR_OMAHE}}) supaya penulis
+# memakai slug perumahan/promo/kategori mitra/region yang benar-benar ada.
+# Bila API down → daftar kosong & penulis hanya memakai route statis.
+API_OMAHE="${OMAHE_API_BASE_URL:-https://api.omahe.co.id}"
+log "daftar fitur dari $API_OMAHE"
+RENDER_DAFTAR_FITUR_OMAHE="$(API="$API_OMAHE" python3 - <<'PY'
+import json, os, urllib.request
+
+def ambil(rute):
+    try:
+        req = urllib.request.Request(
+            os.environ["API"] + rute, headers={"User-Agent": "Mozilla/5.0 (omahe-artikel-bot)"}
+        )
+        with urllib.request.urlopen(req, timeout=8) as r:
+            return json.load(r).get("data") or []
+    except Exception:
+        return None
+
+perumahan = ambil("/public/perumahan?page=1&pageSize=48")
+promo = ambil("/public/promo")
+kategori = ambil("/public/mitra/kategori")
+region = ambil("/public/regions")
+
+if perumahan is None or kategori is None:
+    print("(API publik tidak terjangkau — pakai route statis saja: /cari, /kpr, /promo, /mitra, /lelang, /developer, /gabung, /gabung/agen, /gabung/mitra, /gabung/perumahan)")
+    raise SystemExit
+
+print("- Pencarian /cari — filter ?regionKode= & ?q= & ?hargaMax= & ?kamarTidurMin=")
+print("- Kalkulator KPR /kpr — simulasi cicilan")
+print("- Promo /promo — halaman promo berjalan")
+for p in (promo or [])[:10]:
+    print(f"  - /promo/{p.get('slug')} — {p.get('judul')}")
+print("- Lelang bank /lelang — daftar rumah lelang")
+print("- Direktori developer /developer")
+for k in (kategori or [])[:12]:
+    print(f"- Mitra /mitra?kategori={k.get('slug')} — {k.get('label')}")
+print("- Agen Omahe /mitra?tab=agen — direktori agen")
+print("- Gabung /gabung — /gabung/agen (jadi agen, gratis), /gabung/mitra, /gabung/perumahan")
+for r in (region or [])[:10]:
+    print(f"- Filter region ?regionKode={r.get('kode')} — {r.get('nama')}")
+print("- Perumahan aktif (slug NYATA — jangan pakai slug di luar daftar ini):")
+for p in (perumahan or [])[:48]:
+    po = p.get("programOmahe") or {}
+    ekstra = []
+    if po.get("dp0"): ekstra.append("DP 0%")
+    if po.get("cashback"): ekstra.append(f"cashback Rp{int(po['cashback']):,}".replace(",", "."))
+    if p.get("badge"): ekstra.append(str(p.get("badge")))
+    sufiks = (" · " + ", ".join(ekstra)) if ekstra else ""
+    print(f"  - /perumahan/{p.get('slug')} — {p.get('nama')} ({p.get('regionNama')}){sufiks}")
+PY
+)"
+export RENDER_DAFTAR_FITUR_OMAHE
+
 # --- 1. riset (Claude) ---
 rm -f "$KERJA/brief.md" # jangan pakai brief basi dari percobaan sebelumnya
 log "1/4 riset (claude)"

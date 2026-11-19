@@ -20,7 +20,8 @@ Pembeli membayar harga; sebagian dipakai melunasi sisa KPR Anda; sisa
 dana ke tangan Anda.
 
 - **Proses**: janji jual beli + restitusi bank melepas hak tanggungan →
-  sertifikat bersih → AJB ke pembeli.
+  sertifikat bersih → AJB ke pembeli — [jasa mitra notaris/PPAT](/mitra?kategori=notaris)
+  mengurusi peralihannya dari awal sampai akhir.
 - **Butuh**: pembeli tunai, atau KPR bank yang sama/menyetujui skema
   "payoff" (bank pembeli melunasi ke bank lama saat akad).
 - **Biaya**: [biaya jual beli normal](/artikel/bphtb-pnbp-biaya-jual-beli)
@@ -56,6 +57,8 @@ menunggu yang lama laku, skema-nya dibahas di [over KPR](/artikel/over-kpr-kapan
    jual, jangan "lupa" saat menerima offer.
 4. Kalau sekadar ingin menurunkan beban bulanan (bukan butuh dana):
    bandingkan jual vs refinancing — hitung ulang di [simulasi KPR](/kpr).
+   Dan bila pemasarannya terasa berat, [agen Omahe terverifikasi](/mitra?tab=agen)
+   bisa membantu memasarkan lewat jalur yang rapi.
 
 ## Tiga kesalahan yang merugikan
 
@@ -65,8 +68,15 @@ menunggu yang lama laku, skema-nya dibahas di [over KPR](/artikel/over-kpr-kapan
   masih berutang ke bank setelah rumah pergi).
 - Membiarkan tunggakan berjalan sambil mencari pembeli — bank tidak
   menunggu, dan rumus lelang yang mengambil alih (baca
-  [rumah lelang bank](/artikel/rumah-lelang-bank-peluang-atau-jebakan) —
+  [rumah lelang bank](/artikel/rumah-lelang-bank) —
   dari sisi pemilik kali ini).
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — urusan restitusi, AJB, dan balik nama dalam satu jalur.
+- [Agen Omahe terverifikasi](/mitra?tab=agen) — memasarkan rumah dengan proses yang tertib.
+- [Harga perumahan](/cari) — pembanding harga jual wajar sebelum pasang nomor.
+- [Simulasi KPR](/kpr) — bandingkan jual vs refinancing dengan angka nyata.
 
 ---
 

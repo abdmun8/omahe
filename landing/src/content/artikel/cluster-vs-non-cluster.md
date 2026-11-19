@@ -53,11 +53,17 @@ pasif — Anda yang menggarap pagar, kunci, dan hubungan tetangga sendiri.
 
 ## Cara memilih yang tepat
 
+Bandingkan dulu keduanya dari data yang sama — di Omahe, kawasan berpagar
+seperti [Cluster Pesona Cendana](/perumahan/cluster-pesona-cendana) dan
+proyek non-cluster tampil dengan tipe serta harga mulai yang bisa Anda
+baca sebelum survei. Lalu:
+
 1. **Hitung iuran sebagai bagian cicilan**: tambahkan IPL ke rasio
    pengeluaran bulanan rumah, lalu lihat totalnya masih sehat atau tidak
    (panduan 30–35% penghasilan).
 2. **Tanya peraturan tertulisnya sebelum booking** — minta salinan
-   perjanjian pengelolaan; jangan setelah kunci diterima.
+   perjanjian pengelolaan; jangan setelah kunci diterima. Profil
+   pengembangnya bisa Anda lihat dulu di [direktori developer](/developer).
 3. **Nilai gaya hidup Anda**: sering mudik/tinggalkan rumah kosong →
    cluster berharga; butuh ruang usaha/garasi leluasa → non-cluster.
 4. **Cek pengelolaannya**: cluster tua dengan pengelola lemah bisa lebih
@@ -67,6 +73,13 @@ pasif — Anda yang menggarap pagar, kunci, dan hubungan tetangga sendiri.
 Apapun pilihannya, langkah berikutnya sama: [bandingkan perumahan yang
 tersedia](/cari) di kota target, lalu pastikan cicilannya masuk akal di
 [simulasi KPR](/kpr) — pagar tidak menolong kalau cicilan yang memberatkan.
+
+## Langkah berikutnya di Omahe
+
+- [Contoh kawasan cluster: Cluster Pesona Cendana](/perumahan/cluster-pesona-cendana) — lihat tipe, harga mulai, dan lokasinya.
+- [Rumah di Karawang & sekitarnya](/cari?regionKode=32.15) — bandingkan cluster dan non-cluster di satu pasar.
+- [Direktori developer](/developer) — cek siapa pengembang dan proyek lain yang pernah dibangun.
+- [Simulasi KPR](/kpr) — masukkan IPL ke hitungan bulanan Anda sebelum booking.
 
 ---
 

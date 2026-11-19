@@ -169,6 +169,12 @@ Kenaikan BI-Rate ke 6,00% adalah berita moneter, bukan pengumuman
 bahwa rumah semakin sulit dibeli: FLPP tetap, DP 0% tetap, bunga KPR
 bergerak bertahap — yang menyiapkan angkanya tetap bisa melangkah.
 
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — hitung ulang cicilan dengan bunga floating setelah masa fixed berakhir.
+- [Promo Omahe](/promo) — cek perumahan yang sedang menawarkan DP 0% atau cashback.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — siapkan biaya akad dan balik nama sebelum tanda tangan.
+
 ## Sumber
 
 - https://www.bi.go.id/id/publikasi/ruang-media/news-release/Pages/sp_2825426.aspx

@@ -143,7 +143,8 @@ Selama aturan teknis belum terbit, jalur subsidi yang bisa dipakai hari ini
 tetap rumah subsidi **baru** lewat bank penyalur resmi — jaringannya luas:
 43 bank penyalur, 8.287 pengembang, dan 11.504 perumahan di 391
 kabupaten/kota, 36 provinsi. Mulai dari [pilihan yang tersedia saat
-ini](/cari).
+ini](/cari) — [saring pembanding sekelas subsidi di bawah Rp300
+juta](/cari?hargaMax=300000000) untuk melihat pasar sekitarnya.
 
 Daftar berikut tetap relevan bila kelak pindah ke jalur recycle:
 
@@ -172,6 +173,12 @@ pemesanan", "biaya proses" — kepada siapa pun yang mengaku sudah bisa
 memproses KPR recycle, selama aturan teknisnya belum terbit dan bank
 penyalur resmi belum membukanya. Pantau pengumuman resmi BP Tapera,
 Kementerian PKP, dan bank penyalur.
+
+## Langkah berikutnya di Omahe
+
+- [Pembanding di bawah Rp300 juta](/cari?hargaMax=300000000) — pasar sekelas subsidi hari ini, sementara aturan recycle belum terbit.
+- [Simulasi KPR](/kpr) — cicilan rumah subsidi bekas ditaksir sama dengan rumah baru; hitung sendiri.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — dokumen rumah bekas perlu dicek lebih teliti sebelum apa pun dibayar.
 
 ## Sumber
 

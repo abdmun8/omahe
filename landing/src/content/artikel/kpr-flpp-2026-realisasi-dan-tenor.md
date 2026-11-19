@@ -80,7 +80,9 @@ sisi:
 3. **Cek kondisi kredit Anda.** Bank tetap menilai kelayakan; tunggakan
    kecil di pinjaman online yang lupa bisa menunda berbulan-bulan.
 4. **Pilih unit dari developer berizin** dan periksa proyeknya seperti
-   pembelian biasa — lokasi, akses, dan spesifikasi tetap menentukan
+   pembelian biasa — [direktori developer Omahe](/developer) memudahkan
+   cek proyek apa saja yang pernah dibangun; lokasi, akses, dan
+   spesifikasi tetap menentukan
    hunian yang nyaman, subsidi atau tidak.
 5. **Konfirmasi skema ke bank**: bunga tetap 5%/6% sudah jadi kebijakan,
    tapi soal tenor 40 tahun dan skema berjenjang, minta keterangan
@@ -108,11 +110,19 @@ rusun.
 
 Jalur subsidi bukan satu-satunya pintu. Rumah komersial kecil dengan
 cicilan sehat tetap jalan yang sah untuk banyak keluarga — bandingkan
-pilihan yang tersedia hari ini di [daftar pencarian](/cari), dan lihat
+pilihan yang tersedia hari ini di [daftar pencarian](/cari), misalnya
+[di Karawang dan sekitarnya](/cari?regionKode=32.15), dan lihat
 konsekuensi menunggu versus membeli di artikel
 [inflasi dan harga rumah](/artikel/inflasi-harga-rumah-menabung-dulu).
 Yang paling mahal biasanya bukan bunganya, tapi tahun-tahun yang
 terbuang karena menunggu kondisi sempurna.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — bandingkan anuitas biasa vs skema yang ditawarkan bank.
+- [Perumahan di Karawang & sekitarnya](/cari?regionKode=32.15) — unit subsidi maupun komersial dalam satu daftar.
+- [Direktori developer](/developer) — pastikan unitnya dari developer berizin.
+- [Daftar pencarian](/cari) — jalur pembanding bila kuota subsidi habis.
 
 ## Sumber
 

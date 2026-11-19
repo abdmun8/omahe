@@ -50,7 +50,8 @@ tiga singkatan yang menentukan kualitas hidup Anda 10–20 tahun ke depan.
 
 - Apa saja PSU/Fasos di janjikan dan jadwalnya (baca [site plan](/artikel/membaca-site-plan-perumahan)).
 - Track record developer di proyek lama: apa kawasannya tertata ATAU
-  terbengkalai setelah mereka pergi? Tanya penghuni proyek lamanya —
+  terbengkalai setelah mereka pergi? [Direktori developer Omahe](/developer)
+  memperlihatkan proyek-proyek lamanya; tanya penghuninya —
   cara bertanyanya di [menilai lingkungan](/artikel/menilai-lingkungan-perumahan).
 - Estimasi iuran pasca-developer: siapa pegawai keamanannya, berita
   iuran terakhir, dana kas kawasan.
@@ -63,8 +64,17 @@ dana pemeliharaan terpisah dari operasional. Kawasan yang semua orang
 terjadi justru saat Anda menjual ([exit strategy](/artikel/exit-strategy-properti)).
 
 Sebelum sampai di sana, mulai dari memilih kawasan yang janjinya jelas —
-[bandingkan perumahan & unit](/cari), lalu uji cicilannya di [simulasi
+[bandingkan perumahan & unit](/cari), pelajari [contoh halaman
+proyek](/perumahan/mutiara-residence-2) sebagai gambaran data satu
+kawasan, lalu uji cicilannya di [simulasi
 KPR](/kpr).
+
+## Langkah berikutnya di Omahe
+
+- [Direktori developer](/developer) — lihat proyek lama: tertata atau terbengkalai?
+- [Contoh proyek: Mutiara Residence 2](/perumahan/mutiara-residence-2) — gambaran data satu kawasan sebelum memilih.
+- [Bandingkan perumahan & unit](/cari) — kawasan dengan janji PSU/Fasos yang jelas.
+- [Simulasi KPR](/kpr) — cicilan sehat membuat Anda bisa menahan beban iuran pasca-developer.
 
 ---
 

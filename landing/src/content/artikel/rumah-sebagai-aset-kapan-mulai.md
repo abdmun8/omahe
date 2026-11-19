@@ -65,12 +65,23 @@ dibangun. Untuk perbandingan lebih detail antar-aset, lihat artikel
 4. Cicilan diuji di [simulasi KPR](/kpr) termasuk skenario bunga naik —
    masih nyaman? Lanjut.
 5. Pilih lokasi dari fundamental, bukan diskon — mulai dari
-   [daftar perumahan aktif](/cari) dan bandingkan harga mulai antar
-   proyek sekitar.
+   [daftar perumahan aktif](/cari), pelajari [contoh halaman
+   proyek](/perumahan/casa-green-karawang) untuk lihat tipe dan harga
+   mulainya, lalu bandingkan antarproyek sekitar.
 
 Kesimpulannya: rumah menjadi aset ketika pemiliknya sudah siap menjadi
 pembayar cicilan yang sehat. Urutannya kesiapan dulu, rumah kemudian —
-bukan sebaliknya.
+bukan sebaliknya. Kalau rumah pribadi masih jauh, jalur masuk yang ringan
+ke dunia properti adalah mendampingi pembeli lain sebagai agen —
+[jadi agen Omahe, gratis](/gabung/agen) — sambil membangun pemahaman pasar
+dan penghasilan tambahan.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — uji rasio cicilan dengan skenario bunga naik sebelum mulai.
+- [Daftar perumahan aktif](/cari) — bandingkan harga mulai antarproyek di kota target Anda.
+- [Contoh proyek: Casa Green Karawang](/perumahan/casa-green-karawang) — lihat seperti apa data satu proyek yang lengkap.
+- [Gabung jadi agen Omahe](/gabung/agen) — jalur ringan belajar pasar properti sambil mendampingi pembeli.
 
 ---
 

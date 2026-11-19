@@ -23,7 +23,9 @@ konsekuensi praktis bagi Anda yang sedang mencari rumah.
 
 1. **6 Oktober — menggandeng REI dan pengembang.** Menteri PKP bermitra
    dengan REI dan pengembang untuk mempercepat
-   pembangunan. Bagi pembeli, ini sinyal pasokan proyek baru akan lebih
+   pembangunan — jalur yang sama bisa dipakai pengembang mana pun:
+   di Omahe, proyek bisa [didaftarkan langsung ke pembeli](/gabung/perumahan).
+   Bagi pembeli, ini sinyal pasokan proyek baru akan lebih
    banyak masuk pasar dalam bulan-bulan ke depan.
 2. **13 Oktober — menggandeng BRAN untuk sengketa lahan.** Pertemuan
    dengan Kepala BRAN menekankan tiga hal:
@@ -96,13 +98,21 @@ membayar. Tiga yang utama:
    lewat layanan resmi — panduannya di
    [cek sertifikat ke BPN online](/artikel/cek-sertifikat-rumah-ke-bpn-online).
 3. **Cek developer dan jadwal serah terima di kontrak**, bukan di
-   brosur. Untuk proyek baru, baca juga daftar pertanyaan sebelum beli
+   brosur — [profil dan proyek lamanya](/developer) bisa Anda lihat
+   dulu di direktori Omahe. Untuk proyek baru, baca juga daftar pertanyaan sebelum beli
    [sertifikat rumah baru dari developer](/artikel/sertifikat-rumah-baru-developer).
 
 Setelah tiga itu lolos, barulah bandingkan harga dan unit yang
 benar-benar setara satu sama lain di [daftar pencarian](/cari) —
 termasuk menimbang opsi rusun di perkotaan bila lokasi kerja Anda di
 pusat kota.
+
+## Langkah berikutnya di Omahe
+
+- [Daftarkan perumahan](/gabung/perumahan) — untuk pengembang: pasarkan proyek baru langsung ke pembeli.
+- [Direktori developer](/developer) — cek rekam jejak sebelum kontrak ditandatangani.
+- [Daftar pencarian](/cari) — bandingkan unit yang benar-benar setara, rumah tapak maupun vertikal.
+- [Simulasi KPR](/kpr) — cicilan sehat tetap syaratnya, program besar atau tidak.
 
 ## Cara membaca kabar program ini ke depan
 

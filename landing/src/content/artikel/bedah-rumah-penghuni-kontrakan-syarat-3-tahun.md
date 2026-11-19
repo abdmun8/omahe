@@ -125,7 +125,9 @@ Isi yang masuk akal untuk **perjanjian**:
 - masa menempati minimal tiga tahun berturut-turut;
 - harga sewa dikunci (tidak naik) selama jangka disepakati;
 - persetujuan tertulis pemilik atas perbaikan dan ruang lingkupnya;
-- tanda tangan bermaterai, idealnya disaksikan RT/RW.
+- tanda tangan bermaterai, idealnya disaksikan RT/RW — atau dibantu
+  [mitra notaris/PPAT](/mitra?kategori=notaris) bila besarnya memadai
+  untuk dikukuhkan.
 
 Simpan salinan untuk kedua pihak; bila nanti ada juknis berformat
 baku, ikuti itu.
@@ -187,6 +189,12 @@ juta](/artikel/kpr-subsidi-6-persen-pekerja-gaji-17-juta), uji daya
 dukung cicilan di [simulasi KPR](/kpr), lalu [telusuri stok yang
 benar-benar tersedia](/cari). Kontrakan yang layak hari ini pijakan
 yang sehat — bukan tujuan akhirnya.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — perjanjian sewa–pemilik yang tertulis dan terkukuh.
+- [Simulasi KPR](/kpr) — jalur menuju rumah sendiri dihitung dari sekarang.
+- [Stok rumah yang tersedia](/cari) — pembanding harga sebelum janji tiga tahun ditandatangani.
 
 ## Sumber
 

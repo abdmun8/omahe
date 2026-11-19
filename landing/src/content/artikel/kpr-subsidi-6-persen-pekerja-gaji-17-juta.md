@@ -164,6 +164,12 @@ rumah incarannya cocok, tidak ada yang salah dengan bergerak sekarang —
 menunggu juga punya harganya. Mulai dari [katalog perumahan yang
 tersedia](/cari), bukan dari skema yang wujudnya masih di atas kertas.
 
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — bandingkan cicilan bunga 6% dengan bunga komersial.
+- [Promo Omahe](/promo) — perumahan dengan DP 0% atau cashback yang bisa dipakai sekarang.
+- [Agen Omahe](/mitra?tab=agen) — minta bantuan agen menyiapkan berkas KPR.
+
 ## Sumber
 
 - https://katadata.co.id/finansial/makro/6abd22011a2ca/pemerintah-siapkan-paket-insentif-2027-potongan-pajak-gaji-hingga-bunga-kpr-6

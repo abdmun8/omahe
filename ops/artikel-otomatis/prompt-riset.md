@@ -26,10 +26,13 @@ cover-fotografer: <nama>
 cover-halaman: <url halaman unsplash>
 
 ## Topik & sudut
-<3–6 kalimat: berita apa, kenapa penting hari ini, dampak praktis untuk pembeli rumah, pertanyaan pembaca yang dijawab, outline H2 yang disarankan, tautan internal yang cocok (pilih dari daftar slug di bawah, plus /kpr atau /cari)>
+<3–6 kalimat: berita apa, kenapa penting hari ini, dampak praktis untuk pembeli rumah, pertanyaan pembaca yang dijawab, outline H2 yang disarankan, tautan internal yang cocok (pilih dari daftar slug di bawah, plus minimal 2 FITUR Omahe dari daftar "{{DAFTAR_FITUR_OMAHE}}" yang relevan dengan topik)>
 
 ## Dosier fakta
 <poin-poin fakta terverifikasi, masing-masing dengan tanggal & angka persis + status (berlaku/wacana)>
+
+## Fitur Omahe yang relevan
+<2–4 fitur dari daftar di bawah + SATU kalimat alasan kenapa relevan dengan topik ini — penulis akan memakainya untuk tautan internal & bagian "Langkah berikutnya di Omahe">
 
 ## Sumber
 - <url 1>
@@ -37,6 +40,9 @@ cover-halaman: <url halaman unsplash>
 ...
 ```
 Selesai setelah file ditulis. Balas singkat: slug + satu kalimat topik.
+
+## Fitur Omahe (slug NYATA dari API publik produksi — jangan mengarang slug di luar ini)
+{{DAFTAR_FITUR_OMAHE}}
 
 ## Artikel terakhir (tanggal · tag · slug · judul)
 {{DAFTAR_ARTIKEL}}

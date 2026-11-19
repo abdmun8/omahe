@@ -161,9 +161,18 @@ Bagi pembeli, risiko praktisnya antara lain:
 
 Menunggu bukan berarti pasif. Gunakan waktunya untuk merapikan
 dokumen, membereskan catatan kredit, dan membandingkan beberapa
-perumahan. Mulai dari [daftar perumahan dan unit tersedia](/cari),
-lalu pantau pengumuman resmi aturan 2027 lewat portal rumah.go.id
+perumahan. Mulai dari [daftar perumahan dan unit tersedia](/cari) —
+[stok sekelas subsidi](/cari?hargaMax=300000000) ikut dipantau agar
+pilihan Anda tidak hanya dari satu penawaran — lalu pantau pengumuman
+resmi aturan 2027 lewat portal rumah.go.id
 milik BP Tapera, yang kini juga menampung SiKumbang.
+
+## Langkah berikutnya di Omahe
+
+- [Daftar perumahan dan unit tersedia](/cari) — perbandingan sebelum memilih akad atau menunggu.
+- [Stok sekelas subsidi](/cari?hargaMax=300000000) — pembanding harga di luar satu penawaran.
+- [Simulasi KPR](/kpr) — akad Desember atau Januari tidak mengubah cicilan; angka Anda yang menentukan.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — dokumen akad dibaca rapi sebelum tanda tangan.
 
 ## Sumber
 

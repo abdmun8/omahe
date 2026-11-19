@@ -54,17 +54,25 @@ RDTR bisa direvisi — zona hari ini bukan kontrak abadi, dan rencana
 jalan bisa mundur bertahun-tahun. Gunakan RDTR untuk MENGHINDARI
 risiko besar (jalur, lindung) dan menimbang peluang (akses), bukan
 sebagai janji. Untuk tanah yang sudah dibangun perumahan, tanyakan
-status legal kawasan ke developer — daftar pertanyaannya di
+status legal kawasan ke developer — [profilnya ada di direktori
+developer Omahe](/developer), dan daftar pertanyaannya di
 [panduan sertifikat rumah baru](/artikel/sertifikat-rumah-baru-developer).
 
 ## Alur praktis sebelum tawar
 
-1. Temukan kandidat dari [daftar perumahan & harga](/cari).
+1. Temukan kandidat dari [daftar perumahan & harga](/cari) — misalnya
+   [di Karawang dan sekitarnya](/cari?regionKode=32.15).
 2. Cek RDTR petaknya + rencana prasarana sekitar.
 3. Survei fisik kondisi jalan/banjir.
 4. Uji cicilan di [simulasi KPR](/kpr) sebelum tawar.
 
 Lima belas menit membaca peta bisa berarti puluhan juta — dua arah.
+
+## Langkah berikutnya di Omahe
+
+- [Perumahan di Karawang & sekitarnya](/cari?regionKode=32.15) — kandidat awal sebelum peta RDTR dibuka.
+- [Direktori developer](/developer) — cek siapa yang membangun di kawasan yang Anda selidiki.
+- [Simulasi KPR](/kpr) — uji angka sebelum menawar, bukan sesudah.
 
 ---
 

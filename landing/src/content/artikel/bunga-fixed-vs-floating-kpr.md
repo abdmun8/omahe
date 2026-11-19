@@ -71,7 +71,16 @@ diturunkan.
    Fixed panjang > fixed pendek promo, untuk profil yang sama.
 
 Rumah yang tepat tetap langkah pertama — [telusuri unit yang
-tersedia](/cari) dulu, baru duduk membandingkan skema pembiayaannya.
+tersedia](/cari) dulu, baru duduk membandingkan skema pembiayaannya;
+cek juga [promo perumahan yang sedang tayang](/promo) dan [tipe serta
+harga mulai tiap proyek](/perumahan/salihara-residence) sebelum mengunci
+pilihan.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — uji cicilan versi floating (+1–3%) sebelum Anda menandatangani skema fixed.
+- [Promo berjalan](/promo) — program perumahan yang sedang tayang bisa menekan biaya masuk.
+- [Contoh proyek: Salihara Residence](/perumahan/salihara-residence) — tipe dan harga mulai nyata untuk pembanding penawaran bank.
 
 ---
 

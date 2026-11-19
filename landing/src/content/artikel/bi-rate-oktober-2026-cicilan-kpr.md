@@ -115,7 +115,18 @@ penawaran itu layak dipertimbangkan.
 Keputusan BI bulan ini pada dasarnya menyejukkan debitur: tidak ada
 kenaikan yang harus langsung diantisipasi, tapi juga tidak ada janji
 penurunan. Kontrak yang dipahami baik tetap melindungi Anda lebih dari
-apa pun yang keluar dari rapat bulanan.
+apa pun yang keluar dari rapat bulanan. Setelah angka cicilannya aman,
+pilih unitnya dengan tenang — [daftar perumahan hari ini](/cari),
+[contoh satu proyek utuh](/perumahan/casa-green-karawang), plus
+[promo yang sedang tayang](/promo) — semuanya bisa dibaca sebelum Anda
+berbicara dengan bank mana pun.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — ulangi simulasi +1% dengan pinjaman dan bunga penawaran Anda.
+- [Daftar perumahan hari ini](/cari) — harga mulai nyata sebagai dasar penghitungan pinjaman.
+- [Contoh proyek: Casa Green Karawang](/perumahan/casa-green-karawang) — tipe dan harga mulai satu proyek utuh.
+- [Promo berjalan](/promo) — program yang bisa menekan biaya masuk sambil menunggu arah bunga.
 
 ## Sumber
 

@@ -140,7 +140,9 @@ bisa menerima KUR Perumahan secara bersamaan.
 3. **Tentukan kebutuhan yang jujur.** Data Oktober 2026 menunjukkan
    renovasi adalah penggunaan terbesar. Kalau rencana Anda merenovasi,
    baca dulu [renovasi mana yang benar-benar menaikkan nilai
-   rumah](/artikel/renovasi-naikkan-nilai-rumah); kalau rumahnya akan
+   rumah](/artikel/renovasi-naikkan-nilai-rumah) dan minta RAB tertulis
+   dari [mitra kontraktor](/mitra?kategori=kontraktor) supaya plafon
+   Rp500 juta itu terpakai wajar; kalau rumahnya akan
    dikoskan atau dikontrakkan, uji dulu dengan [hitungan cash flow
    kontrakan sederhana](/artikel/cash-flow-kontrakan-hitungan-sederhana)
    — cicilan Rp1,93 juta harus ditutup pendapatan usaha, bukan harapan.
@@ -162,6 +164,12 @@ KUR Perumahan adalah instrumen yang tepat untuk profil yang tepat: pelaku
 usaha kecil yang rumahnya memang bagian dari usahanya. Kalau profil
 Anda sesuai, 6% selama lima tahun pertama layak dihitung serius; kalau
 tidak, jalur KPR konvensional atau FLPP justru lebih relevan.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — RAB tertulis sebelum plafon Rp500 juta dicairkan.
+- [Simulasi KPR](/kpr) — struktur perhitungannya sama; uji skenario tahun ke-6 tanpa subsidi.
+- [Perumahan dan unit yang tersedia](/cari) — pembanding kondisi dan legalitas objek yang akan dibiayai.
 
 ## Sumber
 

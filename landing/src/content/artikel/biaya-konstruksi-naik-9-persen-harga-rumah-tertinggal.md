@@ -156,7 +156,9 @@ menemukan data bahwa pengembang menurunkan mutu secara luas.
    material di atas.
 3. **Minta spesifikasi tertulis.** Saat biaya naik sementara harga
    subsidi dibatasi, dokumen tertulis menjadi pegangan Anda; merek/grade
-   material utama sebaiknya tercantum di dokumen pembelian. Daftar periksanya:
+   material utama sebaiknya tercantum di dokumen pembelian — bila
+   bahasa materialnya sulit dinilai sendiri, [mitra
+   kontraktor](/mitra?kategori=kontraktor) bisa diajak menilai. Daftar periksanya:
    [spesifikasi bangunan yang sering
    dikecilkan](/artikel/spesifikasi-bangunan-yang-sering-dikecilkan).
 4. **Tanyakan jadwal serah terima** dan konsekuensi keterlambatannya,
@@ -172,6 +174,12 @@ menemukan data bahwa pengembang menurunkan mutu secara luas.
    bergantung pada kecocokan unit dan kemampuan cicilan Anda. Mulai dari
    [daftar perumahan dan harga](/cari), lalu cocokkan dengan wilayah dan
    anggaran Anda.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — menilai spesifikasi yang seharusnya Anda terima.
+- [Simulasi KPR](/kpr) — uji gaji, DP, dan tenor Anda sendiri.
+- [Daftar perumahan dan harga](/cari) — penawaran nyata per wilayah untuk pembanding tabel subsidi.
 
 ## Sumber
 

@@ -49,7 +49,9 @@ ketat (DP dan suku bunga bisa berbeda).
   [inflasi & harga rumah](/artikel/inflasi-harga-rumah-menabung-dulu)).
 - Dana darurat < 12 bulan dari TOTAL dua cicilan.
 - Berharap rumah lama laku "secepat iklan agen" — di pasar lambat,
-   6–12 bulan menganggur itu normal, dengan dua cicilan menunggu.
+   6–12 bulan menganggur itu normal, dengan dua cicilan menunggu —
+   [agen Omahe terverifikasi](/mitra?tab=agen) bisa membantu
+   memasarkan, tapi tidak ada yang bisa menjamin kecepatan pasar.
 - Rumah baru dibeli spekulatif tanpa fundamental lokasi (lihat
   [rumah sebagai aset](/artikel/rumah-sebagai-aset-kapan-mulai)).
 
@@ -57,10 +59,19 @@ ketat (DP dan suku bunga bisa berbeda).
 
 Hitung tiga angka di [simulasi KPR](/kpr): cicilan baru saja; cicilan
 baru + cicilan lama; dan skenario terburuk — cicilan baru + lama + rumah
-lama kosong 6 bulan. Kalau skenario ketiga membuat Anda harus menjual
+lama kosong 6 bulan. Untuk nilai rumah lama, [pendapat penilai publik
+(KJPP)](/mitra?kategori=kjpp) lebih jujur daripada angka iklan. Kalau
+skenario ketiga membuat Anda harus menjual
 aset lain dengan tergesa, strategi ini bukan untuk Anda saat ini. Mulai
 juga dari [unit yang benar-benar tersedia](/cari) supaya angkanya nyata,
 bukan angan-angan.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — hitung tiga skenario cicilan sebelum memutuskan over KPR.
+- [Agen Omahe terverifikasi](/mitra?tab=agen) — memasarkan rumah lama tanpa berharap ajaib.
+- [Penilai publik (KJPP)](/mitra?kategori=kjpp) — nilai wajar rumah lama sebagai data comparable.
+- [Unit yang tersedia](/cari) — angka rumah baru dari data nyata, bukan brosur.
 
 ---
 

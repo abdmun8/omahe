@@ -41,8 +41,9 @@ WNI perseorangan yang:
 
 - memiliki atau menempati **satu-satunya** rumah dalam kondisi tidak layak
   huni;
-- status kepemilikan/penguasaan tanahnya jelas, sesuai peruntukan kawasan
-  permukiman dalam rencana tata ruang, dan tidak sengketa;
+- status kepemilikan/penguasaan tanahnya jelas — kalau dokumennya
+  berbelit, [mitra notaris/PPAT](/mitra?kategori=notaris) bisa membantu
+  merapikannya sejak sekarang;
 - berada pada desil 1–4 data tunggal sosial dan ekonomi nasional (DTSEN)
   terkini, **atau** penghasilan paling tinggi sebesar upah minimum
   provinsi/kabupaten/kota;
@@ -99,7 +100,8 @@ Dana itu **hanya** boleh untuk bahan bangunan dan/atau upah tukang
 (Pasal 22). Upah Rp2,5 juta tidak menutup semua pekerjaan — ini program
 keswadayaan; dengan harga material yang bisa berubah
 ([konteks rupiah dan material](/artikel/rupiah-18-ribu-harga-material-rumah)),
-susun RAB realistis.
+susun RAB realistis — [mitra kontraktor](/mitra?kategori=kontraktor)
+bisa diminta RAB pembanding supaya dana stimulan tidak menguap di tengah jalan.
 
 ## Alurnya: usulan, verifikasi, dana cair, lalu "tender rakyat"
 
@@ -185,6 +187,12 @@ yang sudah diverifikasi atau sedang dicairkan tetap aturan lama
 
 Bagi yang memenuhi kriteria, kuncinya: data benar, tanah jelas, dan
 usulan masuk lewat pengusul sebelum Desember 2026.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — rapikan status tanah sebelum verifikasi faktual.
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — RAB pembanding agar dana stimulan terpakai wajar.
+- [Telusuri unit yang tersedia](/cari) — jalur alternatif bila belum masuk kriteria bantuan.
 
 ## Sumber
 

@@ -94,7 +94,9 @@ Pelajaran praktisnya: angka nasional tidak mewakili kota target Anda.
 Bandingkan penawaran beberapa proyek di kawasan yang sama, dan
 perhatikan juga nilai appraisal bank, bukan hanya harga daftar ([cara
 harga rumah dinilai
-bank](/artikel/appraisal-bank-cara-harga-rumah-dinilai)).
+bank](/artikel/appraisal-bank-cara-harga-rumah-dinilai)) — bila perlu
+pendapat kedua di luar bank, [penilai publik (KJPP)](/mitra?kategori=kjpp)
+bisa disewa langsung.
 
 ## Mengapa harga belum turun walau penjualan melemah
 
@@ -173,7 +175,14 @@ dijamin):
 Kesimpulannya: harga primer hanya naik tipis dan penjualan melemah.
 Anda punya alasan untuk meneliti tanpa terburu-buru dan bertanya lebih
 banyak, tetapi data ini bukan janji diskon. Mulai dari unit yang cocok di [daftar perumahan
-dan harga](/cari), bukan dari angka makronya.
+dan harga](/cari) — [Karawang dan sekitarnya](/cari?regionKode=32.15)
+sebagai contoh pasar — bukan dari angka makronya.
+
+## Langkah berikutnya di Omahe
+
+- [Daftar perumahan dan harga](/cari) — pembanding antarproyek di kawasan yang sama.
+- [Penilai publik (KJPP)](/mitra?kategori=kjpp) — pendapat kedua di luar appraisal bank.
+- [Simulasi KPR](/kpr) — angka cicilan sebagai dasar tawaran Anda.
 
 ## Sumber
 

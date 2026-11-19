@@ -178,8 +178,16 @@ Ekonomi tumbuh 5,47% adalah kabar baik — tapi ia tidak memberi tahu
 harga rumah di lokasi Anda, tidak menjamin bunga KPR turun, dan tidak
 mengubah rasio cicilan yang sehat bagi penghasilan Anda. Yang mengubah
 keputusan tetap: cicilan versi terburuk, dana darurat, dan horizon
-tinggal. Mulai dari [perumahan dan harga nyata hari ini](/cari), bukan
+tinggal. Mulai dari [perumahan dan harga nyata hari ini](/cari) —
+[bandingkan per kota](/cari?regionKode=32.15), lalu lihat [bentuk data
+satu proyek utuh](/perumahan/grand-villa) — bukan
 dari judul berita.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — cicilan versi terburuk sebelum berita apa pun memandu keputusan.
+- [Perumahan per kota](/cari?regionKode=32.15) — harga nyata di lokasi target Anda, bukan angka nasional.
+- [Contoh proyek: Grand Villa](/perumahan/grand-villa) — bentuk data satu proyek utuh sebagai pembanding.
 
 ## Sumber
 

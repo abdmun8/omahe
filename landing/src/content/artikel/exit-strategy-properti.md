@@ -27,6 +27,7 @@ Kecepatan: sedang (diproses bank 1–3 bulan). Harga: baik, pasar paling
 dalam. Siapkan rumah lolos inspeksi: legalitas bersih (cek
 [pertanyaan sertifikat](/artikel/sertifikat-rumah-baru-developer)),
 atap/saluran sehat (lihat [renovasi nilai jual](/artikel/renovasi-naikkan-nilai-rumah)).
+Pemasarannya bisa dititipkan ke [agen Omahe terverifikasi](/mitra?tab=agen).
 Pembeli KPR terbanyak = pasarkan saat cicilan mereka terasa ringan —
 [hitung untuk mereka](/kpr) di iklan Anda.
 
@@ -64,7 +65,16 @@ KPR](/artikel/kpr-rumah-kedua-syarat)).
 Pertanyaan wajib SEBELUM membeli: "Situasi apa yang membuat saya harus
 keluar, dan lewat jalur mana?" Properti yang jawabannya buruk untuk
 semua jalur (lokasi tidak dicari, legalitas rumit, sewa tidak masuk)
-adalah properti yang mengunci Anda — apapun harga belinya.
+adalah properti yang mengunci Anda — apapun harga belinya. Untuk
+eksekusinya nanti, urusan pajak dan akad bisa dikoordinasikan dengan
+[mitra notaris/PPAT](/mitra?kategori=notaris) sejak awal.
+
+## Langkah berikutnya di Omahe
+
+- [Agen Omahe terverifikasi](/mitra?tab=agen) — memasarkan rumah ke pembeli KPR dengan jalur rapi.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — koordinasi pajak dan akad saat exit.
+- [Daftar harga perumahan](/cari) — pembanding harga untuk semua jalur keluar.
+- [Simulasi KPR](/kpr) — angka cicilan pembeli target Anda.
 
 ---
 

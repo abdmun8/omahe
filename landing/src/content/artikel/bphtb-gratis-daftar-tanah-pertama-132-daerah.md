@@ -172,6 +172,12 @@ menandatangani. Kalau Anda memilih mulai dari aset yang sudah
 bersertifikat, [telusuri daftar perumahan dan kaveling yang
 tersedia](/cari).
 
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — tanyakan status "BPHTB terutang" dan hitungan BPHTB sebelum transaksi.
+- [Mitra KJPP](/mitra?kategori=kjpp) — penilaian nilai pasar tanah bila sertifikat akan dijadikan agunan.
+- [Cari rumah](/cari) — bandingkan rumah baru bersertifikat jelas per tipe dan harga.
+
 ## Sumber
 
 - https://www.rctiplus.com/news/detail/inews/5517596/daftar-tanah-kini-lebih-murah--132-kabupaten-kota-beri-keringanan-bphtb

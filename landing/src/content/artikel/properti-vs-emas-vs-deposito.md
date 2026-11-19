@@ -37,6 +37,9 @@ sewa, tapi butuh modal besar, waktu panjang, dan kelola. Ia unggul untuk
 dana yang tidak akan dipakai > 10 tahun. Yang sering dilupakan: hasil
 sewa kotor dipotong pajak, perawatan, dan kekosongan — hitung bersih
 (lihat [hitungan rumah kontrakan](/artikel/cash-flow-kontrakan-hitungan-sederhana)).
+Modal belum cukup untuk rumah sendiri? Jalur jasa tetap terbuka:
+[mendampingi pembeli sebagai agen Omahe](/gabung/agen) tidak menuntut
+rumah sendiri.
 
 ### Emas — pelindung, bukan pesohor
 
@@ -72,7 +75,15 @@ tapi "berapa masing-masing":
 Sebelum menaruh porsi besar di properti, pastikan cicilannya sehat:
 uji di [simulasi KPR](/kpr) dengan skenario bunga naik, dan bandingkan
 harga mulai antar proyek di [hasil pencarian](/cari) supaya masuk di
-lokasi yang fundamentalnya benar.
+lokasi yang fundamentalnya benar — untuk aset second, nilai wajarnya
+bisa divalidasi [penilai publik (KJPP)](/mitra?kategori=kjpp).
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — uji cicilan properti dengan skenario bunga naik sebelum membagi portofolio.
+- [Gabung jadi agen Omahe](/gabung/agen) — ikut arus properti tanpa menunggu modal rumah sendiri.
+- [Penilai publik (KJPP)](/mitra?kategori=kjpp) — validasi nilai wajar aset sebelum masuk/bayar.
+- [Hasil pencarian](/cari) — harga mulai antarproyek sebagai pembanding kelas aset.
 
 ---
 

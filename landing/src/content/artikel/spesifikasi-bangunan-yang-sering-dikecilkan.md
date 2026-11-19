@@ -20,7 +20,9 @@ Ini tujuh titik yang wajib Anda tanyakan, plus cara ceknya.
 Tanyakan: berapa ukuran sloof dan kolom praktis? Rumah bagus memakai
 sloof beton bertulang menyatu dengan pondasi, bukan sekadar batu kali
 timpah. Sulit dilihat mata — makanya minta spesifikasi TERTULIS di
-surat pesanan, dan cek foto progres konstruksi bila bisa.
+surat pesanan, dan cek foto progres konstruksi bila bisa; kalau
+bahasa speknya sulit Anda nilai, [mitra kontraktor](/mitra?kategori=kontraktor)
+bisa diajak menemani survei.
 
 ## 2. Dinding: bata merah vs bata ringan vs hebel dinding-tipis
 
@@ -64,12 +66,21 @@ dan klaim garansi.
 ## Cara bertanya yang efektif
 
 Minta **spesifikasi tertulis** dan bandingkan antar proyek berdampingan
-— sales jarang menolak permintaan yang sopan dan spesifik. Bandingkan
+— sales jarang menolak permintaan yang sopan dan spesifik; galeri dan
+tipe tiap proyek di [halaman perumahannya di Omahe](/perumahan/grand-mutiara-village)
+juga bisa Anda bandingkan dulu dari rumah. Bandingkan
 pula harga per m² terhadap tipe di [daftar perumahan](/cari); kalau satu
 proyek jauh lebih murah dengan spek "standar", asumsikan yang
 dikecilkan ada di daftar di atas. Lalu uji cicilannya di [simulasi
 KPR](/kpr) — kualitas yang benar tidak harus yang paling mahal, tapi
 yang jujur dijelaskan.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — teman survei yang paham bahasa spesifikasi bangunan.
+- [Contoh proyek: Grand Mutiara Village](/perumahan/grand-mutiara-village) — bandingkan galeri dan tipe sebelum ke lokasi.
+- [Direktori developer](/developer) — lihat siapa yang membangun dan proyek lainnya.
+- [Simulasi KPR](/kpr) — kualitas yang jujur tidak harus yang paling mahal; hitung semuanya.
 
 ---
 

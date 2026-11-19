@@ -182,6 +182,12 @@ terburu-buru — keduanya menuntut kesiapan pembiayaan, biaya, dan
 administrasi. Uji cicilan di [simulasi KPR](/kpr), bandingkan unit di
 [daftar perumahan Omahe](/cari).
 
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — pembanding sewa vs cicilan dengan angka hari ini.
+- [Daftar perumahan](/cari) — pasar primer sebagai pembanding harga rumah seken.
+- [Gabung jadi agen Omahe](/gabung/agen) — di pasar yang melambat, jalur jasa tetap bergerak.
+
 ## Sumber
 
 - https://www.cnnindonesia.com/ekonomi/20261111133316-625-1425858/pasar-properti-q3-2026-harga-stabil-kecepatan-transaksi-melambat
