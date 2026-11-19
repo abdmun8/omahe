@@ -1054,3 +1054,41 @@ request API dari Omahe tanpa header ini.
   `/gabung/agen#terverifikasi`) di kartu direktori, blok agen pemasar, kartu nama,
   halaman verifikasi; `badge-profesional` kini membungkus `badge-lencana.svelte` (generik).
   Sebutan "Agen resmi Omahe" dihapus dari website (diganti "Cek ID card").
+
+## §43 — Keunggulan & promo aktif untuk pratinjau tautan (SHARE-02, 2026-11-19)
+
+- `GET /public/perumahan/:slug` (+`?full=1`) dua field ADITIF (repo `perumahan`
+  dibangun paralel; backend lama TIDAK mengirim → Omahe menormalkan ke `[]` di
+  `client.getPerumahan` — komponen tidak pernah membaca `undefined`):
+  - `keunggulan: string[]` — maks 3 item teks polos 2–60 karakter, diisi admin
+    perumahan (mis. "SHM", "5 menit ke tol", "Free biaya KPR"); kosong = [].
+  - `promoAktif: { judul: string; sumber: 'omahe' | 'perumahan'; slug: string | null }[]`
+    — maks 3, promo berjalan untuk pratinjau: `sumber: 'omahe'` = promo Omahe
+    superadmin (PROMO-02) yang tayang & menautkan perumahan ini (`slug` promo);
+    `sumber: 'perumahan'` = item promo section builder tenant yang aktif
+    (`slug` null). Absen = [].
+- Sisi Omahe — SATU pintu `$lib/pratinjau-perumahan.ts::susunPratinjauPerumahan()`
+  (murni, diuji penuh) dipakai bersama halaman detail/tipe & gambar OG supaya
+  meta dan gambar tidak pernah beda:
+  - badge promo urut: "DP 0%*" (`programOmahe.dp0`) → "Cashback Rp…" (format
+    ringkas `formatRupiah`; DISEMBUNYIKAN bila `ref` agen — `refTanpaCashback`,
+    aturan §36/§39) → `promoAktif[].judul` (potong 40 char, "…"); maks 3.
+  - keunggulan: field `keunggulan` → fallback 3 label pertama section
+    `facilities` builder → [] (fallback TIDAK dipakai di chip halaman).
+  - og:title `"<nama> — <kab/kota> · mulai Rp…"`, tipe: `"<tipe> di <nama> ·
+    mulai Rp…"`, maks 90 char; og:description maks 200: promo → keunggulan
+    ("✓ SHM · …") → "<N> unit tersedia" → cuplikan deskripsi
+    (`cuplikanDeskripsi`, polos tanpa markdown/HTML) sepanjang muat.
+- Gambar pratinjau `GET /perumahan/:slug/og.jpg` (Omahe, SSR bukan statis,
+  tidak di-prerender & tidak di sitemap): kartu 1200×630 satori +
+  `@resvg/resvg-js` — foto kiri (presign difetch server-side, timeout 2,5 dtk;
+  gagal → panel brand), kanan nama + "mulai Rp…" emas + maks 3 badge promo +
+  maks 3 keunggulan ✓ + footer "omahe.co.id"; varian `?tipe=<slug>` judul =
+  nama tipe + harga tipe (slug divalidasi pola; teks URL tidak pernah
+  di-echo). Header `cache-control: public, max-age=3600, s-maxage=3600,
+  stale-while-revalidate=86400`; slug tidak dikenal → 404; error
+  backend/render lain → 302 ke statis `/og-default.jpg`.
+- `og:image` di meta = URL og.jpg KANONIKAL tanpa `?ref`; `?ref=` hanya
+  ditempel bila `ref` ref agen (`refTanpaCashback` — validasi pola AO-/OMHA-/OMH-)
+  supaya crawler dengan link agen mendapat kartu TANPA badge cashback. `?tipe=`
+  ditempel di halaman tipe. og:url tetap kanonikal tanpa query.

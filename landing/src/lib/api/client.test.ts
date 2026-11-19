@@ -48,6 +48,21 @@ describe('client (mode fixture, env kosong)', () => {
 		expect(detail.nama).toBe('Griya Asri Bogor');
 	});
 
+	// SHARE-02 — `keunggulan` & `promoAktif` kini field aditif backend; client
+	// WAJIB menormalkan ke [] (backend lama tidak mengirim) supaya komponen
+	// pratinjau tautan/gambar OG tidak pernah membaca undefined.
+	test('getPerumahan: keunggulan & promoAktif selalu array ( SHARE-02, tidak pernah undefined)', async () => {
+		const griya = await getPerumahan(fetchDummy, 'griya-asri-bogor');
+		expect(Array.isArray(griya.keunggulan)).toBe(true);
+		expect(griya.keunggulan).toEqual(['SHM', '5 menit pintu tol Ciawi', 'Free biaya KPR']);
+		expect(Array.isArray(griya.promoAktif)).toBe(true);
+		expect(griya.promoAktif?.map((p) => p.sumber)).toEqual(['omahe', 'perumahan']);
+		// Proyek fixture tanpa contoh keunggulan/promo tetap [] (bukan undefined).
+		const kosong = await getPerumahan(fetchDummy, 'cakrawala-hills-bandung');
+		expect(kosong.keunggulan).toEqual([]);
+		expect(kosong.promoAktif).toEqual([]);
+	});
+
 	test('getUnits: perumahanSlug tidak match apa pun → resolve kosong, bukan throw', async () => {
 		const hasil = await getUnits(fetchDummy, { perumahanSlug: 'slug-tidak-ada' });
 		expect(hasil.items).toEqual([]);

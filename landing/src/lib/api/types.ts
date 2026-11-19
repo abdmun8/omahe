@@ -58,6 +58,16 @@ export interface Paginated<T> {
  * `siteplanSheetId`, `posX`/`posY`) TIDAK pernah ada di sini — tidak boleh
  * diekspos publik (UNIT-04).
  */
+/** SHARE-02 (repo `perumahan`, api-contract.md §43) — satu item promo
+ *  berjalan untuk pratinjau tautan (`?full=1` detail). `sumber: 'omahe'` =
+ *  promo Omahe superadmin (PROMO-02) yang menautkan perumahan ini (`slug`
+ *  promo); `'perumahan'` = item promo section builder tenant (slug null). */
+export interface PromoAktif {
+	judul: string;
+	sumber: 'omahe' | 'perumahan';
+	slug: string | null;
+}
+
 /** KOMISI-OMAHE-01 (repo perumahan) — program Omahe perumahan: promo DP 0%
  *  (diurus Omahe dengan bank) + cashback pembeli. Absen/null = tidak ikut. */
 export interface ProgramOmahe {
@@ -239,6 +249,14 @@ export interface PerumahanDetail {
 	tayangOmahe?: boolean;
 	/** KOMISI-OMAHE-01 — program Omahe (DP 0% / cashback); null = tidak ikut. */
 	programOmahe?: ProgramOmahe | null;
+	/**
+	 * SHARE-02 — poin keunggulan singkat (maks 3, teks polos, diisi admin
+	 * perumahan) untuk pratinjau tautan & halaman detail. Optional: backend
+	 * lama belum mengirim → `client.getPerumahan` menormalkan ke `[]`.
+	 */
+	keunggulan?: string[];
+	/** SHARE-02 — promo berjalan untuk pratinjau tautan (maks 3). Optional, idem. */
+	promoAktif?: PromoAktif[];
 	/**
 	 * Perluasan DEVELOPER-01 — optional karena endpoint yang SEKARANG jalan
 	 * belum mengembalikannya. Jangan asumsikan ada.

@@ -39,9 +39,12 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.45.0",
+		"@resvg/resvg-js": "2.6.2",
 		"bits-ui": "^2.19.2",
 		"clsx": "^2.1.1",
+		"jpeg-js": "0.4.4",
 		"marked": "^18.0.13",
+		"satori": "0.63.2",
 		"tailwind-merge": "^3.7.0",
 		"tailwind-variants": "^3.3.1"
 	}

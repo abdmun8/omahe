@@ -13,6 +13,7 @@
 	import { SITE } from '$lib/config';
 	import { amankanJsonLd } from '$lib/jsonld';
 	import { renderMarkdown } from '$lib/markdown';
+	import { ogImageUrl, susunPratinjauPerumahan } from '$lib/pratinjau-perumahan';
 	import { ajukanUrl, withRef } from '$lib/ref';
 	import {
 		formatAngka,
@@ -64,16 +65,36 @@
 	const urlPerumahan = $derived(`${SITE.url}/perumahan/${p.slug}`);
 	const urlHalaman = $derived(`${urlPerumahan}/tipe/${t.slug}`);
 	const judul = $derived(`${t.nama} — ${p.nama}`);
+
+	/**
+	 * SHARE-02 — pratinjau tautan halaman tipe: judul "<tipe> di <nama> ·
+	 * mulai Rp…", harga/stok dari tipe. Keunggulan & promo perumahan tidak
+	 * ada di respons `TipeDetail` (endpoint tipe belum membawanya) → badge
+	 * kosong di meta; GAMBAR OG-nya tetap lengkap karena route og.jpg
+	 * fetch detail perumahan sendiri. Deskripsi meta pakai deskripsi tipe.
+	 */
+	const pratinjau = $derived(
+		susunPratinjauPerumahan({
+			perumahan: p,
+			tipeUnit: [],
+			ref: data.ref,
+			tipe: { nama: t.nama, hargaMin: t.hargaMin, unitTersedia: t.unitTersedia },
+			deskripsi: t.deskripsi
+		})
+	);
+	/** og:image varian tipe — `?tipe=` (+`?ref=` hanya bila ref agen). */
+	const urlGambarOg = $derived(ogImageUrl({ slug: p.slug, tipeSlug: t.slug, ref: data.ref }));
 	const deskripsiMeta = $derived(
-		[
-			`${t.nama} di ${p.nama}`,
-			lokasi,
-			t.hargaMin !== null ? `mulai ${formatRupiah(t.hargaMin)}` : null,
-			habis ? 'sedang habis' : `${formatAngka(t.unitTersedia)} unit tersedia`
-		]
-			.filter(Boolean)
-			.join(' · ')
-			.slice(0, 155)
+		pratinjau.deskripsi ||
+			[
+				`${t.nama} di ${p.nama}`,
+				lokasi,
+				t.hargaMin !== null ? `mulai ${formatRupiah(t.hargaMin)}` : null,
+				habis ? 'sedang habis' : `${formatAngka(t.unitTersedia)} unit tersedia`
+			]
+				.filter(Boolean)
+				.join(' · ')
+				.slice(0, 155)
 	);
 
 	// JSON-LD — nama/teks datang dari input admin tenant: WAJIB amankanJsonLd().
@@ -124,8 +145,19 @@
 <svelte:head>
 	<title>{judul} · Omahe</title>
 	<meta name="description" content={deskripsiMeta} />
-	<meta property="og:title" content={judul} />
-	{#if fotoUtama}<meta property="og:image" content={fotoUtama} />{/if}
+	<!-- SHARE-02 — pratinjau tautan lengkap; gambar = kartu OG varian tipe. -->
+	<meta property="og:url" content={urlHalaman} />
+	<meta property="og:title" content={pratinjau.judul} />
+	<meta property="og:description" content={deskripsiMeta} />
+	<meta property="og:image" content={urlGambarOg} />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content={pratinjau.judul} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={pratinjau.judul} />
+	<meta name="twitter:description" content={deskripsiMeta} />
+	<meta name="twitter:image" content={urlGambarOg} />
 	{@html `<script type="application/ld+json">${jsonLdAman}</script>`}
 	{@html `<script type="application/ld+json">${jsonLdBreadcrumbAman}</script>`}
 </svelte:head>

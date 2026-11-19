@@ -35,5 +35,20 @@ export default defineConfig({
 				$components: 'src/lib/components'
 			}
 		})
-	]
+	],
+
+	// SHARE-02 — `@resvg/resvg-js` (rasterisasi kartu OG `/perumahan/<slug>/
+	// og.png`) memuat binary `.node` via require → TIDAK bisa dibundel esbuild/
+	// rolldown. Eksternalisasi supaya dibaca dari node_modules saat runtime
+	// (bun test & serverless); adapter-vercel men-trace dependensi dengan
+	// @vercel/nft → paket + binary linux-x64-gnu ikut masuk Vercel function.
+	ssr: { external: ['@resvg/resvg-js'] },
+
+	build: {
+		// SHARE-02 — font TTF kartu OG WAJIB ter-inline base64 di bundle SERVER:
+		// tanpa ini Vite men-emit file + URL web `/_app/immutable/assets/*.ttf`
+		// yang tidak bisa dibaca fs dari Vercel serverless. `undefined` (bukan
+		// false) → aset lain tetap pakai batas default 4 KB (perilaku lama).
+		assetsInlineLimit: (filePath) => (filePath.endsWith('.ttf') ? true : undefined)
+	}
 });
