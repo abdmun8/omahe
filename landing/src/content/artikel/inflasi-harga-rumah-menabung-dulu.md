@@ -65,8 +65,18 @@ KPR](/kpr), termasuk skenario bunga naik ([fixed vs floating](/artikel/bunga-fix
 
 Beli ketika: dana darurat siap + DP 10–20% terkumpul + cicilan masuk
 rasio + horizon ≥ 5–7 tahun — TIDAK menunggu "cash penuh" yang tidak
-pernah datang. Mulai dari [perumahan & harga nyata hari ini](/cari),
-bukan dari impian harga tahun lalu.
+pernah datang. Mempercepat DP paling aman lewat arus kas baru — jalur
+ringannya [mendampingi pembeli sebagai agen Omahe](/gabung/agen).
+Mulai dari [perumahan & harga nyata hari ini](/cari), bukan dari impian
+harga tahun lalu, dan cek [program promo yang sedang tayang](/promo)
+yang bisa menekan biaya masuk.
+
+## Langkah berikutnya di Omahe
+
+- [Perumahan & harga nyata hari ini](/cari) — target berdasarkan harga berjalan, bukan impian tahun lalu.
+- [Promo berjalan](/promo) — program DP dan cashback yang menekan tiket masuk.
+- [Simulasi KPR](/kpr) — uji rasio cicilan Anda termasuk skenario bunga naik.
+- [Gabung jadi agen Omahe](/gabung/agen) — arus kas tambahan yang mempercepat DP secara aman.
 
 ---
 

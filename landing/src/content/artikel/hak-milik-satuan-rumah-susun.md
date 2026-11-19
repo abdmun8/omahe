@@ -31,9 +31,13 @@ tersebut — padanan SHM untuk apartemen/kondominium. Yang penting dipahami:
 
 Sama seperti rumah tapak, tanyakan jadwal sertifikat satuan SEBELUM
 booking: kapan peralihan hak (PPJB → AJB/akad) dan kapan sertifikat
-fisik dipegang. Proses balik nama susun bisa memakan waktu — developer
+fisik dipegang. Proses balik nama susun bisa memakan waktu —
+[jasa mitra notaris/PPAT](/mitra?kategori=notaris) di direktori Omahe
+bisa jadi pembanding — developer
 berpengalaman punya jawaban timeline yang jujur. Daftar pertanyaan
-lengkap untuk developer ada di [panduan sertifikat rumah baru](/artikel/sertifikat-rumah-baru-developer).
+lengkap untuk developer ada di [panduan sertifikat rumah baru](/artikel/sertifikat-rumah-baru-developer);
+[profil developernya](/developer) sendiri bisa Anda lihat dulu di
+direktori Omahe.
 
 ## IPPS: "IPL"-nya apartemen
 
@@ -64,6 +68,13 @@ Bandingkan dulu opsi tapak vs susun di kota Anda lewat [daftar
 perumahan & unit tersedia](/cari), lalu uji cicilannya di [simulasi
 KPR](/kpr) — masukkan IPL sebagai bagian pengeluaran bulanan supaya
 angkanya jujur.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — urusan peralihan hak satuan lebih rapi dengan jasa legalitas.
+- [Direktori developer](/developer) — cek rekam jejak pengembang gedung sebelum booking.
+- [Daftar perumahan & unit](/cari) — bandingkan harga per m² tapak vs susun di kota Anda.
+- [Simulasi KPR](/kpr) — hitung cicilan plus IPL supaya angka bulanannya jujur.
 
 ---
 

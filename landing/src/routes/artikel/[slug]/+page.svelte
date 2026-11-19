@@ -9,6 +9,17 @@
 	import { formatTanggalArtikel } from '$lib/artikel';
 	import { SITE } from '$lib/config';
 	import { amankanJsonLd } from '$lib/jsonld';
+	import Search from '@lucide/svelte/icons/search';
+	import Calculator from '@lucide/svelte/icons/calculator';
+	import BadgePercent from '@lucide/svelte/icons/badge-percent';
+	import Gavel from '@lucide/svelte/icons/gavel';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Landmark from '@lucide/svelte/icons/landmark';
+	import Hammer from '@lucide/svelte/icons/hammer';
+	import Users from '@lucide/svelte/icons/users';
+	import Building2 from '@lucide/svelte/icons/building-2';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
+	import House from '@lucide/svelte/icons/house';
 	import { withRef } from '$lib/ref';
 	import type { PageData } from './$types';
 
@@ -18,6 +29,22 @@
 	const ref = $derived(page.data.ref as string | null);
 	const urlHalaman = $derived(`${SITE.url}/artikel/${a.slug}`);
 	const coverAbsolut = $derived(`${SITE.url}${a.cover}`);
+	const fiturTerkait = $derived(data.fitur);
+
+	/** Peta `FiturArtikel.ikon` → komponen (lihat `$lib/artikel-fitur.ts`). */
+	const IKON_FITUR: Record<string, typeof Search> = {
+		search: Search,
+		calculator: Calculator,
+		'badge-percent': BadgePercent,
+		gavel: Gavel,
+		'file-text': FileText,
+		landmark: Landmark,
+		hammer: Hammer,
+		users: Users,
+		'building-2': Building2,
+		'user-plus': UserPlus,
+		house: House
+	};
 
 	// JSON-LD — headline/deskripsi dari frontmatter in-repo; tetap lewat
 	// amankanJsonLd() (satu jalur escape untuk SEMUA JSON-LD situs).
@@ -103,7 +130,7 @@
 			<span class="text-muted text-sm" aria-hidden="true">·</span>
 			<span class="text-muted text-sm">Oleh {a.penulis}</span>
 		</div>
-		<h1 class="font-display text-ink mt-2 text-2xl font-extrabold leading-tight sm:text-3xl">
+		<h1 class="font-display text-ink mt-2 text-2xl leading-tight font-extrabold sm:text-3xl">
 			{a.judul}
 		</h1>
 
@@ -111,6 +138,34 @@
 		<div class="prose-artikel mt-6">
 			{@html data.html}
 		</div>
+
+		<!-- "Fitur Omahe terkait" — pemilihan pure di `$lib/artikel-fitur.ts`
+		     (deterministik, maks 3, tautan via withRef agar `?ref=` tetap jalan). -->
+		{#if fiturTerkait.length > 0}
+			<aside
+				class="bg-primary/5 border-line mt-8 rounded-2xl border p-4 sm:p-5"
+				aria-label="Fitur Omahe terkait"
+			>
+				<h2 class="font-display text-ink text-base font-bold">Fitur Omahe terkait</h2>
+				<div class="mt-3 grid gap-3 sm:grid-cols-3">
+					{#each fiturTerkait as f (f.href)}
+						{@const Ikon = IKON_FITUR[f.ikon]}
+						<a
+							href={withRef(f.href, ref)}
+							class="bg-surface hover:bg-primary/5 border-line rounded-xl border p-3 transition-colors"
+						>
+							<span
+								class="bg-primary/10 text-primary inline-flex size-8 items-center justify-center rounded-lg"
+							>
+								{#if Ikon}<Ikon class="h-4 w-4" aria-hidden="true" />{/if}
+							</span>
+							<span class="font-display text-ink mt-2 block text-sm font-bold">{f.judul}</span>
+							<span class="text-muted mt-0.5 block text-xs leading-snug">{f.deskripsi}</span>
+						</a>
+					{/each}
+				</div>
+			</aside>
+		{/if}
 	</article>
 
 	<nav class="border-line mt-10 grid gap-3 border-t pt-6 sm:grid-cols-2" aria-label="Artikel lain">
@@ -164,9 +219,13 @@
 							/>
 							<div class="mt-2 flex items-center gap-2">
 								<Badge variant="accent">{t.tag}</Badge>
-								<time datetime={t.tanggal} class="text-muted text-xs">{formatTanggalArtikel(t.tanggal)}</time>
+								<time datetime={t.tanggal} class="text-muted text-xs"
+									>{formatTanggalArtikel(t.tanggal)}</time
+								>
 							</div>
-							<h3 class="font-display text-ink group-hover:text-primary mt-1 text-sm font-bold leading-snug">
+							<h3
+								class="font-display text-ink group-hover:text-primary mt-1 text-sm leading-snug font-bold"
+							>
 								{t.judul}
 							</h3>
 						</a>

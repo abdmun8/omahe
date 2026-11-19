@@ -63,20 +63,28 @@ menerima SHGB sebagai agunan KPR. Yang perlu Anda pahami:
 - **Periksa status tanah** — apakah sedang dijaminkan (hipotek), sengketa,
   atau dalam proses ahli waris.
 - **Untuk rumah baru developer**: minta jadwal serah sertifikat tertulis di
-  surat pesanan, dan cek rekam jejak developer menyerahkan sertifikat di
-  proyek sebelumnya.
+  surat pesanan, dan cek [rekam jejak developernya di direktori Omahe](/developer)
+  — termasuk penyerahan sertifikat di proyek sebelumnya.
 - **Foto kopia sertifikat & surat ukur** sebelum akad, untuk arsip Anda.
 
 ## Hubungannya dengan KPR Anda
 
 Bank akan mengurus balik nama dan pengikatan agunan saat akad — sebagian
-biaya itu (BN, BHTB, notaris) masuk ke biaya kredit Anda. Meski demikian,
+biaya itu (BN, BHTB, notaris) masuk ke biaya kredit Anda — dan
+[jasa notaris/PPAT mitra Omahe](/mitra?kategori=notaris) bisa Anda
+bandingkan lebih dulu. Meski demikian,
 inisiatif cek tetap milik pembeli: bank memeriksa legalitas untuk
 kepentingannya; Anda yang paling berkepentingan dengan kepastian hak Anda.
 
 Setelah sertifikat aman, tinggal memastikan unitnya memang pas — mulai dari
 [mencari perumahan beserta tipe dan harganya](/cari) di kota target Anda,
 lalu [simulasikan cicilannya](/kpr) sebelum menyusun surat pesanan.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — bandingkan jasa balik nama dan pengikatan sertifikat sebelum akad.
+- [Direktori developer](/developer) — lihat rekam jejak serah-terima proyek sebelumnya.
+- [Cari perumahan](/cari) — unit dengan sertifikat jelas siap Anda bandingkan per tipe dan harga.
 
 ---
 

@@ -40,14 +40,18 @@ penjual, dan sebagian dari masalah yang menyertai rumahnya.
 - **Biaya tersembunyi**: biaya lelang, balik nama, PPh/BPHTB, denda
   pajak-pajak tertunggak pemilik lama, perbaikan rumah yang terabaikan.
 - **Kondisi fisik**: rumah ditinggal bertahun-tahun — atap bocor, 
-  asi listrik usang. Anggarkan renovasi sejak harga tawar.
+  asi listrik usang. Anggarkan renovasi sejak harga tawar — survei
+  bersama [mitra kontraktor](/mitra?kategori=kontraktor) mengurangi
+  risiko estimasi gede-gedean.
 - **Proses dan emosi**: penawar lain, syarat dana tunai cepat (kpr lelong
   ada tapi lebih ribet), dan waktu.
 
 ## Due diligence minimum sebelum menawar
 
 1. **Cek sertifikat** seperti transaksi biasa (nomor hak, status, batas) —
-   panduannya di [cek sertifikat ke BPN](/artikel/cek-sertifikat-rumah-ke-bpn-online).
+   panduannya di [cek sertifikat ke BPN](/artikel/cek-sertifikat-rumah-ke-bpn-online);
+   untuk cek ulang dan peralihan haknya, [mitra notaris/PPAT](/mitra?kategori=notaris)
+   bisa dibandingkan langsung di direktori Omahe.
 2. **Survei fisik + tanya tetangga**: siapa menghuni, sejak kapan, ada
    konflik?
 3. **Tanya penjual lelang (bank/KPKNL)**: lelang ke berapa, harga limit,
@@ -66,7 +70,16 @@ Anda punya waktu (bulan-tahun untuk proses), dana yang tidak butuh
 cepat kembali, nyaman dengan risiko hukum ringan, dan menargetkan
 lokasi yang Anda kenal betul. Investor berpengalaman memang mencari
 di sini — pemula yang butuh rumah cepat huni biasanya lebih cocok ke
-pasar reguler.
+pasar reguler. Daftar objek yang sedang tayang kini bisa diikuti dari
+[halaman Rumah Lelang Omahe](/lelang) — lengkap dengan bank dan nilai
+limitnya — tanpa harus memantau situs satu per satu.
+
+## Langkah berikutnya di Omahe
+
+- [Halaman Rumah Lelang](/lelang) — lihat objek lelang yang sedang tayang beserta bank dan nilai limitnya.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — cek sertifikat dan urusan peralihan hak sebelum menawar.
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — estimasi biaya renovasi rumah lelang yang terabaikan.
+- [Daftar rumah baru](/cari) — pembanding harga pasar reguler sebelum memutuskan lelang.
 
 ---
 

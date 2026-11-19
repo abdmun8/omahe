@@ -124,7 +124,17 @@ Bawa daftar ini saat survei atau serah terima:
    siapa?
 
 Aturan ini berlaku sejak diundangkan (Pasal 14), jadi proyek yang sedang
-Anda lihat hari ini sudah bisa ditanya dengan naskah ini di tangan.
+Anda lihat hari ini sudah bisa ditanya dengan naskah ini di tangan —
+[kenali developernya lewat direktori Omahe](/developer), dan [bandingkan
+perumahan di Karawang dan sekitarnya](/cari?regionKode=32.15) untuk melihat
+siapa saja yang bermain di pasar Anda.
+
+## Langkah berikutnya di Omahe
+
+- [Direktori developer](/developer) — siapa yang membangun kawasan yang Anda selidiki.
+- [Perumahan di Karawang & sekitarnya](/cari?regionKode=32.15) — proyek-proyek yang bisa ditanya dengan naskah aturan ini.
+- [Daftarkan perumahan](/gabung/perumahan) — untuk pembangun: pasarkan proyek yang komitmen lingkungannya jelas.
+- [Contoh proyek: Nirwana Residence](/perumahan/nirwana-residence) — lihat seperti apa data satu kawasan yang tampil terbuka.
 
 ## Sumber
 

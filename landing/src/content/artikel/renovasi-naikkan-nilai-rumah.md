@@ -49,7 +49,9 @@ selisih itu. Sisakan margin, bukan habiskan.
 
 ## Checklist praktis
 
-1. Rencana + RAB tertulis; izin [PBG](/artikel/imb-pbg-izin-bangun)
+1. Rencana + RAB tertulis — pelaksananya pilih yang jelas biayanya:
+   [mitra kontraktor terverifikasi](/mitra?kategori=kontraktor); izin
+   [PBG](/artikel/imb-pbg-izin-bangun)
    untuk perubahan struktur/luas.
 2. Prioritas: struktural dulu (atap, saluran) → barulang kosmetik.
 3. Untuk menjual: matikan daftar "selera pribadi"; untuk betah:
@@ -59,8 +61,16 @@ selisih itu. Sisakan margin, bukan habiskan.
 
 Kalau tujuannya jual cepat dan hasil maksimal: fokus 5 daftar atas +
 harga wajar dari [appraisal logika bank](/artikel/appraisal-bank-cara-harga-rumah-dinilai),
+pemasarannya bisa dibantu [agen Omahe terverifikasi](/mitra?tab=agen),
 dan uji posisi jual-beli Anda di [simulasi KPR](/kpr) untuk memahami
 angka pembeli.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — RAB tertulis dan pelaksana yang jelas biayanya.
+- [Agen Omahe terverifikasi](/mitra?tab=agen) — pemasaran rumah pasca-renovasi lewat jalur yang tertib.
+- [Pembanding harga perumahan](/cari) — plafon nilai di lingkungan Anda.
+- [Simulasi KPR](/kpr) — pahami angka cicilan pembeli target Anda.
 
 ---
 

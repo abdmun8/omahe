@@ -148,12 +148,15 @@ fixed vs floating](/artikel/bunga-fixed-vs-floating-kpr).
    cair dalam 5 hari kerja; tanyakan lama masa fixed, uang muka,
    plafon, dan tenor.
 2. **Hitung total kas** — jaminan, selisih tunai harga, bea lelang,
-   BPHTB, balik nama, potensi pengosongan/renovasi.
+   BPHTB, balik nama, potensi pengosongan/renovasi — estimasi
+   perbaikannya bisa diminta ke [mitra kontraktor](/mitra?kategori=kontraktor).
 3. **Baca pengumuman lelang sampai habis**: nilai limit, besaran dan
    cara setor jaminan, jangka waktu bayar (Pasal 62).
 4. **Cek dokumen tanah.** Jenis hak tercantum di pengumuman; cocokkan
    dengan sertifikatnya lewat [cara cek sertifikat ke
-   BPN](/artikel/cek-sertifikat-rumah-ke-bpn-online).
+   BPN](/artikel/cek-sertifikat-rumah-ke-bpn-online) — dan bila
+   dokumennya berbelit, [mitra notaris/PPAT](/mitra?kategori=notaris)
+   bisa diminta meneliti sebelum Anda menawar.
 5. **Survei fisik dan okupansi** selama jendela ±2 minggu sebelum
    lelang.
 6. **Anggar cicilan versi floating**, bukan versi 2,7%.
@@ -163,6 +166,13 @@ Omahe](/lelang) dan pastikan kalendernya cocok dengan kas Anda. Rumah
 lelang bisa jadi pintu masuk dengan harga efisien — tapi yang menentukan
 hasilnya bukan bunga promonya, melainkan kesiapan tunai dan persetujuan
 kredit Anda sebelum lelang dimulai.
+
+## Langkah berikutnya di Omahe
+
+- [Daftar rumah lelang di Omahe](/lelang) — objek, jadwal, dan nilai limit dalam satu halaman.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — teliti dokumen tanah sebelum menekan tombol tawar.
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — estimasi biaya pengosongan dan renovasi.
+- [Simulasi KPR](/kpr) — cicilan versi floating, bukan versi 2,7%.
 
 ## Sumber
 

@@ -62,12 +62,21 @@ non-cluster](/artikel/cluster-vs-non-cluster)).
 ## 8. Fundamental harga sekitar
 
 Bandingkan harga per m² antar perumahan sekitar lewat [daftar
-perumahan](/cari) — lingkungan terbaik pun punya harga wajarnya.
+perumahan](/cari) — misalnya [Karawang dan sekitarnya](/cari?regionKode=32.15)
+dan [contoh satu proyek utuh](/perumahan/sudirman-green-park) —
+lingkungan terbaik pun punya harga wajarnya.
 Setelah kandidat lolos delapan cek, tinggal uji angkanya di [simulasi
 KPR](/kpr).
 
 Rumah bisa direnovasi; lingkungan tidak. Urutan yang benar: pilih
 lingkungan dulu, baru rumahnya.
+
+## Langkah berikutnya di Omahe
+
+- [Perumahan di Karawang & sekitarnya](/cari?regionKode=32.15) — harga per m² antarproyek dalam satu pasar.
+- [Contoh proyek: Sudirman Green Park](/perumahan/sudirman-green-park) — lihat data lengkap satu kandidat sebelum survei.
+- [Direktori developer](/developer) — cek apakah janji masa lalu developer benar-benar ditepati.
+- [Simulasi KPR](/kpr) — uji angka kandidat yang lolos cek lapangan.
 
 ---
 

@@ -44,7 +44,9 @@ tersertifikasi sebelum Oktober 2026 (target, bukan realisasi), dan
 DPD AREBI Banten bersama LSP BPI menyertifikasi 260 broker di Gading
 Serpong pada Juli 2026. Artinya, kualifikasi agen yang Anda temui di
 masa transisi bisa beragam — verifikasi mandiri sebelum bayar
-jadi tugas Anda.
+jadi tugas Anda. Di Omahe, [direktori agen](/mitra?tab=agen) membuat
+penyaringan ini lebih mudah: profil agen tampil terbuka sebelum Anda
+berkomitmen.
 
 ## Siapa yang disebut "broker properti"?
 
@@ -184,7 +186,16 @@ apa pun.
 Mencari rumah juga tidak harus dimulai dari agen: [telusuri
 perumahan dan unit yang tersedia](/cari) dan hitung [simulasi cicilan
 KPR](/kpr) lebih dulu — posisi tawar lebih kuat kalau angka sudah di
-tangan.
+tangan. Dan bila Anda sendiri bergerak di dunia broker, jaringan yang
+sudah tertata bisa jadi rumahnya — [gabung jadi agen Omahe](/gabung/agen),
+gratis, dengan alur perjanjian yang sudah mengikuti standar di atas.
+
+## Langkah berikutnya di Omahe
+
+- [Direktori agen Omahe](/mitra?tab=agen) — profil agen terbuka sebelum Anda menyerahkan tanda jadi.
+- [Gabung jadi agen Omahe](/gabung/agen) — jalur tertata untuk broker yang sedang menyesuaikan diri.
+- [Telusuri perumahan](/cari) — pencarian bisa dimulai tanpa agen.
+- [Simulasi KPR](/kpr) — angka di tangan memperkuat posisi tawar.
 
 ## Sumber
 

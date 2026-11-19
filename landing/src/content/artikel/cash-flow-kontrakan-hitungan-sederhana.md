@@ -36,7 +36,7 @@ sewa Rp30 juta/tahun.
 | **Bersih** | **± Rp24,3 jt** |
 
 Modal Anda ± Rp170–180 juta (DP 25% + biaya-biaya [jual beli](/artikel/bphtb-pnbp-biaya-jual-beli)
-+ renovasi ringan siap sewa). Yield bersih ≈ 13–14%? Bukan — Rp24,3 jt
++ [renovasi ringan siap sewa](/mitra?kategori=kontraktor)). Yield bersih ≈ 13–14%? Bukan — Rp24,3 jt
 terhadap modal Rp175 jt ≈ **13,9%? Itu salah hitung** — yield modal
 memang bisa lebih tinggi dari yield harga kalau pakai KPR; tapi Anda
 belum menghitung cicilan. Kalau KPR 15 th bunga 11%: cicilan ± Rp53 jt/
@@ -69,7 +69,16 @@ sewa > bunga; berpengalaman melihat total arus kas.
 Buka [daftar perumahan & unit](/cari) di kota target, ambil harga nyata
 2–3 kandidat, dan hitung skenarionya (termasuk cicilan) di [simulasi
 KPR](/kpr). Kalau hasilnya negatif di semua skenario wajar — lokasi atau
-harganya yang salah, bukan rumusnya.
+harganya yang salah, bukan rumusnya. Belum punya modal rumah sendiri?
+Jalur jasa tetap menghasilkan: [dampingi pembeli sebagai agen
+Omahe](/gabung/agen) tanpa harus memiliki kontrakan dulu.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — hitung cicilan vs sewa bersih di skenario nyata Anda.
+- [Daftar perumahan & unit](/cari) — ambil harga kandidat nyata untuk memasukkan ke rumus cash flow.
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — estimasi biaya siap-sewa sebelum rumus dihitung.
+- [Gabung jadi agen Omahe](/gabung/agen) — penghasilan tambahan dari dunia properti tanpa modal rumah.
 
 ---
 

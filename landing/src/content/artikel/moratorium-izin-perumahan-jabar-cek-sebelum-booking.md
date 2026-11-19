@@ -157,7 +157,8 @@ semua pembelian rumah baru:
    [artikel menilai lingkungan
    perumahan](/artikel/menilai-lingkungan-perumahan).
 4. **Utamakan yang fisiknya sudah berdiri.** Rumah ready stock
-   mengurangi risiko jadwal. Untuk inden, perhatikan skema pembayaran
+   mengurangi risiko jadwal — dan [rekam jejak developernya](/developer)
+   bisa dilihat dulu di direktori Omahe. Untuk inden, perhatikan skema pembayaran
    bertahap dan klausul pengembalian dana di PPJB bila proyek
    tertunda karena perizinan.
 5. **Jaga uang muka tetap kecil.** Booking fee kecil lebih aman
@@ -165,8 +166,15 @@ semua pembelian rumah baru:
    ilustrasi di atas.
 6. **Kunci sisi finansialnya.** Uji cicilan unit pilihan Anda di
    [simulasi KPR](/kpr); bila hasilnya di luar jangkauan,
-   [telusuri perumahan yang tersedia](/cari) untuk membandingkan
+   [telusuri perumahan yang tersedia](/cari) — misalnya [membandingkan
+   lokasi yang ada hari ini](/cari?regionKode=32.15) — untuk memilih
    lokasi dan harga.
+
+## Langkah berikutnya di Omahe
+
+- [Direktori developer](/developer) — rekam jejak pengembang sebelum PPJB.
+- [Simulasi KPR](/kpr) — cicilan unit pilihan, diuji sebelum booking.
+- [Lokasi yang tersedia hari ini](/cari?regionKode=32.15) — pembanding unit siap berdiri di pasar Jabar.
 
 ## Penutup
 

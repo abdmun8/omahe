@@ -45,7 +45,9 @@ tambah ruang cuci). Tipe 45 di kaveling sama bisa sudah mentok KDB-nya.
 
 Artinya: **Tipe 36 di kaveling lega sering lebih fleksibel jangka panjang**
 daripada Tipe 45 di kaveling sempit — kebalikan dari intuisi banyak orang.
-Selalu minta site plan dan cek batas bangunan sebelum memutuskan.
+Selalu minta site plan dan cek batas bangunan sebelum memutuskan — di
+Omahe, [foto, tipe, dan harga mulai tiap proyek](/perumahan/klari-regency)
+bisa dilihat dulu dari halaman perumahannya, sebelum Anda datang ke lokasi.
 
 ## Hitungan cicilan: selisih yang tidak sebesar kelihatannya
 
@@ -86,7 +88,15 @@ tenor sampai cicilannya nyaman.
    untuk skenario keluarga Anda?
 5. Bandingkan dulu unit yang benar-benar tersedia di
    [daftar perumahan](/cari) — tipe dan harga mulai per proyek, jangan
-   hanya dari satu brosur.
+   hanya dari satu brosur; untuk keluarga muda, saring dulu
+   [yang punya ≥ 2 kamar tidur](/cari?kamarTidurMin=2).
+
+## Langkah berikutnya di Omahe
+
+- [Rumah dengan ≥ 2 kamar tidur](/cari?kamarTidurMin=2) — bandingkan Tipe 36 vs 45 dari unit yang benar-benar tersedia.
+- [Contoh halaman proyek: Klari Regency](/perumahan/klari-regency) — lihat denah, galeri, dan spesifikasi tipe sebelum survei.
+- [Simulasi KPR](/kpr) — masukkan harga dua tipe dan bandingkan cicilannya dengan penghasilan Anda.
+- [Direktori developer](/developer) — kenali pengembang di balik tiap proyek sebelum memilih tipe.
 
 Kesimpulannya bukan "36 kalah" atau "45 menang": Tipe 36 menang untuk
 budget ketat dengan rencana keluarga kecil atau strategi pindah dalam

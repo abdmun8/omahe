@@ -31,7 +31,9 @@ dan peraturan turunannya. Perubahan kunci dibanding IMB:
 
 Untuk perumahan baru, developer mengurus PBG untuk kawasan/blok-nya —
 tapi **pastikan unit Anda tercakup** dan tanyakan kapan dokumen
-diserahterimakan. Praktik yang benar: PBG kawalan di akad/kunci, salinan
+diserahterimakan. [Profil developernya](/developer) bisa Anda lihat dulu
+di direktori Omahe sebelum booking. Praktik yang benar: PBG kawalan di
+akad/kunci, salinan
 untuk arsip Anda. Ini satu item daftar periksa sebelum serah terima —
 bersama [spesifikasi bangunan](/artikel/spesifikasi-bangunan-yang-sering-dikecilkan)
 yang jarang dicek pembeli.
@@ -41,8 +43,10 @@ yang jarang dicek pembeli.
 Ringkasannya: perubahan struktur, penambahan luas, perubahan fungsi,
 atau melewati batas KDB/KTB → wajib PBG. Renovasi kecil tanpa mengubah
 struktur (finishing, interior) umumnya tidak. Aturan detail bisa berbeda
-per daerah — cek SIMBG/Pemerintah Daerah sebelum membeli material,
-karena renovasi tanpa PBG berisiko denda keterlambatan dan kesulitan
+per daerah — cek SIMBG/Pemerintah Daerah sebelum membeli material, dan
+pilih pelaksana yang paham prosesnya — [mitra kontraktor di direktori
+Omahe](/mitra?kategori=kontraktor) bisa jadi pembanding — karena
+renovasi tanpa PBG berisiko denda keterlambatan dan kesulitan
 saat jual beli.
 
 ## Rumah lama tanpa IMB: apa yang harus dilakukan?
@@ -75,6 +79,13 @@ Rincian pos biaya transaksi lainnya ada di [BPHTB & biaya jual beli](/artikel/bp
 Sisanya menikmati proses memilihnya: [telusuri perumahan dan
 harganya](/cari), dan bila perlu uji cicilan di [simulasi KPR](/kpr)
 sebelum mengurus apa pun.
+
+## Langkah berikutnya di Omahe
+
+- [Direktori developer](/developer) — pastikan pengembang proyek Anda rutin menyerahkan dokumen.
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — pelaksana renovasi yang paham urusan PBG menghindarkan denda.
+- [Daftar perumahan](/cari) — bandingkan proyek dengan dokumen kawasan yang rapi.
+- [Simulasi KPR](/kpr) — rumah berdokumen patuh memudahkan kredit berikutnya.
 
 ---
 

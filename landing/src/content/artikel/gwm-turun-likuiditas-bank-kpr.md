@@ -107,7 +107,15 @@ calon debitur dengan berkas paling siap.
 
 Likuiditas ±Rp190 triliun bukan janji bunga murah — ia pintu peluang.
 Pintu hanya menguntungkan mereka yang berdiri di depannya dengan berkas
-yang siap.
+yang siap — dan target unit yang sudah jelas: mulai dari [daftar
+perumahan](/cari) (misalnya [di Karawang dan sekitarnya](/cari?regionKode=32.15)),
+sambil memantau [promo yang sedang tayang](/promo) untuk menekan biaya masuk.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — uji cicilan maksimal dan skenario bunga naik 1%.
+- [Perumahan di Karawang & sekitarnya](/cari?regionKode=32.15) — target unit jelas sebelum promo datang.
+- [Promo berjalan](/promo) — biaya masuk yang bisa dipantau sejak sekarang.
 
 ## Sumber
 

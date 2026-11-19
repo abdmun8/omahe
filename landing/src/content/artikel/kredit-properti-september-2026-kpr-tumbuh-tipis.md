@@ -136,7 +136,8 @@ membantu dana DP mengikuti harga rumah yang naik pelan.
 3. **Gunakan posisi tawar Anda ke developer.** Data menunjukkan penjualan
    primer masih kontraksi sementara sisi pembangunan dibiayai kencang —
    kombinasi yang wajar membuat pengembang lebih terbuka pada diskon harga,
-   bonus, atau bantuan biaya transaksi. Minta penawarannya secara
+   bonus, atau bantuan biaya transaksi; [program yang sudah tayang di
+   halaman promo Omahe](/promo) bisa jadi pembanding. Minta penawarannya secara
    tertulis.
 4. **Manfaatkan PPN DTP sebelum tenggatnya.** Insentif PPN ditanggung
    pemerintah untuk rumah berlaku hingga 31 Desember 2026 — nilainya
@@ -160,6 +161,12 @@ Mulailah dari angka Anda sendiri: hitung cicilan yang masih masuk rasio
 sehat di [simulasi KPR](/kpr), lalu telusuri
 [unit yang tersedia hari ini](/cari) untuk melihat pasokan yang dibiayai
 angka-angka di atas.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — angka Anda sendiri sebelum negosiasi apa pun.
+- [Promo berjalan](/promo) — pembanding diskon yang sudah tayang.
+- [Unit yang tersedia hari ini](/cari) — pasokan yang sedang dibiayai kencang sisi developer.
 
 ## Sumber
 

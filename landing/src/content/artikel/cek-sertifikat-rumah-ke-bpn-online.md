@@ -61,19 +61,28 @@ murah dibanding risiko. Yang Anda dapatkan:
 Online memverifikasi data; kaki Anda memverifikasi kenyataan. Datangi
 lokasi: cocokkan batas dengan surat ukur, tanya tetangga sejak kapan
 penjual menguasai, dan pastikan tidak ada bangunan liar di atasnya. Untuk
-pembelian serius, jasa notaris/PPAT akan mengulang sebagian besar cek ini —
-tapi menemukan masalah SEBELUM bayar DP jauh lebih murah daripada sesudah.
+pembelian serius, [jasa notaris/PPAT](/mitra?kategori=notaris) akan
+mengulang sebagian besar cek ini — tapi menemukan masalah SEBELUM bayar DP
+jauh lebih murah daripada sesudah.
 
 ## Red flag yang bikin urung
 
 - Penjual menolak memberi salinan sertifikat "nanti pas akad saja"
 - Nama pemegang hak berbeda dan tidak ada surat kuasa yang sah
-- Sertifikat masih proses balik nama dari developer ke penjual pertama
+- Sertifikat masih proses balik nama dari developer ke penjual pertama —
+  [profesi dan rekam jejak developernya](/developer) bisa Anda lihat dulu
+  di direktori Omahe
 - Harga jauh di bawah pasar "karena butuh cepat"
 
 Kalau semua lolos, lanjut ke tahap menyenangkan: membandingkan pilihan —
 mulai dari [daftar rumah baru beserta harganya](/cari), lalu hitung
 kelayakan cicilan di [simulasi KPR](/kpr) sebelum tanda tangan pesanan.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — serahkan cek ulang dan pengikatan sertifikat ke jasa legalitas terverifikasi.
+- [Direktori developer](/developer) — intip rekam jejak pengembang sebelum menyusun surat pesanan.
+- [Simulasi KPR](/kpr) — pastikan cicilan masih masuk rasio sehat setelah semua biaya transaksi.
 
 ---
 

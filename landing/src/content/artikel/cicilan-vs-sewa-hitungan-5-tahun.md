@@ -14,7 +14,8 @@ penulis: 'Tim Omahe'
 Kalimat ini mungkin sering Anda dengar — dan sebagiannya benar, sebagiannya
 menyesatkan. Artikel ini membedah hitungan nyata lima tahun untuk rumah
 tipe kecil di sekitar Jabodetabek, dengan angka yang bisa Anda ganti
-sendiri sesuai kota Anda.
+sendiri sesuai kota Anda — contoh stok dan harga mulainya bisa Anda intip
+dari [rumah di Karawang dan kota satelit lain](/cari?regionKode=32.15).
 
 ## Asumsi dasar perhitungan
 
@@ -57,7 +58,9 @@ Dari total ± Rp385 juta yang keluar (DP + 5 tahun cicilan), tidak semuanya
   awal porsinya kecil, tapi bertambah besar setiap tahun.
 - Sisanya bunga — ya, ini juga "hilang", sama seperti sewa.
 - Plus biaya-biaya yang nyata: provisi bank, notaris, asuransi, pajak
-  jual-beli (BPHTB). Jangan diabaikan; totalnya bisa 5–8% harga rumah.
+  jual-beli (BPHTB) — estimasi rinci biaya legalitasnya bisa Anda minta ke
+  [mitra notaris/PPAT](/mitra?kategori=notaris). Jangan diabaikan; totalnya
+  bisa 5–8% harga rumah.
 
 Kuncinya: **bandingkan yang hilang dengan yang hilang** — sewa 100% hilang,
 sedangkan bunga KPR + biaya-biaya itulah "sewa" sesungguhnya dari KPR.
@@ -97,6 +100,13 @@ terbentuk terpisah dari dana DP.
 Setelah memutuskan, langkah berikutnya membandingkan hunian yang benar-benar
 ada — mulai dari [daftar rumah baru di berbagai kota](/cari), lengkap
 dengan tipe dan harga mulainya.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — ganti semua asumsi di artikel ini dengan angka gaji, DP, dan tenor Anda sendiri.
+- [Rumah di Karawang & sekitarnya](/cari?regionKode=32.15) — lihat harga mulai nyata di kota satelit sebelum memilih sewa atau cicilan.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — minta rincian biaya provisi, notaris, dan BPHTB sebelum akad.
+- [Gabung jadi agen Omahe](/gabung/agen) — kalau sisi sewa yang menarik buat Anda, dampingi pembeli lain sebagai agen (gratis).
 
 ---
 

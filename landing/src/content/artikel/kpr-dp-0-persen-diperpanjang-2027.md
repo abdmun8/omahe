@@ -168,11 +168,22 @@ lagi relevan; yang perlu dipastikan adalah apakah bank bisa memberi LTV
 5. **Jaga dana darurat** — DP 0% boleh mengosongkan uang muka, tidak
    boleh mengosongkan buffer.
 6. **Baru berburu unitnya** — kalau poin di atas aman, [telusuri
-   pilihan yang tersedia](/cari).
+   pilihan yang tersedia](/cari); beberapa proyek menandai programnya
+   secara terbuka — [contoh: Salihara Residence yang menandai program
+   tanpa DP](/perumahan/salihara-residence).
 
 Perpanjangan ini memberi waktu, bukan kepastian — kepastiannya tetap
 dibangun sendiri: profil kredit sehat, hitungan cicilan jujur, dan
-dana tunai yang disiapkan.
+dana tunai yang disiapkan. Program DP dari proyek-proyek mitra juga
+bisa dipantau [di halaman promo Omahe](/promo) agar tidak tertukar
+dengan aturan bank.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — bandingkan cicilan DP 0% vs 10% vs 20% dengan rentang bunga.
+- [Promo berjalan](/promo) — program DP dari proyek mitra, terpisah dari izin LTV bank.
+- [Contoh proyek: Salihara Residence](/perumahan/salihara-residence) — proyek yang menandai programnya secara terbuka.
+- [Pilihan yang tersedia](/cari) — berburu unit setelah angka tunai non-DP aman.
 
 ## Sumber
 

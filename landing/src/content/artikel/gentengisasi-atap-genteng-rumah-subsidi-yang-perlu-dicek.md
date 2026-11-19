@@ -164,6 +164,12 @@ kecukupan rangka sebagai bagian dari daftar pertanyaan Anda sejak
 survei — bukan baru saat serah terima. Bandingkan spesifikasi beberapa
 proyek di [pencarian Omahe](/cari) sebelum memutuskan.
 
+## Langkah berikutnya di Omahe
+
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — minta pengecekan rangka atap sebelum serah terima atau saat mengganti genteng.
+- [Rumah di bawah Rp200 juta](/cari?hargaMax=200000000) — bandingkan spesifikasi atap antarproyek rumah subsidi.
+- [Direktori developer](/developer) — lihat rekam jejak pengembang sebelum booking.
+
 ## Sumber
 
 - https://megapolitan.antaranews.com/berita/492622/prabowo-usulkan-gerakan-gentengisasi-nasional-gantikan-atap-seng

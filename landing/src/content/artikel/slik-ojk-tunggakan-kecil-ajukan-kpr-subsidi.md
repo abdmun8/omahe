@@ -162,8 +162,15 @@ kantor OJK atau mengajukan lewat pelapor SLIK (bank).
    2026](/artikel/kpr-flpp-2026-realisasi-dan-tenor), sampai ikatan
    setelah tanda tangan di artikel akad massal Desember di atas.
 6. **Bila profil Anda belum pas untuk subsidi**, pasar komersial lebih
-   lebar — [telusuri unit yang tersedia](/cari) dan cocokkan dengan
+   lebar — [telusuri unit yang tersedia](/cari), misalnya [pembanding
+   sekelas subsidi di bawah Rp400 juta](/cari?hargaMax=400000000), dan cocokkan dengan
    anggaran yang sehat.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — rasio cicilan tetap ujian utama bank, SLIK yang bersih pun bukan jaminan.
+- [Unit di bawah Rp400 juta](/cari?hargaMax=400000000) — pasar komersial sekelas subsidi yang lebih lebar.
+- [Daftar pencarian](/cari) — bandingkan unit dengan anggaran yang sehat.
 
 Dua penghalang KPR yang kerap dikeluhkan kini punya jawaban
 kebijakan: data kecil tak lagi memenuhi laporan, data lunas tak

@@ -30,7 +30,9 @@ ketat dan biaya yang berbeda. Ini bedahnya.
 1. **Rasio cicilan total sehat** — dua cicilan dihitung bersama;
    panduan aman: total tetap ≤ 40–45% penghasilan (lebih ketat dari
    cicilan tunggal 30–35%). Penghasilan tambahan yang bisa dibuktikan
-   (kontrak sewa, usaha ber-legal) membantu.
+   (kontrak sewa, usaha ber-legal) membantu — [jalur jasa seperti jadi
+   agen Omahe](/gabung/agen) bisa menambah arus kas, meski bank tetap
+   menilai penghasilan yang terdokumentasi.
 2. **DP lebih besar + dana biaya** — 20–30% + [biaya jual beli](/artikel/bphtb-pnbp-biaya-jual-beli)
    penuh dari kas, tidak bisa "ditumpangkan" ke KPR.
 3. **Tujuan jelas di aplikasi** — penghuni kedua vs investasi; berpengaruh
@@ -50,9 +52,17 @@ unitnya.
 ## Pilih unitnya seperti investor, bukan seperti penghuni
 
 Rumah kedua dinilai pasarnya, bukan selera Anda: lokasi penopang sewa,
-harga masuk akal dibanding [perbandingan perumahan](/cari) sekitar,
-dan legalitas bersih (cek [pertanyaan wajib ke developer](/artikel/sertifikat-rumah-baru-developer)).
+harga masuk akal dibanding [perbandingan perumahan](/cari) sekitar —
+bandingkan juga [tipe dan harga mulai satu proyek utuh](/perumahan/mutiara-village)
+sebagai kerangka — dan legalitas bersih (cek [pertanyaan wajib ke developer](/artikel/sertifikat-rumah-baru-developer)).
 Fundamental-nya dirangkum di [rumah sebagai aset](/artikel/rumah-sebagai-aset-kapan-mulai).
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — uji tiga layer cicilan sebelum mengajukan.
+- [Perbandingan perumahan](/cari) — harga mulai antarproyek sebagai patokan pasar.
+- [Contoh proyek: Mutiara Village](/perumahan/mutiara-village) — satu proyek utuh sebagai kerangka penilaian.
+- [Gabung jadi agen Omahe](/gabung/agen) — arus kas tambahan di sisi jasa, bukan cuma cicilan.
 
 ---
 

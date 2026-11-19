@@ -48,12 +48,14 @@ kecil lahir dari kalimat ini.
 Jasa notaris/PPAT di pasar bebas — ±0,5–1,25% harga. Untuk KPR, bank
 biasanya menunjuk rekanannya, tapi biaya tetap milik pembeli dan BOLEH
 ditanya rinciannya. Minta rincian tertulis: honorarium, cek sertifikat,
-balik nama, PNBP.
+balik nama, PNBP — atau bandingkan [mitra notaris/PPAT di direktori
+Omahe](/mitra?kategori=notaris) sebelum memutuskan.
 
 ## Rumah baru dari developer: baca surat pesanan
 
 Selain tabel di atas, rumah baru punya pos "biaya-biaya" di surat pesanan:
-BPHTB (kadang ditanggung developer dalam promo), administrasi, meterai,
+BPHTB (kadang ditanggung developer dalam [promo yang sedang berjalan](/promo)),
+administrasi, meterai,
 KPR prorasi bunga. Harga "harga bersih di lokasi" vs "harga kotor" bisa
 beda jutaan — selalu tanya total kas yang harus disiapkan sampai kunci.
 
@@ -69,6 +71,12 @@ Panduan kasar untuk rumah Rp500 juta (KPR, rumah pertama):
 Masukkan angka ini sejak awal ke rencana Anda — dan uji dulu berapa
 cicilan yang nyaman lewat [simulasi KPR](/kpr), sebelum jatuh cinta pada
 unit di [hasil pencarian](/cari).
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — minta rincian tertulis honorarium, cek sertifikat, dan balik nama.
+- [Promo berjalan](/promo) — cek program yang bisa menekan biaya masuk sebelum akad.
+- [Simulasi KPR](/kpr) — pastikan total kas (DP + biaya transaksi) masih masuk anggaran Anda.
 
 ---
 

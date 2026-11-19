@@ -142,7 +142,9 @@ dibandingkan dengan cicilan berikutnya.
   dan tunggakan](/artikel/slik-ojk-tunggakan-kecil-ajukan-kpr-subsidi)).
 - **Take over ke bank lain** yang menawarkan bunga promo bisa masuk
   akal, tapi hitung dulu seluruh biayanya: penalti pelunasan di bank
-  lama, provisi dan administrasi, appraisal, notaris/APHT, hingga
+  lama, provisi dan administrasi, appraisal, [notaris/APHT](/mitra?kategori=notaris)
+  (mitra notaris/PPAT bisa dibandingkan dari
+  direktori Omahe), hingga
   asuransi. Pindah hanya masuk akal bila total penghematan bunga
   melebihi total biaya pindah — prinsip hitung-biaya-dulu yang sama
   dengan [over KPR](/artikel/over-kpr-kapan-masuk-akal). Bila beban
@@ -180,6 +182,12 @@ Kenaikan 0,4–0,5 poin bukan alasan panik — tapi ia mengingatkan
 bahwa floating bergerak dua arah. Anggaran yang siap untuk kedua
 arah selalu lebih tenang: cek status Anda, pastikan autodebet aman,
 hitung ulang dengan angka Anda sendiri.
+
+## Langkah berikutnya di Omahe
+
+- [Simulasi KPR](/kpr) — hitung ulang cicilan versi bunga baru Anda.
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — salah satu pos biaya yang wajib masuk hitungan take over.
+- [Pilihan yang ada hari ini](/cari) — bagi calon pembeli: tanya floating sebelum akad, bukan sesudahnya.
 
 ## Sumber
 

@@ -29,12 +29,15 @@ lengkapnya.
 ## Biaya total yang sering lupa dihitung
 
 Kaveling murah di brosur + biaya bangun murni sering TIDAK lebih murah
-dari rumah jadi setelah ditambah: pengawasan (atau waktumu sendiri),
+dari rumah jadi setelah ditambah: pengawasan (atau [jasa tukang
+bangunan terverifikasi](/mitra?kategori=kontraktor), atau waktumu
+sendiri),
 [spek yang benar](/artikel/spesifikasi-bangunan-yang-sering-dikecilkan)
 (bukan versi hemat tukang), izin [PBG](/artikel/imb-pbg-izin-bangun),
 listrik-air sambungan baru, dan bunga selama masa bangun. Rumah jadi
 developer besar menikmati skala ekonomi material yang tidak bisa
-diraih rumah tunggal.
+diraih rumah tunggal — [bandingkan dulu profil
+developernya](/developer) sebelum memihak.
 
 ## Kaveling cocok bila…
 
@@ -72,6 +75,17 @@ diraih rumah tunggal.
 2. Siapa yang mengawasi? (tidak ada → rumah jadi).
 3. Apakah denah spesial benar-benar prioritas? (ya → kaveling).
 4. Berapa tolerance biaya meleset 15–20%? (tidak tahan → rumah jadi).
+
+Sebelum memilih, lihat dulu pilihan yang benar-benar ada: [daftar
+perumahan & unit tersedia](/cari) memuat rumah jadi dengan harga
+mulainya, dan uji keduanya di [simulasi KPR](/kpr).
+
+## Langkah berikutnya di Omahe
+
+- [Mitra kontraktor](/mitra?kategori=kontraktor) — pelaksana/pengawas bangunan yang jujur untuk opsi kaveling.
+- [Direktori developer](/developer) — rekam jejak yang membangun rumah jadi.
+- [Daftar perumahan & unit](/cari) — harga mulai rumah jadi sebagai pembanding RAB bangun sendiri.
+- [Simulasi KPR](/kpr) — bandingkan skema kaveling + bangun vs KPR rumah jadi.
 
 ---
 

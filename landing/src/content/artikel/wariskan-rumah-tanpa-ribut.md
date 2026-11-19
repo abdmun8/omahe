@@ -31,7 +31,9 @@ tau harus mulai dari mana. Artikel ini urutannya.
 ## Jalur resmi: ahli waris balik nama
 
 Dengan SKW + dokumen di atas, ahli waris mengajukan **pemecahan/
-pemindahtanganan hak karena warisan** ke BPN (via PPAT): satu rapor
+pemindahtanganan hak karena warisan** ke BPN via PPAT — [mitra
+notaris/PPAT di direktori Omahe](/mitra?kategori=notaris) bisa
+dibandingkan dari awal. Satu rapor
 menjadi nama para ahli waris (gamang? bisa satu nama ditunjuk dengan
 pernyataan kesepakatan tertulis), atau langsung dijual ke pihak ketiga
 dengan AJB warisan. Estimasi prosesnya beberapa bulan bila dokumen
@@ -41,7 +43,7 @@ lengkap — tanpa lengkap, bisa bertahun-tahun.
 
 | Peristiwa | Pajak | Dibayar siapa |
 | --- | --- | --- |
-| Mewarisi (balik nama) | BPHTB atas ahli waris (nilai pasar − NPOPTKP) | Ahli waris |
+| Mewarisi (balik nama) | BPHTB atas ahli waris (nilai pasar − NPOPTKP; nilai pasar bisa divalidasi [penilai publik KJPP](/mitra?kategori=kjpp)) | Ahli waris |
 | Menjual warisan | PPh final 2,5% × harga jual | Penjual (ahli waris) |
 | Rutin | PBB tahunan | Pemilik baru |
 
@@ -68,6 +70,13 @@ Sisanya persiapan yang menyenangkan: bila berencana membeli rumah
 untuk generasi berikutnya, mulai dari [daftar perumahan](/cari) dan
 pastikan cicilannya sehat di [simulasi KPR](/kpr) — warisan terbaik
 adalah aset yang tidak menjadi sumber konflik.
+
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — SKW, pemecahan hak, dan AJB warisan diurus rapi.
+- [Penilai publik (KJPP)](/mitra?kategori=kjpp) — nilai pasar untuk dasar BPHTB yang objektif.
+- [Daftar perumahan](/cari) — rumah baru dengan sertifikat jelas untuk generasi berikutnya.
+- [Simulasi KPR](/kpr) — pastikan cicilannya sehat supaya aset tidak jadi beban warisan.
 
 ---
 

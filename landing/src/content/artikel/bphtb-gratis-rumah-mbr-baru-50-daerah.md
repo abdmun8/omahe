@@ -176,6 +176,12 @@ bila rumah yang Anda bidik rumah subsidi. Masih memilih?
 [Telusuri perumahan dan unit yang tersedia](/cari) untuk melihat
 harga nyata hari ini.
 
+## Langkah berikutnya di Omahe
+
+- [Mitra notaris/PPAT](/mitra?kategori=notaris) — pastikan kewajiban BPHTB di daerah Anda sebelum akad.
+- [Rumah di bawah Rp200 juta](/cari?hargaMax=200000000) — bandingkan unit dengan rentang harga rumah subsidi.
+- [Simulasi KPR](/kpr) — hitung cicilan setelah biaya BPHTB diperhitungkan.
+
 ## Sumber
 
 - https://news.ddtc.co.id/berita/nasional/1823406/pbg-rp0-untuk-rumah-mbr-melonjak-pembebasan-bphtb-malah-stagnan

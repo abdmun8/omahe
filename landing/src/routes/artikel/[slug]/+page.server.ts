@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { amankanTautanArtikel, artikelTayang } from '$lib/artikel';
+import { fiturTerkaitArtikel } from '$lib/artikel-fitur';
 import { bacaArtikel, hariIniWib, metaArtikel, renderArtikelHtml } from '$lib/server/artikel';
 import type { EntryGenerator, PageServerLoad } from './$types';
 
@@ -30,13 +31,19 @@ export const load: PageServerLoad = ({ params }) => {
 	// Artikel terkait: 3 terbaru SE-TAG dulu (fallback lintas tag bila
 	// kurang) — dirender build-time, bukan runtime.
 	const lain = daftar.filter((x) => x.slug !== params.slug);
-	const terkait = [...lain.filter((x) => x.tag === daftar[i].tag), ...lain.filter((x) => x.tag !== daftar[i].tag)]
+	const terkait = [
+		...lain.filter((x) => x.tag === daftar[i].tag),
+		...lain.filter((x) => x.tag !== daftar[i].tag)
+	]
 		.slice(0, 3)
 		.map(metaArtikel);
 
 	return {
 		artikel: metaArtikel(daftar[i]),
 		html,
+		// "Fitur Omahe terkait" — dipilih dari FULL artikel (judul + isi) di
+		// server/build-time; kotaknya dirender statis ikut prerender.
+		fitur: fiturTerkaitArtikel(daftar[i]),
 		terkait,
 		// Daftar terurut terbaru dulu: indeks lebih besar = lebih lama.
 		sebelumnya: i + 1 < daftar.length ? metaArtikel(daftar[i + 1]) : null,

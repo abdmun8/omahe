@@ -64,8 +64,15 @@ menaikkan harga di akad (praktik ilegal dan berisiko).
   appraisal saat membeli second; uji dulu rasio cicilan di [simulasi
   KPR](/kpr) dengan plafon konservatif.
 
-Appraisal bukan musul yang menggagalkan deal — ia asuransi Anda dari
+Appraisal bukan musuh yang menggagalkan deal — ia asuransi Anda dari
 membayar terlalu mahal. Anggap ia teman di meja negosiasi.
+
+## Langkah berikutnya di Omahe
+
+- [Penilai publik (KJPP)](/mitra?kategori=kjpp) — pendapat kedua independen sebelum deal atau saat banding appraisal.
+- [Harga mulai antarproyek](/cari) — bangun intuisi kisaran wajar dari data yang sama.
+- [Contoh proyek: Citra Mulia Megah](/perumahan/citra-mulia-megah) — lihat tipe dan harga mulai yang bisa dibandingkan.
+- [Simulasi KPR](/kpr) — uji rasio cicilan dengan plafon konservatif.
 
 ---
 
